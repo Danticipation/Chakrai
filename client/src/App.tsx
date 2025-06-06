@@ -40,6 +40,8 @@ const AppLayout = () => {
   const [personalityMode, setPersonalityMode] = useState<string>('friend');
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
+  const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
+  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('iCrDUkL56s3C8sCRl7wb');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -206,6 +208,9 @@ const AppLayout = () => {
         const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
         const audioUrl = URL.createObjectURL(audioBlob);
         
+        // Store audio for replay functionality
+        setLastBotAudio(audioUrl);
+        
         // Try to play audio - handle browser restrictions
         const audio = new Audio(audioUrl);
         audio.volume = 1.0;
@@ -234,7 +239,7 @@ const AppLayout = () => {
         
         audio.onended = () => {
           console.log('🔊 Audio playback ended');
-          URL.revokeObjectURL(audioUrl);
+          // Don't revoke URL immediately - keep for replay
         };
       } catch (voiceError) {
         console.log('Voice synthesis unavailable');
@@ -402,6 +407,47 @@ const AppLayout = () => {
       setShowSettings(false);
     } catch (error) {
       console.error('Bot reset failed:', error);
+    }
+  };
+
+  const replayLastMessage = () => {
+    if (lastBotAudio && audioEnabled) {
+      const audio = new Audio(lastBotAudio);
+      audio.volume = 1.0;
+      audio.play().catch(err => {
+        console.error('Replay failed:', err);
+      });
+    } else if (lastBotAudio && !audioEnabled) {
+      setPendingAudio(lastBotAudio);
+    }
+  };
+
+  const readReflection = async () => {
+    if (!weeklySummary) return;
+    
+    try {
+      const audioResponse = await axios.post('/api/text-to-speech', { 
+        text: weeklySummary,
+        voiceId: selectedReflectionVoice
+      }, {
+        responseType: 'blob'
+      });
+      
+      const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      if (audioEnabled) {
+        const audio = new Audio(audioUrl);
+        audio.volume = 1.0;
+        audio.play().catch(err => {
+          console.error('Reflection reading failed:', err);
+        });
+        audio.onended = () => URL.revokeObjectURL(audioUrl);
+      } else {
+        setPendingAudio(audioUrl);
+      }
+    } catch (error) {
+      console.error('Failed to generate reflection audio:', error);
     }
   };
 
@@ -626,6 +672,15 @@ const AppLayout = () => {
                 >
                   {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                 </button>
+                {lastBotAudio && (
+                  <button
+                    onClick={replayLastMessage}
+                    className="p-3 rounded-full bg-purple-600 hover:bg-purple-700"
+                    title="Replay last response"
+                  >
+                    🔄
+                  </button>
+                )}
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
@@ -641,7 +696,34 @@ const AppLayout = () => {
       case 'reflect':
         return (
           <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
-            <h2 className="text-2xl font-bold mb-4">Weekly Reflection</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold">Weekly Reflection</h2>
+              <div className="flex items-center gap-3">
+                <select
+                  value={selectedReflectionVoice}
+                  onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                  className="px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                >
+                  <optgroup label="Female Voices">
+                    {voiceOptions.female.map(voice => (
+                      <option key={voice.id} value={voice.id}>{voice.name}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Male Voices">
+                    {voiceOptions.male.map(voice => (
+                      <option key={voice.id} value={voice.id}>{voice.name}</option>
+                    ))}
+                  </optgroup>
+                </select>
+                <button
+                  onClick={readReflection}
+                  disabled={!weeklySummary}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-sm font-medium"
+                >
+                  🔊 Read Aloud
+                </button>
+              </div>
+            </div>
             <div className="bg-zinc-800 rounded-lg p-6 flex-1 overflow-y-auto">
               <div className="text-zinc-300 whitespace-pre-wrap">
                 {weeklySummary}
