@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -45,6 +45,7 @@ const AppLayout = () => {
     { id: 'chat', icon: MessageCircle, label: 'Chat', emoji: '💬' },
     { id: 'reflect', icon: Brain, label: 'Reflect', emoji: '🔁' },
     { id: 'memory', icon: BookOpen, label: 'Memory', emoji: '📊' },
+    { id: 'progress', icon: Target, label: 'Progress', emoji: '📈' },
     { id: 'voice', icon: Mic, label: 'Voice', emoji: '🎤' },
     { id: 'settings', icon: User, label: 'Settings', emoji: '⚙️' }
   ];
@@ -64,7 +65,10 @@ const AppLayout = () => {
     { id: 'friend', name: 'Friend Mode', emoji: '😊', description: 'Casual conversation and friendly banter' },
     { id: 'counsel', name: 'Counsel Mode', emoji: '🧭', description: 'Advice and guidance for decisions' },
     { id: 'study', name: 'Study Mode', emoji: '📚', description: 'Research and learning assistance' },
-    { id: 'diary', name: 'Diary Mode', emoji: '💭', description: 'Listening and emotional support' }
+    { id: 'diary', name: 'Diary Mode', emoji: '💭', description: 'Listening and emotional support' },
+    { id: 'goal', name: 'Goal-Setting Mode', emoji: '🎯', description: 'Track progress and achieve milestones' },
+    { id: 'wellness', name: 'Wellness Mode', emoji: '🌱', description: 'Mental health and mindfulness support' },
+    { id: 'creative', name: 'Creative Mode', emoji: '🎨', description: 'Brainstorming and creative inspiration' }
   ];
 
   useEffect(() => {
@@ -262,7 +266,7 @@ const AppLayout = () => {
             {/* Personality Mode Selector */}
             <div className="mb-4">
               <h3 className="text-sm font-medium text-zinc-400 mb-2">Personality Mode</h3>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                 {personalityModes.map((mode) => (
                   <button
                     key={mode.id}
@@ -275,9 +279,9 @@ const AppLayout = () => {
                   >
                     <div className="flex items-center space-x-2">
                       <span className="text-lg">{mode.emoji}</span>
-                      <div>
-                        <div className="font-medium text-sm">{mode.name}</div>
-                        <div className="text-xs opacity-70">{mode.description}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{mode.name}</div>
+                        <div className="text-xs opacity-70 truncate">{mode.description}</div>
                       </div>
                     </div>
                   </button>
@@ -359,6 +363,107 @@ const AppLayout = () => {
         return (
           <div className="p-6 max-w-4xl mx-auto">
             <MemoryDashboard userId={1} />
+          </div>
+        );
+
+      case 'progress':
+        return (
+          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col space-y-6">
+            <h2 className="text-2xl font-bold mb-4">Progress Tracking</h2>
+            
+            {/* Goal Setting Section */}
+            <div className="bg-zinc-800 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-emerald-400 flex items-center">
+                <span className="mr-2">🎯</span>
+                Active Goals
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Sample goals - these would be user-defined */}
+                <div className="bg-zinc-700/50 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-medium">Learn 50 new words this week</h4>
+                    <span className="text-sm text-zinc-400">85% complete</span>
+                  </div>
+                  <div className="w-full bg-zinc-600 rounded-full h-3">
+                    <div className="bg-gradient-to-r from-blue-500 to-emerald-500 h-3 rounded-full transition-all duration-500" style={{ width: '85%' }}></div>
+                  </div>
+                  <div className="text-xs text-zinc-400 mt-1">42 / 50 words learned</div>
+                </div>
+
+                <div className="bg-zinc-700/50 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-medium">Daily reflection practice</h4>
+                    <span className="text-sm text-zinc-400">7 day streak</span>
+                  </div>
+                  <div className="w-full bg-zinc-600 rounded-full h-3">
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500" style={{ width: '100%' }}></div>
+                  </div>
+                  <div className="text-xs text-zinc-400 mt-1">Completed today ✓</div>
+                </div>
+
+                <div className="bg-zinc-700/50 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-medium">Creative project brainstorming</h4>
+                    <span className="text-sm text-zinc-400">3 sessions this month</span>
+                  </div>
+                  <div className="w-full bg-zinc-600 rounded-full h-3">
+                    <div className="bg-gradient-to-r from-orange-500 to-yellow-500 h-3 rounded-full transition-all duration-500" style={{ width: '60%' }}></div>
+                  </div>
+                  <div className="text-xs text-zinc-400 mt-1">3 / 5 sessions completed</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Wellness Tracking */}
+            <div className="bg-zinc-800 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-green-400 flex items-center">
+                <span className="mr-2">🌱</span>
+                Wellness Metrics
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-zinc-700/50 p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-green-400">7</div>
+                  <div className="text-sm text-zinc-400">Mindful conversations</div>
+                  <div className="text-xs text-zinc-500 mt-1">This week</div>
+                </div>
+                
+                <div className="bg-zinc-700/50 p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-blue-400">5</div>
+                  <div className="text-sm text-zinc-400">Stress management sessions</div>
+                  <div className="text-xs text-zinc-500 mt-1">This month</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Achievement Milestones */}
+            <div className="bg-zinc-800 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-yellow-400 flex items-center">
+                <span className="mr-2">🏆</span>
+                Recent Achievements
+              </h3>
+              
+              <div className="space-y-3">
+                <div className="flex items-center p-3 bg-zinc-700/50 rounded-lg">
+                  <span className="text-2xl mr-3">🎯</span>
+                  <div>
+                    <div className="font-medium">Goal Setter</div>
+                    <div className="text-sm text-zinc-400">Set your first personal goal</div>
+                  </div>
+                  <div className="ml-auto text-xs text-zinc-500">2 days ago</div>
+                </div>
+                
+                <div className="flex items-center p-3 bg-zinc-700/50 rounded-lg">
+                  <span className="text-2xl mr-3">🧠</span>
+                  <div>
+                    <div className="font-medium">Reflective Thinker</div>
+                    <div className="text-sm text-zinc-400">Completed 5 reflection sessions</div>
+                  </div>
+                  <div className="ml-auto text-xs text-zinc-500">1 week ago</div>
+                </div>
+              </div>
+            </div>
           </div>
         );
       
