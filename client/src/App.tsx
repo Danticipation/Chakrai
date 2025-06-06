@@ -558,7 +558,18 @@ const AppLayout = () => {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Say something..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                    if (e.key === 'Escape') {
+                      // Audio test shortcut
+                      e.preventDefault();
+                      testAudio();
+                    }
+                  }}
+                  placeholder="Say something... (ESC to test audio)"
                   className="flex-1 p-3 rounded-2xl bg-zinc-800 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
