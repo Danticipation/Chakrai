@@ -331,9 +331,9 @@ const AppLayout = () => {
 
       case 'reflect':
         return (
-          <div className="p-6 max-w-4xl mx-auto">
+          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
             <h2 className="text-2xl font-bold mb-4">Weekly Reflection</h2>
-            <div className="bg-zinc-800 rounded-lg p-6">
+            <div className="bg-zinc-800 rounded-lg p-6 flex-1 overflow-y-auto">
               <div className="text-zinc-300 whitespace-pre-wrap">
                 {weeklySummary}
               </div>

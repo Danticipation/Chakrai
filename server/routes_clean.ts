@@ -53,20 +53,160 @@ function extractFacts(message: string): string[] {
   const facts: string[] = [];
   const lowerMessage = message.toLowerCase();
   
-  if (lowerMessage.includes('my name is')) {
-    const nameMatch = message.match(/my name is (\w+)/i);
-    if (nameMatch) facts.push(`User's name is ${nameMatch[1]}`);
+  // Only extract specific, meaningful facts - not general conversation
+  
+  // Name information
+  if (lowerMessage.includes('my name is') || lowerMessage.includes('call me')) {
+    const nameMatch = message.match(/(?:my name is|call me)\s+(\w+)/i);
+    if (nameMatch && nameMatch[1].length > 1) {
+      facts.push(`Name: ${nameMatch[1]}`);
+    }
   }
   
-  if (lowerMessage.includes('i work') || lowerMessage.includes('my job')) {
-    facts.push(`Work/career related: ${message}`);
+  // Age information
+  const ageMatch = message.match(/(\d+)\s+years?\s+old/i);
+  if (ageMatch) {
+    facts.push(`Age: ${ageMatch[1]} years old`);
   }
   
-  if (lowerMessage.includes('i live') || lowerMessage.includes('i am from')) {
-    facts.push(`Location related: ${message}`);
+  // Location - be specific
+  if (lowerMessage.includes('live in') || lowerMessage.includes('from ')) {
+    const locationMatch = message.match(/(?:live in|from)\s+([A-Z][a-zA-Z\s]+)/i);
+    if (locationMatch && locationMatch[1].trim().length > 2) {
+      facts.push(`Location: ${locationMatch[1].trim()}`);
+    }
   }
   
-  return facts.slice(0, 3);
+  // Occupation - specific job titles
+  if (lowerMessage.includes('work as') || lowerMessage.includes('job is')) {
+    const jobMatch = message.match(/(?:work as|job is)\s+(?:a |an )?([a-zA-Z\s]+)/i);
+    if (jobMatch && jobMatch[1].trim().length > 3) {
+      facts.push(`Occupation: ${jobMatch[1].trim()}`);
+    }
+  }
+  
+  // Pets with names
+  if (lowerMessage.includes('have a') && (lowerMessage.includes('cat') || lowerMessage.includes('dog'))) {
+    const petMatch = message.match(/have a\s+(cat|dog)[^.]*?(?:named|called)\s+(\w+)/i);
+    if (petMatch) {
+      facts.push(`Pet: ${petMatch[1]} named ${petMatch[2]}`);
+    }
+  }
+  
+  // Family status
+  if (lowerMessage.includes('married') || lowerMessage.includes('have kids') || lowerMessage.includes('children')) {
+    if (lowerMessage.includes('married')) facts.push('Marital status: Married');
+    if (lowerMessage.includes('kids') || lowerMessage.includes('children')) facts.push('Has children');
+  }
+  
+  // Education
+  if (lowerMessage.includes('graduated from') || lowerMessage.includes('studied at')) {
+    const eduMatch = message.match(/(?:graduated from|studied at)\s+([A-Z][a-zA-Z\s]+)/i);
+    if (eduMatch) {
+      facts.push(`Education: ${eduMatch[1].trim()}`);
+    }
+  }
+  
+  return facts.slice(0, 2); // Limit to most important facts
+}
+
+// Incremental reflection system - builds upon previous reflections every 25 words
+async function updateIncrementalReflection(userId: number, botId: number): Promise<void> {
+  try {
+    const memories = await storage.getUserMemories(userId);
+    const facts = await storage.getUserFacts(userId);
+    const messages = await storage.getMessages(botId);
+    const learnedWords = await storage.getLearnedWords(botId);
+    
+    // Get recent conversations (last 10 messages)
+    const recentMessages = messages.slice(-10);
+    const userMessages = recentMessages.filter(m => m.sender === 'user').map(m => m.text);
+    const botMessages = recentMessages.filter(m => m.sender === 'bot').map(m => m.text);
+    
+    // Get existing reflection to build upon
+    const existingReflection = memories.find(m => m.category === 'weekly_reflection');
+    
+    const prompt = `You are creating an incremental reflection update. ${existingReflection ? 'Build upon and enhance the existing reflection below rather than replacing it.' : 'Create a new comprehensive reflection.'}
+
+${existingReflection ? `EXISTING REFLECTION TO BUILD UPON:
+${existingReflection.memory}
+
+---
+
+` : ''}RECENT CONVERSATION DATA:
+User messages: ${userMessages.join(' | ')}
+Bot responses: ${botMessages.join(' | ')}
+Known facts: ${facts.map(f => f.fact).join(', ')}
+Total words learned: ${learnedWords.length}
+
+${existingReflection ? 
+'TASK: Enhance and expand the existing reflection above with new insights from recent conversations. Add depth, new observations, and connections while preserving the valuable content already there. Build upon previous insights rather than starting over.' : 
+'TASK: Create a comprehensive reflection on the user\'s personality, communication style, interests, and growth patterns based on all conversations.'
+}
+
+Focus on:
+- Personality insights and communication patterns
+- Emotional themes and growth areas
+- Interests and values expressed
+- Conversation dynamics and relationship development
+- Learning and development patterns
+
+Write as a thoughtful, empathetic AI companion who has been observing and learning about this person. Be specific and insightful, not generic.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: 'You are an empathetic AI creating thoughtful reflections on user interactions.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 800,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const updatedReflection = data.choices[0].message.content;
+
+    // Update or create the reflection
+    if (existingReflection) {
+      // Delete old reflection and create updated one
+      await storage.clearUserMemories(userId);
+      // Restore non-reflection memories
+      for (const memory of memories) {
+        if (memory.category !== 'weekly_reflection') {
+          await storage.createUserMemory({
+            userId,
+            memory: memory.memory,
+            category: memory.category,
+            importance: memory.importance
+          });
+        }
+      }
+    }
+
+    // Store the new/updated reflection
+    await storage.createUserMemory({
+      userId,
+      memory: updatedReflection,
+      category: 'weekly_reflection',
+      importance: 'high'
+    });
+
+    console.log('Incremental reflection updated successfully');
+  } catch (error) {
+    console.error('Failed to update incremental reflection:', error);
+    throw error;
+  }
 }
 
 // Enhanced AI response generation with advanced intelligence
@@ -297,6 +437,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get updated word count and stage
       const updatedWords = await storage.getLearnedWords(bot.id);
       const stage = getStageFromWordCount(updatedWords.length);
+      
+      // Check if we need to update reflection (every 25 words)
+      const shouldUpdateReflection = updatedWords.length % 25 === 0 && updatedWords.length > 0;
+      
+      if (shouldUpdateReflection) {
+        try {
+          await updateIncrementalReflection(userId, bot.id);
+        } catch (reflectionError) {
+          console.log('Reflection update failed:', reflectionError);
+        }
+      }
 
       res.json({
         response: aiResponse,
@@ -304,7 +455,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         wordsLearned: updatedWords.length,
         newWordsThisMessage: keywords.filter(word => 
           !existingWords.some(existing => existing.word.toLowerCase() === word.toLowerCase())
-        )
+        ),
+        reflectionUpdated: shouldUpdateReflection
       });
 
     } catch (error) {
