@@ -187,7 +187,25 @@ const AppLayout = () => {
       }]);
       
       try {
-        await axios.post('/api/text-to-speech', { text: res.data.response });
+        const audioResponse = await axios.post('/api/text-to-speech', { 
+          text: res.data.response 
+        }, {
+          responseType: 'blob'
+        });
+        
+        // Create audio blob and play it
+        const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        
+        audio.play().catch(audioError => {
+          console.log('Audio playback failed:', audioError);
+        });
+        
+        // Clean up the URL after playing
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+        };
       } catch (voiceError) {
         console.log('Voice synthesis unavailable');
       }
