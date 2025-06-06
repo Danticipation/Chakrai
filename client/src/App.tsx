@@ -797,37 +797,61 @@ const AppLayout = () => {
             
             <div className="space-y-6">
               <div>
-                <h4 className="font-semibold mb-3">Voice Selection ({voiceOptions.female.length + voiceOptions.male.length} voices)</h4>
+                <h4 className="font-semibold mb-3">Voice Selection - 11 Available Voices</h4>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-zinc-400 mb-2">Female Voices</p>
+                    <p className="text-sm text-zinc-400 mb-2">Female Voices ({voiceOptions.female.length})</p>
                     <div className="space-y-2">
-                      {voiceOptions.female.map((voice) => (
-                        <button
-                          key={voice.id}
-                          onClick={() => selectVoice(voice.id)}
-                          className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
-                        >
-                          <div className="font-medium">{voice.name}</div>
-                          <div className="text-sm text-zinc-400">{voice.description}</div>
-                        </button>
-                      ))}
+                      <button onClick={() => selectVoice('iCrDUkL56s3C8sCRl7wb')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Hope</div>
+                        <div className="text-sm text-zinc-400">Warm, soothing, captivating American female</div>
+                      </button>
+                      <button onClick={() => selectVoice('FA6HhUjVbervLw2rNl8M')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Ophelia</div>
+                        <div className="text-sm text-zinc-400">Calm, articulate British female</div>
+                      </button>
+                      <button onClick={() => selectVoice('Xb7hH8MSUJpSbSDYk0k2')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Alice</div>
+                        <div className="text-sm text-zinc-400">Confident, friendly British female</div>
+                      </button>
+                      <button onClick={() => selectVoice('pFZP5JQG7iQjIQuC4Bku')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Lily</div>
+                        <div className="text-sm text-zinc-400">Warm, engaging British female</div>
+                      </button>
+                      <button onClick={() => selectVoice('EXAVITQu4vr4xnSDxMaL')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Sarah</div>
+                        <div className="text-sm text-zinc-400">Soft, gentle American female</div>
+                      </button>
+                      <button onClick={() => selectVoice('21m00Tcm4TlvDq8ikWAM')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Rachel</div>
+                        <div className="text-sm text-zinc-400">Calm, professional American female</div>
+                      </button>
                     </div>
                   </div>
                   
                   <div>
-                    <p className="text-sm text-zinc-400 mb-2">Male Voices</p>
+                    <p className="text-sm text-zinc-400 mb-2">Male Voices ({voiceOptions.male.length})</p>
                     <div className="space-y-2">
-                      {voiceOptions.male.map((voice) => (
-                        <button
-                          key={voice.id}
-                          onClick={() => selectVoice(voice.id)}
-                          className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
-                        >
-                          <div className="font-medium">{voice.name}</div>
-                          <div className="text-sm text-zinc-400">{voice.description}</div>
-                        </button>
-                      ))}
+                      <button onClick={() => selectVoice('pNInz6obpgDQGcFmaJgB')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Adam</div>
+                        <div className="text-sm text-zinc-400">Deep, resonant American male</div>
+                      </button>
+                      <button onClick={() => selectVoice('ErXwobaYiN019PkySvjV')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Antoni</div>
+                        <div className="text-sm text-zinc-400">Well-rounded American male</div>
+                      </button>
+                      <button onClick={() => selectVoice('VR6AewLTigWG4xSOukaG')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Arnold</div>
+                        <div className="text-sm text-zinc-400">Crisp, authoritative American male</div>
+                      </button>
+                      <button onClick={() => selectVoice('TxGEqnHWrfWFTfGW9XjX')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Josh</div>
+                        <div className="text-sm text-zinc-400">Deep, serious American male</div>
+                      </button>
+                      <button onClick={() => selectVoice('yoZ06aMxZJJ28mfd3POQ')} className="w-full text-left p-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div className="font-medium">Sam</div>
+                        <div className="text-sm text-zinc-400">Raspy, casual American male</div>
+                      </button>
                     </div>
                   </div>
                 </div>
