@@ -797,7 +797,7 @@ const AppLayout = () => {
             
             <div className="space-y-6">
               <div>
-                <h4 className="font-semibold mb-3">Voice Selection</h4>
+                <h4 className="font-semibold mb-3">Voice Selection ({voiceOptions.female.length + voiceOptions.male.length} voices)</h4>
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-zinc-400 mb-2">Female Voices</p>
