@@ -126,32 +126,32 @@ async function updateIncrementalReflection(userId: number, botId: number): Promi
     // Get existing reflection to build upon
     const existingReflection = memories.find(m => m.category === 'weekly_reflection');
     
-    const prompt = `You are creating an incremental reflection update. ${existingReflection ? 'Build upon and enhance the existing reflection below rather than replacing it.' : 'Create a new comprehensive reflection.'}
+    const prompt = `You are creating an incremental reflection update after a conversation. ${existingReflection ? 'Intelligently enhance the existing reflection with fresh insights from this latest conversation.' : 'Create a thoughtful initial reflection.'}
 
-${existingReflection ? `EXISTING REFLECTION TO BUILD UPON:
+${existingReflection ? `EXISTING REFLECTION:
 ${existingReflection.memory}
 
 ---
 
-` : ''}RECENT CONVERSATION DATA:
-User messages: ${userMessages.join(' | ')}
-Bot responses: ${botMessages.join(' | ')}
-Known facts: ${facts.map(f => f.fact).join(', ')}
-Total words learned: ${learnedWords.length}
+` : ''}LATEST CONVERSATION:
+Recent user messages: ${userMessages.slice(-3).join(' | ')}
+Recent bot responses: ${botMessages.slice(-3).join(' | ')}
+Current known facts: ${facts.map(f => f.fact).join(', ')}
+Bot development stage: ${learnedWords.length} words learned
 
 ${existingReflection ? 
-'TASK: Enhance and expand the existing reflection above with new insights from recent conversations. Add depth, new observations, and connections while preserving the valuable content already there. Build upon previous insights rather than starting over.' : 
-'TASK: Create a comprehensive reflection on the user\'s personality, communication style, interests, and growth patterns based on all conversations.'
+'TASK: Thoughtfully integrate new insights from this latest conversation into the existing reflection. Look for:\n- New personality traits or behavioral patterns revealed\n- Shifts in mood, interests, or communication style\n- Deeper understanding of existing themes\n- New connections between past and present interactions\n\nEnhance the reflection meaningfully without just adding fluff. If this conversation didn\'t reveal significant new insights, make subtle refinements to existing observations.' : 
+'TASK: Create an initial comprehensive reflection on this user based on our conversations so far.'
 }
 
-Focus on:
-- Personality insights and communication patterns
-- Emotional themes and growth areas
-- Interests and values expressed
-- Conversation dynamics and relationship development
-- Learning and development patterns
+Focus on genuine insights:
+- Authentic personality observations from actual interactions
+- Communication patterns and emotional expressions
+- Interests, values, and goals that emerge naturally
+- Relationship dynamics and trust building
+- Growth, learning, or changes over time
 
-Write as a thoughtful, empathetic AI companion who has been observing and learning about this person. Be specific and insightful, not generic.`;
+Write as an empathetic AI who notices meaningful details about this specific person. Be insightful and personal, not generic.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -438,15 +438,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedWords = await storage.getLearnedWords(bot.id);
       const stage = getStageFromWordCount(updatedWords.length);
       
-      // Check if we need to update reflection (every 25 words)
-      const shouldUpdateReflection = updatedWords.length % 25 === 0 && updatedWords.length > 0;
-      
-      if (shouldUpdateReflection) {
-        try {
-          await updateIncrementalReflection(userId, bot.id);
-        } catch (reflectionError) {
-          console.log('Reflection update failed:', reflectionError);
-        }
+      // Update reflection after every conversation
+      let reflectionUpdated = false;
+      try {
+        await updateIncrementalReflection(userId, bot.id);
+        reflectionUpdated = true;
+        console.log('Reflection updated after conversation');
+      } catch (reflectionError) {
+        console.log('Reflection update failed:', reflectionError);
       }
 
       res.json({
@@ -456,7 +455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newWordsThisMessage: keywords.filter(word => 
           !existingWords.some(existing => existing.word.toLowerCase() === word.toLowerCase())
         ),
-        reflectionUpdated: shouldUpdateReflection
+        reflectionUpdated
       });
 
     } catch (error) {
