@@ -374,6 +374,30 @@ const AppLayout = () => {
               </div>
             </div>
 
+            {/* Audio Debug Controls - Always Visible */}
+            <div className="mb-4 p-3 bg-red-900/30 border border-red-500 rounded-lg">
+              <div className="text-sm text-red-200 mb-2">Audio Debug Panel</div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={testAudio}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                >
+                  Test Audio
+                </button>
+                {!audioEnabled && (
+                  <button
+                    onClick={enableAudio}
+                    className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+                  >
+                    Enable Audio
+                  </button>
+                )}
+                <span className="text-xs text-zinc-400">
+                  Audio: {audioEnabled ? 'ON' : 'OFF'} | Pending: {pendingAudio ? 'YES' : 'NO'}
+                </span>
+              </div>
+            </div>
+
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto space-y-3 pr-2 bg-zinc-800/50 rounded-lg p-4">
               {messages.map((msg, index) => (
