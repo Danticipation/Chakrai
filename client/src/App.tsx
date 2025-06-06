@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MessageCircle, Brain, BookOpen, Mic, User, MicOff, Square, Send, Bot, BarChart3, FileText, Calendar, Clock, Volume2, VolumeX, Heart, Star, Zap, RotateCcw } from 'lucide-react';
 import axios from 'axios';
 import WhisperRecorder from './components/WhisperRecorder';
 import MemoryDashboard from './components/MemoryDashboard';
@@ -25,10 +26,13 @@ interface Message {
   time: string;
 }
 
-const AppComponent = () => {
+const AppLayout = () => {
+  const [activeSection, setActiveSection] = useState('chat');
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [input, setInput] = useState('');
   const [botStats, setBotStats] = useState<BotStats | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [weeklySummary, setWeeklySummary] = useState<string>('');
   const [showReflection, setShowReflection] = useState(false);
@@ -36,6 +40,16 @@ const AppComponent = () => {
   const [showVoiceSelector, setShowVoiceSelector] = useState(false);
   const [showUserSwitch, setShowUserSwitch] = useState(false);
   const [newUserName, setNewUserName] = useState('');
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  const sections = [
+    { id: 'chat', icon: MessageCircle, label: 'Chat', emoji: '💬' },
+    { id: 'insights', icon: Brain, label: 'Insights', emoji: '🧠' },
+    { id: 'knowledge', icon: BookOpen, label: 'Knowledge', emoji: '📘' },
+    { id: 'voice', icon: Mic, label: 'Voice', emoji: '🎤' },
+    { id: 'profile', icon: User, label: 'Profile', emoji: '👤' }
+  ];
 
   useEffect(() => {
     axios.get('/api/stats?userId=1')
@@ -52,6 +66,70 @@ const AppComponent = () => {
       .then(res => setWeeklySummary(res.data.summary))
       .catch(() => setWeeklySummary('No reflections available yet.'));
   }, []);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(chunksRef.current, { type: 'audio/wav' });
+        await sendAudioToWhisper(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      alert('Could not access microphone. Please check permissions.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  const sendAudioToWhisper = async (audioBlob: Blob) => {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.wav');
+
+    try {
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTranscript(data.text || 'Transcription completed');
+        setInput(data.text || '');
+      } else {
+        throw new Error('Server not available');
+      }
+    } catch (error) {
+      console.error('Transcription error:', error);
+    }
+  };
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -120,210 +198,218 @@ const AppComponent = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white font-sans flex flex-col">
-      {/* Header */}
-      <div className="p-6 bg-gradient-to-r from-slate-800/80 to-gray-800/80 backdrop-blur-sm shadow-lg border-b border-slate-700/50">
-        <div className="flex justify-between items-center max-w-6xl mx-auto">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
-              Reflectibot
-            </h1>
-            <p className="text-slate-400 text-sm font-medium">Your evolving AI companion</p>
-          </div>
-          {botStats && (
-            <div className="text-right">
-              <div className="flex gap-4">
-                <div className="bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-slate-600/50 shadow-lg">
-                  <div className="text-emerald-400 font-bold text-lg">Level {botStats.level}</div>
-                  <div className="text-slate-400 text-xs font-medium">{botStats.stage}</div>
-                </div>
-                <div className="bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-slate-600/50 shadow-lg">
-                  <div className="text-blue-400 font-bold text-lg">{botStats.wordsLearned}</div>
-                  <div className="text-slate-400 text-xs font-medium">words learned</div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Chat History */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-4xl mx-auto">
-          {messages.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-full flex items-center justify-center">
-                <div className="text-4xl">🤖</div>
-              </div>
-              <h2 className="text-2xl font-bold text-slate-200 mb-3">Welcome to Reflectibot!</h2>
-              <p className="text-slate-400 max-w-md mx-auto mb-2">Start a conversation and watch me learn from you.</p>
-              <p className="text-slate-500 text-sm">I'll speak my responses and adapt to your style over time.</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {messages.map((msg, idx) => (
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'chat':
+        return (
+          <div className="flex flex-col h-full relative p-4">
+            {/* Chat messages */}
+            <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+              {messages.map((msg, index) => (
                 <div
-                  key={idx}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  key={index}
+                  className={`p-3 max-w-[75%] rounded-2xl shadow ${
+                    msg.sender === 'user'
+                      ? 'bg-blue-600 text-white ml-auto'
+                      : 'bg-zinc-700 text-white mr-auto'
+                  }`}
                 >
-                  <div className={`rounded-2xl p-4 max-w-lg shadow-lg ${
-                    msg.sender === 'user' 
-                      ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white' 
-                      : 'bg-slate-800/80 backdrop-blur-sm border border-slate-700/50'
-                  }`}>
-                    <p className="text-sm leading-relaxed">{msg.text}</p>
-                    <p className="text-xs opacity-60 mt-2">{msg.time}</p>
-                  </div>
+                  <p>{msg.text}</p>
+                  <span className="text-xs opacity-70">{msg.time}</span>
                 </div>
               ))}
               {loading && (
-                <div className="flex justify-start">
-                  <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-4 shadow-lg">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
-                    </div>
+                <div className="bg-zinc-700 text-white mr-auto p-3 max-w-[75%] rounded-2xl">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                   </div>
                 </div>
               )}
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Input & Actions */}
-      <div className="border-t border-slate-700/50 bg-slate-800/30 backdrop-blur-sm">
-        <div className="p-6 max-w-6xl mx-auto">
-          <div className="flex gap-3 items-end mb-4">
-            <input
-              type="text"
-              placeholder="Share your thoughts..."
-              className="flex-1 bg-slate-800/80 border border-slate-600/50 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-              disabled={loading}
-            />
-            <button
-              onClick={() => setShowVoiceSelector(true)}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-3 rounded-xl font-medium transition-all shadow-lg"
-              title="Change Lily's Voice"
-            >
-              🎤
-            </button>
-            <button
-              onClick={sendMessage}
-              disabled={loading || !input.trim()}
-              className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 disabled:from-slate-600 disabled:to-slate-700 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg"
-            >
-              {loading ? 'Sending...' : 'Send'}
-            </button>
-          </div>
-          
-          {/* Voice Selection Button */}
-          <div className="mb-4">
-            <button
-              onClick={() => setShowVoiceSelector(true)}
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-6 rounded-xl font-medium transition-all shadow-lg"
-            >
-              🎤 Change Lily's Voice
-            </button>
-          </div>
+            {/* Input area */}
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  placeholder="Say something..."
+                  className="flex-1 p-3 rounded-2xl bg-zinc-800 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={toggleRecording}
+                  className={`p-3 rounded-full transition-all ${
+                    isRecording 
+                      ? 'bg-red-600 hover:bg-red-700' 
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                >
+                  {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                </button>
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || loading}
+                  className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
 
-          {/* Voice Recorder */}
-          <div className="mb-4">
-            <WhisperRecorder 
-              onTranscription={(text) => {
-                // Add voice input to chat history
-                const userMessage: Message = {
-                  sender: 'user',
-                  text: text,
-                  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                };
-                setMessages(prev => [...prev, userMessage]);
-              }} 
-              onResponse={(response) => {
-                // Add bot response to chat history
-                const botMessage: Message = {
-                  sender: 'bot',
-                  text: response,
-                  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                };
-                setMessages(prev => [...prev, botMessage]);
-              }} 
-            />
-          </div>
-
-          {/* Action Buttons - Updated Layout */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            <button 
-              onClick={() => setShowMemory(!showMemory)}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-2 rounded-lg text-xs font-medium"
-            >
-              🧠 Memory
-            </button>
-            <button 
-              onClick={() => setShowReflection(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-2 rounded-lg text-xs font-medium"
-            >
-              📘 Reflection
-            </button>
-            <button 
-              onClick={() => setShowVoiceSelector(true)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-2 rounded-lg text-xs font-medium"
-            >
-              🎤 Voice
-            </button>
-          </div>
-          <div className="grid grid-cols-1 gap-2 mb-3">
-            <button 
-              onClick={() => setShowUserSwitch(!showUserSwitch)}
-              className="bg-amber-600 hover:bg-amber-700 text-white px-2 py-2 rounded-lg text-xs font-medium"
-            >
-              👤 Switch User
-            </button>
-          </div>
-          
-          <div className="text-xs text-slate-500 text-center">
-            Press Enter to send
-          </div>
-        </div>
-      </div>
-
-      {/* Weekly Reflection Modal */}
-      {showReflection && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 max-w-2xl w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-slate-200">🎙️ Voice Selection</h3>
-              <button 
-                onClick={() => setShowReflection(false)}
-                className="text-slate-400 hover:text-white"
-              >
-                ✕
-              </button>
+              {/* Quick actions */}
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <button
+                  onClick={() => setShowReflection(true)}
+                  className="py-2 px-3 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
+                >
+                  🔁 Reflect
+                </button>
+                <button
+                  onClick={() => setShowMemory(true)}
+                  className="py-2 px-3 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
+                >
+                  📊 Memory
+                </button>
+                <button
+                  onClick={() => setShowVoiceSelector(true)}
+                  className="py-2 px-3 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
+                >
+                  🎤 Voice
+                </button>
+              </div>
             </div>
-            <VoiceSelector 
-              userId={1} 
-              onVoiceChange={(voice) => {
-                console.log('Voice changed to:', voice.name);
-              }}
-            />
+          </div>
+        );
+      
+      case 'insights':
+        return (
+          <div className="p-6 space-y-6">
+            <h2 className="text-2xl font-bold">Insights & Analytics</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-zinc-800 p-4 rounded-lg">
+                <h3 className="font-semibold mb-2">Learning Progress</h3>
+                <p className="text-zinc-400">Stage: {botStats?.stage || 'Loading...'}</p>
+                <p className="text-zinc-400">Words: {botStats?.wordsLearned || 0}</p>
+              </div>
+              <div className="bg-zinc-800 p-4 rounded-lg">
+                <h3 className="font-semibold mb-2">Conversation Stats</h3>
+                <p className="text-zinc-400">Messages: {messages.length}</p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 'knowledge':
+        return (
+          <div className="p-6">
+            <MemoryDashboard userId={1} />
+          </div>
+        );
+      
+      case 'voice':
+        return (
+          <div className="p-6">
+            <VoiceSelector />
+          </div>
+        );
+      
+      case 'profile':
+        return (
+          <div className="p-6 space-y-6">
+            <h2 className="text-2xl font-bold">Profile Settings</h2>
+            <div className="space-y-4">
+              <div className="bg-zinc-800 p-4 rounded-lg">
+                <h3 className="font-semibold mb-2">User Information</h3>
+                <button
+                  onClick={() => setShowUserSwitch(true)}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                >
+                  Switch User
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      
+      default:
+        return <div>Select a section</div>;
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-zinc-900 text-white">
+      {/* Sidebar */}
+      <div className="w-20 bg-zinc-800 border-r border-zinc-700 flex flex-col items-center py-6 space-y-4">
+        {sections.map((section) => {
+          const Icon = section.icon;
+          return (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
+              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110 ${
+                activeSection === section.id
+                  ? 'bg-blue-600 shadow-lg shadow-blue-600/20'
+                  : 'bg-zinc-700 hover:bg-zinc-600'
+              }`}
+              title={section.label}
+            >
+              <span className="text-2xl">{section.emoji}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
+        <div className="h-16 bg-zinc-800 border-b border-zinc-700 flex items-center justify-between px-6">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-bold">Reflectibot</h1>
+            <div className="text-sm text-zinc-400 capitalize">
+              {sections.find(s => s.id === activeSection)?.label}
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span className="text-sm text-zinc-400">Connected</span>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-hidden">
+          {renderContent()}
+        </div>
+      </div>
+
+      {/* Modals */}
+      {showReflection && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full max-h-96 overflow-y-auto">
+            <h3 className="text-lg font-bold mb-4">Weekly Reflection</h3>
+            <div className="text-sm text-zinc-300 whitespace-pre-wrap">
+              {weeklySummary}
+            </div>
+            <button
+              onClick={() => setShowReflection(false)}
+              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
 
-      {/* Memory Dashboard */}
       {showMemory && (
-        <div className="bg-slate-800/50 backdrop-blur-sm border-t border-slate-700/50 p-6">
-          <div className="max-w-6xl mx-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-zinc-800 rounded-lg p-6 max-w-2xl w-full max-h-96 overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-slate-200">Memory Dashboard</h3>
-              <button 
+              <h3 className="text-lg font-bold">Memory Dashboard</h3>
+              <button
                 onClick={() => setShowMemory(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-zinc-400 hover:text-white"
               >
                 ✕
               </button>
@@ -333,58 +419,50 @@ const AppComponent = () => {
         </div>
       )}
 
-      {/* Voice Selector Modal */}
       {showVoiceSelector && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-slate-200">Voice Selection</h3>
-              <button 
+              <h3 className="text-lg font-bold">Voice Settings</h3>
+              <button
                 onClick={() => setShowVoiceSelector(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-zinc-400 hover:text-white"
               >
                 ✕
               </button>
             </div>
-            <VoiceSelector 
-              userId={1} 
-              onVoiceChange={(voice) => {
-                console.log('Voice changed to:', voice.name);
-                // Voice change will be handled automatically by the component
-              }}
-            />
+            <VoiceSelector />
           </div>
         </div>
       )}
 
-      {/* User Switch Modal */}
       {showUserSwitch && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold text-purple-400 mb-4">Switch User Identity</h3>
-            <p className="text-slate-400 mb-4">Clear all memories and start fresh with a new user identity.</p>
-            <div className="flex gap-2">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-bold mb-4">Switch User</h3>
+            <div className="space-y-4">
               <input
                 type="text"
                 value={newUserName}
                 onChange={(e) => setNewUserName(e.target.value)}
                 placeholder="Enter new user name"
-                className="flex-1 bg-slate-700/80 border border-slate-600/50 rounded-lg px-3 py-2 text-white placeholder-slate-400"
-                onKeyPress={(e) => e.key === 'Enter' && switchUser()}
+                className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400"
               />
-              <button 
-                onClick={switchUser}
-                disabled={!newUserName.trim()}
-                className="bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 text-white px-4 py-2 rounded-lg"
-              >
-                Switch
-              </button>
-              <button 
-                onClick={() => setShowUserSwitch(false)}
-                className="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg"
-              >
-                Cancel
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={switchUser}
+                  disabled={!newUserName.trim()}
+                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded transition-colors"
+                >
+                  Switch
+                </button>
+                <button
+                  onClick={() => setShowUserSwitch(false)}
+                  className="flex-1 py-2 bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -393,12 +471,10 @@ const AppComponent = () => {
   );
 };
 
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppComponent />
+      <AppLayout />
     </QueryClientProvider>
   );
 }
-
-export default App;
