@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, MicOff, Square, Send, Bot, BarChart3, FileText, Calendar, Clock, Volume2, VolumeX, Heart, Star, Zap, RotateCcw } from 'lucide-react';
 import axios from 'axios';
+import WhisperRecorder from './components/WhisperRecorder';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 
@@ -28,6 +29,7 @@ interface Message {
 const AppLayout = () => {
   const [activeSection, setActiveSection] = useState('chat');
   const [isRecording, setIsRecording] = useState(false);
+  const [transcript, setTranscript] = useState('');
   const [input, setInput] = useState('');
   const [botStats, setBotStats] = useState<BotStats | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -35,8 +37,10 @@ const AppLayout = () => {
   const [weeklySummary, setWeeklySummary] = useState<string>('');
   const [showReflection, setShowReflection] = useState(false);
   const [showMemory, setShowMemory] = useState(false);
+  const [showVoiceSelector, setShowVoiceSelector] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [newUserName, setNewUserName] = useState('');
+  const [showVoiceMenu, setShowVoiceMenu] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -47,17 +51,6 @@ const AppLayout = () => {
     { id: 'voice', icon: Mic, label: 'Voice', emoji: '🎤' },
     { id: 'profile', icon: User, label: 'Profile', emoji: '👤' }
   ];
-
-  const voiceOptions = {
-    male: [
-      { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam', description: 'Deep and mature' },
-      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm and encouraging' }
-    ],
-    female: [
-      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily', description: 'Gentle and caring' },
-      { id: 'FA6HhUjVbervLw2rNl8M', name: 'Ophelia', description: 'Expressive and dynamic' }
-    ]
-  };
 
   useEffect(() => {
     axios.get('/api/stats?userId=1')
@@ -129,7 +122,10 @@ const AppLayout = () => {
 
       if (response.ok) {
         const data = await response.json();
+        setTranscript(data.text || 'Transcription completed');
         setInput(data.text || '');
+      } else {
+        throw new Error('Server not available');
       }
     } catch (error) {
       console.error('Transcription error:', error);
@@ -155,12 +151,14 @@ const AppLayout = () => {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
       
+      // Speak the response
       try {
         await axios.post('/api/text-to-speech', { text: res.data.response });
       } catch (voiceError) {
         console.log('Voice synthesis unavailable');
       }
       
+      // Update stats
       setBotStats(prev => prev ? {
         ...prev,
         wordsLearned: res.data.wordsLearned || prev.wordsLearned,
@@ -177,6 +175,17 @@ const AppLayout = () => {
       }]);
     }
     setLoading(false);
+  };
+
+  const voiceOptions = {
+    male: [
+      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm and encouraging' },
+      { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam', description: 'Deep and mature' }
+    ],
+    female: [
+      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily', description: 'Gentle and caring' },
+      { id: 'FA6HhUjVbervLw2rNl8M', name: 'Ophelia', description: 'Expressive and dynamic' }
+    ]
   };
 
   const switchUser = async () => {
@@ -203,7 +212,7 @@ const AppLayout = () => {
   const selectVoice = async (voiceId: string) => {
     try {
       await axios.post('/api/voice/set', { voiceId });
-      setShowSettings(false);
+      setShowVoiceMenu(false);
     } catch (error) {
       console.error('Voice selection failed:', error);
     }
@@ -225,6 +234,7 @@ const AppLayout = () => {
       case 'chat':
         return (
           <div className="flex flex-col h-full relative p-4">
+            {/* Chat messages */}
             <div className="flex-1 overflow-y-auto space-y-3 pr-2">
               {messages.map((msg, index) => (
                 <div
@@ -250,6 +260,7 @@ const AppLayout = () => {
               )}
             </div>
 
+            {/* Input area */}
             <div className="mt-4 space-y-3">
               <div className="flex items-center space-x-2">
                 <input
@@ -279,6 +290,7 @@ const AppLayout = () => {
                 </button>
               </div>
 
+              {/* Quick actions */}
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <button
                   onClick={() => setShowReflection(true)}
@@ -360,24 +372,30 @@ const AppLayout = () => {
 
   return (
     <div className="flex h-screen bg-zinc-900 text-white">
+      {/* Sidebar */}
       <div className="w-20 bg-zinc-800 border-r border-zinc-700 flex flex-col items-center py-6 space-y-4">
-        {sections.map((section) => (
-          <button
-            key={section.id}
-            onClick={() => setActiveSection(section.id)}
-            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110 ${
-              activeSection === section.id
-                ? 'bg-blue-600 shadow-lg shadow-blue-600/20'
-                : 'bg-zinc-700 hover:bg-zinc-600'
-            }`}
-            title={section.label}
-          >
-            <span className="text-2xl">{section.emoji}</span>
-          </button>
-        ))}
+        {sections.map((section) => {
+          const Icon = section.icon;
+          return (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
+              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110 ${
+                activeSection === section.id
+                  ? 'bg-blue-600 shadow-lg shadow-blue-600/20'
+                  : 'bg-zinc-700 hover:bg-zinc-600'
+              }`}
+              title={section.label}
+            >
+              <span className="text-2xl">{section.emoji}</span>
+            </button>
+          );
+        })}
       </div>
 
+      {/* Main Content */}
       <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
         <div className="h-16 bg-zinc-800 border-b border-zinc-700 flex items-center justify-between px-6">
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-bold">Reflectibot</h1>
@@ -391,11 +409,13 @@ const AppLayout = () => {
           </div>
         </div>
 
+        {/* Content Area */}
         <div className="flex-1 overflow-hidden">
           {renderContent()}
         </div>
       </div>
 
+      {/* Modals */}
       {showReflection && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full max-h-96 overflow-y-auto">
@@ -430,6 +450,23 @@ const AppLayout = () => {
         </div>
       )}
 
+      {showVoiceSelector && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">Voice Settings</h3>
+              <button
+                onClick={() => setShowVoiceSelector(false)}
+                className="text-zinc-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <VoiceSelector />
+          </div>
+        </div>
+      )}
+
       {showSettings && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full max-h-96 overflow-y-auto">
@@ -444,6 +481,7 @@ const AppLayout = () => {
             </div>
             
             <div className="space-y-6">
+              {/* Voice Selection */}
               <div>
                 <h4 className="font-semibold mb-3">Voice Selection</h4>
                 <div className="space-y-3">
@@ -481,6 +519,7 @@ const AppLayout = () => {
                 </div>
               </div>
 
+              {/* User Management */}
               <div>
                 <h4 className="font-semibold mb-3">User Management</h4>
                 <input
@@ -499,6 +538,7 @@ const AppLayout = () => {
                 </button>
               </div>
 
+              {/* Bot Reset */}
               <div>
                 <h4 className="font-semibold mb-3">Bot Management</h4>
                 <button
