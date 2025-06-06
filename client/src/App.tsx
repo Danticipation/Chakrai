@@ -417,6 +417,34 @@ const AppLayout = () => {
               </div>
             )}
 
+            {/* Audio Test Section */}
+            <div className="mb-4 p-3 bg-zinc-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-zinc-300">Audio Testing & Control</span>
+                <div className="flex items-center space-x-2">
+                  {!audioEnabled && (
+                    <button
+                      onClick={enableAudio}
+                      className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+                      title="Enable audio responses"
+                    >
+                      🔊 Enable Audio
+                    </button>
+                  )}
+                  <button
+                    onClick={testAudio}
+                    className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                    title="Test audio playback"
+                  >
+                    🎵 Test Audio
+                  </button>
+                  {audioEnabled && (
+                    <span className="text-xs text-green-400">Audio Enabled</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Input Area */}
             <div className="mt-4">
               <div className="flex items-center space-x-2">
@@ -427,22 +455,6 @@ const AppLayout = () => {
                   placeholder="Say something..."
                   className="flex-1 p-3 rounded-2xl bg-zinc-800 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                {!audioEnabled && (
-                  <button
-                    onClick={enableAudio}
-                    className="p-3 rounded-full bg-green-600 hover:bg-green-700 transition-all"
-                    title="Enable audio responses"
-                  >
-                    🔊
-                  </button>
-                )}
-                <button
-                  onClick={testAudio}
-                  className="p-3 rounded-full bg-purple-600 hover:bg-purple-700 transition-all"
-                  title="Test audio playback"
-                >
-                  🎵
-                </button>
                 <button
                   onClick={toggleRecording}
                   className={`p-3 rounded-full transition-all ${
