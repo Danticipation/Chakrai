@@ -736,7 +736,35 @@ const AppLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-zinc-900 text-white">
+    <div className="flex h-screen bg-zinc-900 text-white relative">
+      {/* Audio Debug Overlay - Always Visible */}
+      <div className="fixed top-4 right-4 z-50 bg-red-900/90 border border-red-500 rounded-lg p-3 backdrop-blur-sm">
+        <div className="text-xs text-red-200 mb-2">Audio Debug</div>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={testAudio}
+            className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm font-medium"
+          >
+            Test Audio
+          </button>
+          {!audioEnabled && (
+            <button
+              onClick={enableAudio}
+              className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm font-medium"
+            >
+              Enable Audio
+            </button>
+          )}
+          <div className="text-xs text-zinc-300">
+            Audio: {audioEnabled ? 'ON' : 'OFF'}
+          </div>
+          {pendingAudio && (
+            <div className="text-xs text-yellow-300">
+              Pending: YES
+            </div>
+          )}
+        </div>
+      </div>
       <div className="w-20 bg-zinc-800 border-r border-zinc-700 flex flex-col items-center py-6 space-y-4">
         {sections.map((section) => (
           <button
