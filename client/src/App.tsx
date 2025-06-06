@@ -199,48 +199,34 @@ const AppLayout = () => {
         const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
         const audioUrl = URL.createObjectURL(audioBlob);
         
-        // Try to play audio with user interaction unlock
+        // Try to play audio - handle browser restrictions
         const audio = new Audio(audioUrl);
         audio.volume = 1.0;
         
-        console.log('Creating audio element with URL:', audioUrl);
-        console.log('Audio ready state:', audio.readyState);
+        console.log('🔊 Creating audio element:', {
+          url: audioUrl,
+          audioEnabled,
+          browserUserAgent: navigator.userAgent.includes('Firefox') ? 'Firefox' : 'Other'
+        });
         
-        // First try direct play
-        const playAttempt = audio.play();
+        // Attempt to play immediately
+        const playPromise = audio.play();
         
-        if (playAttempt !== undefined) {
-          playAttempt.then(() => {
-            console.log('✓ Audio playing successfully');
-            setAudioEnabled(true);
-          }).catch(audioError => {
-            console.error('❌ Audio blocked:', audioError.name);
-            
-            // If blocked, create user interaction to unlock
-            if (audioError.name === 'NotAllowedError') {
-              setPendingAudio(audioUrl);
-              
-              // Create click handler to unlock audio
-              const unlockAudio = () => {
-                console.log('Attempting to unlock audio...');
-                const testAudio = new Audio(audioUrl);
-                testAudio.play().then(() => {
-                  console.log('✓ Audio unlocked and playing');
-                  setAudioEnabled(true);
-                  setPendingAudio(null);
-                }).catch(e => console.error('Still blocked:', e));
-                document.removeEventListener('click', unlockAudio);
-              };
-              
-              document.addEventListener('click', unlockAudio, { once: true });
-              console.log('Click anywhere to enable audio');
-            }
-          });
-        } else {
-          console.error('Audio play() returned undefined');
-        }
+        playPromise.then(() => {
+          console.log('✅ Audio playing successfully');
+          setAudioEnabled(true);
+        }).catch(error => {
+          console.log('❌ Audio blocked by browser:', error.name, error.message);
+          
+          // Always show unlock button when blocked
+          setPendingAudio(audioUrl);
+          
+          // For debugging
+          console.log('Setting pendingAudio to show unlock button');
+        });
         
         audio.onended = () => {
+          console.log('🔊 Audio playback ended');
           URL.revokeObjectURL(audioUrl);
         };
       } catch (voiceError) {
@@ -584,18 +570,18 @@ const AppLayout = () => {
                 Audio: {audioEnabled ? 'ON' : 'OFF'} | Pending: {pendingAudio ? 'YES' : 'NO'}
               </div>
               
-              {/* Audio Unlock Button */}
-              {pendingAudio && (
+              {/* Audio Unlock Button - Always show if not enabled */}
+              {(!audioEnabled || pendingAudio) && (
                 <div className="mt-3 p-3 bg-yellow-600/20 border border-yellow-500/30 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-yellow-200">
-                      Browser blocked audio playback
+                      {pendingAudio ? 'Click to enable voice responses' : 'Audio disabled - click to enable'}
                     </div>
                     <button
                       onClick={enableAudio}
-                      className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm rounded-lg transition-colors"
+                      className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm rounded-lg transition-colors font-medium"
                     >
-                      Enable Audio
+                      🔊 Enable Audio
                     </button>
                   </div>
                 </div>
