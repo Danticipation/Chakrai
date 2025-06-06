@@ -208,7 +208,8 @@ const AppLayout = () => {
         const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
         const audioUrl = URL.createObjectURL(audioBlob);
         
-        // Store audio for replay functionality
+        // Store audio for replay functionality - force update
+        console.log('📦 Storing audio for replay:', audioUrl);
         setLastBotAudio(audioUrl);
         
         // Try to play audio - handle browser restrictions
@@ -218,6 +219,7 @@ const AppLayout = () => {
         console.log('🔊 Creating audio element:', {
           url: audioUrl,
           audioEnabled,
+          lastBotAudio: audioUrl,
           browserUserAgent: navigator.userAgent.includes('Firefox') ? 'Firefox' : 'Other'
         });
         
@@ -672,15 +674,14 @@ const AppLayout = () => {
                 >
                   {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                 </button>
-                {lastBotAudio && (
-                  <button
-                    onClick={replayLastMessage}
-                    className="p-3 rounded-full bg-purple-600 hover:bg-purple-700"
-                    title="Replay last response"
-                  >
-                    🔄
-                  </button>
-                )}
+                <button
+                  onClick={replayLastMessage}
+                  className={`p-3 rounded-full ${lastBotAudio ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 opacity-50'}`}
+                  title={lastBotAudio ? "Replay last response" : "No audio to replay"}
+                  disabled={!lastBotAudio}
+                >
+                  🔄
+                </button>
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}

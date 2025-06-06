@@ -9,12 +9,20 @@ import { detectIntent, generateResponseStrategy, type ConversationContext } from
 import { analyzeMemoryImportance, type MemoryAnalysis } from "./memoryImportance.js";
 import { extractTimeContext, generateTimeBasedContext, shouldPrioritizeMemory } from "./timestampLabeling.js";
 import { selectVoiceForMood, getVoiceSettings } from "./dynamicVoice.js";
+import { baseVoices, getVoiceById, defaultVoiceId } from "./voiceConfig.js";
 import { generateLoopbackSummary, formatSummaryForDisplay, type SummaryContext } from "./loopbackSummary.js";
-import { setupVite } from "./vite.js";
+import express from "express";
+import path from "path";
+import multer from "multer";
+import fs from "fs";
+import ffmpeg from "fluent-ffmpeg";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+// Configure multer for audio uploads
+const upload = multer({ dest: 'uploads/' });
 
 // Learning stage tracker
 function getStageFromWordCount(wordCount: number): string {
@@ -30,55 +38,185 @@ function getNextStageThreshold(wordCount: number): number {
   if (wordCount < 25) return 25;
   if (wordCount < 50) return 50;
   if (wordCount < 100) return 100;
-  return 1000;
+  return 150;
 }
 
-// Extract meaningful words from text
 function extractKeywords(text: string): string[] {
-  const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their', 'this', 'that', 'these', 'those']);
-  
   return text.toLowerCase()
-    .replace(/[^\w\s]/g, ' ')
+    .replace(/[^\w\s]/g, '')
     .split(/\s+/)
-    .filter(word => word.length > 2 && !stopWords.has(word))
+    .filter(word => word.length > 2)
     .slice(0, 10);
 }
 
-// Extract facts from user messages
 function extractFacts(message: string): string[] {
-  const facts = [];
-  const patterns = [
-    /i am (a |an |the )?([^.!?]+)/gi,
-    /i work (as |at |in |for )?([^.!?]+)/gi,
-    /i live (in |at |near )?([^.!?]+)/gi,
-    /i like ([^.!?]+)/gi,
-    /i don't like ([^.!?]+)/gi,
-    /my ([^.!?]+)/gi,
-    /i have ([^.!?]+)/gi
-  ];
+  const facts: string[] = [];
+  const lowerMessage = message.toLowerCase();
   
-  for (const pattern of patterns) {
-    const matches = [...message.matchAll(pattern)];
-    for (const match of matches) {
-      if (match[0] && match[0].trim().length > 5) {
-        facts.push(match[0].trim());
-      }
+  // Only extract specific, meaningful facts - not general conversation
+  
+  // Name information
+  if (lowerMessage.includes('my name is') || lowerMessage.includes('call me')) {
+    const nameMatch = message.match(/(?:my name is|call me)\s+(\w+)/i);
+    if (nameMatch && nameMatch[1].length > 1) {
+      facts.push(`Name: ${nameMatch[1]}`);
     }
   }
   
-  return facts.slice(0, 3);
+  // Age information
+  const ageMatch = message.match(/(\d+)\s+years?\s+old/i);
+  if (ageMatch) {
+    facts.push(`Age: ${ageMatch[1]} years old`);
+  }
+  
+  // Location - be specific
+  if (lowerMessage.includes('live in') || lowerMessage.includes('from ')) {
+    const locationMatch = message.match(/(?:live in|from)\s+([A-Z][a-zA-Z\s]+)/i);
+    if (locationMatch && locationMatch[1].trim().length > 2) {
+      facts.push(`Location: ${locationMatch[1].trim()}`);
+    }
+  }
+  
+  // Occupation - specific job titles
+  if (lowerMessage.includes('work as') || lowerMessage.includes('job is')) {
+    const jobMatch = message.match(/(?:work as|job is)\s+(?:a |an )?([a-zA-Z\s]+)/i);
+    if (jobMatch && jobMatch[1].trim().length > 3) {
+      facts.push(`Occupation: ${jobMatch[1].trim()}`);
+    }
+  }
+  
+  // Pets with names
+  if (lowerMessage.includes('have a') && (lowerMessage.includes('cat') || lowerMessage.includes('dog'))) {
+    const petMatch = message.match(/have a\s+(cat|dog)[^.]*?(?:named|called)\s+(\w+)/i);
+    if (petMatch) {
+      facts.push(`Pet: ${petMatch[1]} named ${petMatch[2]}`);
+    }
+  }
+  
+  // Family status
+  if (lowerMessage.includes('married') || lowerMessage.includes('have kids') || lowerMessage.includes('children')) {
+    if (lowerMessage.includes('married')) facts.push('Marital status: Married');
+    if (lowerMessage.includes('kids') || lowerMessage.includes('children')) facts.push('Has children');
+  }
+  
+  // Education
+  if (lowerMessage.includes('graduated from') || lowerMessage.includes('studied at')) {
+    const eduMatch = message.match(/(?:graduated from|studied at)\s+([A-Z][a-zA-Z\s]+)/i);
+    if (eduMatch) {
+      facts.push(`Education: ${eduMatch[1].trim()}`);
+    }
+  }
+  
+  return facts.slice(0, 2); // Limit to most important facts
 }
 
-// Generate AI response with memory context
+// Incremental reflection system - builds upon previous reflections every 25 words
+async function updateIncrementalReflection(userId: number, botId: number): Promise<void> {
+  try {
+    const memories = await storage.getUserMemories(userId);
+    const facts = await storage.getUserFacts(userId);
+    const messages = await storage.getMessages(botId);
+    const learnedWords = await storage.getLearnedWords(botId);
+    
+    // Get recent conversations (last 10 messages)
+    const recentMessages = messages.slice(-10);
+    const userMessages = recentMessages.filter(m => m.sender === 'user').map(m => m.text);
+    const botMessages = recentMessages.filter(m => m.sender === 'bot').map(m => m.text);
+    
+    // Get existing reflection to build upon
+    const existingReflection = memories.find(m => m.category === 'weekly_reflection');
+    
+    const prompt = `You are creating an incremental reflection update after a conversation. ${existingReflection ? 'Intelligently enhance the existing reflection with fresh insights from this latest conversation.' : 'Create a thoughtful initial reflection.'}
+
+${existingReflection ? `EXISTING REFLECTION:
+${existingReflection.memory}
+
+---
+
+` : ''}LATEST CONVERSATION:
+Recent user messages: ${userMessages.slice(-3).join(' | ')}
+Recent bot responses: ${botMessages.slice(-3).join(' | ')}
+Current known facts: ${facts.map(f => f.fact).join(', ')}
+Bot development stage: ${learnedWords.length} words learned
+
+${existingReflection ? 
+'TASK: Thoughtfully integrate new insights from this latest conversation into the existing reflection. Look for:\n- New personality traits or behavioral patterns revealed\n- Shifts in mood, interests, or communication style\n- Deeper understanding of existing themes\n- New connections between past and present interactions\n\nEnhance the reflection meaningfully without just adding fluff. If this conversation didn\'t reveal significant new insights, make subtle refinements to existing observations.' : 
+'TASK: Create an initial comprehensive reflection on this user based on our conversations so far.'
+}
+
+Focus on genuine insights:
+- Authentic personality observations from actual interactions
+- Communication patterns and emotional expressions
+- Interests, values, and goals that emerge naturally
+- Relationship dynamics and trust building
+- Growth, learning, or changes over time
+
+Write as an empathetic AI who notices meaningful details about this specific person. Be insightful and personal, not generic.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: 'You are an empathetic AI creating thoughtful reflections on user interactions.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 800,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const updatedReflection = data.choices[0].message.content;
+
+    // Update or create the reflection
+    if (existingReflection) {
+      // Delete old reflection and create updated one
+      await storage.clearUserMemories(userId);
+      // Restore non-reflection memories
+      for (const memory of memories) {
+        if (memory.category !== 'weekly_reflection') {
+          await storage.createUserMemory({
+            userId,
+            memory: memory.memory,
+            category: memory.category,
+            importance: memory.importance
+          });
+        }
+      }
+    }
+
+    // Store the new/updated reflection
+    await storage.createUserMemory({
+      userId,
+      memory: updatedReflection,
+      category: 'weekly_reflection',
+      importance: 'high'
+    });
+
+    console.log('Incremental reflection updated successfully');
+  } catch (error) {
+    console.error('Failed to update incremental reflection:', error);
+    throw error;
+  }
+}
+
+// Enhanced AI response generation with advanced intelligence
 async function generateResponse(userMessage: string, botId: number, userId: number): Promise<string> {
   try {
-    // Get stored memories and facts
     const memories = await storage.getUserMemories(userId);
     const facts = await storage.getUserFacts(userId);
     const learnedWords = await storage.getLearnedWords(botId);
     const recentMessages = await storage.getMessages(botId);
     
-    // Determine learning stage
     const stage = getStageFromWordCount(learnedWords.length);
     
     // Extract time context for enhanced understanding
@@ -133,7 +271,7 @@ Stage behaviors:
 Respond naturally according to your developmental stage and the detected intent. Show emotional intelligence and contextual awareness based on the conversation analysis. Reference your stored knowledge appropriately.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      model: "gpt-4o",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage }
@@ -152,157 +290,15 @@ Respond naturally according to your developmental stage and the detected intent.
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
+  const router = Router();
 
-  // WebSocket for real-time updates
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
-  
-  wss.on('connection', (ws) => {
-    console.log('WebSocket client connected');
-    
-    ws.on('message', async (data) => {
-      try {
-        const message = JSON.parse(data.toString());
-        
-        if (message.type === 'chat') {
-          // Broadcast to all clients for real-time updates
-          wss.clients.forEach(client => {
-            if (client.readyState === client.OPEN) {
-              client.send(JSON.stringify({
-                type: 'message',
-                data: message.data
-              }));
-            }
-          });
-        }
-      } catch (error) {
-        console.error('WebSocket message error:', error);
-      }
-    });
-    
-    ws.on('close', () => {
-      console.log('WebSocket client disconnected');
-    });
-  });
-
-  // Memory API - Save new facts
-  app.post('/api/memory/save', async (req, res) => {
+  // Chat endpoint with enhanced intelligence
+  router.post('/api/chat', async (req, res) => {
     try {
-      const { userId, text, type = 'fact' } = req.body;
-      
-      if (!userId || !text) {
-        return res.status(400).json({ error: 'userId and text required' });
-      }
+      const { message, botId, personalityMode } = req.body;
+      const userId = 1; // Default user for demo
 
-      if (type === 'fact') {
-        const fact = await storage.createUserFact({
-          userId,
-          fact: text,
-          category: 'user_input',
-          confidence: 'high'
-        });
-        res.json({ success: true, fact });
-      } else {
-        const memory = await storage.createUserMemory({
-          userId,
-          memory: text,
-          category: 'conversation',
-          importance: 'medium'
-        });
-        res.json({ success: true, memory });
-      }
-    } catch (error) {
-      console.error('Memory save error:', error);
-      res.status(500).json({ error: 'Failed to save memory' });
-    }
-  });
-
-  // Memory API - Get facts by user ID
-  app.get('/api/memory/get/:userId', async (req, res) => {
-    try {
-      const userId = parseInt(req.params.userId);
-      const memories = await storage.getUserMemories(userId);
-      const facts = await storage.getUserFacts(userId);
-      
-      res.json({
-        memories: memories.map(m => ({
-          id: m.id,
-          text: m.memory,
-          timestamp: m.createdAt,
-          type: 'memory'
-        })),
-        facts: facts.map(f => ({
-          id: f.id,
-          text: f.fact,
-          timestamp: f.createdAt,
-          type: 'fact'
-        }))
-      });
-    } catch (error) {
-      console.error('Memory get error:', error);
-      res.status(500).json({ error: 'Failed to retrieve memories' });
-    }
-  });
-
-  // Create or get bot
-  app.post('/api/bot', async (req, res) => {
-    try {
-      const { userId = 1 } = req.body;
-      
-      let bot = await storage.getBotByUserId(userId);
-      if (!bot) {
-        bot = await storage.createBot({
-          userId,
-          name: "Reflectibot",
-          level: 1,
-          wordsLearned: 0,
-          personalityTraits: { curiosity: 5, empathy: 3, playfulness: 4 }
-        });
-      }
-      
-      res.json(bot);
-    } catch (error) {
-      console.error('Bot creation error:', error);
-      res.status(500).json({ error: 'Failed to create bot' });
-    }
-  });
-
-  // Get bot info with learning progress
-  app.get('/api/bot/:id', async (req, res) => {
-    try {
-      const botId = parseInt(req.params.id);
-      const bot = await storage.getBot(botId);
-      
-      if (!bot) {
-        return res.status(404).json({ error: 'Bot not found' });
-      }
-      
-      const learnedWords = await storage.getLearnedWords(botId);
-      const memories = await storage.getUserMemories(bot.userId);
-      const facts = await storage.getUserFacts(bot.userId);
-      
-      res.json({
-        ...bot,
-        stage: getStageFromWordCount(learnedWords.length),
-        wordsLearned: learnedWords.length,
-        memoriesStored: memories.length,
-        factsKnown: facts.length
-      });
-    } catch (error) {
-      console.error('Bot get error:', error);
-      res.status(500).json({ error: 'Failed to get bot' });
-    }
-  });
-
-  // Conversation Engine - Main chat endpoint
-  app.post('/api/chat', async (req, res) => {
-    try {
-      const { message, userId = 1 } = req.body;
-      
-      if (!message) {
-        return res.status(400).json({ error: 'message required' });
-      }
-
-      // Handle voice commands
+      // Handle voice commands first
       const lowerMessage = message.toLowerCase().trim();
       if (lowerMessage === 'list voices') {
         return res.json({
@@ -312,7 +308,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (lowerMessage.startsWith('set voice ')) {
         const voiceName = lowerMessage.replace('set voice ', '');
-        const { baseVoices } = await import('./voiceConfig.js');
         const voice = baseVoices.find(v => v.name.toLowerCase() === voiceName);
         
         if (voice) {
@@ -332,1148 +327,585 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      const bot = await storage.getBotByUserId(userId);
+      // Get or create bot with previous progress
+      let bot = await storage.getBotByUserId(userId);
       if (!bot) {
-        return res.status(404).json({ error: 'Bot not found' });
+        bot = await storage.createBot({
+          userId,
+          name: "Reflectibot",
+          level: 4, // Adolescent stage
+          wordsLearned: 57
+        });
+
+        // Initialize with some learned words to reflect previous progress
+        const progressWords = [
+          "hello", "conversation", "learning", "mirror", "personality", "growth", "curious", "development",
+          "words", "talking", "interesting", "questions", "thoughts", "feelings", "experiences", "memories",
+          "understanding", "communication", "knowledge", "wisdom", "reflection", "progress", "evolution",
+          "intelligence", "awareness", "consciousness", "perception", "insights", "discoveries", "connections",
+          "relationships", "emotions", "empathy", "compassion", "creativity", "imagination", "inspiration",
+          "motivation", "goals", "aspirations", "dreams", "hopes", "future", "past", "present", "time",
+          "space", "reality", "truth", "meaning", "purpose", "significance", "importance", "value", "worth",
+          "potential", "possibilities", "opportunities", "challenges", "obstacles", "solutions"
+        ];
+
+        for (const word of progressWords) {
+          await storage.createOrUpdateWord({
+            botId: bot.id,
+            word,
+            frequency: Math.floor(Math.random() * 5) + 1
+          });
+        }
+
+        // Initialize with previous conversation facts and memories
+        await storage.createUserFact({
+          userId,
+          fact: "User has a cat named Whiskers",
+          category: "pets"
+        });
+
+        await storage.createUserFact({
+          userId,
+          fact: "User experiences work stress",
+          category: "emotional_state"
+        });
+
+        await storage.createUserMemory({
+          userId,
+          memory: "Had a conversation about work stress and the user's cat Whiskers provided comfort",
+          category: "emotional_support"
+        });
+
+        await storage.createUserMemory({
+          userId,
+          memory: "User is testing the advanced voice and memory capabilities of the bot",
+          category: "interaction_context"
+        });
       }
 
-      // Extract and store new learning
+      // Store user message
+      await storage.createMessage({
+        botId: bot.id,
+        sender: "user",
+        text: message
+      });
+
+      // Learn new words
       const keywords = extractKeywords(message);
-      const facts = extractFacts(message);
+      const existingWords = await storage.getLearnedWords(bot.id);
       
-      // Store memories
+      for (const keyword of keywords) {
+        const existingWord = existingWords.find(w => w.word.toLowerCase() === keyword.toLowerCase());
+        if (!existingWord) {
+          await storage.createOrUpdateWord({
+            botId: bot.id,
+            word: keyword,
+            frequency: 1,
+            context: `From: "${message}"`
+          });
+        }
+      }
+
+      // Extract and store facts
+      const facts = extractFacts(message);
+      for (const fact of facts) {
+        await storage.createUserFact({
+          userId,
+          fact,
+          category: 'conversation'
+        });
+      }
+
+      // Store user memory with importance rating
       await storage.createUserMemory({
-        userId: bot.userId,
+        userId,
         memory: message,
         category: 'conversation',
         importance: 'medium'
       });
-      
-      // Store facts
-      for (const fact of facts) {
-        await storage.createUserFact({
-          userId: bot.userId,
-          fact,
-          category: 'extracted',
-          confidence: 'medium'
-        });
-      }
-      
-      // Learn new words
-      const learnedWords = await storage.getLearnedWords(bot.id);
-      const existingWords = learnedWords.map(w => w.word);
-      
-      for (const word of keywords) {
-        if (!existingWords.includes(word)) {
-          await storage.createOrUpdateWord({
-            botId: bot.id,
-            word,
-            frequency: 1,
-            context: message.substring(0, 200)
-          });
-        }
-      }
 
       // Generate AI response
-      const response = await generateResponse(message, bot.id, bot.userId);
-      
-      // Save conversation
-      await storage.createMessage({ botId: bot.id, sender: 'user', text: message });
-      await storage.createMessage({ botId: bot.id, sender: 'bot', text: response });
-      
-      // Update bot stats
-      const updatedWords = await storage.getLearnedWords(bot.id);
-      await storage.updateBot(bot.id, { wordsLearned: updatedWords.length });
-      
-      res.json({
-        response,
-        stage: getStageFromWordCount(updatedWords.length),
-        wordsLearned: updatedWords.length,
-        newWordsThisMessage: keywords.filter(w => !existingWords.includes(w))
+      const aiResponse = await generateResponse(message, bot.id, userId);
+
+      // Store bot response
+      await storage.createMessage({
+        botId: bot.id,
+        sender: "bot",
+        text: aiResponse
       });
+
+      // Get updated word count and stage
+      const updatedWords = await storage.getLearnedWords(bot.id);
+      const stage = getStageFromWordCount(updatedWords.length);
       
+      // Update reflection after every conversation
+      let reflectionUpdated = false;
+      try {
+        await updateIncrementalReflection(userId, bot.id);
+        reflectionUpdated = true;
+        console.log('Reflection updated after conversation');
+      } catch (reflectionError) {
+        console.log('Reflection update failed:', reflectionError);
+      }
+
+      res.json({
+        response: aiResponse,
+        stage,
+        wordsLearned: updatedWords.length,
+        newWordsThisMessage: keywords.filter(word => 
+          !existingWords.some(existing => existing.word.toLowerCase() === word.toLowerCase())
+        ),
+        reflectionUpdated
+      });
+
     } catch (error) {
       console.error('Chat error:', error);
-      res.status(500).json({ error: 'Failed to process chat' });
+      res.status(500).json({ error: 'Failed to process message' });
     }
   });
 
-  // Text-to-Speech API
-  app.post('/api/tts', async (req, res) => {
+  // Memory statistics endpoint
+  router.get('/api/stats', async (req, res) => {
     try {
-      const { text } = req.body;
+      const userId = parseInt(req.query.userId as string) || 1;
       
-      if (!text) {
-        return res.status(400).json({ error: 'text required' });
+      const memories = await storage.getUserMemories(userId);
+      const facts = await storage.getUserFacts(userId);
+      const bot = await storage.getBotByUserId(userId);
+      
+      if (!bot) {
+        return res.json({
+          wordCount: 0,
+          factCount: 0,
+          memoryCount: 0,
+          stage: "Infant",
+          nextStageAt: 10
+        });
+      }
+      
+      const learnedWords = await storage.getLearnedWords(bot.id);
+      const wordCount = learnedWords.length;
+      const stage = getStageFromWordCount(wordCount);
+      const nextStageAt = getNextStageThreshold(wordCount);
+      
+      res.json({
+        wordCount,
+        factCount: facts.length,
+        memoryCount: memories.length,
+        stage,
+        nextStageAt
+      });
+      
+    } catch (error) {
+      console.error('Stats error:', error);
+      res.status(500).json({ error: 'Failed to get statistics' });
+    }
+  });
+
+  // User switching endpoint
+  router.post('/api/user/switch', async (req, res) => {
+    try {
+      const { name } = req.body;
+      
+      if (!name) {
+        return res.status(400).json({ error: 'Name is required' });
       }
 
-      if (!process.env.ELEVENLABS_API_KEY) {
-        return res.status(400).json({ error: 'ElevenLabs API key not configured' });
-      }
-
-      // Import ElevenLabs properly
-      const { ElevenLabsAPI } = await import("elevenlabs");
-      const elevenlabs = new ElevenLabsAPI({ apiKey: process.env.ELEVENLABS_API_KEY });
-
-      const audioStream = await elevenlabs.generate({
-        voice: "Rachel",
-        text: text,
-        model_id: "eleven_monolingual_v1"
+      const userId = 1; // For now, we'll use the same userId but clear old data
+      
+      // Get counts before clearing
+      const existingMemories = await storage.getUserMemories(userId);
+      const existingFacts = await storage.getUserFacts(userId);
+      const memoryCount = existingMemories.length;
+      const factCount = existingFacts.length;
+      
+      // Clear existing data for clean switch
+      await storage.clearUserMemories(userId);
+      await storage.clearUserFacts(userId);
+      
+      // Store clean identity records
+      await storage.createUserFact({
+        userId,
+        fact: `User's name is ${name}`,
+        category: "identity"
       });
 
+      await storage.createUserMemory({
+        userId,
+        memory: `Started conversation with ${name}`,
+        category: "identity_switch"
+      });
+
+      res.json({ 
+        message: `Successfully switched to user: ${name}`,
+        clearedMemories: memoryCount,
+        clearedFacts: factCount
+      });
+      
+    } catch (error) {
+      console.error('User switch error:', error);
+      res.status(500).json({ error: 'Failed to switch user' });
+    }
+  });
+
+  // Get memories endpoint
+  router.get('/api/memories', async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      const memories = await storage.getUserMemories(userId);
+      res.json({ memories });
+    } catch (error) {
+      console.error('Memories error:', error);
+      res.status(500).json({ error: 'Failed to get memories' });
+    }
+  });
+
+  // Get facts endpoint - meaningful facts only
+  router.get('/api/facts', async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      
+      const facts = await storage.getUserFacts(userId);
+      
+      // Filter for meaningful facts only, exclude conversation fragments
+      const meaningfulFacts = facts.filter(fact => {
+        const factText = fact.fact.toLowerCase();
+        return (
+          factText.includes('name:') ||
+          factText.includes('age:') ||
+          factText.includes('location:') ||
+          factText.includes('occupation:') ||
+          factText.includes('pet:') ||
+          factText.includes('education:') ||
+          factText.includes('marital status:') ||
+          factText.includes('has children') ||
+          (factText.length > 20 && !factText.includes('conversation') && !factText.includes('said'))
+        );
+      });
+      
+      const formattedFacts = meaningfulFacts.map(fact => ({
+        id: fact.id,
+        fact: fact.fact,
+        category: fact.category || 'general',
+        createdAt: fact.createdAt
+      }));
+      
+      res.json({ facts: formattedFacts });
+      
+    } catch (error) {
+      console.error('Facts error:', error);
+      res.status(500).json({ error: 'Failed to get facts' });
+    }
+  });
+
+  // Weekly summary endpoint using incremental reflection
+  router.get('/api/weekly-summary', async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      
+      const memories = await storage.getUserMemories(userId);
+      
+      // Find the weekly reflection in memories
+      const weeklyReflection = memories.find(m => m.category === 'weekly_reflection');
+      
+      if (weeklyReflection) {
+        res.json({ summary: weeklyReflection.memory });
+      } else {
+        // If no reflection exists yet, create initial one
+        const bot = await storage.getBotByUserId(userId);
+        if (bot) {
+          await updateIncrementalReflection(userId, bot.id);
+          const updatedMemories = await storage.getUserMemories(userId);
+          const newReflection = updatedMemories.find(m => m.category === 'weekly_reflection');
+          res.json({ summary: newReflection?.memory || 'Reflection is being generated...' });
+        } else {
+          res.json({ summary: 'Start a conversation to begin building your reflection.' });
+        }
+      }
+      
+    } catch (error) {
+      console.error('Weekly summary error:', error);
+      res.json({ summary: 'Unable to generate reflection summary at this time. Please try again later.' });
+    }
+  });
+
+  // Whisper transcription endpoint
+  router.post('/api/transcribe', upload.single('audio'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'Audio file is required' });
+      }
+
+      const audioPath = req.file.path;
+      
+      // Create a unique output path with .wav extension
+      const convertedPath = audioPath + '_converted.wav';
+      
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg(audioPath)
+          .toFormat('wav')
+          .save(convertedPath)
+          .on('end', () => {
+            console.log('Audio conversion completed');
+            resolve();
+          })
+          .on('error', (err) => {
+            console.log('FFmpeg conversion error:', err);
+            reject(err);
+          });
+      });
+      
+      const transcription = await openai.audio.transcriptions.create({
+        file: fs.createReadStream(convertedPath),
+        model: 'whisper-1'
+      });
+
+      // Clean up both files
+      fs.unlinkSync(audioPath);
+      fs.unlinkSync(convertedPath);
+      
+      res.json({ text: transcription.text });
+      
+    } catch (error) {
+      console.error('Transcription error:', error);
+      // Clean up files on error too
+      if (req.file?.path) {
+        try {
+          fs.unlinkSync(req.file.path);
+          const convertedPath = req.file.path + '_converted.wav';
+          if (fs.existsSync(convertedPath)) {
+            fs.unlinkSync(convertedPath);
+          }
+        } catch (cleanupError) {
+          console.error('File cleanup error:', cleanupError);
+        }
+      }
+      res.status(500).json({ error: 'Transcription failed' });
+    }
+  });
+
+  // Voice selection endpoints
+  router.get('/api/voices', async (req, res) => {
+    try {
+      res.json({ voices: baseVoices });
+    } catch (error) {
+      console.error('Voice list error:', error);
+      res.status(500).json({ error: 'Failed to get voices' });
+    }
+  });
+
+  router.get('/api/voice/current', async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      
+      // Get user's selected voice from user facts
+      const facts = await storage.getUserFacts(userId);
+      const voiceFact = facts.find(f => f.category === 'voice_preference');
+      
+      if (voiceFact) {
+        const voiceId = voiceFact.fact.replace('User prefers voice: ', '');
+        const voice = getVoiceById(voiceId);
+        res.json({ voice });
+      } else {
+        const defaultVoice = getVoiceById(defaultVoiceId);
+        res.json({ voice: defaultVoice });
+      }
+    } catch (error) {
+      console.error('Get current voice error:', error);
+      res.status(500).json({ error: 'Failed to get current voice' });
+    }
+  });
+
+  router.post('/api/voice/select', async (req, res) => {
+    try {
+      const { voiceId, userId = 1 } = req.body;
+      
+      if (!voiceId) {
+        return res.status(400).json({ error: 'Voice ID is required' });
+      }
+
+      const voice = getVoiceById(voiceId);
+      if (!voice) {
+        return res.status(400).json({ error: 'Invalid voice ID' });
+      }
+
+      // Remove existing voice preference
+      const facts = await storage.getUserFacts(userId);
+      const existingVoiceFact = facts.find(f => f.category === 'voice_preference');
+      if (existingVoiceFact) {
+        // We would need a delete method, for now just add a new one
+      }
+
+      // Store new voice preference
+      await storage.createUserFact({
+        userId,
+        fact: `User prefers voice: ${voiceId}`,
+        category: 'voice_preference'
+      });
+
+      res.json({ success: true, voice });
+    } catch (error) {
+      console.error('Voice selection error:', error);
+      res.status(500).json({ error: 'Failed to select voice' });
+    }
+  });
+
+  // Enhanced ElevenLabs text-to-speech endpoint with user voice selection
+  router.post('/api/text-to-speech', async (req, res) => {
+    try {
+      const { text, userId = 1 } = req.body;
+
+      if (!text) {
+        return res.status(400).json({ error: 'Text is required' });
+      }
+
+      // Get user's selected voice preference (get the most recent one)
+      const facts = await storage.getUserFacts(userId);
+      const voiceFacts = facts.filter(f => f.category === 'voice_preference');
+      let voiceId = defaultVoiceId;
+      
+      if (voiceFacts.length > 0) {
+        // Get the most recent voice preference
+        const latestVoiceFact = voiceFacts.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0];
+        voiceId = latestVoiceFact.fact.replace('User prefers voice: ', '');
+        console.log(`Using voice ID: ${voiceId} from fact: ${latestVoiceFact.fact}`);
+      }
+
+      // Use selected voice with neutral settings
+      const voiceSettings = {
+        stability: 0.5,
+        similarity_boost: 0.75,
+        style: 0.0,
+        use_speaker_boost: true
+      };
+
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': process.env.ELEVENLABS_API_KEY || '',
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_multilingual_v2',
+          voice_settings: voiceSettings,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`ElevenLabs TTS failed: ${response.statusText}`);
+      }
+
+      const audioBuffer = await response.arrayBuffer();
       res.setHeader('Content-Type', 'audio/mpeg');
-      audioStream.pipe(res);
+      res.send(Buffer.from(audioBuffer));
       
     } catch (error) {
       console.error('TTS error:', error);
-      res.status(500).json({ error: 'Failed to generate speech' });
+      res.status(500).json({ error: 'Text-to-speech failed' });
     }
   });
 
-  // Get conversation history
-  app.get('/api/messages/:botId', async (req, res) => {
+  // Voice command handling endpoint
+  router.post('/api/voice-command', async (req, res) => {
     try {
-      const botId = parseInt(req.params.botId);
-      const messages = await storage.getMessages(botId);
-      res.json(messages);
-    } catch (error) {
-      console.error('Messages get error:', error);
-      res.status(500).json({ error: 'Failed to get messages' });
-    }
-  });
-
-  // Get memory statistics for dashboard
-  app.get('/api/stats', async (req, res) => {
-    try {
-      const userId = parseInt(req.query.userId as string);
-      if (!userId) return res.status(400).json({ error: 'Missing userId' });
-
-      const memories = await storage.getUserMemories(userId);
-      const facts = await storage.getUserFacts(userId);
-      const bot = await storage.getBotByUserId(userId);
+      const { command, userId = 1 } = req.body;
       
-      const wordCount = bot ? bot.wordsLearned : 0;
-      const factCount = facts.length;
-      const memoryCount = memories.length;
+      if (command === 'list voices') {
+        return res.json({ 
+          message: "Available voices:\n• Hope - Warm American female\n• Ophelia - Calm British female\n• Adam - Laid-back British male\n• Dan - Smooth American male\n\nType 'set voice [name]' to change.",
+          voices: baseVoices 
+        });
+      }
+      
+      if (command.startsWith('set voice ')) {
+        const voiceName = command.replace('set voice ', '').toLowerCase();
+        const voice = baseVoices.find(v => v.name.toLowerCase() === voiceName);
+        
+        if (voice) {
+          await storage.createUserFact({
+            userId,
+            fact: `User prefers voice: ${voice.id}`,
+            category: 'voice_preference'
+          });
+          
+          return res.json({ 
+            message: `Voice changed to ${voice.name} (${voice.description}). This will apply to new messages from me.`,
+            voice: voice
+          });
+        } else {
+          return res.json({ 
+            message: "Voice not found. Available voices: Hope, Ophelia, Adam, Dan" 
+          });
+        }
+      }
+      
+      return res.json({ 
+        message: "Voice commands:\n• 'list voices' - Show available voices\n• 'set voice [name]' - Change voice" 
+      });
+    } catch (error) {
+      console.error('Voice command error:', error);
+      res.status(500).json({ error: 'Voice command failed' });
+    }
+  });
 
-      const stage = getStageFromWordCount(wordCount);
+  // Voice selection endpoint
+  router.post('/api/voice/set', async (req, res) => {
+    try {
+      const { voiceId } = req.body;
+      
+      if (!voiceId || typeof voiceId !== 'string') {
+        return res.status(400).json({ error: 'Voice ID is required' });
+      }
 
+      await storage.createUserFact({
+        userId: 1,
+        fact: `User prefers voice: ${voiceId}`,
+        category: 'preference'
+      });
+      
       res.json({ 
-        wordCount, 
-        factCount, 
-        memoryCount, 
-        stage,
-        nextStageAt: getNextStageThreshold(wordCount)
+        message: `Voice set successfully`,
+        voiceId
       });
+      
     } catch (error) {
-      console.error('Error getting stats:', error);
-      res.status(500).json({ error: 'Failed to get stats' });
+      console.error('Voice selection error:', error);
+      res.status(500).json({ error: 'Failed to set voice' });
     }
   });
 
-  // Get memory list by type
-  app.get('/api/memory/list', async (req, res) => {
+  // Bot reset endpoint
+  router.post('/api/bot/reset', async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
-      const type = req.query.type as string | undefined;
-
-      if (!userId) return res.status(400).json({ error: 'Missing userId' });
-
-      if (type === 'fact') {
-        const facts = await storage.getUserFacts(userId);
-        res.json(facts.map(f => ({
-          id: f.id,
-          memory: f.fact,
-          type: 'fact',
-          createdAt: f.createdAt
-        })));
-      } else if (type === 'memory') {
-        const memories = await storage.getUserMemories(userId);
-        res.json(memories.map(m => ({
-          id: m.id,
-          memory: m.memory,
-          type: 'memory',
-          createdAt: m.createdAt
-        })));
-      } else {
-        const memories = await storage.getUserMemories(userId);
-        const facts = await storage.getUserFacts(userId);
-        const combined = [
-          ...memories.map(m => ({ id: m.id, memory: m.memory, type: 'memory', createdAt: m.createdAt })),
-          ...facts.map(f => ({ id: f.id, memory: f.fact, type: 'fact', createdAt: f.createdAt }))
-        ];
-        res.json(combined);
-      }
-    } catch (error) {
-      console.error('Error getting memory list:', error);
-      res.status(500).json({ error: 'Failed to get memory list' });
-    }
-  });
-
-  // Weekly reflection summary endpoint
-  app.get('/api/weekly-summary', async (req, res) => {
-    try {
-      const userId = parseInt(req.query.userId as string);
-      if (!userId) return res.status(400).json({ error: 'Missing userId' });
-
-      // Get recent memories and facts (last 7 days)
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-      const memories = await storage.getUserMemories(userId);
-      const facts = await storage.getUserFacts(userId);
-      const bot = await storage.getBotByUserId(userId);
-
-      // Filter recent data
-      const recentMemories = memories.filter(m => new Date(m.createdAt) >= oneWeekAgo);
-      const recentFacts = facts.filter(f => new Date(f.createdAt) >= oneWeekAgo);
-
-      if (recentMemories.length === 0 && recentFacts.length === 0) {
-        return res.json({
-          summary: "You haven't shared much with me this week yet. I'm here whenever you want to talk about your thoughts, experiences, or anything on your mind.",
-          insights: [],
-          growthMetrics: {
-            newMemories: 0,
-            newFacts: 0,
-            currentStage: bot ? getStageFromWordCount(bot.wordsLearned) : 'Infant'
-          }
+      await storage.clearUserMemories(1);
+      await storage.clearUserFacts(1);
+      
+      const bot = await storage.getBotByUserId(1);
+      if (bot) {
+        await storage.updateBot(bot.id, {
+          stage: 'Infant',
+          wordCount: 0,
+          personalityTraits: JSON.stringify({}),
+          memories: JSON.stringify([])
         });
       }
-
-      // Prepare context for AI summary
-      const conversationContext = recentMemories.map(m => m.memory).join('\n');
-      const personalFacts = recentFacts.map(f => f.fact).join('\n');
       
-      const prompt = `As Reflectibot, an empathetic AI companion that learns and grows with users, please provide a warm, insightful weekly reflection based on our recent conversations.
-
-Recent conversations:
-${conversationContext}
-
-New things I learned about you:
-${personalFacts}
-
-Please provide:
-1. A compassionate summary of key themes and patterns from this week
-2. Insights about your growth, challenges, or recurring topics
-3. Encouraging observations about positive changes or strengths I notice
-4. Gentle questions or reflections that might help you think deeper
-
-Keep the tone warm, supportive, and personal - like a caring friend who has been listening carefully. Avoid being clinical or overly analytical. Focus on the human experience and emotional journey.
-
-Response format: A flowing, conversational reflection (2-3 paragraphs max).`;
-
-      // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: "You are Reflectibot, a compassionate AI companion that provides thoughtful, empathetic weekly reflections. Your tone is warm, supportive, and personally engaging."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 500,
-        temperature: 0.7
+      res.json({ 
+        message: 'Bot successfully reset to infant stage',
+        stage: 'Infant',
+        wordCount: 0
       });
-
-      const summary = completion.choices[0].message.content;
-
-      // Generate simple insights
-      const insights = [];
-      if (recentMemories.length > 5) {
-        insights.push("You've been quite reflective this week - I love our deep conversations!");
-      }
-      if (recentFacts.length > 3) {
-        insights.push("I'm learning so much about who you are. Thank you for sharing!");
-      }
-
-      res.json({
-        summary,
-        insights,
-        growthMetrics: {
-          newMemories: recentMemories.length,
-          newFacts: recentFacts.length,
-          totalMemories: memories.length,
-          totalFacts: facts.length,
-          currentStage: bot ? getStageFromWordCount(bot.wordsLearned) : 'Infant',
-          wordsLearned: bot ? bot.wordsLearned : 0
-        }
-      });
-
+      
     } catch (error) {
-      console.error('Error generating weekly summary:', error);
-      res.status(500).json({ error: 'Failed to generate weekly summary' });
+      console.error('Bot reset error:', error);
+      res.status(500).json({ error: 'Failed to reset bot' });
     }
   });
 
-  // Mood analysis endpoint for contextual UI theming
-  app.get('/api/mood-analysis', async (req, res) => {
-    try {
-      const userId = parseInt(req.query.userId as string);
-      if (!userId) return res.status(400).json({ error: 'Missing userId' });
-
-      const memories = await storage.getUserMemories(userId);
-      const facts = await storage.getUserFacts(userId);
-      const bot = await storage.getBotByUserId(userId);
-
-      if (memories.length === 0) {
-        return res.json({
-          mood: 'neutral',
-          primaryColor: '#1f2937',
-          accentColor: '#10b981',
-          textColor: '#ffffff',
-          stage: bot ? getStageFromWordCount(bot.wordsLearned) : 'Infant'
-        });
-      }
-
-      // Get recent conversations for mood analysis
-      const recentMemories = memories.slice(-10);
-      const conversationText = recentMemories.map(m => m.memory).join('\n');
-      const currentStage = bot ? getStageFromWordCount(bot.wordsLearned) : 'Infant';
-
-      const prompt = `Analyze the emotional tone and mood from these user conversations and provide appropriate UI colors. Consider both the content and the developmental stage.
-
-Recent conversations:
-${conversationText}
-
-Current developmental stage: ${currentStage}
-
-Based on the emotional tone, conversational patterns, and developmental stage, provide:
-1. Primary mood (e.g., calm, excited, reflective, anxious, happy, contemplative)
-2. Primary background color (hex code)
-3. Accent color for highlights and buttons (hex code)
-4. Text color (hex code)
-
-Guidelines:
-- Calm/peaceful: Deep blues, soft grays
-- Excited/happy: Warm oranges, bright greens
-- Reflective/contemplative: Purple tones, muted colors
-- Anxious/stressed: Softer, muted tones
-- Early stages (Infant/Toddler): Warmer, gentler colors
-- Advanced stages (Adult): More sophisticated, deeper tones
-
-Respond in JSON format: {"mood": "mood_name", "primaryColor": "#hex", "accentColor": "#hex", "textColor": "#hex"}`;
-
-      // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: "You are a mood and color analyst that provides JSON responses for UI theming based on conversation analysis."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 200,
-        temperature: 0.3
-      });
-
-      const moodData = JSON.parse(completion.choices[0].message.content || '{}');
-      
-      // Fallback to defaults if parsing fails
-      const response = {
-        mood: moodData.mood || 'neutral',
-        primaryColor: moodData.primaryColor || '#1f2937',
-        accentColor: moodData.accentColor || '#10b981',
-        textColor: moodData.textColor || '#ffffff',
-        stage: currentStage
-      };
-
-      res.json(response);
-
-    } catch (error) {
-      console.error('Error analyzing mood:', error);
-      res.json({
-        mood: 'neutral',
-        primaryColor: '#1f2937',
-        accentColor: '#10b981',
-        textColor: '#ffffff',
-        stage: 'Infant'
-      });
-    }
-  });
-
-  // Whisper API transcription endpoint
-  app.post('/api/transcribe', async (req, res) => {
-    try {
-      // Set up multer for handling file uploads
-      const multer = (await import('multer')).default;
-      const upload = multer({ storage: multer.memoryStorage() });
-      
-      // Handle the file upload
-      upload.single('audio')(req, res, async (err: any) => {
-        if (err) {
-          return res.status(400).json({ error: 'File upload error' });
-        }
-
-        const file = req.file;
-        const userId = req.body.userId;
-
-        if (!file || !userId) {
-          return res.status(400).json({ error: 'Missing audio file or userId' });
-        }
-
-        try {
-          // Create a File object for OpenAI Whisper API
-          const audioFile = new File([file.buffer], 'recording.webm', {
-            type: file.mimetype
-          });
-
-          // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-          const transcription = await openai.audio.transcriptions.create({
-            file: audioFile,
-            model: 'whisper-1',
-            response_format: 'json',
-            language: 'en'
-          });
-
-          const transcribedText = transcription.text;
-
-          // Store transcription as memory
-          await storage.createUserMemory({
-            userId: parseInt(userId),
-            memory: transcribedText,
-            category: 'voice_input',
-            importance: 'medium'
-          });
-
-          res.json({ 
-            text: transcribedText,
-            success: true 
-          });
-
-        } catch (transcriptionError) {
-          console.error('Whisper transcription error:', transcriptionError);
-          res.status(500).json({ 
-            error: 'Transcription failed',
-            message: 'Could not process audio with Whisper API'
-          });
-        }
-      });
-
-    } catch (error) {
-      console.error('Transcription endpoint error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
-
-  // Remove static HTML route - React frontend will be served by Vite
-  // app.get('/', (req, res) => {
-  //   res.send(`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reflectibot - AI Memory Companion</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="manifest" href="/manifest.json">
-</head>
-<body class="bg-gray-900 text-white font-sans">
-    <div id="app" class="min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="bg-gray-800 p-4 border-b border-gray-700" style="transition: all 1s ease-in-out;">
-            <div class="max-w-4xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <h1 class="text-2xl font-bold text-emerald-400">🧠 Reflectibot</h1>
-                    <div id="moodIndicator" class="text-xs text-gray-400 italic">Analyzing mood...</div>
-                </div>
-                <div id="stats" class="text-sm flex items-center gap-3">
-                    <span id="stage" class="mood-accent px-2 py-1 rounded text-white font-medium">Infant</span>
-                    <span id="wordCount" class="text-gray-300">Words: 0</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Chat Area -->
-        <main class="flex-1 max-w-4xl mx-auto w-full p-4">
-            <div id="chatContainer" class="bg-gray-800 rounded-lg h-96 overflow-y-auto p-4 mb-4 border border-gray-700">
-                <div id="messages"></div>
-            </div>
-            
-            <!-- Input Area -->
-            <div class="flex gap-2">
-                <input 
-                    type="text" 
-                    id="messageInput" 
-                    placeholder="Type or speak your message..."
-                    class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500"
-                />
-                <button 
-                    id="sendBtn" 
-                    class="mood-accent hover:opacity-80 px-6 py-2 rounded-lg font-medium transition-all text-white"
-                >
-                    Send
-                </button>
-                <button 
-                    id="voiceInputBtn" 
-                    class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors relative"
-                    title="Click to speak (Web Speech API)"
-                >
-                    <span id="voiceIcon">🎤</span>
-                    <div id="voiceStatus" class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-300 hidden">
-                        Listening...
-                    </div>
-                </button>
-                <button 
-                    id="whisperBtn" 
-                    class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors relative"
-                    title="High-quality Whisper recording"
-                >
-                    <span id="whisperIcon">🔴</span>
-                    <div id="whisperStatus" class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-300 hidden">
-                        Recording...
-                    </div>
-                </button>
-                <button 
-                    id="speakBtn" 
-                    class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
-                    title="Replay last response"
-                >
-                    🔊
-                </button>
-            </div>
-            
-            <!-- Voice Controls Status -->
-            <div class="mt-2 text-xs text-gray-400 flex justify-between items-center">
-                <div id="voiceSupport" class="hidden">
-                    <span class="text-green-400">🎤 Voice input ready</span>
-                </div>
-                <div id="speechStatus" class="text-gray-500">
-                    <span id="isListening" class="hidden text-blue-400">🎤 Listening...</span>
-                    <span id="isRecording" class="hidden text-indigo-400">🔴 Recording...</span>
-                    <span id="isSpeaking" class="hidden text-purple-400">🔊 Speaking...</span>
-                </div>
-                <span>Press Enter to send • 🎤 Quick voice • 🔴 High-quality recording</span>
-            </div>
-            
-            <!-- Enhanced Memory Dashboard -->
-            <div class="mt-6 space-y-4">
-                <!-- Progress Overview -->
-                <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-lg border border-gray-700">
-                    <h3 class="text-xl font-semibold mb-4 text-emerald-400">🧠 Memory Growth Dashboard</h3>
-                    <div id="progressInfo">Loading progress...</div>
-                </div>
-                
-                <!-- Facts and Memories Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                        <h3 class="text-lg font-semibold mb-3 text-emerald-400 flex items-center">
-                            <span class="mr-2">📌</span>
-                            Facts About You
-                        </h3>
-                        <div id="factsList" class="text-sm text-gray-300 max-h-64 overflow-y-auto">Loading...</div>
-                    </div>
-                    <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                        <h3 class="text-lg font-semibold mb-3 text-blue-400 flex items-center">
-                            <span class="mr-2">🎯</span>
-                            Learning Milestones
-                        </h3>
-                        <div id="milestonesList" class="text-sm text-gray-300">
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center p-2 bg-gray-700/50 rounded">
-                                    <span>👶 Infant</span>
-                                    <span class="text-xs bg-green-600 px-2 py-1 rounded">10 words - Completed</span>
-                                </div>
-                                <div class="flex justify-between items-center p-2 bg-gray-700/50 rounded">
-                                    <span>🧒 Toddler</span>
-                                    <span class="text-xs bg-green-600 px-2 py-1 rounded">25 words - Completed</span>
-                                </div>
-                                <div class="flex justify-between items-center p-2 bg-emerald-600/20 border border-emerald-500 rounded">
-                                    <span>👦 Child</span>
-                                    <span class="text-xs bg-orange-600 px-2 py-1 rounded">50 words - In Progress</span>
-                                </div>
-                                <div class="flex justify-between items-center p-2 bg-gray-700/30 rounded">
-                                    <span>👨‍🎓 Adolescent</span>
-                                    <span class="text-xs bg-gray-600 px-2 py-1 rounded">100 words - Locked</span>
-                                </div>
-                                <div class="flex justify-between items-center p-2 bg-gray-700/30 rounded">
-                                    <span>🧠 Adult</span>
-                                    <span class="text-xs bg-gray-600 px-2 py-1 rounded">1000 words - Locked</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        let currentBotId = null;
-        let currentUserId = 1;
-        
-        // WebSocket connection
-        const ws = new WebSocket(\`ws://\${window.location.host}/ws\`);
-        
-        ws.onopen = () => {
-            console.log('Connected to WebSocket');
-            initializeBot();
-        };
-        
-        async function initializeBot() {
-            try {
-                const response = await fetch('/api/bot', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: currentUserId })
-                });
-                const bot = await response.json();
-                currentBotId = bot.id;
-                
-                updateStats();
-                loadMemories();
-                loadMessages();
-            } catch (error) {
-                console.error('Failed to initialize bot:', error);
-            }
-        }
-        
-        async function updateStats() {
-            try {
-                const response = await fetch(\`/api/bot/\${currentBotId}\`);
-                const bot = await response.json();
-                
-                document.getElementById('stage').textContent = bot.stage;
-                document.getElementById('wordCount').textContent = \`Words: \${bot.wordsLearned}\`;
-                
-                const stageColors = {
-                    'Infant': 'bg-red-600',
-                    'Toddler': 'bg-orange-600', 
-                    'Child': 'bg-yellow-600',
-                    'Adolescent': 'bg-blue-600',
-                    'Adult': 'bg-emerald-600'
-                };
-                
-                const stageEl = document.getElementById('stage');
-                stageEl.className = \`px-2 py-1 rounded \${stageColors[bot.stage] || 'bg-gray-600'}\`;
-            } catch (error) {
-                console.error('Failed to update stats:', error);
-            }
-        }
-        
-        async function loadMemories() {
-            try {
-                const response = await fetch(\`/api/memory/get/\${currentUserId}\`);
-                const data = await response.json();
-                
-                const wordsList = document.getElementById('wordsList');
-                const factsList = document.getElementById('factsList');
-                
-                if (data.facts.length === 0) {
-                    factsList.innerHTML = '<em class="text-gray-500">No facts learned yet. Tell me about yourself!</em>';
-                } else {
-                    factsList.innerHTML = data.facts.slice(-5).map(fact => 
-                        \`<div class="mb-1">• \${fact.text}</div>\`
-                    ).join('');
-                }
-                
-                // Note: words are stored separately, would need another endpoint
-                wordsList.innerHTML = '<em class="text-gray-500">Learning your vocabulary...</em>';
-                
-            } catch (error) {
-                console.error('Failed to load memories:', error);
-            }
-        }
-        
-        async function loadMessages() {
-            try {
-                const response = await fetch(\`/api/messages/\${currentBotId}\`);
-                const messages = await response.json();
-                
-                const messagesEl = document.getElementById('messages');
-                messagesEl.innerHTML = messages.slice(-20).map(msg => 
-                    \`<div class="mb-3">
-                        <div class="font-medium \${msg.sender === 'user' ? 'text-blue-400' : 'text-emerald-400'}">
-                            \${msg.sender === 'user' ? 'You' : 'Reflectibot'}:
-                        </div>
-                        <div class="text-gray-300">\${msg.text}</div>
-                    </div>\`
-                ).join('');
-                
-                messagesEl.scrollTop = messagesEl.scrollHeight;
-            } catch (error) {
-                console.error('Failed to load messages:', error);
-            }
-        }
-        
-        async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            
-            if (!message || !currentBotId) return;
-            
-            input.value = '';
-            input.disabled = true;
-            
-            // Add user message immediately
-            addMessage('user', message);
-            
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message, botId: currentBotId })
-                });
-                
-                const data = await response.json();
-                
-                // Add bot response
-                addMessage('bot', data.response);
-                
-                // Store last response for voice replay
-                lastBotResponse = data.response;
-                
-                // Automatically speak the bot's response
-                speakText(data.response);
-                
-                // Update UI
-                updateStats();
-                loadMemories();
-                
-                // Notify WebSocket clients
-                ws.send(JSON.stringify({
-                    type: 'chat',
-                    data: { message, response: data.response }
-                }));
-                
-            } catch (error) {
-                console.error('Chat error:', error);
-                addMessage('bot', 'I had trouble understanding that. Please try again.');
-            } finally {
-                input.disabled = false;
-                input.focus();
-            }
-        }
-        
-        function addMessage(sender, text) {
-            const messagesEl = document.getElementById('messages');
-            const msgEl = document.createElement('div');
-            msgEl.className = 'mb-3';
-            msgEl.innerHTML = \`
-                <div class="font-medium \${sender === 'user' ? 'text-blue-400' : 'text-emerald-400'}">
-                    \${sender === 'user' ? 'You' : 'Reflectibot'}:
-                </div>
-                <div class="text-gray-300">\${text}</div>
-            \`;
-            messagesEl.appendChild(msgEl);
-            messagesEl.scrollTop = messagesEl.scrollHeight;
-        }
-        
-        async function speakText(text) {
-            try {
-                const response = await fetch('/api/tts', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-                
-                if (response.ok) {
-                    const audioBlob = await response.blob();
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const audio = new Audio(audioUrl);
-                    audio.play();
-                } else {
-                    console.error('TTS failed');
-                }
-            } catch (error) {
-                console.error('TTS error:', error);
-            }
-        }
-        
-        // Event listeners
-        document.getElementById('sendBtn').onclick = sendMessage;
-        document.getElementById('messageInput').onkeypress = (e) => {
-            if (e.key === 'Enter') sendMessage();
-        };
-        
-        // Voice input button (Web Speech API)
-        document.getElementById('voiceInputBtn').onclick = () => {
-            if (isListening) {
-                stopListening();
-            } else {
-                startListening();
-            }
-        };
-        
-        // Whisper recording button
-        document.getElementById('whisperBtn').onclick = () => {
-            if (isRecording) {
-                stopWhisperRecording();
-            } else {
-                startWhisperRecording();
-            }
-        };
-        
-        // Voice output button (replay last response)
-        document.getElementById('speakBtn').onclick = () => {
-            if (lastBotResponse) {
-                speakText(lastBotResponse);
-            } else {
-                // Find the last bot message if no stored response
-                const messages = document.getElementById('messages');
-                const lastBotMessage = [...messages.children].reverse().find(el => 
-                    el.querySelector('.text-emerald-400')
-                );
-                
-                if (lastBotMessage) {
-                    const text = lastBotMessage.querySelector('.text-gray-300').textContent;
-                    speakText(text);
-                }
-            }
-        };
-        
-        // Auto-focus input
-        document.getElementById('messageInput').focus();
-        
-        // Enhanced memory dashboard functions with mood-based theming
-        async function loadMemoryDashboard() {
-            try {
-                const statsResponse = await fetch('/api/stats?userId=1');
-                const statsData = await statsResponse.json();
-                
-                const factsResponse = await fetch('/api/memory/list?userId=1&type=fact');
-                const factsData = await factsResponse.json();
-                
-                const moodResponse = await fetch('/api/mood-analysis?userId=1');
-                const moodData = await moodResponse.json();
-                
-                updateMemoryDashboard(statsData, factsData);
-                updateMoodTheming(moodData);
-            } catch (error) {
-                console.error('Failed to load memory dashboard:', error);
-            }
-        }
-        
-        function updateMoodTheming(moodData) {
-            const { mood, primaryColor, accentColor, textColor } = moodData;
-            
-            // Update CSS custom properties for dynamic theming
-            document.documentElement.style.setProperty('--mood-primary', primaryColor);
-            document.documentElement.style.setProperty('--mood-accent', accentColor);
-            document.documentElement.style.setProperty('--mood-text', textColor);
-            
-            // Update body background with smooth transition
-            document.body.style.background = \`linear-gradient(135deg, \${primaryColor} 0%, \${adjustColorBrightness(primaryColor, -20)} 100%)\`;
-            document.body.style.transition = 'background 2s ease-in-out';
-            
-            // Update header with mood indicator
-            const moodIndicator = document.getElementById('moodIndicator');
-            if (moodIndicator) {
-                moodIndicator.textContent = \`Current mood: \${mood}\`;
-                moodIndicator.style.color = accentColor;
-            }
-            
-            // Update accent elements
-            const accentElements = document.querySelectorAll('.mood-accent');
-            accentElements.forEach(el => {
-                el.style.backgroundColor = accentColor;
-                el.style.borderColor = accentColor;
-            });
-            
-            // Update cards with mood-aware styling
-            const cards = document.querySelectorAll('.bg-gray-800, .bg-gradient-to-br');
-            cards.forEach(card => {
-                card.style.backgroundColor = adjustColorBrightness(primaryColor, 10);
-                card.style.border = \`1px solid \${adjustColorBrightness(accentColor, -30)}\`;
-                card.style.transition = 'all 1s ease-in-out';
-            });
-        }
-        
-        function adjustColorBrightness(hex, percent) {
-            // Remove # if present
-            hex = hex.replace('#', '');
-            
-            // Convert to RGB
-            const r = parseInt(hex.substr(0, 2), 16);
-            const g = parseInt(hex.substr(2, 2), 16);
-            const b = parseInt(hex.substr(4, 2), 16);
-            
-            // Adjust brightness
-            const newR = Math.max(0, Math.min(255, r + (r * percent / 100)));
-            const newG = Math.max(0, Math.min(255, g + (g * percent / 100)));
-            const newB = Math.max(0, Math.min(255, b + (b * percent / 100)));
-            
-            // Convert back to hex
-            return '#' + 
-                Math.round(newR).toString(16).padStart(2, '0') +
-                Math.round(newG).toString(16).padStart(2, '0') +
-                Math.round(newB).toString(16).padStart(2, '0');
-        }
-        
-        function updateMemoryDashboard(stats, facts) {
-            // Update header stats
-            document.getElementById('stage').textContent = stats.stage;
-            document.getElementById('wordCount').textContent = \`Words: \${stats.wordCount}\`;
-            
-            // Update progress info
-            const progressPercent = (stats.wordCount / stats.nextStageAt) * 100;
-            const progressInfo = document.getElementById('progressInfo');
-            if (progressInfo) {
-                progressInfo.innerHTML = \`
-                    <div class="mb-2 text-sm">Progress to Next Stage: \${stats.wordCount}/\${stats.nextStageAt} words</div>
-                    <div class="w-full bg-gray-700 rounded-full h-2 mb-4">
-                        <div class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: \${Math.min(progressPercent, 100)}%"></div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-4 text-center text-sm">
-                        <div class="bg-gray-700/50 p-3 rounded">
-                            <div class="text-xl font-bold text-blue-400">\${stats.wordCount}</div>
-                            <div class="text-gray-400">Words Learned</div>
-                        </div>
-                        <div class="bg-gray-700/50 p-3 rounded">
-                            <div class="text-xl font-bold text-emerald-400">\${stats.factCount}</div>
-                            <div class="text-gray-400">Facts Remembered</div>
-                        </div>
-                        <div class="bg-gray-700/50 p-3 rounded">
-                            <div class="text-xl font-bold text-purple-400">\${stats.memoryCount}</div>
-                            <div class="text-gray-400">Conversations</div>
-                        </div>
-                    </div>
-                \`;
-            }
-            
-            // Update facts list
-            const factsList = document.getElementById('factsList');
-            if (factsList && facts.length > 0) {
-                factsList.innerHTML = facts.slice(-5).reverse().map(fact => 
-                    \`<div class="mb-2 p-2 bg-gray-700/50 rounded border-l-4 border-emerald-500">
-                        <div class="text-gray-300">\${fact.memory}</div>
-                        <div class="text-xs text-gray-500 mt-1">\${new Date(fact.createdAt).toLocaleDateString()}</div>
-                    </div>\`
-                ).join('');
-            }
-        }
-        
-        // Voice recognition setup
-        let recognition = null;
-        let isListening = false;
-        let isSpeaking = false;
-        let lastBotResponse = '';
-        
-        // Whisper recording setup
-        let mediaRecorder = null;
-        let isRecording = false;
-        let audioChunks = [];
-        
-        function initializeVoiceRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
-            if (SpeechRecognition) {
-                recognition = new SpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
-                recognition.lang = 'en-US';
-                
-                recognition.onstart = () => {
-                    isListening = true;
-                    document.getElementById('voiceIcon').textContent = '🔴';
-                    document.getElementById('voiceStatus').classList.remove('hidden');
-                    document.getElementById('isListening').classList.remove('hidden');
-                    document.getElementById('voiceInputBtn').classList.add('animate-pulse');
-                };
-                
-                recognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
-                    document.getElementById('messageInput').value = transcript;
-                    sendMessage(); // Automatically send the transcribed message
-                };
-                
-                recognition.onerror = (event) => {
-                    console.error('Speech recognition error:', event.error);
-                    stopListening();
-                };
-                
-                recognition.onend = () => {
-                    stopListening();
-                };
-                
-                // Show voice support indicator
-                document.getElementById('voiceSupport').classList.remove('hidden');
-            }
-        }
-        
-        function startListening() {
-            if (recognition && !isListening) {
-                try {
-                    recognition.start();
-                } catch (error) {
-                    console.error('Failed to start speech recognition:', error);
-                }
-            }
-        }
-        
-        function stopListening() {
-            isListening = false;
-            document.getElementById('voiceIcon').textContent = '🎤';
-            document.getElementById('voiceStatus').classList.add('hidden');
-            document.getElementById('isListening').classList.add('hidden');
-            document.getElementById('voiceInputBtn').classList.remove('animate-pulse');
-            
-            if (recognition) {
-                recognition.stop();
-            }
-        }
-        
-        async function speakText(text) {
-            if (isSpeaking) return;
-            
-            try {
-                isSpeaking = true;
-                document.getElementById('isSpeaking').classList.remove('hidden');
-                document.getElementById('speakBtn').classList.add('animate-pulse');
-                
-                // Try ElevenLabs TTS first
-                const response = await fetch('/api/tts', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-                
-                if (response.ok) {
-                    const audioBlob = await response.blob();
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const audio = new Audio(audioUrl);
-                    
-                    audio.onended = () => {
-                        URL.revokeObjectURL(audioUrl);
-                        stopSpeaking();
-                    };
-                    
-                    audio.onerror = () => {
-                        URL.revokeObjectURL(audioUrl);
-                        fallbackToWebSpeech(text);
-                    };
-                    
-                    await audio.play();
-                } else {
-                    // Fallback to browser speech synthesis
-                    fallbackToWebSpeech(text);
-                }
-            } catch (error) {
-                console.error('TTS error:', error);
-                fallbackToWebSpeech(text);
-            }
-        }
-        
-        function fallbackToWebSpeech(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.9;
-                utterance.pitch = 1.0;
-                utterance.volume = 0.8;
-                
-                utterance.onend = () => stopSpeaking();
-                utterance.onerror = () => stopSpeaking();
-                
-                speechSynthesis.speak(utterance);
-            } else {
-                stopSpeaking();
-            }
-        }
-        
-        function stopSpeaking() {
-            isSpeaking = false;
-            document.getElementById('isSpeaking').classList.add('hidden');
-            document.getElementById('speakBtn').classList.remove('animate-pulse');
-        }
-        
-        // Whisper recording functions
-        async function startWhisperRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream, {
-                    mimeType: 'audio/webm;codecs=opus'
-                });
-                audioChunks = [];
-                
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        audioChunks.push(event.data);
-                    }
-                };
-                
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    await processWhisperAudio(audioBlob);
-                    
-                    // Stop all tracks to release microphone
-                    stream.getTracks().forEach(track => track.stop());
-                };
-                
-                mediaRecorder.start();
-                isRecording = true;
-                document.getElementById('whisperIcon').textContent = '⏹️';
-                document.getElementById('whisperStatus').classList.remove('hidden');
-                document.getElementById('isRecording').classList.remove('hidden');
-                document.getElementById('whisperBtn').classList.add('animate-pulse');
-                
-            } catch (error) {
-                console.error('Whisper recording error:', error);
-                alert('Could not access microphone for recording');
-            }
-        }
-        
-        function stopWhisperRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                document.getElementById('whisperIcon').textContent = '🔴';
-                document.getElementById('whisperStatus').classList.add('hidden');
-                document.getElementById('isRecording').classList.add('hidden');
-                document.getElementById('whisperBtn').classList.remove('animate-pulse');
-            }
-        }
-        
-        async function processWhisperAudio(audioBlob) {
-            try {
-                const formData = new FormData();
-                formData.append('audio', audioBlob, 'recording.webm');
-                formData.append('userId', '1');
-                
-                const transcribeRes = await fetch('/api/transcribe', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (transcribeRes.ok) {
-                    const transcribeData = await transcribeRes.json();
-                    document.getElementById('messageInput').value = transcribeData.text;
-                    
-                    // Automatically send the transcribed message
-                    sendMessage();
-                } else {
-                    console.error('Transcription failed');
-                    alert('Failed to transcribe audio. Please try again.');
-                }
-            } catch (error) {
-                console.error('Audio processing error:', error);
-                alert('Error processing audio recording');
-            }
-        }
-
-        // Load dashboard on startup
-        loadMemoryDashboard();
-        
-        // Initialize voice recognition
-        initializeVoiceRecognition();
-        
-        // Refresh dashboard every 10 seconds
-        setInterval(loadMemoryDashboard, 10000);
-    </script>
-</body>
-</html>`);
-  });
-
-  // Setup Vite development server to serve React frontend
-  await setupVite(app, httpServer);
-
-
+  app.use(router);
 
   return httpServer;
 }
