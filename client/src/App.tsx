@@ -199,39 +199,24 @@ const AppLayout = () => {
         const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
         const audioUrl = URL.createObjectURL(audioBlob);
         
-        if (audioEnabled) {
-          const audio = new Audio(audioUrl);
-          
-          // Add debugging
-          console.log('Attempting to play audio with URL:', audioUrl);
-          console.log('Audio object created:', audio);
-          
-          audio.load(); // Ensure audio is loaded
-          
-          audio.play().then(() => {
-            console.log('Audio playing successfully');
-          }).catch(audioError => {
-            console.error('Audio playback failed:', audioError);
-            console.error('Error name:', audioError.name);
-            console.error('Error message:', audioError.message);
-            setPendingAudio(audioUrl);
-          });
-          
-          audio.onerror = (e) => {
-            console.error('Audio error event:', e);
-          };
-          
-          audio.onloadstart = () => console.log('Audio load started');
-          audio.oncanplay = () => console.log('Audio can play');
-          audio.onplaying = () => console.log('Audio is playing');
-          
-          audio.onended = () => {
-            console.log('Audio ended');
-            URL.revokeObjectURL(audioUrl);
-          };
-        } else {
+        // Always try to play audio - enable it automatically
+        const audio = new Audio(audioUrl);
+        audio.volume = 1.0;
+        
+        console.log('Attempting to play audio...');
+        
+        audio.play().then(() => {
+          console.log('Audio playing successfully');
+          setAudioEnabled(true); // Enable audio after successful play
+        }).catch(audioError => {
+          console.error('Audio playback failed:', audioError);
+          // User interaction required - show enable button
           setPendingAudio(audioUrl);
-        }
+        });
+        
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+        };
       } catch (voiceError) {
         console.log('Voice synthesis unavailable');
       }

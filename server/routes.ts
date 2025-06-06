@@ -1473,73 +1473,7 @@ Respond in JSON format: {"mood": "mood_name", "primaryColor": "#hex", "accentCol
   // Setup Vite development server to serve React frontend
   await setupVite(app, httpServer);
 
-  // Audio test page
-  app.get('/audio-test', (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
-    res.send(`<!DOCTYPE html>
-<html>
-<head>
-    <title>Audio Test</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
-        #log { margin-top: 20px; padding: 10px; background: #f0f0f0; }
-    </style>
-</head>
-<body>
-    <h1>Audio Test</h1>
-    <button onclick="testBeep()">Test Browser Audio</button>
-    <button onclick="testTTS()">Test TTS</button>
-    <div id="log"></div>
-    <script>
-        function log(msg) {
-            document.getElementById('log').innerHTML += '<br>' + msg;
-            console.log(msg);
-        }
-        
-        function testBeep() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.value = 440;
-                gain.gain.value = 0.1;
-                osc.start();
-                setTimeout(() => osc.stop(), 200);
-                log('Browser audio working - did you hear a beep?');
-            } catch (e) {
-                log('Browser audio failed: ' + e.message);
-            }
-        }
-        
-        async function testTTS() {
-            try {
-                log('Testing TTS...');
-                const res = await fetch('/api/text-to-speech', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({text: 'Test audio message'})
-                });
-                if (!res.ok) throw new Error('API failed: ' + res.status);
-                const blob = await res.blob();
-                log('TTS API returned ' + blob.size + ' bytes');
-                
-                const audio = new Audio(URL.createObjectURL(blob));
-                audio.volume = 1.0;
-                audio.onplay = () => log('Audio playing - do you hear speech?');
-                audio.onerror = (e) => log('Audio error: ' + e.type);
-                audio.onended = () => log('Audio playback completed');
-                await audio.play();
-            } catch (e) {
-                log('TTS failed: ' + e.message);
-            }
-        }
-    </script>
-</body>
-</html>`);
-  });
+
 
   return httpServer;
 }
