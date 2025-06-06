@@ -81,7 +81,22 @@ const AppLayout = () => {
     axios.get('/api/weekly-summary?userId=1')
       .then(res => setWeeklySummary(res.data.summary))
       .catch(() => setWeeklySummary('No reflections available yet.'));
-  }, []);
+
+    // Global keyboard listener for Enter key
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey && activeSection === 'chat') {
+        const target = e.target as HTMLElement;
+        // Only send message if Enter is pressed in the input field
+        if (target.tagName === 'INPUT' && target.getAttribute('placeholder')?.includes('Say something')) {
+          e.preventDefault();
+          sendMessage();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [activeSection, input]);
 
   const startRecording = async () => {
     try {
@@ -303,7 +318,6 @@ const AppLayout = () => {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
                   placeholder="Say something..."
                   className="flex-1 p-3 rounded-2xl bg-zinc-800 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
