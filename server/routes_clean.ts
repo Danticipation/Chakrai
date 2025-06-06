@@ -666,6 +666,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Voice selection endpoint
+  router.post('/api/voice/set', async (req, res) => {
+    try {
+      const { voiceId } = req.body;
+      
+      if (!voiceId || typeof voiceId !== 'string') {
+        return res.status(400).json({ error: 'Voice ID is required' });
+      }
+
+      await storage.createUserFact({
+        userId: 1,
+        fact: `User prefers voice: ${voiceId}`,
+        category: 'preference'
+      });
+      
+      res.json({ 
+        message: `Voice set successfully`,
+        voiceId
+      });
+      
+    } catch (error) {
+      console.error('Voice selection error:', error);
+      res.status(500).json({ error: 'Failed to set voice' });
+    }
+  });
+
+  // Bot reset endpoint
+  router.post('/api/bot/reset', async (req, res) => {
+    try {
+      await storage.clearUserMemories(1);
+      await storage.clearUserFacts(1);
+      
+      const bot = await storage.getBotByUserId(1);
+      if (bot) {
+        await storage.updateBot(bot.id, {
+          stage: 'Infant',
+          wordCount: 0,
+          personalityTraits: JSON.stringify({}),
+          memories: JSON.stringify([])
+        });
+      }
+      
+      res.json({ 
+        message: 'Bot successfully reset to infant stage',
+        stage: 'Infant',
+        wordCount: 0
+      });
+      
+    } catch (error) {
+      console.error('Bot reset error:', error);
+      res.status(500).json({ error: 'Failed to reset bot' });
+    }
+  });
+
   app.use(router);
 
   return httpServer;
