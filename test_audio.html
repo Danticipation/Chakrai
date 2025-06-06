@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Test</title>
+</head>
+<body>
+    <h1>Audio Test Page</h1>
+    <button onclick="testBrowserAudio()">Test Browser Audio (Beep)</button>
+    <button onclick="testTTSAudio()">Test TTS Audio</button>
+    <div id="status"></div>
+
+    <script>
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML += '<br>' + message;
+            console.log(message);
+        }
+
+        function testBrowserAudio() {
+            try {
+                updateStatus('Testing basic browser audio...');
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 440;
+                gainNode.gain.value = 0.1;
+                
+                oscillator.start();
+                setTimeout(() => {
+                    oscillator.stop();
+                    updateStatus('✓ Browser audio test completed');
+                }, 500);
+                
+            } catch (error) {
+                updateStatus('✗ Browser audio failed: ' + error.message);
+            }
+        }
+
+        async function testTTSAudio() {
+            try {
+                updateStatus('Testing TTS audio...');
+                
+                const response = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: 'This is a test of the text to speech system' })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API failed: ${response.status}`);
+                }
+                
+                const audioBlob = await response.blob();
+                updateStatus('✓ TTS API responded with ' + audioBlob.size + ' bytes');
+                
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                
+                audio.addEventListener('loadstart', () => updateStatus('Audio loading...'));
+                audio.addEventListener('canplay', () => updateStatus('Audio ready to play'));
+                audio.addEventListener('play', () => updateStatus('✓ Audio playback started'));
+                audio.addEventListener('ended', () => updateStatus('✓ Audio playback completed'));
+                audio.addEventListener('error', (e) => updateStatus('✗ Audio error: ' + e.type));
+                
+                updateStatus('Attempting to play audio...');
+                await audio.play();
+                
+            } catch (error) {
+                updateStatus('✗ TTS test failed: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
