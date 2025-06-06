@@ -504,6 +504,53 @@ const AppLayout = () => {
               </div>
             </div>
 
+            {/* Audio Test Section */}
+            <div className="mb-4 p-3 bg-orange-900/30 border border-orange-500 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-orange-200">Audio Debug</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.frequency.value = 440;
+                        gain.gain.value = 0.1;
+                        osc.start();
+                        setTimeout(() => osc.stop(), 200);
+                        console.log('Beep test completed');
+                      } catch (e) {
+                        console.error('Beep failed:', e);
+                      }
+                    }}
+                    className="px-2 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-xs"
+                  >
+                    Beep Test
+                  </button>
+                  <button
+                    onClick={testAudio}
+                    className="px-2 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs"
+                  >
+                    Voice Test
+                  </button>
+                  {!audioEnabled && (
+                    <button
+                      onClick={enableAudio}
+                      className="px-2 py-1 bg-green-600 hover:bg-green-700 rounded text-xs"
+                    >
+                      Enable Audio
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="text-xs text-zinc-400 mt-1">
+                Audio: {audioEnabled ? 'ON' : 'OFF'} | Pending: {pendingAudio ? 'YES' : 'NO'}
+              </div>
+            </div>
+
             {/* Input Area */}
             <div className="mt-4">
               <div className="flex items-center space-x-2">
@@ -826,25 +873,7 @@ const AppLayout = () => {
             </div>
           </div>
           
-          {/* Audio Debug Controls - Always Visible */}
           <div className="flex items-center space-x-2">
-            <button
-              onClick={testAudio}
-              className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm"
-            >
-              Test Audio
-            </button>
-            {!audioEnabled && (
-              <button
-                onClick={enableAudio}
-                className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
-              >
-                Enable Audio
-              </button>
-            )}
-            <span className="text-xs text-zinc-400">
-              Audio: {audioEnabled ? 'ON' : 'OFF'}
-            </span>
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span className="text-sm text-zinc-400">Connected</span>
           </div>
@@ -868,13 +897,57 @@ export default function App() {
   );
 }
 
-// Make audio test available globally for console debugging
-if (typeof window !== 'undefined') {
-  (window as any).testReflectibotAudio = async () => {
-    try {
-      console.log('=== REFLECTIBOT AUDIO TEST ===');
-      
-      // Test browser audio capability
+// Audio debugging setup
+setTimeout(() => {
+  if (typeof window !== 'undefined') {
+    (window as any).testReflectibotAudio = async () => {
+      try {
+        console.log('=== REFLECTIBOT AUDIO TEST ===');
+        
+        // Test browser audio capability
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.frequency.value = 440;
+        gainNode.gain.value = 0.1;
+        oscillator.start();
+        setTimeout(() => oscillator.stop(), 200);
+        console.log('✓ Browser audio test completed');
+        
+        // Test ElevenLabs API
+        const response = await fetch('/api/text-to-speech', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: 'Audio test from console' })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API failed: ${response.status}`);
+        }
+        
+        const audioBlob = await response.blob();
+        console.log('✓ TTS API responded with', audioBlob.size, 'bytes');
+        
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        
+        audio.addEventListener('play', () => console.log('✓ Audio playback started'));
+        audio.addEventListener('ended', () => console.log('✓ Audio playback completed'));
+        audio.addEventListener('error', (e) => console.error('✗ Audio error:', e));
+        
+        await audio.play();
+        console.log('✓ Audio test successful');
+        
+      } catch (error) {
+        console.error('✗ Audio test failed:', error);
+      }
+    };
+    
+    // Also add a simple beep test
+    (window as any).testBeep = () => {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
@@ -885,36 +958,11 @@ if (typeof window !== 'undefined') {
       gainNode.gain.value = 0.1;
       oscillator.start();
       setTimeout(() => oscillator.stop(), 200);
-      console.log('✓ Browser audio test completed');
-      
-      // Test ElevenLabs API
-      const response = await fetch('/api/text-to-speech', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: 'Audio test from console' })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API failed: ${response.status}`);
-      }
-      
-      const audioBlob = await response.blob();
-      console.log('✓ TTS API responded with', audioBlob.size, 'bytes');
-      
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      
-      audio.addEventListener('play', () => console.log('✓ Audio playback started'));
-      audio.addEventListener('ended', () => console.log('✓ Audio playback completed'));
-      audio.addEventListener('error', (e) => console.error('✗ Audio error:', e));
-      
-      await audio.play();
-      console.log('✓ Audio test successful');
-      
-    } catch (error) {
-      console.error('✗ Audio test failed:', error);
-    }
-  };
-  
-  console.log('🎵 Audio Debug: Run testReflectibotAudio() in console to test audio');
-}
+      console.log('Beep test executed');
+    };
+    
+    console.log('🎵 Audio Debug Commands Available:');
+    console.log('- testReflectibotAudio() - Full audio test');
+    console.log('- testBeep() - Simple beep test');
+  }
+}, 1000);
