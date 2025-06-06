@@ -1475,10 +1475,17 @@ Respond in JSON format: {"mood": "mood_name", "primaryColor": "#hex", "accentCol
 
   // Audio test page
   app.get('/audio-test', (req, res) => {
-    res.send(`
-<!DOCTYPE html>
+    res.setHeader('Content-Type', 'text/html');
+    res.send(`<!DOCTYPE html>
 <html>
-<head><title>Audio Test</title></head>
+<head>
+    <title>Audio Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        #log { margin-top: 20px; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
 <body>
     <h1>Audio Test</h1>
     <button onclick="testBeep()">Test Browser Audio</button>
@@ -1501,9 +1508,9 @@ Respond in JSON format: {"mood": "mood_name", "primaryColor": "#hex", "accentCol
                 gain.gain.value = 0.1;
                 osc.start();
                 setTimeout(() => osc.stop(), 200);
-                log('✓ Browser audio working');
+                log('Browser audio working - did you hear a beep?');
             } catch (e) {
-                log('✗ Browser audio failed: ' + e.message);
+                log('Browser audio failed: ' + e.message);
             }
         }
         
@@ -1513,23 +1520,25 @@ Respond in JSON format: {"mood": "mood_name", "primaryColor": "#hex", "accentCol
                 const res = await fetch('/api/text-to-speech', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({text: 'Test audio'})
+                    body: JSON.stringify({text: 'Test audio message'})
                 });
+                if (!res.ok) throw new Error('API failed: ' + res.status);
                 const blob = await res.blob();
-                log('✓ TTS API: ' + blob.size + ' bytes');
+                log('TTS API returned ' + blob.size + ' bytes');
                 
                 const audio = new Audio(URL.createObjectURL(blob));
-                audio.onplay = () => log('✓ Audio playing');
-                audio.onerror = (e) => log('✗ Audio error: ' + e.type);
+                audio.volume = 1.0;
+                audio.onplay = () => log('Audio playing - do you hear speech?');
+                audio.onerror = (e) => log('Audio error: ' + e.type);
+                audio.onended = () => log('Audio playback completed');
                 await audio.play();
             } catch (e) {
-                log('✗ TTS failed: ' + e.message);
+                log('TTS failed: ' + e.message);
             }
         }
     </script>
 </body>
-</html>
-    `);
+</html>`);
   });
 
   return httpServer;

@@ -282,21 +282,30 @@ const AppLayout = () => {
     try {
       console.log('=== AUDIO TEST START ===');
       
+      // Add an alert to confirm the test is running
+      alert('Starting audio test - check console for results');
+      
       // First test: Browser audio capability with simple beep
       console.log('Testing browser audio with AudioContext...');
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 440; // A4 note
-      gainNode.gain.value = 0.1;
-      
-      oscillator.start();
-      setTimeout(() => oscillator.stop(), 200);
-      console.log('Browser beep test completed');
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 440; // A4 note
+        gainNode.gain.value = 0.1;
+        
+        oscillator.start();
+        setTimeout(() => oscillator.stop(), 200);
+        console.log('✓ Browser beep test completed');
+        alert('Browser beep test completed - did you hear a sound?');
+      } catch (beepError) {
+        console.error('✗ Browser beep failed:', beepError);
+        alert('Browser beep test failed: ' + beepError.message);
+      }
       
       // Second test: ElevenLabs API
       console.log('Testing ElevenLabs TTS API...');
@@ -322,18 +331,32 @@ const AppLayout = () => {
       audio.addEventListener('error', (e) => console.error('Audio error:', e));
       
       console.log('Attempting to play TTS audio...');
+      
+      // Try multiple approaches
+      audio.volume = 1.0; // Ensure volume is at maximum
+      audio.muted = false; // Ensure not muted
+      
       const playPromise = audio.play();
       
       playPromise.then(() => {
         console.log('✅ TTS audio playing successfully');
+        alert('TTS audio should be playing now - do you hear speech?');
       }).catch(err => {
         console.error('❌ TTS audio failed:', err);
-        alert(`Audio test failed: ${err.message}`);
+        alert(`TTS audio test failed: ${err.message}\nTrying alternative method...`);
+        
+        // Try alternative approach - create download link
+        const link = document.createElement('a');
+        link.href = audioUrl;
+        link.download = 'test_audio.mp3';
+        link.textContent = 'Download test audio';
+        document.body.appendChild(link);
+        alert('Added download link to page - try downloading and playing the audio file');
       });
       
     } catch (error) {
       console.error('❌ Audio test error:', error);
-      alert(`Audio test error: ${error.message}`);
+      alert(`Audio test error: ${(error as any).message}`);
     }
   };
 
