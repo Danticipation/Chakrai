@@ -42,6 +42,8 @@ const AppLayout = () => {
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
   const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('iCrDUkL56s3C8sCRl7wb');
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState<boolean>(false);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -56,20 +58,11 @@ const AppLayout = () => {
   ];
 
   const voiceOptions = {
-    female: [
-      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm, soothing, captivating American female' },
+    all: [
+      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm, soothing female voice' },
       { id: 'FA6HhUjVmxBGQLlzA8WZ', name: 'Ophelia', description: 'Calm, articulate British female' },
-      { id: 'oWAxZDx7w5VEj9dCyTzz', name: 'Grace', description: 'Confident, friendly British female' },
-      { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel', description: 'Calm, professional American female' },
-      { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi', description: 'Soft, gentle American female' },
-      { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella', description: 'Warm, engaging voice' }
-    ],
-    male: [
-      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Brian', description: 'Deep, resonant American male' },
-      { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni', description: 'Well-rounded American male' },
-      { id: 'VR6AewLTigWG4xSOukaG', name: 'Arnold', description: 'Crisp, authoritative American male' },
-      { id: 'CYw3kZ02Hs0563khs1Fj', name: 'Dave', description: 'Deep, serious American male' },
-      { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George', description: 'Raspy, casual American male' }
+      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Brian', description: 'Deep, resonant male voice' },
+      { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni', description: 'Well-rounded male voice' }
     ]
   };
 
@@ -355,9 +348,20 @@ const AppLayout = () => {
   };
 
   const readReflection = async () => {
-    if (!weeklySummary) return;
+    if (!weeklySummary || isGeneratingAudio) return;
+    
+    // Stop any currently playing audio
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      setCurrentAudio(null);
+    }
+    
+    setIsGeneratingAudio(true);
     
     try {
+      console.log('Generating audio with voice:', selectedReflectionVoice);
+      
       const response = await axios.post('/api/text-to-speech', { 
         text: weeklySummary,
         voiceId: selectedReflectionVoice 
@@ -370,15 +374,21 @@ const AppLayout = () => {
       
       const audio = new Audio(audioUrl);
       audio.volume = 1.0;
-      audio.play().then(() => {
-        console.log('Reflection audio playing');
-        setAudioEnabled(true);
-      }).catch(error => {
-        console.error('Reflection audio blocked:', error);
-        setPendingAudio(audioUrl);
-      });
+      setCurrentAudio(audio);
+      
+      audio.onended = () => {
+        setCurrentAudio(null);
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      await audio.play();
+      console.log('Reflection audio playing with voice:', selectedReflectionVoice);
+      setAudioEnabled(true);
+      
     } catch (error) {
       console.error('Reflection audio generation failed:', error);
+    } finally {
+      setIsGeneratingAudio(false);
     }
   };
 
@@ -549,23 +559,23 @@ const AppLayout = () => {
                   onChange={(e) => setSelectedReflectionVoice(e.target.value)}
                   className="px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
                 >
-                  <optgroup label="Female Voices">
-                    {voiceOptions.female.map(voice => (
-                      <option key={voice.id} value={voice.id}>{voice.name}</option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Male Voices">
-                    {voiceOptions.male.map(voice => (
-                      <option key={voice.id} value={voice.id}>{voice.name}</option>
-                    ))}
-                  </optgroup>
+                  {voiceOptions.all.map(voice => (
+                    <option key={voice.id} value={voice.id}>{voice.name}</option>
+                  ))}
                 </select>
                 <button
                   onClick={readReflection}
-                  disabled={!weeklySummary}
+                  disabled={!weeklySummary || isGeneratingAudio}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-sm font-medium"
                 >
-                  🔊 Read Aloud
+                  {isGeneratingAudio ? (
+                    <>
+                      <span className="inline-block animate-spin mr-2">⌚</span>
+                      Generating...
+                    </>
+                  ) : (
+                    '🔊 Read Aloud'
+                  )}
                 </button>
               </div>
             </div>

@@ -753,24 +753,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Enhanced ElevenLabs text-to-speech endpoint with user voice selection
   router.post('/api/text-to-speech', async (req, res) => {
     try {
-      const { text, userId = 1 } = req.body;
+      const { text, voiceId: requestedVoiceId, userId = 1 } = req.body;
 
       if (!text) {
         return res.status(400).json({ error: 'Text is required' });
       }
 
-      // Get user's selected voice preference (get the most recent one)
-      const facts = await storage.getUserFacts(userId);
-      const voiceFacts = facts.filter(f => f.category === 'voice_preference');
-      let voiceId = defaultVoiceId;
+      let voiceId = requestedVoiceId || defaultVoiceId;
       
-      if (voiceFacts.length > 0) {
-        // Get the most recent voice preference
-        const latestVoiceFact = voiceFacts.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )[0];
-        voiceId = latestVoiceFact.fact.replace('User prefers voice: ', '');
-        console.log(`Using voice ID: ${voiceId} from fact: ${latestVoiceFact.fact}`);
+      // If no specific voice requested, use user's stored preference
+      if (!requestedVoiceId) {
+        const facts = await storage.getUserFacts(userId);
+        const voiceFacts = facts.filter(f => f.category === 'voice_preference');
+        
+        if (voiceFacts.length > 0) {
+          // Get the most recent voice preference
+          const latestVoiceFact = voiceFacts.sort((a, b) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )[0];
+          voiceId = latestVoiceFact.fact.replace('User prefers voice: ', '');
+          console.log(`Using voice ID: ${voiceId} from fact: ${latestVoiceFact.fact}`);
+        }
+      } else {
+        console.log(`Using requested voice ID: ${voiceId}`);
       }
 
       // Use selected voice with neutral settings
