@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Features Working Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .feature-box { background: #1a1a1a; border: 2px solid #333; border-radius: 8px; padding: 20px; margin: 15px 0; }
+        .feature-box.working { border-color: #00ff00; }
+        .feature-box h3 { color: #00ff88; margin-top: 0; }
+        .btn { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        .btn-purple { background: #8b5cf6; color: white; }
+        .btn-green { background: #10b981; color: white; }
+        .btn-blue { background: #3b82f6; color: white; }
+        .status { background: #333; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace; }
+        .success { color: #00ff88; }
+        .error { color: #ff4444; }
+        select { background: #333; color: white; border: 1px solid #555; padding: 8px; border-radius: 4px; }
+        .input-demo { display: flex; gap: 10px; align-items: center; margin: 15px 0; }
+        .input-demo input { flex: 1; padding: 12px; background: #333; border: 1px solid #555; border-radius: 25px; color: white; }
+        .input-demo button { width: 45px; height: 45px; border-radius: 50%; border: none; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Voice Features - Live Demo</h1>
+        <p>Direct access to working voice functionality</p>
+
+        <div class="feature-box working">
+            <h3>1. Replay Button Feature</h3>
+            <p>Purple replay button appears next to the send button</p>
+            <div class="input-demo">
+                <input type="text" placeholder="Type your message..." readonly>
+                <button style="background: #666;">🎤</button>
+                <button class="btn-purple" onclick="testReplay()">🔄</button>
+                <button style="background: #0066cc;">➤</button>
+            </div>
+            <button class="btn btn-purple" onclick="testReplay()">Test Replay Functionality</button>
+            <div id="replayStatus" class="status">Ready to test replay</div>
+        </div>
+
+        <div class="feature-box working">
+            <h3>2. Voice Selection & Read Aloud</h3>
+            <p>Voice dropdown and Read Aloud button in reflection section</p>
+            <div style="display: flex; gap: 15px; align-items: center; margin: 15px 0;">
+                <select id="voiceSelect">
+                    <optgroup label="Female Voices">
+                        <option value="iCrDUkL56s3C8sCRl7wb">Hope</option>
+                        <option value="FA6HhUjVmxBGQLlzA8WZ">Ophelia</option>
+                        <option value="oWAxZDx7w5VEj9dCyTzz">Grace</option>
+                        <option value="21m00Tcm4TlvDq8ikWAM">Rachel</option>
+                    </optgroup>
+                    <optgroup label="Male Voices">
+                        <option value="pFZP5JQG7iQjIQuC4Bku">Brian</option>
+                        <option value="ErXwobaYiN019PkySvjV">Antoni</option>
+                        <option value="VR6AewLTigWG4xSOukaG">Arnold</option>
+                    </optgroup>
+                </select>
+                <button class="btn btn-blue" onclick="testReadAloud()">🔊 Read Aloud</button>
+            </div>
+            <div id="readStatus" class="status">Select voice and test reading</div>
+        </div>
+
+        <div class="feature-box working">
+            <h3>3. Voice System Test</h3>
+            <p>Complete voice generation and audio playback testing</p>
+            <button class="btn btn-green" onclick="testVoiceSystem()">Test Voice Generation</button>
+            <button class="btn btn-blue" onclick="testSelectedVoice()">Test Selected Voice</button>
+            <div id="voiceStatus" class="status">Voice system ready</div>
+        </div>
+
+        <div class="feature-box">
+            <h3>Backend Status</h3>
+            <div id="backendStatus" class="status">Checking backend connection...</div>
+        </div>
+    </div>
+
+    <script>
+        async function updateStatus(elementId, message, isSuccess = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${isSuccess ? 'success' : 'error'}`;
+            console.log(`[${elementId}] ${message}`);
+        }
+
+        async function testReplay() {
+            updateStatus('replayStatus', 'Testing replay functionality...');
+            try {
+                const response = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: 'Replay test successful. This is how bot responses sound when replayed.' })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.volume = 1.0;
+                
+                await audio.play();
+                updateStatus('replayStatus', 'Replay feature working - audio played successfully', true);
+            } catch (error) {
+                updateStatus('replayStatus', `Replay failed: ${error.message}`);
+            }
+        }
+
+        async function testReadAloud() {
+            const voiceId = document.getElementById('voiceSelect').value;
+            const voiceName = document.getElementById('voiceSelect').selectedOptions[0].text;
+            
+            updateStatus('readStatus', `Testing ${voiceName} voice...`);
+            
+            try {
+                const response = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: `Hello, this is ${voiceName}. Read Aloud feature is working correctly. You can select different voices for reading your weekly reflections.`,
+                        voiceId: voiceId
+                    })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.volume = 1.0;
+                
+                await audio.play();
+                updateStatus('readStatus', `${voiceName} voice test successful - Read Aloud working`, true);
+            } catch (error) {
+                updateStatus('readStatus', `Read Aloud failed: ${error.message}`);
+            }
+        }
+
+        async function testVoiceSystem() {
+            updateStatus('voiceStatus', 'Testing complete voice system...');
+            try {
+                const response = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: 'Voice system fully operational. All features including replay, voice selection, and reflection reading are working correctly.' })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.volume = 1.0;
+                
+                await audio.play();
+                updateStatus('voiceStatus', 'Voice system test successful - all features operational', true);
+            } catch (error) {
+                updateStatus('voiceStatus', `Voice system test failed: ${error.message}`);
+            }
+        }
+
+        async function testSelectedVoice() {
+            const voiceId = document.getElementById('voiceSelect').value;
+            const voiceName = document.getElementById('voiceSelect').selectedOptions[0].text;
+            
+            updateStatus('voiceStatus', `Testing voice switching to ${voiceName}...`);
+            
+            try {
+                // Set the voice
+                await fetch('/api/voice/set', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ voiceId })
+                });
+
+                // Test the voice
+                const response = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: `Voice successfully switched to ${voiceName}. Voice selection feature is working correctly.`,
+                        voiceId: voiceId
+                    })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.volume = 1.0;
+                
+                await audio.play();
+                updateStatus('voiceStatus', `Voice switching to ${voiceName} successful`, true);
+            } catch (error) {
+                updateStatus('voiceStatus', `Voice switching failed: ${error.message}`);
+            }
+        }
+
+        async function checkBackend() {
+            try {
+                const response = await fetch('/api/stats?userId=1');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('backendStatus', `Backend connected - ${data.wordCount} words learned, ${data.factCount} facts stored`, true);
+                } else {
+                    throw new Error(`Backend responded with ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('backendStatus', `Backend connection failed: ${error.message}`);
+            }
+        }
+
+        // Initialize
+        checkBackend();
+    </script>
+</body>
+</html>

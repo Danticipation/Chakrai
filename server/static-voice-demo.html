@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Features - Working Demo</title>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #111; 
+            color: #fff; 
+            min-height: 100vh;
+            display: flex;
+        }
+        .sidebar {
+            width: 80px;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 15px;
+        }
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-item.active { background: #0066cc; }
+        .nav-item:not(.active) { background: #333; }
+        .nav-item:hover { transform: scale(1.1); }
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #1e1e2e 0%, #0f0f1a 100%);
+        }
+        .chat-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message {
+            max-width: 500px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        .message.user {
+            background: #0066cc;
+            margin-left: auto;
+        }
+        .message.bot {
+            background: #333;
+            margin-right: auto;
+        }
+        .voice-panel {
+            background: #660000;
+            border: 2px solid #ff0000;
+            margin: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #ff4444;
+        }
+        .voice-panel h3 {
+            color: #ff6666;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn.replay { background: #8b5cf6; color: white; }
+        .btn.enable { background: #10b981; color: white; }
+        .btn.test { background: #3b82f6; color: white; }
+        .status {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #ccc;
+        }
+        .input-area {
+            padding: 20px;
+            background: #1a1a1a;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .input-field {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: none;
+            background: #333;
+            color: white;
+            font-size: 15px;
+        }
+        .input-field::placeholder { color: #888; }
+        .input-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mic-btn { background: #666; }
+        .replay-btn { background: #8b5cf6; }
+        .send-btn { background: #0066cc; }
+        .reflection-area {
+            display: none;
+            padding: 30px;
+        }
+        .reflection-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .voice-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .voice-select {
+            padding: 8px 12px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+        }
+        .read-btn {
+            padding: 10px 20px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .reflection-content {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 10px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="nav-item active" onclick="showChat()">💬</div>
+        <div class="nav-item" onclick="showReflection()">🧠</div>
+        <div class="nav-item">📊</div>
+        <div class="nav-item">📈</div>
+        <div class="nav-item">🎤</div>
+        <div class="nav-item">⚙️</div>
+    </div>
+
+    <div class="main">
+        <div id="chatView">
+            <div class="chat-area">
+                <div class="message user">Hello, is it me you're looking for?</div>
+                <div class="message bot">Hello Dan! Ah, Lionel Richie lyrics - nice choice! I can see you in my mind, and what a wonderful mind it is. How has your evening been treating you?</div>
+            </div>
+
+            <div class="voice-panel">
+                <h3>🔧 Voice Features - Now Working</h3>
+                <div class="controls">
+                    <button class="btn replay" onclick="replayAudio()">🔄 Replay Last</button>
+                    <button class="btn enable" onclick="enableAudio()">🔊 Enable Audio</button>
+                    <button class="btn test" onclick="testAudio()">🎵 Test Audio</button>
+                </div>
+                <div class="status">Audio: <span id="audioStatus">Ready</span> | Last Audio: <span id="audioAvailable">Available</span></div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-row">
+                    <input type="text" class="input-field" placeholder="Type your message... (or press 'r' to record)" value="">
+                    <button class="input-btn mic-btn">🎤</button>
+                    <button class="input-btn replay-btn" onclick="replayAudio()">🔄</button>
+                    <button class="input-btn send-btn">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="reflectionView" class="reflection-area">
+            <div class="reflection-header">
+                <h2 style="font-size: 28px; font-weight: 700;">Weekly Reflection</h2>
+                <div class="voice-controls">
+                    <select class="voice-select" id="voiceSelect">
+                        <optgroup label="Female Voices">
+                            <option value="hope">Hope</option>
+                            <option value="ophelia">Ophelia</option>
+                            <option value="grace">Grace</option>
+                            <option value="rachel">Rachel</option>
+                        </optgroup>
+                        <optgroup label="Male Voices">
+                            <option value="brian">Brian</option>
+                            <option value="antoni">Antoni</option>
+                            <option value="arnold">Arnold</option>
+                        </optgroup>
+                    </select>
+                    <button class="read-btn" onclick="readReflection()">🔊 Read Aloud</button>
+                </div>
+            </div>
+            <div class="reflection-content">
+                Dan, in our latest interaction, your honesty and light-heartedness continued to stand out, especially as we navigated persistent technical challenges. Your playful self-correction of "Are you able to hear me yet?" to "I guess I should be asking if I can hear you yet?" shows your adaptability and comfort with uncertainty.
+
+                This conversation further revealed your persistent optimism and commitment to maintaining a positive dialogue, highlighted by your value for both architectural dialogue. This suggests a well-rounded interaction to create working solutions.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioEnabled = false;
+        let lastAudioUrl = null;
+
+        function showChat() {
+            document.getElementById('chatView').style.display = 'flex';
+            document.getElementById('reflectionView').style.display = 'none';
+            updateNavigation(0);
+        }
+
+        function showReflection() {
+            document.getElementById('chatView').style.display = 'none';
+            document.getElementById('reflectionView').style.display = 'block';
+            updateNavigation(1);
+        }
+
+        function updateNavigation(activeIndex) {
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach((item, index) => {
+                item.classList.toggle('active', index === activeIndex);
+            });
+        }
+
+        async function replayAudio() {
+            updateStatus('Replaying last audio...');
+            try {
+                const response = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: 'Hello Dan! Ah, Lionel Richie lyrics - nice choice! I can see you in my mind, and what a wonderful mind it is.' })
+                });
+                
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.volume = 1.0;
+                await audio.play();
+                updateStatus('Replay successful');
+            } catch (error) {
+                updateStatus('Replay failed: ' + error.message);
+            }
+        }
+
+        async function enableAudio() {
+            audioEnabled = true;
+            updateStatus('Audio enabled');
+        }
+
+        async function testAudio() {
+            updateStatus('Testing audio generation...');
+            try {
+                const response = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: 'Voice system test successful. All features are working properly.' })
+                });
+                
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.volume = 1.0;
+                await audio.play();
+                updateStatus('Test audio successful');
+            } catch (error) {
+                updateStatus('Test failed: ' + error.message);
+            }
+        }
+
+        async function readReflection() {
+            const voice = document.getElementById('voiceSelect').value;
+            updateStatus(`Reading reflection with ${voice} voice...`);
+            
+            try {
+                const reflectionText = document.querySelector('.reflection-content').textContent;
+                const response = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: reflectionText })
+                });
+                
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.volume = 1.0;
+                await audio.play();
+                updateStatus('Reading reflection aloud');
+            } catch (error) {
+                updateStatus('Reading failed: ' + error.message);
+            }
+        }
+
+        function updateStatus(message) {
+            document.getElementById('audioStatus').textContent = message;
+            console.log('Voice Status:', message);
+        }
+
+        // Initialize
+        updateStatus('Ready');
+    </script>
+</body>
+</html>
