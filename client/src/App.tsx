@@ -38,6 +38,8 @@ const AppLayout = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [personalityMode, setPersonalityMode] = useState<string>('friend');
+  const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
+  const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -196,16 +198,22 @@ const AppLayout = () => {
         // Create audio blob and play it
         const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
         const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
         
-        audio.play().catch(audioError => {
-          console.log('Audio playback failed:', audioError);
-        });
-        
-        // Clean up the URL after playing
-        audio.onended = () => {
-          URL.revokeObjectURL(audioUrl);
-        };
+        if (audioEnabled) {
+          const audio = new Audio(audioUrl);
+          audio.play().then(() => {
+            console.log('Audio playing successfully');
+          }).catch(audioError => {
+            console.error('Audio playback failed:', audioError);
+            setPendingAudio(audioUrl);
+          });
+          
+          audio.onended = () => {
+            URL.revokeObjectURL(audioUrl);
+          };
+        } else {
+          setPendingAudio(audioUrl);
+        }
       } catch (voiceError) {
         console.log('Voice synthesis unavailable');
       }
@@ -232,6 +240,22 @@ const AppLayout = () => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+    }
+  };
+
+  const enableAudio = () => {
+    setAudioEnabled(true);
+    if (pendingAudio) {
+      const audio = new Audio(pendingAudio);
+      audio.play().then(() => {
+        console.log('Pending audio playing');
+      }).catch(err => {
+        console.error('Failed to play pending audio:', err);
+      });
+      audio.onended = () => {
+        URL.revokeObjectURL(pendingAudio);
+        setPendingAudio(null);
+      };
     }
   };
 
@@ -333,6 +357,23 @@ const AppLayout = () => {
               )}
             </div>
 
+            {/* Audio Enable Notification */}
+            {!audioEnabled && pendingAudio && (
+              <div className="mb-4 p-3 bg-yellow-600/20 border border-yellow-500 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-yellow-200">
+                    🔊 Click to enable audio responses
+                  </span>
+                  <button
+                    onClick={enableAudio}
+                    className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-sm font-medium"
+                  >
+                    Enable Audio
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Input Area */}
             <div className="mt-4">
               <div className="flex items-center space-x-2">
@@ -343,6 +384,15 @@ const AppLayout = () => {
                   placeholder="Say something..."
                   className="flex-1 p-3 rounded-2xl bg-zinc-800 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {!audioEnabled && (
+                  <button
+                    onClick={enableAudio}
+                    className="p-3 rounded-full bg-green-600 hover:bg-green-700 transition-all"
+                    title="Enable audio responses"
+                  >
+                    🔊
+                  </button>
+                )}
                 <button
                   onClick={toggleRecording}
                   className={`p-3 rounded-full transition-all ${
