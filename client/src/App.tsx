@@ -52,26 +52,22 @@ const AppLayout = () => {
     { id: 'settings', icon: User, label: 'Settings', emoji: '⚙️' }
   ];
 
-  const [allVoices, setAllVoices] = useState<any[]>([]);
-  
-  useEffect(() => {
-    const loadAllVoices = async () => {
-      try {
-        const response = await fetch('/api/voices');
-        const data = await response.json();
-        console.log('Loaded voices:', data.voices);
-        console.log('Voice count:', data.voices?.length);
-        setAllVoices(data.voices || []);
-      } catch (error) {
-        console.error('Failed to load voices:', error);
-      }
-    };
-    loadAllVoices();
-  }, []);
-
   const voiceOptions = {
-    male: allVoices.filter(v => v.gender === 'Male'),
-    female: allVoices.filter(v => v.gender === 'Female')
+    female: [
+      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm, soothing, captivating American female' },
+      { id: 'FA6HhUjVbervLw2rNl8M', name: 'Ophelia', description: 'Calm, articulate British female' },
+      { id: 'Xb7hH8MSUJpSbSDYk0k2', name: 'Alice', description: 'Confident, friendly British female' },
+      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily', description: 'Warm, engaging British female' },
+      { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah', description: 'Soft, gentle American female' },
+      { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel', description: 'Calm, professional American female' }
+    ],
+    male: [
+      { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam', description: 'Deep, resonant American male' },
+      { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni', description: 'Well-rounded American male' },
+      { id: 'VR6AewLTigWG4xSOukaG', name: 'Arnold', description: 'Crisp, authoritative American male' },
+      { id: 'TxGEqnHWrfWFTfGW9XjX', name: 'Josh', description: 'Deep, serious American male' },
+      { id: 'yoZ06aMxZJJ28mfd3POQ', name: 'Sam', description: 'Raspy, casual American male' }
+    ]
   };
 
   const personalityModes = [
