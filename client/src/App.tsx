@@ -201,14 +201,32 @@ const AppLayout = () => {
         
         if (audioEnabled) {
           const audio = new Audio(audioUrl);
+          
+          // Add debugging
+          console.log('Attempting to play audio with URL:', audioUrl);
+          console.log('Audio object created:', audio);
+          
+          audio.load(); // Ensure audio is loaded
+          
           audio.play().then(() => {
             console.log('Audio playing successfully');
           }).catch(audioError => {
             console.error('Audio playback failed:', audioError);
+            console.error('Error name:', audioError.name);
+            console.error('Error message:', audioError.message);
             setPendingAudio(audioUrl);
           });
           
+          audio.onerror = (e) => {
+            console.error('Audio error event:', e);
+          };
+          
+          audio.onloadstart = () => console.log('Audio load started');
+          audio.oncanplay = () => console.log('Audio can play');
+          audio.onplaying = () => console.log('Audio is playing');
+          
           audio.onended = () => {
+            console.log('Audio ended');
             URL.revokeObjectURL(audioUrl);
           };
         } else {
@@ -247,8 +265,9 @@ const AppLayout = () => {
     setAudioEnabled(true);
     if (pendingAudio) {
       const audio = new Audio(pendingAudio);
+      console.log('Playing pending audio:', pendingAudio);
       audio.play().then(() => {
-        console.log('Pending audio playing');
+        console.log('Pending audio playing successfully');
       }).catch(err => {
         console.error('Failed to play pending audio:', err);
       });
@@ -256,6 +275,30 @@ const AppLayout = () => {
         URL.revokeObjectURL(pendingAudio);
         setPendingAudio(null);
       };
+    }
+  };
+
+  const testAudio = async () => {
+    try {
+      console.log('Testing audio with simple TTS call...');
+      const response = await axios.post('/api/text-to-speech', { 
+        text: 'This is a test message' 
+      }, {
+        responseType: 'blob'
+      });
+      
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      console.log('Test audio created, attempting playback...');
+      audio.play().then(() => {
+        console.log('Test audio playing successfully');
+      }).catch(err => {
+        console.error('Test audio failed:', err);
+      });
+    } catch (error) {
+      console.error('Test audio generation failed:', error);
     }
   };
 
@@ -393,6 +436,13 @@ const AppLayout = () => {
                     🔊
                   </button>
                 )}
+                <button
+                  onClick={testAudio}
+                  className="p-3 rounded-full bg-purple-600 hover:bg-purple-700 transition-all"
+                  title="Test audio playback"
+                >
+                  🎵
+                </button>
                 <button
                   onClick={toggleRecording}
                   className={`p-3 rounded-full transition-all ${
