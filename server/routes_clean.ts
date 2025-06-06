@@ -561,34 +561,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Weekly summary endpoint
+  // Get facts endpoint - meaningful facts only
+  router.get('/api/facts', async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      
+      const facts = await storage.getUserFacts(userId);
+      
+      // Filter for meaningful facts only, exclude conversation fragments
+      const meaningfulFacts = facts.filter(fact => {
+        const factText = fact.fact.toLowerCase();
+        return (
+          factText.includes('name:') ||
+          factText.includes('age:') ||
+          factText.includes('location:') ||
+          factText.includes('occupation:') ||
+          factText.includes('pet:') ||
+          factText.includes('education:') ||
+          factText.includes('marital status:') ||
+          factText.includes('has children') ||
+          (factText.length > 20 && !factText.includes('conversation') && !factText.includes('said'))
+        );
+      });
+      
+      const formattedFacts = meaningfulFacts.map(fact => ({
+        id: fact.id,
+        fact: fact.fact,
+        category: fact.category || 'general',
+        createdAt: fact.createdAt
+      }));
+      
+      res.json({ facts: formattedFacts });
+      
+    } catch (error) {
+      console.error('Facts error:', error);
+      res.status(500).json({ error: 'Failed to get facts' });
+    }
+  });
+
+  // Weekly summary endpoint using incremental reflection
   router.get('/api/weekly-summary', async (req, res) => {
     try {
       const userId = parseInt(req.query.userId as string) || 1;
       
-      // Get recent memories and facts for summary generation
       const memories = await storage.getUserMemories(userId);
-      const facts = await storage.getUserFacts(userId);
       
-      if (memories.length === 0 && facts.length === 0) {
-        return res.json({ summary: 'No memories or reflections available yet. Start chatting with me to build our conversation history!' });
+      // Find the weekly reflection in memories
+      const weeklyReflection = memories.find(m => m.category === 'weekly_reflection');
+      
+      if (weeklyReflection) {
+        res.json({ summary: weeklyReflection.memory });
+      } else {
+        // If no reflection exists yet, create initial one
+        const bot = await storage.getBotByUserId(userId);
+        if (bot) {
+          await updateIncrementalReflection(userId, bot.id);
+          const updatedMemories = await storage.getUserMemories(userId);
+          const newReflection = updatedMemories.find(m => m.category === 'weekly_reflection');
+          res.json({ summary: newReflection?.memory || 'Reflection is being generated...' });
+        } else {
+          res.json({ summary: 'Start a conversation to begin building your reflection.' });
+        }
       }
-
-      // Create summary context from recent interactions
-      const summaryContext = {
-        userMessages: memories.map(m => m.memory),
-        botResponses: [],
-        timeframe: 'recent',
-        userFacts: facts.map(f => f.fact),
-        emotionalTone: 'reflective',
-        stage: getStageFromWordCount(183) // Current stage based on word count
-      };
-
-      // Generate summary using the loopback summary system
-      const summary = await generateLoopbackSummary(summaryContext);
-      const formattedSummary = formatSummaryForDisplay(summary);
-      
-      res.json({ summary: formattedSummary });
       
     } catch (error) {
       console.error('Weekly summary error:', error);
