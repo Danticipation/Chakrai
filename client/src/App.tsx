@@ -42,6 +42,26 @@ const AppLayout = () => {
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
   const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('iCrDUkL56s3C8sCRl7wb');
+  const [forceReplayButton, setForceReplayButton] = useState<boolean>(true);
+
+  // Voice options for reflection reading
+  const voiceOptions = {
+    female: [
+      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope' },
+      { id: 'FA6HhUjVmxBGQLlzA8WZ', name: 'Ophelia' },
+      { id: 'oWAxZDx7w5VEj9dCyTzz', name: 'Grace' },
+      { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel' },
+      { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi' },
+      { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella' }
+    ],
+    male: [
+      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Brian' },
+      { id: 'VR6AewLTigWG4xSOukaG', name: 'Arnold' },
+      { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni' },
+      { id: 'CYw3kZ02Hs0563khs1Fj', name: 'Dave' },
+      { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George' }
+    ]
+  };
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -401,6 +421,51 @@ const AppLayout = () => {
     }
   };
 
+  const replayLastMessage = () => {
+    console.log('🔄 Replay requested - lastBotAudio:', lastBotAudio);
+    if (lastBotAudio) {
+      const audio = new Audio(lastBotAudio);
+      audio.volume = 1.0;
+      audio.play().then(() => {
+        console.log('✅ Replay successful');
+        setAudioEnabled(true);
+      }).catch(error => {
+        console.error('❌ Replay failed:', error);
+        setPendingAudio(lastBotAudio);
+      });
+    } else {
+      // Generate audio for the last bot message
+      const lastBotMessage = messages.filter(m => m.sender === 'bot').pop();
+      if (lastBotMessage) {
+        generateAudioForText(lastBotMessage.text);
+      }
+    }
+  };
+
+  const generateAudioForText = async (text: string) => {
+    try {
+      const response = await axios.post('/api/text-to-speech', { text }, {
+        responseType: 'blob'
+      });
+      
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      setLastBotAudio(audioUrl);
+      
+      const audio = new Audio(audioUrl);
+      audio.volume = 1.0;
+      audio.play().then(() => {
+        console.log('✅ Generated audio playing');
+        setAudioEnabled(true);
+      }).catch(error => {
+        console.error('❌ Generated audio blocked:', error);
+        setPendingAudio(audioUrl);
+      });
+    } catch (error) {
+      console.error('Audio generation failed:', error);
+    }
+  };
+
   const resetBot = async () => {
     try {
       await axios.post('/api/bot/reset');
@@ -643,6 +708,34 @@ const AppLayout = () => {
               )}
             </div>
 
+            {/* Voice Controls Debug Panel - FORCE VISIBLE */}
+            <div className="mt-4 p-3 bg-red-900/30 border border-red-500 rounded-lg">
+              <div className="text-sm text-red-200 mb-2">🔧 Voice Debug Panel (Force Visible)</div>
+              <div className="flex gap-2">
+                <button
+                  onClick={replayLastMessage}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                >
+                  🔄 Replay Last
+                </button>
+                <button
+                  onClick={enableAudio}
+                  className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+                >
+                  🔊 Enable Audio
+                </button>
+                <button
+                  onClick={testAudio}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm"
+                >
+                  🎵 Test Audio
+                </button>
+              </div>
+              <div className="text-xs text-gray-400 mt-1">
+                Audio: {audioEnabled ? 'ON' : 'OFF'} | Last Audio: {lastBotAudio ? 'Available' : 'None'}
+              </div>
+            </div>
+
             {/* Input Area */}
             <div className="mt-4">
               <div className="flex items-center space-x-2">
@@ -676,9 +769,8 @@ const AppLayout = () => {
                 </button>
                 <button
                   onClick={replayLastMessage}
-                  className={`p-3 rounded-full ${lastBotAudio ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 opacity-50'}`}
-                  title={lastBotAudio ? "Replay last response" : "No audio to replay"}
-                  disabled={!lastBotAudio}
+                  className={`p-3 rounded-full ${(lastBotAudio || forceReplayButton) ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 opacity-50'}`}
+                  title={lastBotAudio ? "Replay last response" : "Replay button (will activate with audio)"}
                 >
                   🔄
                 </button>
