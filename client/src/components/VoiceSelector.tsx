@@ -48,15 +48,20 @@ export default function VoiceSelector({ userId = 1, onVoiceChange }: VoiceSelect
 
   const selectVoice = async (voice: Voice) => {
     try {
-      const response = await fetch('/api/voice/select', {
+      console.log('Selecting voice:', voice.name, voice.id);
+      
+      const response = await fetch('/api/voice/set', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ voiceId: voice.id, userId })
+        body: JSON.stringify({ voiceId: voice.id })
       });
 
       if (response.ok) {
+        console.log('Voice selected successfully');
         setCurrentVoice(voice);
         onVoiceChange?.(voice);
+      } else {
+        console.error('Voice selection failed:', response.status);
       }
     } catch (error) {
       console.error('Failed to select voice:', error);

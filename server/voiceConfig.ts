@@ -19,16 +19,65 @@ export const baseVoices = [
     gender: "Female"
   },
   {
-    name: "Adam",
-    id: "NFG5qt843uXKj4pFvR7C",
-    description: "Laid-back, late-night British male",
+    name: "Alice",
+    id: "Xb7hH8MSUJpSbSDYk0k2",
+    description: "Confident, friendly British female",
     accent: "British",
+    gender: "Female"
+  },
+  {
+    name: "Lily",
+    id: "pFZP5JQG7iQjIQuC4Bku",
+    description: "Warm, engaging British female",
+    accent: "British", 
+    gender: "Female"
+  },
+  {
+    name: "Sarah",
+    id: "EXAVITQu4vr4xnSDxMaL",
+    description: "Soft, gentle American female",
+    accent: "American",
+    gender: "Female"
+  },
+  {
+    name: "Rachel",
+    id: "21m00Tcm4TlvDq8ikWAM",
+    description: "Calm, professional American female",
+    accent: "American",
+    gender: "Female"
+  },
+  {
+    name: "Adam",
+    id: "pNInz6obpgDQGcFmaJgB",
+    description: "Deep, resonant American male",
+    accent: "American",
     gender: "Male"
   },
   {
-    name: "Dan",
-    id: "a4CnuaYbALRvW39mDitg",
-    description: "Smooth, grounded American male",
+    name: "Antoni",
+    id: "ErXwobaYiN019PkySvjV",
+    description: "Well-rounded American male",
+    accent: "American",
+    gender: "Male"
+  },
+  {
+    name: "Arnold",
+    id: "VR6AewLTigWG4xSOukaG",
+    description: "Crisp, authoritative American male",
+    accent: "American",
+    gender: "Male"
+  },
+  {
+    name: "Josh",
+    id: "TxGEqnHWrfWFTfGW9XjX",
+    description: "Deep, serious American male",
+    accent: "American",
+    gender: "Male"
+  },
+  {
+    name: "Sam",
+    id: "yoZ06aMxZJJ28mfd3POQ",
+    description: "Raspy, casual American male",
     accent: "American",
     gender: "Male"
   }
