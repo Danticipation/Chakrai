@@ -280,25 +280,60 @@ const AppLayout = () => {
 
   const testAudio = async () => {
     try {
-      console.log('Testing audio with simple TTS call...');
+      console.log('=== AUDIO TEST START ===');
+      
+      // First test: Browser audio capability with simple beep
+      console.log('Testing browser audio with AudioContext...');
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 440; // A4 note
+      gainNode.gain.value = 0.1;
+      
+      oscillator.start();
+      setTimeout(() => oscillator.stop(), 200);
+      console.log('Browser beep test completed');
+      
+      // Second test: ElevenLabs API
+      console.log('Testing ElevenLabs TTS API...');
       const response = await axios.post('/api/text-to-speech', { 
-        text: 'This is a test message' 
+        text: 'Audio test successful' 
       }, {
         responseType: 'blob'
       });
+      
+      console.log('TTS Response received:', response.status, response.data.size, 'bytes');
       
       const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
       
-      console.log('Test audio created, attempting playback...');
-      audio.play().then(() => {
-        console.log('Test audio playing successfully');
+      // Add detailed event listeners
+      audio.addEventListener('loadstart', () => console.log('Audio loading started'));
+      audio.addEventListener('loadeddata', () => console.log('Audio data loaded'));
+      audio.addEventListener('canplay', () => console.log('Audio can start playing'));
+      audio.addEventListener('play', () => console.log('Audio play event fired'));
+      audio.addEventListener('playing', () => console.log('Audio is playing'));
+      audio.addEventListener('ended', () => console.log('Audio playback ended'));
+      audio.addEventListener('error', (e) => console.error('Audio error:', e));
+      
+      console.log('Attempting to play TTS audio...');
+      const playPromise = audio.play();
+      
+      playPromise.then(() => {
+        console.log('✅ TTS audio playing successfully');
       }).catch(err => {
-        console.error('Test audio failed:', err);
+        console.error('❌ TTS audio failed:', err);
+        alert(`Audio test failed: ${err.message}`);
       });
+      
     } catch (error) {
-      console.error('Test audio generation failed:', error);
+      console.error('❌ Audio test error:', error);
+      alert(`Audio test error: ${error.message}`);
     }
   };
 
@@ -831,4 +866,55 @@ export default function App() {
       <AppLayout />
     </QueryClientProvider>
   );
+}
+
+// Make audio test available globally for console debugging
+if (typeof window !== 'undefined') {
+  (window as any).testReflectibotAudio = async () => {
+    try {
+      console.log('=== REFLECTIBOT AUDIO TEST ===');
+      
+      // Test browser audio capability
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.frequency.value = 440;
+      gainNode.gain.value = 0.1;
+      oscillator.start();
+      setTimeout(() => oscillator.stop(), 200);
+      console.log('✓ Browser audio test completed');
+      
+      // Test ElevenLabs API
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: 'Audio test from console' })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API failed: ${response.status}`);
+      }
+      
+      const audioBlob = await response.blob();
+      console.log('✓ TTS API responded with', audioBlob.size, 'bytes');
+      
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.addEventListener('play', () => console.log('✓ Audio playback started'));
+      audio.addEventListener('ended', () => console.log('✓ Audio playback completed'));
+      audio.addEventListener('error', (e) => console.error('✗ Audio error:', e));
+      
+      await audio.play();
+      console.log('✓ Audio test successful');
+      
+    } catch (error) {
+      console.error('✗ Audio test failed:', error);
+    }
+  };
+  
+  console.log('🎵 Audio Debug: Run testReflectibotAudio() in console to test audio');
 }
