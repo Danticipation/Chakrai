@@ -155,7 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Chat endpoint with enhanced intelligence
   router.post('/api/chat', async (req, res) => {
     try {
-      const { message, botId } = req.body;
+      const { message, botId, personalityMode } = req.body;
       const userId = 1; // Default user for demo
 
       // Handle voice commands first
