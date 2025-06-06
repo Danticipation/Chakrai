@@ -762,7 +762,26 @@ const AppLayout = () => {
               {sections.find(s => s.id === activeSection)?.label}
             </div>
           </div>
+          
+          {/* Audio Debug Controls - Always Visible */}
           <div className="flex items-center space-x-2">
+            <button
+              onClick={testAudio}
+              className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+            >
+              Test Audio
+            </button>
+            {!audioEnabled && (
+              <button
+                onClick={enableAudio}
+                className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+              >
+                Enable Audio
+              </button>
+            )}
+            <span className="text-xs text-zinc-400">
+              Audio: {audioEnabled ? 'ON' : 'OFF'}
+            </span>
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span className="text-sm text-zinc-400">Connected</span>
           </div>
