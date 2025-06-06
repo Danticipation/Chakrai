@@ -59,6 +59,8 @@ const AppLayout = () => {
       try {
         const response = await fetch('/api/voices');
         const data = await response.json();
+        console.log('Loaded voices:', data.voices);
+        console.log('Voice count:', data.voices?.length);
         setAllVoices(data.voices || []);
       } catch (error) {
         console.error('Failed to load voices:', error);
