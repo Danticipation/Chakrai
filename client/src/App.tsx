@@ -38,8 +38,9 @@ const AppLayout = () => {
   const [showReflection, setShowReflection] = useState(false);
   const [showMemory, setShowMemory] = useState(false);
   const [showVoiceSelector, setShowVoiceSelector] = useState(false);
-  const [showUserSwitch, setShowUserSwitch] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [newUserName, setNewUserName] = useState('');
+  const [showVoiceMenu, setShowVoiceMenu] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -176,6 +177,17 @@ const AppLayout = () => {
     setLoading(false);
   };
 
+  const voiceOptions = {
+    male: [
+      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm and encouraging' },
+      { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam', description: 'Deep and mature' }
+    ],
+    female: [
+      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily', description: 'Gentle and caring' },
+      { id: 'FA6HhUjVbervLw2rNl8M', name: 'Ophelia', description: 'Expressive and dynamic' }
+    ]
+  };
+
   const switchUser = async () => {
     if (!newUserName.trim()) return;
     
@@ -183,9 +195,8 @@ const AppLayout = () => {
       await axios.post('/api/user/switch', { name: newUserName.trim() });
       setMessages([]);
       setNewUserName('');
-      setShowUserSwitch(false);
+      setShowSettings(false);
       
-      // Refresh stats
       const statsRes = await axios.get('/api/stats?userId=1');
       setBotStats({
         level: statsRes.data.stage === 'Infant' ? 1 : statsRes.data.stage === 'Toddler' ? 2 : statsRes.data.stage === 'Child' ? 3 : statsRes.data.stage === 'Adolescent' ? 4 : 5,
@@ -195,6 +206,26 @@ const AppLayout = () => {
       
     } catch (error) {
       console.error('User switch failed:', error);
+    }
+  };
+
+  const selectVoice = async (voiceId: string) => {
+    try {
+      await axios.post('/api/voice/set', { voiceId });
+      setShowVoiceMenu(false);
+    } catch (error) {
+      console.error('Voice selection failed:', error);
+    }
+  };
+
+  const resetBot = async () => {
+    try {
+      await axios.post('/api/bot/reset');
+      setMessages([]);
+      setBotStats({ level: 1, stage: 'Infant', wordsLearned: 0 });
+      setShowSettings(false);
+    } catch (error) {
+      console.error('Bot reset failed:', error);
     }
   };
 
@@ -274,10 +305,10 @@ const AppLayout = () => {
                   📊 Memory
                 </button>
                 <button
-                  onClick={() => setShowVoiceSelector(true)}
+                  onClick={() => setShowSettings(true)}
                   className="py-2 px-3 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
                 >
-                  🎤 Voice
+                  ⚙️ Settings
                 </button>
               </div>
             </div>
@@ -322,12 +353,12 @@ const AppLayout = () => {
             <h2 className="text-2xl font-bold">Profile Settings</h2>
             <div className="space-y-4">
               <div className="bg-zinc-800 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">User Information</h3>
+                <h3 className="font-semibold mb-2">User Management</h3>
                 <button
-                  onClick={() => setShowUserSwitch(true)}
+                  onClick={() => setShowSettings(true)}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
                 >
-                  Switch User
+                  User & Bot Settings
                 </button>
               </div>
             </div>
@@ -436,32 +467,89 @@ const AppLayout = () => {
         </div>
       )}
 
-      {showUserSwitch && (
+      {showSettings && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">Switch User</h3>
-            <div className="space-y-4">
-              <input
-                type="text"
-                value={newUserName}
-                onChange={(e) => setNewUserName(e.target.value)}
-                placeholder="Enter new user name"
-                className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400"
-              />
-              <div className="flex space-x-2">
+          <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full max-h-96 overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">Settings</h3>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="text-zinc-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Voice Selection */}
+              <div>
+                <h4 className="font-semibold mb-3">Voice Selection</h4>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-zinc-400 mb-2">Female Voices</p>
+                    <div className="space-y-2">
+                      {voiceOptions.female.map((voice) => (
+                        <button
+                          key={voice.id}
+                          onClick={() => selectVoice(voice.id)}
+                          className="w-full text-left p-3 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
+                        >
+                          <div className="font-medium">{voice.name}</div>
+                          <div className="text-sm text-zinc-400">{voice.description}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm text-zinc-400 mb-2">Male Voices</p>
+                    <div className="space-y-2">
+                      {voiceOptions.male.map((voice) => (
+                        <button
+                          key={voice.id}
+                          onClick={() => selectVoice(voice.id)}
+                          className="w-full text-left p-3 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
+                        >
+                          <div className="font-medium">{voice.name}</div>
+                          <div className="text-sm text-zinc-400">{voice.description}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* User Management */}
+              <div>
+                <h4 className="font-semibold mb-3">User Management</h4>
+                <input
+                  type="text"
+                  value={newUserName}
+                  onChange={(e) => setNewUserName(e.target.value)}
+                  placeholder="Enter new user name"
+                  className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 mb-2"
+                />
                 <button
                   onClick={switchUser}
                   disabled={!newUserName.trim()}
-                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded transition-colors"
+                  className="w-full py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded transition-colors"
                 >
-                  Switch
+                  Switch User
                 </button>
+              </div>
+
+              {/* Bot Reset */}
+              <div>
+                <h4 className="font-semibold mb-3">Bot Management</h4>
                 <button
-                  onClick={() => setShowUserSwitch(false)}
-                  className="flex-1 py-2 bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
+                  onClick={resetBot}
+                  className="w-full py-2 bg-red-600 hover:bg-red-700 rounded transition-colors"
                 >
-                  Cancel
+                  Reset Bot to Baby Stage
                 </button>
+                <p className="text-xs text-zinc-400 mt-1">
+                  This will clear all memories and reset the bot to infant stage
+                </p>
               </div>
             </div>
           </div>
