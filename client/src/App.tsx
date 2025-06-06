@@ -52,15 +52,24 @@ const AppLayout = () => {
     { id: 'settings', icon: User, label: 'Settings', emoji: '⚙️' }
   ];
 
+  const [allVoices, setAllVoices] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const loadAllVoices = async () => {
+      try {
+        const response = await fetch('/api/voices');
+        const data = await response.json();
+        setAllVoices(data.voices || []);
+      } catch (error) {
+        console.error('Failed to load voices:', error);
+      }
+    };
+    loadAllVoices();
+  }, []);
+
   const voiceOptions = {
-    male: [
-      { id: 'pNInz6obpgDQGcFmaJgB', name: 'Adam', description: 'Deep and mature' },
-      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm and encouraging' }
-    ],
-    female: [
-      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily', description: 'Gentle and caring' },
-      { id: 'FA6HhUjVbervLw2rNl8M', name: 'Ophelia', description: 'Expressive and dynamic' }
-    ]
+    male: allVoices.filter(v => v.gender === 'Male'),
+    female: allVoices.filter(v => v.gender === 'Female')
   };
 
   const personalityModes = [
