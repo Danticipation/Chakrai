@@ -469,41 +469,61 @@ const AppLayout = () => {
         return (
           <div className="flex flex-col h-[calc(100vh-4rem)]">
             
-            {/* Mobile: Compact Feature Bar */}
-            <div className="lg:hidden bg-zinc-800 border-b border-zinc-700 p-2">
-              <div className="flex gap-2 overflow-x-auto pb-1">
+            {/* Mobile: Vertical Feature Panel */}
+            <div className="lg:hidden bg-zinc-800 border-b border-zinc-700 p-3">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={generateDailyContent}
                   disabled={affirmationLoading}
-                  className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-xs whitespace-nowrap flex-shrink-0"
+                  className="px-3 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-sm flex items-center justify-center"
                 >
-                  {affirmationLoading ? '✨' : '✨ Daily'}
+                  {affirmationLoading ? '✨ Loading...' : '✨ Daily Inspiration'}
                 </button>
                 <button
                   onClick={replayLastMessage}
-                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs whitespace-nowrap flex-shrink-0"
+                  className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm flex items-center justify-center"
                 >
-                  🔄 Replay
+                  🔄 Replay Audio
                 </button>
                 <button
                   onClick={() => setActiveSection('memory')}
-                  className="px-3 py-1 bg-cyan-600 hover:bg-cyan-700 rounded text-xs whitespace-nowrap flex-shrink-0"
+                  className="px-3 py-2 bg-cyan-600 hover:bg-cyan-700 rounded text-sm flex items-center justify-center"
                 >
                   🧠 Memory
                 </button>
                 <button
                   onClick={() => setActiveSection('voice')}
-                  className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 rounded text-xs whitespace-nowrap flex-shrink-0"
+                  className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-sm flex items-center justify-center"
                 >
                   🎤 Voice
                 </button>
-                <button
-                  onClick={() => setActiveSection('settings')}
-                  className="px-3 py-1 bg-slate-600 hover:bg-slate-700 rounded text-xs whitespace-nowrap flex-shrink-0"
-                >
-                  ⚙️ Settings
-                </button>
               </div>
+              
+              {/* Bot Stats Row */}
+              {botStats && (
+                <div className="mt-3 bg-zinc-900 rounded p-2 flex justify-between items-center text-xs">
+                  <span className="text-blue-400">Level {botStats.level} • {botStats.stage}</span>
+                  <span className="text-green-400">{botStats.wordsLearned} words learned</span>
+                </div>
+              )}
+              
+              {/* Daily Content Display */}
+              {(dailyAffirmation || horoscope) && (
+                <div className="mt-3 space-y-2">
+                  {dailyAffirmation && (
+                    <div className="bg-zinc-900 p-2 rounded text-xs">
+                      <div className="text-yellow-400 font-medium mb-1">Daily Affirmation:</div>
+                      <div className="text-zinc-300">{dailyAffirmation}</div>
+                    </div>
+                  )}
+                  {horoscope && (
+                    <div className="bg-zinc-900 p-2 rounded text-xs">
+                      <div className="text-yellow-400 font-medium mb-1">Daily Insight:</div>
+                      <div className="text-zinc-300">{horoscope}</div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex-1 flex lg:p-6 lg:max-w-7xl lg:mx-auto lg:gap-6">
