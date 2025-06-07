@@ -41,7 +41,7 @@ const AppLayout = () => {
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
-  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('iCrDUkL56s3C8sCRl7wb');
+  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('EkK5I93UQWFDigLMpZcX');
   const [isGeneratingAudio, setIsGeneratingAudio] = useState<boolean>(false);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
 
@@ -59,10 +59,10 @@ const AppLayout = () => {
 
   const voiceOptions = {
     all: [
-      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm, soothing female voice' },
-      { id: 'FA6HhUjVmxBGQLlzA8WZ', name: 'Ophelia', description: 'Calm, articulate British female' },
-      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Brian', description: 'Deep, resonant male voice' },
-      { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni', description: 'Well-rounded male voice' }
+      { id: 'EkK5I93UQWFDigLMpZcX', name: 'James', description: 'Professional male voice' },
+      { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian', description: 'Deep, resonant male voice' },
+      { id: 'kdmDKE6EkgrWrrykO9Qt', name: 'Alexandra', description: 'Clear female voice' },
+      { id: 'l32B8XDoylOsZKiSdfhE', name: 'Carla', description: 'Warm female voice' }
     ]
   };
 
