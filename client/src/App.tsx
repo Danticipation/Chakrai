@@ -183,10 +183,15 @@ const AppLayout = () => {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
       
-      // Generate audio for bot response
+      // Generate audio for bot response using current voice selection
       try {
+        // Get current voice selection
+        const currentVoiceResponse = await axios.get('/api/voice/current');
+        const currentVoiceId = currentVoiceResponse.data.voice?.id;
+        
         const audioResponse = await axios.post('/api/text-to-speech', { 
-          text: res.data.response 
+          text: res.data.response,
+          voiceId: currentVoiceId
         }, {
           responseType: 'blob'
         });
@@ -325,7 +330,14 @@ const AppLayout = () => {
 
   const generateAudioForText = async (text: string) => {
     try {
-      const response = await axios.post('/api/text-to-speech', { text }, {
+      // Get current voice selection
+      const currentVoiceResponse = await axios.get('/api/voice/current');
+      const currentVoiceId = currentVoiceResponse.data.voice?.id;
+      
+      const response = await axios.post('/api/text-to-speech', { 
+        text,
+        voiceId: currentVoiceId 
+      }, {
         responseType: 'blob'
       });
       
