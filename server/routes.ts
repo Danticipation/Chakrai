@@ -754,6 +754,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   router.post('/api/text-to-speech', async (req, res) => {
     try {
       const { text, voiceId: requestedVoiceId, userId = 1 } = req.body;
+      console.log('TTS Request body:', JSON.stringify(req.body, null, 2));
 
       if (!text) {
         return res.status(400).json({ error: 'Text is required' });
@@ -767,6 +768,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         console.log(`No voice requested, using default: ${defaultVoiceId}`);
       }
+      console.log(`Final voice ID being used: ${voiceId}`);
 
       // Use selected voice with neutral settings
       const voiceSettings = {
