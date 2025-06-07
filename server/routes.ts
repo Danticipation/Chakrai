@@ -759,23 +759,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Text is required' });
       }
 
+      // Always use requested voice if provided, otherwise use default
       let voiceId = requestedVoiceId || defaultVoiceId;
       
-      // If no specific voice requested, use user's stored preference
-      if (!requestedVoiceId) {
-        const facts = await storage.getUserFacts(userId);
-        const voiceFacts = facts.filter(f => f.category === 'voice_preference');
-        
-        if (voiceFacts.length > 0) {
-          // Get the most recent voice preference
-          const latestVoiceFact = voiceFacts.sort((a, b) => 
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          )[0];
-          voiceId = latestVoiceFact.fact.replace('User prefers voice: ', '');
-          console.log(`Using voice ID: ${voiceId} from fact: ${latestVoiceFact.fact}`);
-        }
+      if (requestedVoiceId) {
+        console.log(`Using requested voice ID: ${requestedVoiceId}`);
       } else {
-        console.log(`Using requested voice ID: ${voiceId}`);
+        console.log(`No voice requested, using default: ${defaultVoiceId}`);
       }
 
       // Use selected voice with neutral settings
