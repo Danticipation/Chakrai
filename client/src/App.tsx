@@ -449,8 +449,8 @@ const AppLayout = () => {
     switch (activeSection) {
       case 'chat':
         return (
-          <div className="p-6 max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-8rem)]">
+          <div className="p-2 sm:p-4 lg:p-6 max-w-7xl mx-auto">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 lg:gap-6 h-[calc(100vh-6rem)] lg:h-[calc(100vh-8rem)]">
               
               {/* Main Chat Container */}
               <div className="lg:col-span-2 flex flex-col bg-zinc-800 rounded-lg border border-zinc-700 shadow-lg">
@@ -547,11 +547,11 @@ const AppLayout = () => {
               </div>
 
               {/* Right Sidebar - Features Showcase */}
-              <div className="space-y-4">
+              <div className="order-first lg:order-last flex lg:flex-col gap-4 lg:space-y-4 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
                 
                 {/* Bot Progress Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
-                  <h3 className="text-lg font-semibold text-blue-400 mb-3">Bot Development</h3>
+                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
+                  <h3 className="text-base lg:text-lg font-semibold text-blue-400 mb-2 lg:mb-3">Bot Development</h3>
                   {botStats && (
                     <div className="space-y-3">
                       <div>
@@ -579,8 +579,8 @@ const AppLayout = () => {
                 </div>
 
                 {/* Voice Controls Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
-                  <h3 className="text-lg font-semibold text-purple-400 mb-3">Voice Controls</h3>
+                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
+                  <h3 className="text-base lg:text-lg font-semibold text-purple-400 mb-2 lg:mb-3">Voice Controls</h3>
                   <div className="space-y-2">
                     <button
                       onClick={replayLastMessage}
@@ -607,8 +607,8 @@ const AppLayout = () => {
                 </div>
 
                 {/* Quick Navigation Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
-                  <h3 className="text-lg font-semibold text-orange-400 mb-3">Features</h3>
+                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
+                  <h3 className="text-base lg:text-lg font-semibold text-orange-400 mb-2 lg:mb-3">Features</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => setActiveSection('reflect')}
@@ -638,8 +638,8 @@ const AppLayout = () => {
                 </div>
 
                 {/* Personality Mode Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
-                  <h3 className="text-lg font-semibold text-emerald-400 mb-3">Personality Mode</h3>
+                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
+                  <h3 className="text-base lg:text-lg font-semibold text-emerald-400 mb-2 lg:mb-3">Personality Mode</h3>
                   <div className="text-sm text-zinc-300 mb-2">
                     Current: <span className="text-emerald-400 capitalize">{personalityMode}</span>
                   </div>
