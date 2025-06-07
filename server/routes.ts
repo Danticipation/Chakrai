@@ -765,16 +765,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.query.userId as string) || 1;
       
-      // Get user's selected voice from user facts
+      // Get user's selected voice from user facts (most recent)
       const facts = await storage.getUserFacts(userId);
-      const voiceFact = facts.find(f => f.category === 'voice_preference');
+      const voiceFacts = facts.filter(f => f.category === 'voice_preference');
       
-      if (voiceFact) {
-        const voiceId = voiceFact.fact.replace('User prefers voice: ', '');
+      if (voiceFacts.length > 0) {
+        // Get the most recent voice preference
+        const latestVoiceFact = voiceFacts.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0];
+        const voiceId = latestVoiceFact.fact.replace('User prefers voice: ', '');
         const voice = getVoiceById(voiceId);
+        console.log(`Current voice retrieved: ${voice.name} (${voiceId})`);
         res.json({ voice });
       } else {
         const defaultVoice = getVoiceById(defaultVoiceId);
+        console.log(`Using default voice: ${defaultVoice.name}`);
         res.json({ voice: defaultVoice });
       }
     } catch (error) {
