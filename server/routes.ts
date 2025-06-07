@@ -342,7 +342,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Chat endpoint with enhanced intelligence
   router.post('/api/chat', async (req, res) => {
     try {
-      const { message, botId, personalityMode } = req.body;
+      let { message, botId } = req.body;
+      let personalityMode = req.body.personalityMode;
       const userId = 1; // Default user for demo
       
       // Store personality mode if provided
@@ -795,10 +796,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid voice ID' });
       }
 
-      // Clear existing voice preferences first
-      const facts = await storage.getUserFacts(userId);
-      const existingVoiceFacts = facts.filter(f => f.category === 'voice_preference');
-      
       // Store new voice preference
       await storage.createUserFact({
         userId,
@@ -811,6 +808,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Voice selection error:', error);
       res.status(500).json({ error: 'Failed to select voice' });
+    }
+  });
+
+  // Add the /api/voice/set endpoint that the frontend expects
+  router.post('/api/voice/set', async (req, res) => {
+    try {
+      const { voiceId, userId = 1 } = req.body;
+      
+      if (!voiceId) {
+        return res.status(400).json({ error: 'Voice ID is required' });
+      }
+
+      const voice = getVoiceById(voiceId);
+      if (!voice) {
+        return res.status(400).json({ error: 'Invalid voice ID' });
+      }
+
+      // Store new voice preference
+      await storage.createUserFact({
+        userId,
+        fact: `User prefers voice: ${voiceId}`,
+        category: 'voice_preference'
+      });
+
+      console.log(`Voice set to: ${voice.name} (${voiceId})`);
+      res.json({ message: 'Voice set successfully', voiceId, voice });
+    } catch (error) {
+      console.error('Voice set error:', error);
+      res.status(500).json({ error: 'Failed to set voice' });
     }
   });
 
