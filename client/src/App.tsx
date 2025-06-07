@@ -44,6 +44,9 @@ const AppLayout = () => {
   const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('EkK5I93UQWFDigLMpZcX');
   const [isGeneratingAudio, setIsGeneratingAudio] = useState<boolean>(false);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
+  const [horoscope, setHoroscope] = useState<string>('');
+  const [affirmationLoading, setAffirmationLoading] = useState<boolean>(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -445,6 +448,21 @@ const AppLayout = () => {
     }
   };
 
+  const generateDailyContent = async () => {
+    setAffirmationLoading(true);
+    try {
+      const response = await axios.post('/api/daily-content', { userId: 1 });
+      setDailyAffirmation(response.data.affirmation);
+      setHoroscope(response.data.horoscope);
+    } catch (error) {
+      console.error('Daily content generation failed:', error);
+      setDailyAffirmation('Focus on progress, not perfection. Every small step forward is meaningful.');
+      setHoroscope('Today brings opportunities for growth and learning.');
+    } finally {
+      setAffirmationLoading(false);
+    }
+  };
+
   const renderActiveSection = () => {
     switch (activeSection) {
       case 'chat':
@@ -634,6 +652,32 @@ const AppLayout = () => {
                     >
                       ⚙️ Settings
                     </button>
+                  </div>
+                </div>
+
+                {/* Daily Inspiration Card */}
+                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[220px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
+                  <h3 className="text-base lg:text-lg font-semibold text-yellow-400 mb-2 lg:mb-3">Daily Inspiration</h3>
+                  <div className="space-y-2">
+                    <button
+                      onClick={generateDailyContent}
+                      disabled={affirmationLoading}
+                      className="w-full px-3 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-sm transition-colors"
+                    >
+                      {affirmationLoading ? '✨ Generating...' : '✨ Get Daily Content'}
+                    </button>
+                    {dailyAffirmation && (
+                      <div className="bg-zinc-900 p-2 rounded text-xs text-zinc-300">
+                        <div className="text-yellow-400 font-medium mb-1">Affirmation:</div>
+                        {dailyAffirmation}
+                      </div>
+                    )}
+                    {horoscope && (
+                      <div className="bg-zinc-900 p-2 rounded text-xs text-zinc-300">
+                        <div className="text-yellow-400 font-medium mb-1">Insight:</div>
+                        {horoscope}
+                      </div>
+                    )}
                   </div>
                 </div>
 

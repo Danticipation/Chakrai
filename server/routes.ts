@@ -970,6 +970,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Daily content generation endpoint
+  router.post('/api/daily-content', async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      // Get user context for personalized content
+      const userFacts = await storage.getUserFacts(userId || 1);
+      const memories = await storage.getUserMemories(userId || 1);
+      
+      // Build context for personalization
+      const userContext = {
+        interests: userFacts.filter(f => f.category === 'interest').map(f => f.fact),
+        goals: userFacts.filter(f => f.category === 'goal').map(f => f.fact),
+        recentTopics: memories.slice(-5).map(m => m.content)
+      };
+
+      // Generate personalized affirmation
+      const affirmationPrompt = `Create a personalized daily affirmation for someone with these characteristics:
+      - Recent conversations: ${userContext.recentTopics.join(', ')}
+      - Interests: ${userContext.interests.join(', ')}
+      - Goals: ${userContext.goals.join(', ')}
+      
+      Make it encouraging, specific to their journey, and actionable. Keep it under 50 words.`;
+
+      const affirmationResponse = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: "user", content: affirmationPrompt }],
+        max_tokens: 100
+      });
+
+      // Generate personalized insight/horoscope
+      const insightPrompt = `Create a personalized daily insight for someone based on:
+      - Recent focus: ${userContext.recentTopics.join(', ')}
+      - Personal interests: ${userContext.interests.join(', ')}
+      
+      Provide practical wisdom or perspective that relates to their current journey. Keep it under 60 words.`;
+
+      const insightResponse = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: "user", content: insightPrompt }],
+        max_tokens: 120
+      });
+
+      res.json({
+        affirmation: affirmationResponse.choices[0].message.content?.trim(),
+        horoscope: insightResponse.choices[0].message.content?.trim()
+      });
+
+    } catch (error) {
+      console.error('Daily content generation error:', error);
+      res.status(500).json({ error: 'Failed to generate daily content' });
+    }
+  });
+
   // Bot reset endpoint
   router.post('/api/bot/reset', async (req, res) => {
     try {
