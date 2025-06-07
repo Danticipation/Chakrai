@@ -467,11 +467,49 @@ const AppLayout = () => {
     switch (activeSection) {
       case 'chat':
         return (
-          <div className="p-2 sm:p-4 lg:p-6 max-w-7xl mx-auto">
-            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 lg:gap-6 h-[calc(100vh-6rem)] lg:h-[calc(100vh-8rem)]">
+          <div className="flex flex-col h-[calc(100vh-4rem)]">
+            
+            {/* Mobile: Compact Feature Bar */}
+            <div className="lg:hidden bg-zinc-800 border-b border-zinc-700 p-2">
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                <button
+                  onClick={generateDailyContent}
+                  disabled={affirmationLoading}
+                  className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-xs whitespace-nowrap flex-shrink-0"
+                >
+                  {affirmationLoading ? '✨' : '✨ Daily'}
+                </button>
+                <button
+                  onClick={replayLastMessage}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs whitespace-nowrap flex-shrink-0"
+                >
+                  🔄 Replay
+                </button>
+                <button
+                  onClick={() => setActiveSection('memory')}
+                  className="px-3 py-1 bg-cyan-600 hover:bg-cyan-700 rounded text-xs whitespace-nowrap flex-shrink-0"
+                >
+                  🧠 Memory
+                </button>
+                <button
+                  onClick={() => setActiveSection('voice')}
+                  className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 rounded text-xs whitespace-nowrap flex-shrink-0"
+                >
+                  🎤 Voice
+                </button>
+                <button
+                  onClick={() => setActiveSection('settings')}
+                  className="px-3 py-1 bg-slate-600 hover:bg-slate-700 rounded text-xs whitespace-nowrap flex-shrink-0"
+                >
+                  ⚙️ Settings
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 flex lg:p-6 lg:max-w-7xl lg:mx-auto lg:gap-6">
               
               {/* Main Chat Container */}
-              <div className="lg:col-span-2 flex flex-col bg-zinc-800 rounded-lg border border-zinc-700 shadow-lg">
+              <div className="flex-1 lg:flex-[2] flex flex-col bg-zinc-800 lg:rounded-lg lg:border lg:border-zinc-700 lg:shadow-lg">
                 {/* Chat Header */}
                 <div className="p-4 border-b border-zinc-700 bg-zinc-800 rounded-t-lg">
                   <h2 className="text-xl font-bold text-white">Chat with Reflectibot</h2>
@@ -564,12 +602,12 @@ const AppLayout = () => {
                 </div>
               </div>
 
-              {/* Right Sidebar - Features Showcase */}
-              <div className="order-first lg:order-last flex lg:flex-col gap-4 lg:space-y-4 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+              {/* Desktop Sidebar - Hidden on Mobile */}
+              <div className="hidden lg:flex lg:flex-col lg:flex-1 lg:space-y-4">
                 
                 {/* Bot Progress Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
-                  <h3 className="text-base lg:text-lg font-semibold text-blue-400 mb-2 lg:mb-3">Bot Development</h3>
+                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
+                  <h3 className="text-lg font-semibold text-blue-400 mb-3">Bot Development</h3>
                   {botStats && (
                     <div className="space-y-3">
                       <div>
@@ -597,8 +635,8 @@ const AppLayout = () => {
                 </div>
 
                 {/* Voice Controls Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
-                  <h3 className="text-base lg:text-lg font-semibold text-purple-400 mb-2 lg:mb-3">Voice Controls</h3>
+                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
+                  <h3 className="text-lg font-semibold text-purple-400 mb-3">Voice Controls</h3>
                   <div className="space-y-2">
                     <button
                       onClick={replayLastMessage}
@@ -624,40 +662,9 @@ const AppLayout = () => {
                   </div>
                 </div>
 
-                {/* Quick Navigation Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
-                  <h3 className="text-base lg:text-lg font-semibold text-orange-400 mb-2 lg:mb-3">Features</h3>
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => setActiveSection('reflect')}
-                      className="w-full px-3 py-2 bg-orange-600 hover:bg-orange-700 rounded text-sm transition-colors text-left"
-                    >
-                      📝 Weekly Reflection
-                    </button>
-                    <button
-                      onClick={() => setActiveSection('memory')}
-                      className="w-full px-3 py-2 bg-cyan-600 hover:bg-cyan-700 rounded text-sm transition-colors text-left"
-                    >
-                      🧠 Memory Dashboard
-                    </button>
-                    <button
-                      onClick={() => setActiveSection('voice')}
-                      className="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-sm transition-colors text-left"
-                    >
-                      🎤 Voice Settings
-                    </button>
-                    <button
-                      onClick={() => setActiveSection('settings')}
-                      className="w-full px-3 py-2 bg-slate-600 hover:bg-slate-700 rounded text-sm transition-colors text-left"
-                    >
-                      ⚙️ Settings
-                    </button>
-                  </div>
-                </div>
-
                 {/* Daily Inspiration Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[220px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
-                  <h3 className="text-base lg:text-lg font-semibold text-yellow-400 mb-2 lg:mb-3">Daily Inspiration</h3>
+                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
+                  <h3 className="text-lg font-semibold text-yellow-400 mb-3">Daily Inspiration</h3>
                   <div className="space-y-2">
                     <button
                       onClick={generateDailyContent}
@@ -682,8 +689,8 @@ const AppLayout = () => {
                 </div>
 
                 {/* Personality Mode Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-3 lg:p-4 min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
-                  <h3 className="text-base lg:text-lg font-semibold text-emerald-400 mb-2 lg:mb-3">Personality Mode</h3>
+                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
+                  <h3 className="text-lg font-semibold text-emerald-400 mb-3">Personality Mode</h3>
                   <div className="text-sm text-zinc-300 mb-2">
                     Current: <span className="text-emerald-400 capitalize">{personalityMode}</span>
                   </div>
