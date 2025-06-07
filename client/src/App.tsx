@@ -843,8 +843,8 @@ const AppLayout = () => {
 
   return (
     <div className="flex h-screen bg-zinc-900 text-white">
-      {/* Sidebar */}
-      <div className="w-20 bg-zinc-800 flex flex-col items-center py-6 space-y-4">
+      {/* Sidebar - Hidden on Mobile */}
+      <div className="hidden lg:flex w-20 bg-zinc-800 flex-col items-center py-6 space-y-4">
         {sections.map((section) => {
           const Icon = section.icon;
           return (
