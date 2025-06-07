@@ -543,10 +543,10 @@ const AppLayout = () => {
             </div>
 
             {/* Mobile: Full-width Chat / Desktop: Sidebar Layout */}
-            <div className="flex-1 flex flex-col lg:flex-row lg:p-6 lg:max-w-7xl lg:mx-auto lg:gap-6">
+            <div className="flex-1 flex flex-col lg:flex-row lg:p-6 lg:max-w-7xl lg:mx-auto lg:gap-6 min-w-0">
               
               {/* Main Chat Container */}
-              <div className="flex-1 lg:flex-[2] flex flex-col bg-zinc-800 lg:rounded-lg lg:border lg:border-zinc-700 lg:shadow-lg">
+              <div className="flex-1 lg:flex-[2] flex flex-col bg-zinc-800 lg:rounded-lg lg:border lg:border-zinc-700 lg:shadow-lg min-w-0">
                 {/* Chat Header - Desktop Only */}
                 <div className="hidden lg:block p-4 border-b border-zinc-700 bg-zinc-800 rounded-t-lg">
                   <h2 className="text-xl font-bold text-white">Chat with Reflectibot</h2>
@@ -604,7 +604,35 @@ const AppLayout = () => {
 
                 {/* Input Area */}
                 <div className="p-3 lg:p-4 border-t border-zinc-700 bg-zinc-800 lg:rounded-b-lg">
-                  <div className="flex items-center space-x-2">
+                  {/* Mobile: Simple Input */}
+                  <div className="lg:hidden flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Type your message..."
+                      className="flex-1 p-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      onClick={isRecording ? stopRecording : startRecording}
+                      className={`p-3 rounded-full flex-shrink-0 ${
+                        isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-600 hover:bg-zinc-500'
+                      }`}
+                    >
+                      {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                    </button>
+                    <button
+                      onClick={sendMessage}
+                      disabled={!input.trim() || loading}
+                      className="p-3 rounded-full flex-shrink-0 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
+                  </div>
+                  
+                  {/* Desktop: Full Input with All Actions */}
+                  <div className="hidden lg:flex items-center space-x-2">
                     <input
                       type="text"
                       value={input}
@@ -879,7 +907,7 @@ const AppLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-zinc-900 text-white">
+    <div className="flex h-screen bg-zinc-900 text-white overflow-hidden">
       {/* Sidebar - Hidden on Mobile */}
       <div className="hidden lg:flex w-20 bg-zinc-800 flex-col items-center py-6 space-y-4">
         {sections.map((section) => {
@@ -914,7 +942,7 @@ const AppLayout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <div className="flex-1 overflow-hidden">
           {renderActiveSection()}
         </div>
