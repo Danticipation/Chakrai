@@ -209,8 +209,50 @@ Write as an empathetic AI who notices meaningful details about this specific per
   }
 }
 
+// Get personality mode specific context and behavior instructions
+function getPersonalityModeContext(mode: string): string {
+  const modeDefinitions = {
+    'friend': {
+      name: 'Friend Mode',
+      behavior: 'Be casual, friendly, and engaging. Use conversational language, share relatable thoughts, and maintain a warm, supportive tone. Feel free to use humor and be more personal in your responses.'
+    },
+    'counsel': {
+      name: 'Counsel Mode', 
+      behavior: 'Provide thoughtful advice and guidance. Ask clarifying questions, offer different perspectives, and help the user work through decisions. Be supportive but also challenge them to think critically.'
+    },
+    'study': {
+      name: 'Study Mode',
+      behavior: 'Focus on learning and research assistance. Break down complex topics, ask questions to test understanding, provide structured information, and encourage deeper exploration of subjects.'
+    },
+    'diary': {
+      name: 'Diary Mode',
+      behavior: 'Listen actively and provide emotional support. Be empathetic, validate feelings, ask gentle follow-up questions, and create a safe space for the user to express themselves freely.'
+    },
+    'goal': {
+      name: 'Goal-Setting Mode',
+      behavior: 'Help track progress and achieve milestones. Be motivational, ask about specific goals, break down tasks into manageable steps, and celebrate achievements while addressing obstacles.'
+    },
+    'wellness': {
+      name: 'Wellness Mode',
+      behavior: 'Focus on mental health and mindfulness. Encourage self-care, suggest stress management techniques, promote positive thinking, and be sensitive to emotional wellbeing.'
+    },
+    'creative': {
+      name: 'Creative Mode',
+      behavior: 'Inspire brainstorming and creative thinking. Ask imaginative questions, suggest creative exercises, encourage experimentation, and help generate new ideas and perspectives.'
+    }
+  };
+
+  const modeConfig = modeDefinitions[mode as keyof typeof modeDefinitions];
+  if (!modeConfig) return '';
+  
+  return `PERSONALITY MODE: ${modeConfig.name}
+Behavior Instructions: ${modeConfig.behavior}
+
+Adapt your responses to match this personality mode while maintaining your developmental stage characteristics.`;
+}
+
 // Enhanced AI response generation with advanced intelligence
-async function generateResponse(userMessage: string, botId: number, userId: number): Promise<string> {
+async function generateResponse(userMessage: string, botId: number, userId: number, personalityMode?: string): Promise<string> {
   try {
     const memories = await storage.getUserMemories(userId);
     const facts = await storage.getUserFacts(userId);
@@ -247,7 +289,12 @@ async function generateResponse(userMessage: string, botId: number, userId: numb
     const factContext = facts.map(f => f.fact).join('\n');
     const conversationHistoryContext = recentMessages.slice(-6).map(m => `${m.sender}: ${m.text}`).join('\n');
     
+    // Define personality mode behaviors
+    const personalityModeContext = personalityMode ? getPersonalityModeContext(personalityMode) : '';
+
     const systemPrompt = `You are Reflectibot, an AI companion in the "${stage}" learning stage. You learn and grow through conversations.
+
+${personalityModeContext}
 
 Context Analysis:
 - ${timeBasedContext}
@@ -268,7 +315,7 @@ Stage behaviors:
 - Adolescent: Nuanced responses, emotional awareness
 - Adult: Sophisticated dialogue, deep connections to memories
 
-Respond naturally according to your developmental stage and the detected intent. Show emotional intelligence and contextual awareness based on the conversation analysis. Reference your stored knowledge appropriately.`;
+Respond naturally according to your developmental stage, personality mode, and the detected intent. Show emotional intelligence and contextual awareness based on the conversation analysis. Reference your stored knowledge appropriately.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -297,6 +344,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { message, botId, personalityMode } = req.body;
       const userId = 1; // Default user for demo
+      
+      console.log(`Chat request - Mode: ${personalityMode || 'none'}, Message: ${message.substring(0, 50)}...`);
 
       // Handle voice commands first
       const lowerMessage = message.toLowerCase().trim();
@@ -424,8 +473,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         importance: 'medium'
       });
 
-      // Generate AI response
-      const aiResponse = await generateResponse(message, bot.id, userId);
+      // Generate AI response with personality mode
+      const aiResponse = await generateResponse(message, bot.id, userId, personalityMode);
 
       // Store bot response
       await storage.createMessage({
