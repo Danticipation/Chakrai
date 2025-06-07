@@ -345,6 +345,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { message, botId, personalityMode } = req.body;
       const userId = 1; // Default user for demo
       
+      // Store personality mode if provided
+      if (personalityMode) {
+        await storage.createUserFact({
+          userId,
+          fact: `User prefers personality mode: ${personalityMode}`,
+          category: 'personality_mode'
+        });
+        console.log(`Personality mode set to: ${personalityMode}`);
+      } else {
+        // Get stored personality mode if none provided
+        const facts = await storage.getUserFacts(userId);
+        const modeFact = facts.find(f => f.category === 'personality_mode');
+        if (modeFact) {
+          personalityMode = modeFact.fact.replace('User prefers personality mode: ', '');
+        }
+      }
+      
       console.log(`Chat request - Mode: ${personalityMode || 'none'}, Message: ${message.substring(0, 50)}...`);
 
       // Handle voice commands first
@@ -778,7 +795,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid voice ID' });
       }
 
-      // Don't store voice preferences - let frontend handle voice selection
+      // Clear existing voice preferences first
+      const facts = await storage.getUserFacts(userId);
+      const existingVoiceFacts = facts.filter(f => f.category === 'voice_preference');
+      
+      // Store new voice preference
+      await storage.createUserFact({
+        userId,
+        fact: `User prefers voice: ${voiceId}`,
+        category: 'voice_preference'
+      });
+
+      console.log(`Voice changed to: ${voice.name} (${voiceId})`);
       res.json({ success: true, voice });
     } catch (error) {
       console.error('Voice selection error:', error);
