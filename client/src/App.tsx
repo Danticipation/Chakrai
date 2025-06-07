@@ -47,6 +47,7 @@ const AppLayout = () => {
   const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
   const [horoscope, setHoroscope] = useState<string>('');
   const [affirmationLoading, setAffirmationLoading] = useState<boolean>(false);
+  const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -467,71 +468,87 @@ const AppLayout = () => {
     switch (activeSection) {
       case 'chat':
         return (
-          <div className="flex flex-col h-[calc(100vh-4rem)]">
+          <div className="flex flex-col h-screen lg:h-[calc(100vh-4rem)]">
             
-            {/* Mobile: Vertical Feature Panel */}
+            {/* Mobile: Simple Header with Quick Actions */}
             <div className="lg:hidden bg-zinc-800 border-b border-zinc-700 p-3">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={generateDailyContent}
-                  disabled={affirmationLoading}
-                  className="px-3 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-sm flex items-center justify-center"
-                >
-                  {affirmationLoading ? '✨ Loading...' : '✨ Daily Inspiration'}
-                </button>
-                <button
-                  onClick={replayLastMessage}
-                  className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm flex items-center justify-center"
-                >
-                  🔄 Replay Audio
-                </button>
-                <button
-                  onClick={() => setActiveSection('memory')}
-                  className="px-3 py-2 bg-cyan-600 hover:bg-cyan-700 rounded text-sm flex items-center justify-center"
-                >
-                  🧠 Memory
-                </button>
-                <button
-                  onClick={() => setActiveSection('voice')}
-                  className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-sm flex items-center justify-center"
-                >
-                  🎤 Voice
-                </button>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-lg font-bold text-white">Reflectibot</h1>
+                  {botStats && (
+                    <p className="text-xs text-zinc-400">Level {botStats.level} • {botStats.wordsLearned}w</p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={generateDailyContent}
+                    disabled={affirmationLoading}
+                    className="w-8 h-8 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded-full flex items-center justify-center text-sm"
+                    title="Daily Inspiration"
+                  >
+                    ✨
+                  </button>
+                  <button
+                    onClick={replayLastMessage}
+                    className="w-8 h-8 bg-purple-600 hover:bg-purple-700 rounded-full flex items-center justify-center text-sm"
+                    title="Replay Audio"
+                  >
+                    🔄
+                  </button>
+                  <button
+                    onClick={() => setShowMobileMenu(!showMobileMenu)}
+                    className="w-8 h-8 bg-zinc-600 hover:bg-zinc-700 rounded-full flex items-center justify-center text-sm"
+                    title="Menu"
+                  >
+                    ⋯
+                  </button>
+                </div>
               </div>
               
-              {/* Bot Stats Row */}
-              {botStats && (
-                <div className="mt-3 bg-zinc-900 rounded p-2 flex justify-between items-center text-xs">
-                  <span className="text-blue-400">Level {botStats.level} • {botStats.stage}</span>
-                  <span className="text-green-400">{botStats.wordsLearned} words learned</span>
+              {/* Mobile Menu Dropdown */}
+              {showMobileMenu && (
+                <div className="mt-3 bg-zinc-900 rounded-lg p-3 space-y-2">
+                  <button
+                    onClick={() => { setActiveSection('memory'); setShowMobileMenu(false); }}
+                    className="w-full text-left px-3 py-2 bg-cyan-600 hover:bg-cyan-700 rounded text-sm"
+                  >
+                    🧠 Memory Dashboard
+                  </button>
+                  <button
+                    onClick={() => { setActiveSection('voice'); setShowMobileMenu(false); }}
+                    className="w-full text-left px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-sm"
+                  >
+                    🎤 Voice Settings
+                  </button>
+                  <button
+                    onClick={() => { setActiveSection('settings'); setShowMobileMenu(false); }}
+                    className="w-full text-left px-3 py-2 bg-slate-600 hover:bg-slate-700 rounded text-sm"
+                  >
+                    ⚙️ Settings
+                  </button>
                 </div>
               )}
               
-              {/* Daily Content Display */}
+              {/* Daily Content - Compact */}
               {(dailyAffirmation || horoscope) && (
-                <div className="mt-3 space-y-2">
+                <div className="mt-3 bg-zinc-900 rounded p-2">
                   {dailyAffirmation && (
-                    <div className="bg-zinc-900 p-2 rounded text-xs">
-                      <div className="text-yellow-400 font-medium mb-1">Daily Affirmation:</div>
-                      <div className="text-zinc-300">{dailyAffirmation}</div>
-                    </div>
+                    <div className="text-xs text-zinc-300 mb-1">{dailyAffirmation}</div>
                   )}
                   {horoscope && (
-                    <div className="bg-zinc-900 p-2 rounded text-xs">
-                      <div className="text-yellow-400 font-medium mb-1">Daily Insight:</div>
-                      <div className="text-zinc-300">{horoscope}</div>
-                    </div>
+                    <div className="text-xs text-zinc-400">{horoscope}</div>
                   )}
                 </div>
               )}
             </div>
 
-            <div className="flex-1 flex lg:p-6 lg:max-w-7xl lg:mx-auto lg:gap-6">
+            {/* Mobile: Full-width Chat / Desktop: Sidebar Layout */}
+            <div className="flex-1 flex flex-col lg:flex-row lg:p-6 lg:max-w-7xl lg:mx-auto lg:gap-6">
               
               {/* Main Chat Container */}
               <div className="flex-1 lg:flex-[2] flex flex-col bg-zinc-800 lg:rounded-lg lg:border lg:border-zinc-700 lg:shadow-lg">
-                {/* Chat Header */}
-                <div className="p-4 border-b border-zinc-700 bg-zinc-800 rounded-t-lg">
+                {/* Chat Header - Desktop Only */}
+                <div className="hidden lg:block p-4 border-b border-zinc-700 bg-zinc-800 rounded-t-lg">
                   <h2 className="text-xl font-bold text-white">Chat with Reflectibot</h2>
                   {botStats && (
                     <p className="text-sm text-zinc-400">
@@ -586,14 +603,14 @@ const AppLayout = () => {
                 </div>
 
                 {/* Input Area */}
-                <div className="p-4 border-t border-zinc-700 bg-zinc-800 rounded-b-lg">
+                <div className="p-3 lg:p-4 border-t border-zinc-700 bg-zinc-800 lg:rounded-b-lg">
                   <div className="flex items-center space-x-2">
                     <input
                       type="text"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Type your message... (or press 'r' to record)"
+                      placeholder="Type your message..."
                       className="flex-1 p-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
