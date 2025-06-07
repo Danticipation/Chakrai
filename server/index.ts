@@ -1,7 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
 import path from "path";
-import { registerRoutes } from "./routes_clean";
+import { registerRoutes } from "./routes";
 import { setupVite } from "./vite";
 
 const app = express();

@@ -729,20 +729,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid voice ID' });
       }
 
-      // Remove existing voice preference
-      const facts = await storage.getUserFacts(userId);
-      const existingVoiceFact = facts.find(f => f.category === 'voice_preference');
-      if (existingVoiceFact) {
-        // We would need a delete method, for now just add a new one
-      }
-
-      // Store new voice preference
-      await storage.createUserFact({
-        userId,
-        fact: `User prefers voice: ${voiceId}`,
-        category: 'voice_preference'
-      });
-
+      // Don't store voice preferences - let frontend handle voice selection
       res.json({ success: true, voice });
     } catch (error) {
       console.error('Voice selection error:', error);
