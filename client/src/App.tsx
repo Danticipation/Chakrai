@@ -664,82 +664,93 @@ const AppLayout = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-zinc-900 text-white">
-      {/* Mobile Header */}
-      <div className="md:hidden bg-zinc-800 p-4 flex items-center justify-between">
-        <img 
-          src="/trai-logo.jpg" 
-          alt="TraI Logo" 
-          className="w-8 h-8 rounded-full object-cover"
-        />
-        <h1 className="text-xl font-bold">TraI</h1>
-        {botStats && (
-          <div className="text-xs text-zinc-400">
-            Level {botStats.level} • {botStats.stage}
-          </div>
-        )}
-      </div>
+    <div className="h-screen bg-zinc-900 text-white">
+      {/* Mobile Layout */}
+      <div className="md:hidden h-full flex flex-col">
+        {/* Mobile Header */}
+        <div className="bg-zinc-800 p-4 flex items-center justify-between shrink-0">
+          <img 
+            src="/trai-logo.jpg" 
+            alt="TraI Logo" 
+            className="w-8 h-8 rounded-full object-cover"
+          />
+          <h1 className="text-xl font-bold">TraI</h1>
+          {botStats && (
+            <div className="text-xs text-zinc-400">
+              Level {botStats.level} • {botStats.stage}
+            </div>
+          )}
+        </div>
 
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex w-20 bg-zinc-800 flex-col items-center py-6 space-y-4">
-        {sections.map((section) => {
-          const Icon = section.icon;
-          return (
-            <button
-              key={section.id}
-              onClick={() => setActiveSection(section.id)}
-              className={`p-3 rounded-lg transition-colors relative group ${
-                activeSection === section.id 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
-              }`}
-              title={section.label}
-            >
-              <Icon className="w-6 h-6" />
-              <div className="absolute left-full ml-2 px-2 py-1 bg-zinc-700 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                {section.label}
-              </div>
-            </button>
-          );
-        })}
-
-        {/* Bot Stats in Sidebar */}
-        {botStats && (
-          <div className="mt-auto text-center text-xs">
-            <div className="text-zinc-400">Level {botStats.level}</div>
-            <div className="text-zinc-500">{botStats.stage}</div>
-            <div className="text-zinc-500">{botStats.wordsLearned}w</div>
-          </div>
-        )}
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+        {/* Mobile Content */}
         <div className="flex-1 overflow-hidden">
           {renderActiveSection()}
         </div>
+
+        {/* Mobile Bottom Navigation - Fixed */}
+        <div className="bg-zinc-800 border-t border-zinc-700 shrink-0 safe-area-inset-bottom">
+          <div className="flex justify-around py-3 px-2">
+            {sections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`flex flex-col items-center p-2 min-w-[60px] rounded-lg transition-colors ${
+                    activeSection === section.id 
+                      ? 'text-blue-400 bg-blue-900/30' 
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
+                  }`}
+                >
+                  <Icon className="w-6 h-6 mb-1" />
+                  <span className="text-xs font-medium">{section.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="md:hidden bg-zinc-800 border-t border-zinc-700">
-        <div className="flex justify-around py-2">
+      {/* Desktop Layout */}
+      <div className="hidden md:flex h-full">
+        {/* Desktop Sidebar */}
+        <div className="w-20 bg-zinc-800 flex flex-col items-center py-6 space-y-4">
           {sections.map((section) => {
             const Icon = section.icon;
             return (
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
-                className={`flex flex-col items-center p-3 min-w-[60px] ${
+                className={`p-3 rounded-lg transition-colors relative group ${
                   activeSection === section.id 
-                    ? 'text-blue-400' 
-                    : 'text-zinc-400'
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
                 }`}
+                title={section.label}
               >
-                <Icon className="w-5 h-5 mb-1" />
-                <span className="text-xs">{section.label}</span>
+                <Icon className="w-6 h-6" />
+                <div className="absolute left-full ml-2 px-2 py-1 bg-zinc-700 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {section.label}
+                </div>
               </button>
             );
           })}
+
+          {/* Bot Stats in Sidebar */}
+          {botStats && (
+            <div className="mt-auto text-center text-xs">
+              <div className="text-zinc-400">Level {botStats.level}</div>
+              <div className="text-zinc-500">{botStats.stage}</div>
+              <div className="text-zinc-500">{botStats.wordsLearned}w</div>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Main Content */}
+        <div className="flex-1 flex flex-col">
+          <div className="flex-1 overflow-hidden">
+            {renderActiveSection()}
+          </div>
         </div>
       </div>
     </div>
