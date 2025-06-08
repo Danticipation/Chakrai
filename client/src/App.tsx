@@ -470,82 +470,84 @@ const AppLayout = () => {
         return (
           <div className="flex flex-col h-[100vh] lg:h-[calc(100vh-4rem)]">
             
-            {/* Mobile: Simple Header with Quick Actions */}
-            <div className="lg:hidden bg-zinc-800 border-b border-zinc-700 p-3 flex-shrink-0">
-              <div className="flex items-center justify-between">
+            {/* Mobile: Clean Header */}
+            <div className="lg:hidden bg-zinc-800 border-b border-zinc-700 p-4 flex-shrink-0">
+              <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h1 className="text-lg font-bold text-white">Reflectibot</h1>
+                  <h1 className="text-xl font-bold text-white">Reflectibot</h1>
                   {botStats && (
-                    <p className="text-xs text-zinc-400">Level {botStats.level} • {botStats.wordsLearned}w</p>
+                    <p className="text-sm text-zinc-400">Level {botStats.level} • {botStats.wordsLearned} words</p>
                   )}
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setShowMobileMenu(!showMobileMenu)}
-                    className="w-8 h-8 bg-zinc-600 hover:bg-zinc-700 rounded-full flex items-center justify-center text-sm"
-                    title="Menu"
-                  >
-                    ⋯
-                  </button>
-                </div>
+                <button
+                  onClick={() => setShowMobileMenu(!showMobileMenu)}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium"
+                >
+                  Menu
+                </button>
               </div>
               
-              {/* Daily Affirmation Display - Mobile */}
-              {(dailyAffirmation || horoscope) && (
-                <div className="mt-3 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-3 border border-purple-500/30 overflow-hidden">
-                  <div className="text-xs text-purple-300 font-medium mb-1">Daily Affirmation</div>
-                  {dailyAffirmation && (
-                    <div className="text-sm text-white leading-relaxed mb-2 break-words">{dailyAffirmation}</div>
-                  )}
-                  {horoscope && (
-                    <div className="text-xs text-purple-200 opacity-90 break-words">{horoscope}</div>
-                  )}
-                </div>
-              )}
-              
-              {/* Mobile Menu Dropdown */}
+              {/* Mobile Menu */}
               {showMobileMenu && (
-                <div className="mt-3 bg-zinc-900 rounded-lg p-3 space-y-2">
+                <div className="bg-zinc-900 rounded-lg p-3 space-y-2 mb-3">
                   <button
                     onClick={() => { generateDailyContent(); setShowMobileMenu(false); }}
                     disabled={affirmationLoading}
-                    className="w-full text-left px-3 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-sm"
+                    className="w-full text-left px-3 py-3 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-white font-medium"
                   >
                     ✨ Daily Affirmation
                   </button>
                   <button
                     onClick={() => { replayLastMessage(); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                    className="w-full text-left px-3 py-3 bg-purple-600 hover:bg-purple-700 rounded text-white font-medium"
                   >
                     🔄 Replay Audio
                   </button>
                   <button
                     onClick={() => { setActiveSection('reflect'); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                    className="w-full text-left px-3 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium"
                   >
                     🔁 Weekly Reflection
                   </button>
                   <button
                     onClick={() => { setActiveSection('memory'); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-2 bg-cyan-600 hover:bg-cyan-700 rounded text-sm"
+                    className="w-full text-left px-3 py-3 bg-cyan-600 hover:bg-cyan-700 rounded text-white font-medium"
                   >
                     🧠 Memory Dashboard
                   </button>
                   <button
                     onClick={() => { setActiveSection('voice'); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-sm"
+                    className="w-full text-left px-3 py-3 bg-indigo-600 hover:bg-indigo-700 rounded text-white font-medium"
                   >
                     🎤 Voice Settings
                   </button>
                   <button
                     onClick={() => { setActiveSection('settings'); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-2 bg-slate-600 hover:bg-slate-700 rounded text-sm"
+                    className="w-full text-left px-3 py-3 bg-slate-600 hover:bg-slate-700 rounded text-white font-medium"
                   >
                     ⚙️ Settings
                   </button>
                 </div>
               )}
-              
+
+              {/* Daily Affirmation - Simplified */}
+              {(dailyAffirmation || horoscope) && (
+                <div className="bg-purple-800 rounded-lg p-4 border border-purple-600 relative">
+                  <button 
+                    onClick={() => { setDailyAffirmation(''); setHoroscope(''); }}
+                    className="absolute top-2 right-2 w-8 h-8 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white font-bold"
+                  >
+                    ×
+                  </button>
+                  <div className="text-sm text-purple-200 font-medium mb-2">Daily Affirmation</div>
+                  {dailyAffirmation && (
+                    <div className="text-base text-white leading-relaxed mb-2 pr-10">{dailyAffirmation}</div>
+                  )}
+                  {horoscope && (
+                    <div className="text-sm text-purple-200 pr-10">{horoscope}</div>
+                  )}
+                </div>
+              )}
 
             </div>
 
