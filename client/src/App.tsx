@@ -618,9 +618,8 @@ const AppLayout = () => {
                   )}
                 </div>
 
-                {/* Input Area */}
-                <div className="p-4 border-t border-zinc-700 bg-zinc-800 pb-safe">
-                  {/* Mobile Input Bar */}
+                {/* Input Area - Always Visible */}
+                <div className="p-4 border-t border-zinc-700 bg-zinc-800">
                   <div className="flex items-center gap-3">
                     <input
                       type="text"
@@ -633,9 +632,19 @@ const AppLayout = () => {
                     <button
                       type="button"
                       onClick={isRecording ? stopRecording : startRecording}
-                      className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white ${
-                        isRecording ? 'bg-red-500' : 'bg-green-500'
-                      }`}
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '20px',
+                        backgroundColor: isRecording ? '#ef4444' : '#22c55e',
+                        color: 'white',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
                     >
                       🎤
                     </button>
@@ -643,11 +652,25 @@ const AppLayout = () => {
                       type="button"
                       onClick={sendMessage}
                       disabled={!input.trim() || loading}
-                      className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white disabled:opacity-50"
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '20px',
+                        backgroundColor: '#3b82f6',
+                        color: 'white',
+                        border: 'none',
+                        cursor: 'pointer',
+                        opacity: (!input.trim() || loading) ? 0.5 : 1
+                      }}
                     >
                       ➤
                     </button>
                   </div>
+                </div>
                   
                   {/* Desktop: Full Input with All Actions */}
                   <div className="hidden lg:flex items-center space-x-2">
