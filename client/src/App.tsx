@@ -505,6 +505,19 @@ const AppLayout = () => {
                 </div>
               </div>
               
+              {/* Daily Reflection Display - Mobile */}
+              {(dailyAffirmation || horoscope) && (
+                <div className="mt-3 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-3 border border-purple-500/30">
+                  <div className="text-xs text-purple-300 font-medium mb-1">Daily Reflection</div>
+                  {dailyAffirmation && (
+                    <div className="text-sm text-white leading-relaxed mb-2">{dailyAffirmation}</div>
+                  )}
+                  {horoscope && (
+                    <div className="text-xs text-purple-200 opacity-90">{horoscope}</div>
+                  )}
+                </div>
+              )}
+              
               {/* Mobile Menu Dropdown */}
               {showMobileMenu && (
                 <div className="mt-3 bg-zinc-900 rounded-lg p-3 space-y-2">
@@ -883,10 +896,10 @@ const AppLayout = () => {
               <div className="bg-zinc-800 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4 text-blue-400">User Management</h3>
                 <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Switch User</label>
-                  <div className="flex space-x-2">
-                    <input
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Switch User</label>
+                    <div className="flex space-x-2">
+                      <input
                       type="text"
                       value={newUserName}
                       onChange={(e) => setNewUserName(e.target.value)}
