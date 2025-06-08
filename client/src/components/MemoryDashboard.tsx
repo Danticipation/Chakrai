@@ -107,20 +107,18 @@ export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-2 lg:gap-4">
-          <div className="bg-gray-700/50 p-2 lg:p-4 rounded-lg text-center">
-            <div className="text-lg lg:text-2xl font-bold text-blue-400">{stats.wordCount}</div>
-            <div className="text-xs lg:text-sm text-gray-400">Words</div>
-            <div className="text-xs lg:text-sm text-gray-400">Learned</div>
+        <div className="grid grid-cols-3 gap-3 lg:gap-4">
+          <div className="bg-gray-700/50 p-3 lg:p-4 rounded-lg text-center">
+            <div className="text-xl lg:text-2xl font-bold text-blue-400">{stats.wordCount}</div>
+            <div className="text-xs lg:text-sm text-gray-400 leading-tight">Words<br/>Learned</div>
           </div>
-          <div className="bg-gray-700/50 p-2 lg:p-4 rounded-lg text-center">
-            <div className="text-lg lg:text-2xl font-bold text-emerald-400">{stats.factCount}</div>
-            <div className="text-xs lg:text-sm text-gray-400">Facts</div>
-            <div className="text-xs lg:text-sm text-gray-400">Remembered</div>
+          <div className="bg-gray-700/50 p-3 lg:p-4 rounded-lg text-center">
+            <div className="text-xl lg:text-2xl font-bold text-emerald-400">{stats.factCount}</div>
+            <div className="text-xs lg:text-sm text-gray-400 leading-tight">Facts<br/>Remembered</div>
           </div>
-          <div className="bg-gray-700/50 p-2 lg:p-4 rounded-lg text-center">
-            <div className="text-lg lg:text-2xl font-bold text-purple-400">{stats.memoryCount}</div>
-            <div className="text-xs lg:text-sm text-gray-400">Conversat</div>
+          <div className="bg-gray-700/50 p-3 lg:p-4 rounded-lg text-center">
+            <div className="text-xl lg:text-2xl font-bold text-purple-400">{stats.memoryCount}</div>
+            <div className="text-xs lg:text-sm text-gray-400 leading-tight">Conversations</div>
           </div>
         </div>
       </div>
