@@ -481,21 +481,6 @@ const AppLayout = () => {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={generateDailyContent}
-                    disabled={affirmationLoading}
-                    className="w-8 h-8 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded-full flex items-center justify-center text-sm"
-                    title="Daily Inspiration"
-                  >
-                    ✨
-                  </button>
-                  <button
-                    onClick={replayLastMessage}
-                    className="w-8 h-8 bg-purple-600 hover:bg-purple-700 rounded-full flex items-center justify-center text-sm"
-                    title="Replay Audio"
-                  >
-                    🔄
-                  </button>
-                  <button
                     onClick={() => setShowMobileMenu(!showMobileMenu)}
                     className="w-8 h-8 bg-zinc-600 hover:bg-zinc-700 rounded-full flex items-center justify-center text-sm"
                     title="Menu"
@@ -507,13 +492,13 @@ const AppLayout = () => {
               
               {/* Daily Affirmation Display - Mobile */}
               {(dailyAffirmation || horoscope) && (
-                <div className="mt-3 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-3 border border-purple-500/30">
+                <div className="mt-3 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-3 border border-purple-500/30 overflow-hidden">
                   <div className="text-xs text-purple-300 font-medium mb-1">Daily Affirmation</div>
                   {dailyAffirmation && (
-                    <div className="text-sm text-white leading-relaxed mb-2">{dailyAffirmation}</div>
+                    <div className="text-sm text-white leading-relaxed mb-2 break-words">{dailyAffirmation}</div>
                   )}
                   {horoscope && (
-                    <div className="text-xs text-purple-200 opacity-90">{horoscope}</div>
+                    <div className="text-xs text-purple-200 opacity-90 break-words">{horoscope}</div>
                   )}
                 </div>
               )}
@@ -521,6 +506,19 @@ const AppLayout = () => {
               {/* Mobile Menu Dropdown */}
               {showMobileMenu && (
                 <div className="mt-3 bg-zinc-900 rounded-lg p-3 space-y-2">
+                  <button
+                    onClick={() => { generateDailyContent(); setShowMobileMenu(false); }}
+                    disabled={affirmationLoading}
+                    className="w-full text-left px-3 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-sm"
+                  >
+                    ✨ Daily Affirmation
+                  </button>
+                  <button
+                    onClick={() => { replayLastMessage(); setShowMobileMenu(false); }}
+                    className="w-full text-left px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                  >
+                    🔄 Replay Audio
+                  </button>
                   <button
                     onClick={() => { setActiveSection('reflect'); setShowMobileMenu(false); }}
                     className="w-full text-left px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm"
