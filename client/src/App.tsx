@@ -664,9 +664,24 @@ const AppLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-zinc-900 text-white">
-      {/* Sidebar */}
-      <div className="w-20 bg-zinc-800 flex flex-col items-center py-6 space-y-4">
+    <div className="flex flex-col md:flex-row h-screen bg-zinc-900 text-white">
+      {/* Mobile Header */}
+      <div className="md:hidden bg-zinc-800 p-4 flex items-center justify-between">
+        <img 
+          src="/trai-logo.png" 
+          alt="TraI Logo" 
+          className="w-8 h-8 rounded-full"
+        />
+        <h1 className="text-xl font-bold">TraI</h1>
+        {botStats && (
+          <div className="text-xs text-zinc-400">
+            Level {botStats.level} • {botStats.stage}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex w-20 bg-zinc-800 flex-col items-center py-6 space-y-4">
         {sections.map((section) => {
           const Icon = section.icon;
           return (
@@ -702,6 +717,29 @@ const AppLayout = () => {
       <div className="flex-1 flex flex-col">
         <div className="flex-1 overflow-hidden">
           {renderActiveSection()}
+        </div>
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden bg-zinc-800 border-t border-zinc-700">
+        <div className="flex justify-around py-2">
+          {sections.map((section) => {
+            const Icon = section.icon;
+            return (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`flex flex-col items-center p-3 min-w-[60px] ${
+                  activeSection === section.id 
+                    ? 'text-blue-400' 
+                    : 'text-zinc-400'
+                }`}
+              >
+                <Icon className="w-5 h-5 mb-1" />
+                <span className="text-xs">{section.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
