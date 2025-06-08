@@ -88,14 +88,14 @@ export default function VoiceSelector({ userId = 1, onVoiceChange }: VoiceSelect
   }
 
   return (
-    <div className="p-4 bg-gray-800 rounded-xl border border-gray-700 text-white">
+    <div className="p-3 lg:p-4 bg-gray-800 rounded-xl border border-gray-700 text-white max-h-screen overflow-y-auto">
       <h3 className="text-lg font-semibold mb-4 text-purple-400">
-        🎙️ Choose Lily's Voice
+        🎙️ Voice Settings
       </h3>
       
       {currentVoice && (
         <div className="mb-4 p-3 bg-gray-700 rounded-lg border border-purple-500">
-          <div className="text-sm text-gray-300 mb-1">Currently Selected:</div>
+          <div className="text-sm text-gray-300 mb-1">Current Voice:</div>
           <div className="flex items-center gap-2">
             <span>{getVoiceIcon(currentVoice.gender)}</span>
             <span className="font-medium">{currentVoice.name}</span>
@@ -105,7 +105,7 @@ export default function VoiceSelector({ userId = 1, onVoiceChange }: VoiceSelect
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-2 max-h-96 overflow-y-auto">
         {voices.map((voice) => (
           <button
             key={voice.id}
@@ -132,7 +132,7 @@ export default function VoiceSelector({ userId = 1, onVoiceChange }: VoiceSelect
       </div>
 
       <div className="mt-4 text-xs text-gray-400">
-        Voice changes will apply to new messages from Lily
+        Voice changes apply to new responses
       </div>
     </div>
   );

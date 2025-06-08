@@ -79,55 +79,57 @@ export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6 max-h-screen overflow-y-auto p-3 lg:p-0">
       {/* Main Stats Card */}
-      <div className="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg text-white border border-gray-700">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-emerald-400">Memory Growth Dashboard</h2>
-          <div className="text-right">
+      <div className="p-4 lg:p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg text-white border border-gray-700">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 lg:mb-6">
+          <h2 className="text-xl lg:text-2xl font-bold text-emerald-400 mb-2 lg:mb-0">Memory Dashboard</h2>
+          <div className="text-left lg:text-right">
             <div className="text-sm text-gray-400">Current Stage</div>
-            <div className="text-xl font-bold">
+            <div className="text-lg lg:text-xl font-bold">
               {stageEmojis[stats.stage as keyof typeof stageEmojis]} {stats.stage}
             </div>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="flex justify-between text-sm mb-2">
-            <span>Progress to Next Stage</span>
+        <div className="mb-4 lg:mb-6">
+          <div className="flex justify-between text-xs lg:text-sm mb-2">
+            <span>Progress to Next</span>
             <span>{stats.wordCount} / {stats.nextStageAt} words</span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-3">
+          <div className="w-full bg-gray-700 rounded-full h-2 lg:h-3">
             <div 
-              className={`h-3 rounded-full bg-gradient-to-r ${stageColors[stats.stage as keyof typeof stageColors]} transition-all duration-500`}
+              className={`h-2 lg:h-3 rounded-full bg-gradient-to-r ${stageColors[stats.stage as keyof typeof stageColors]} transition-all duration-500`}
               style={{ width: `${Math.min(progressToNext, 100)}%` }}
             ></div>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-gray-700/50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-blue-400">{stats.wordCount}</div>
-            <div className="text-sm text-gray-400">Words Learned</div>
+        <div className="grid grid-cols-3 gap-2 lg:gap-4">
+          <div className="bg-gray-700/50 p-2 lg:p-4 rounded-lg text-center">
+            <div className="text-lg lg:text-2xl font-bold text-blue-400">{stats.wordCount}</div>
+            <div className="text-xs lg:text-sm text-gray-400">Words</div>
+            <div className="text-xs lg:text-sm text-gray-400">Learned</div>
           </div>
-          <div className="bg-gray-700/50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-emerald-400">{stats.factCount}</div>
-            <div className="text-sm text-gray-400">Facts Remembered</div>
+          <div className="bg-gray-700/50 p-2 lg:p-4 rounded-lg text-center">
+            <div className="text-lg lg:text-2xl font-bold text-emerald-400">{stats.factCount}</div>
+            <div className="text-xs lg:text-sm text-gray-400">Facts</div>
+            <div className="text-xs lg:text-sm text-gray-400">Remembered</div>
           </div>
-          <div className="bg-gray-700/50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-purple-400">{stats.memoryCount}</div>
-            <div className="text-sm text-gray-400">Conversations</div>
+          <div className="bg-gray-700/50 p-2 lg:p-4 rounded-lg text-center">
+            <div className="text-lg lg:text-2xl font-bold text-purple-400">{stats.memoryCount}</div>
+            <div className="text-xs lg:text-sm text-gray-400">Conversat</div>
           </div>
         </div>
       </div>
 
       {/* Facts Panel */}
-      <div className="p-6 bg-gray-800 rounded-xl shadow-lg text-white border border-gray-700">
-        <h3 className="text-lg font-semibold mb-4 text-emerald-400 flex items-center">
+      <div className="p-3 lg:p-6 bg-gray-800 rounded-xl shadow-lg text-white border border-gray-700">
+        <h3 className="text-base lg:text-lg font-semibold mb-3 lg:mb-4 text-emerald-400 flex items-center">
           <span className="mr-2">📌</span>
-          Facts About You
+          Personal Facts
         </h3>
         
         {factsLoading ? (
@@ -137,17 +139,17 @@ export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
             ))}
           </div>
         ) : facts.length === 0 ? (
-          <p className="text-gray-400 italic">
-            Share personal details like your name, age, location, or occupation to see facts appear here!
+          <p className="text-gray-400 italic text-sm">
+            Share details to see facts here
           </p>
         ) : (
-          <div className="space-y-3 max-h-64 overflow-y-auto">
-            {facts.slice(-10).reverse().map((fact) => (
+          <div className="space-y-2 lg:space-y-3 max-h-48 lg:max-h-64 overflow-y-auto">
+            {facts.slice(-8).reverse().map((fact) => (
               <div 
                 key={fact.id} 
-                className="p-3 bg-gray-700/50 rounded-lg border-l-4 border-emerald-500"
+                className="p-2 lg:p-3 bg-gray-700/50 rounded-lg border-l-2 lg:border-l-4 border-emerald-500"
               >
-                <div className="text-gray-300">{fact.fact}</div>
+                <div className="text-gray-300 text-sm lg:text-base">{fact.fact}</div>
                 <div className="text-xs text-gray-500 mt-1 flex justify-between">
                   <span>{new Date(fact.createdAt).toLocaleDateString()}</span>
                   <span className="text-emerald-400">{fact.category}</span>
@@ -159,13 +161,13 @@ export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
       </div>
 
       {/* Learning Milestones */}
-      <div className="p-6 bg-gray-800 rounded-xl shadow-lg text-white border border-gray-700">
-        <h3 className="text-lg font-semibold mb-4 text-blue-400 flex items-center">
+      <div className="p-3 lg:p-6 bg-gray-800 rounded-xl shadow-lg text-white border border-gray-700">
+        <h3 className="text-base lg:text-lg font-semibold mb-3 lg:mb-4 text-blue-400 flex items-center">
           <span className="mr-2">🎯</span>
-          Learning Milestones
+          Growth Stages
         </h3>
         
-        <div className="space-y-3">
+        <div className="space-y-2 lg:space-y-3 max-h-64 overflow-y-auto">
           {[
             { stage: 'Infant', threshold: 10, emoji: '👶' },
             { stage: 'Toddler', threshold: 25, emoji: '🧒' },
@@ -179,25 +181,25 @@ export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
             return (
               <div 
                 key={milestone.stage}
-                className={`flex items-center p-3 rounded-lg ${
+                className={`flex items-center p-2 lg:p-3 rounded-lg ${
                   isCurrent ? 'bg-emerald-600/20 border border-emerald-500' :
                   isCompleted ? 'bg-gray-700/50' : 'bg-gray-700/30'
                 }`}
               >
-                <span className="text-2xl mr-3">{milestone.emoji}</span>
+                <span className="text-lg lg:text-2xl mr-2 lg:mr-3">{milestone.emoji}</span>
                 <div className="flex-1">
-                  <div className={`font-medium ${isCurrent ? 'text-emerald-400' : 'text-white'}`}>
+                  <div className={`font-medium text-sm lg:text-base ${isCurrent ? 'text-emerald-400' : 'text-white'}`}>
                     {milestone.stage}
                   </div>
-                  <div className="text-sm text-gray-400">
-                    {milestone.threshold} words required
+                  <div className="text-xs lg:text-sm text-gray-400">
+                    {milestone.threshold} words
                   </div>
                 </div>
-                <div className={`text-sm px-2 py-1 rounded ${
+                <div className={`text-xs lg:text-sm px-2 py-1 rounded ${
                   isCompleted ? 'bg-green-600 text-white' :
                   isCurrent ? 'bg-emerald-600 text-white' : 'bg-gray-600 text-gray-300'
                 }`}>
-                  {isCompleted ? 'Completed' : isCurrent ? 'Current' : 'Locked'}
+                  {isCompleted ? '✓' : isCurrent ? 'Now' : 'Locked'}
                 </div>
               </div>
             );

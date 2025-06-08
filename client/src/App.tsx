@@ -822,14 +822,14 @@ const AppLayout = () => {
 
       case 'memory':
         return (
-          <div className="p-6 max-w-4xl mx-auto">
+          <div className="p-3 lg:p-6 max-w-4xl mx-auto h-full overflow-y-auto">
             <MemoryDashboard userId={1} />
           </div>
         );
 
       case 'voice':
         return (
-          <div className="p-6 max-w-4xl mx-auto">
+          <div className="p-3 lg:p-6 max-w-4xl mx-auto h-full overflow-y-auto">
             <VoiceSelector />
           </div>
         );
