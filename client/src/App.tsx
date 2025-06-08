@@ -619,32 +619,33 @@ const AppLayout = () => {
                 </div>
 
                 {/* Input Area */}
-                <div className="p-3 lg:p-4 border-t border-zinc-700 bg-zinc-800 lg:rounded-b-lg pb-safe">
-                  {/* Mobile: Simple Input */}
-                  <div className="lg:hidden flex items-center space-x-2 mb-2">
+                <div className="p-4 border-t border-zinc-700 bg-zinc-800 pb-safe">
+                  {/* Mobile Input Bar */}
+                  <div className="flex items-center gap-3">
                     <input
                       type="text"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyPress={handleKeyPress}
                       placeholder="Type your message..."
-                      className="flex-1 p-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+                      className="flex-1 px-4 py-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
                     />
                     <button
+                      type="button"
                       onClick={isRecording ? stopRecording : startRecording}
-                      className={`p-3 rounded-full flex-shrink-0 min-w-12 h-12 flex items-center justify-center ${
-                        isRecording ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-500 text-white'
+                      className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white ${
+                        isRecording ? 'bg-red-500' : 'bg-green-500'
                       }`}
-                      title={isRecording ? 'Stop recording' : 'Start voice recording'}
                     >
-                      {isRecording ? <Square className="w-6 h-6 text-white" /> : <Mic className="w-6 h-6 text-white" />}
+                      🎤
                     </button>
                     <button
+                      type="button"
                       onClick={sendMessage}
                       disabled={!input.trim() || loading}
-                      className="p-3 rounded-full flex-shrink-0 min-w-12 h-12 flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white"
+                      className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white disabled:opacity-50"
                     >
-                      <Send className="w-6 h-6" />
+                      ➤
                     </button>
                   </div>
                   
