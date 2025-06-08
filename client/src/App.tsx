@@ -812,14 +812,14 @@ const AppLayout = () => {
                 Back to Chat
               </button>
             </div>
-            <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">Weekly Reflection</h2>
-                <div className="flex items-center gap-3">
+            <div className="p-4 lg:p-6 max-w-4xl mx-auto h-full flex flex-col">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3">
+                <h2 className="text-xl lg:text-2xl font-bold">Weekly Reflection</h2>
+                <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-3">
                   <select
                     value={selectedReflectionVoice}
                     onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                    className="px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                    className="px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
                   >
                     {voiceOptions.all.map(voice => (
                       <option key={voice.id} value={voice.id}>{voice.name}</option>
@@ -828,7 +828,7 @@ const AppLayout = () => {
                   <button
                     onClick={readReflection}
                     disabled={!weeklySummary || isGeneratingAudio}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-sm font-medium"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded font-medium text-white"
                   >
                     {isGeneratingAudio ? (
                       <>
@@ -841,8 +841,8 @@ const AppLayout = () => {
                   </button>
                 </div>
               </div>
-              <div className="bg-zinc-800 rounded-lg p-6 flex-1 overflow-y-auto">
-                <div className="text-zinc-300 whitespace-pre-wrap">
+              <div className="bg-zinc-800 rounded-lg p-4 lg:p-6 flex-1 overflow-y-auto">
+                <div className="text-zinc-300 whitespace-pre-wrap text-sm lg:text-base leading-relaxed">
                   {weeklySummary}
                 </div>
               </div>

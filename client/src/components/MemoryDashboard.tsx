@@ -79,28 +79,28 @@ export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
   };
 
   return (
-    <div className="space-y-4 lg:space-y-6 max-h-screen overflow-y-auto p-3 lg:p-0">
+    <div className="space-y-6 max-h-screen overflow-y-auto">
       {/* Main Stats Card */}
-      <div className="p-4 lg:p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg text-white border border-gray-700">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 lg:mb-6">
-          <h2 className="text-xl lg:text-2xl font-bold text-emerald-400 mb-2 lg:mb-0">Memory Dashboard</h2>
+      <div className="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg text-white border border-gray-700">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+          <h2 className="text-2xl font-bold text-emerald-400 mb-4 lg:mb-0">Memory Dashboard</h2>
           <div className="text-left lg:text-right">
-            <div className="text-sm text-gray-400">Current Stage</div>
-            <div className="text-lg lg:text-xl font-bold">
+            <div className="text-sm text-gray-400 mb-1">Current Stage</div>
+            <div className="text-2xl font-bold">
               {stageEmojis[stats.stage as keyof typeof stageEmojis]} {stats.stage}
             </div>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-4 lg:mb-6">
-          <div className="flex justify-between text-xs lg:text-sm mb-2">
-            <span>Progress to Next</span>
-            <span>{stats.wordCount} / {stats.nextStageAt} words</span>
+        <div className="mb-6">
+          <div className="flex flex-col lg:flex-row lg:justify-between gap-1 lg:gap-0 text-sm mb-3">
+            <span className="text-gray-300">Progress to Next Stage</span>
+            <span className="text-emerald-400 font-medium">{stats.wordCount} / {stats.nextStageAt} words</span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2 lg:h-3">
+          <div className="w-full bg-gray-700 rounded-full h-3">
             <div 
-              className={`h-2 lg:h-3 rounded-full bg-gradient-to-r ${stageColors[stats.stage as keyof typeof stageColors]} transition-all duration-500`}
+              className={`h-3 rounded-full bg-gradient-to-r ${stageColors[stats.stage as keyof typeof stageColors]} transition-all duration-500`}
               style={{ width: `${Math.min(progressToNext, 100)}%` }}
             ></div>
           </div>
