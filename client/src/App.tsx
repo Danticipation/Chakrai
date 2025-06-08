@@ -505,10 +505,10 @@ const AppLayout = () => {
                 </div>
               </div>
               
-              {/* Daily Reflection Display - Mobile */}
+              {/* Daily Affirmation Display - Mobile */}
               {(dailyAffirmation || horoscope) && (
                 <div className="mt-3 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-3 border border-purple-500/30">
-                  <div className="text-xs text-purple-300 font-medium mb-1">Daily Reflection</div>
+                  <div className="text-xs text-purple-300 font-medium mb-1">Daily Affirmation</div>
                   {dailyAffirmation && (
                     <div className="text-sm text-white leading-relaxed mb-2">{dailyAffirmation}</div>
                   )}
@@ -521,6 +521,12 @@ const AppLayout = () => {
               {/* Mobile Menu Dropdown */}
               {showMobileMenu && (
                 <div className="mt-3 bg-zinc-900 rounded-lg p-3 space-y-2">
+                  <button
+                    onClick={() => { setActiveSection('reflect'); setShowMobileMenu(false); }}
+                    className="w-full text-left px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                  >
+                    🔁 Weekly Reflection
+                  </button>
                   <button
                     onClick={() => { setActiveSection('memory'); setShowMobileMenu(false); }}
                     className="w-full text-left px-3 py-2 bg-cyan-600 hover:bg-cyan-700 rounded text-sm"
@@ -793,38 +799,52 @@ const AppLayout = () => {
 
       case 'reflect':
         return (
-          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">Weekly Reflection</h2>
-              <div className="flex items-center gap-3">
-                <select
-                  value={selectedReflectionVoice}
-                  onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                  className="px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
-                >
-                  {voiceOptions.all.map(voice => (
-                    <option key={voice.id} value={voice.id}>{voice.name}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={readReflection}
-                  disabled={!weeklySummary || isGeneratingAudio}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-sm font-medium"
-                >
-                  {isGeneratingAudio ? (
-                    <>
-                      <span className="inline-block animate-spin mr-2">⌚</span>
-                      Generating...
-                    </>
-                  ) : (
-                    '🔊 Read Aloud'
-                  )}
-                </button>
-              </div>
+          <div className="flex flex-col h-full">
+            {/* Mobile Back Button */}
+            <div className="lg:hidden flex items-center p-3 bg-zinc-800 border-b border-zinc-700">
+              <button
+                onClick={() => setActiveSection('chat')}
+                className="flex items-center text-white hover:text-blue-400"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Chat
+              </button>
             </div>
-            <div className="bg-zinc-800 rounded-lg p-6 flex-1 overflow-y-auto">
-              <div className="text-zinc-300 whitespace-pre-wrap">
-                {weeklySummary}
+            <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Weekly Reflection</h2>
+                <div className="flex items-center gap-3">
+                  <select
+                    value={selectedReflectionVoice}
+                    onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                    className="px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                  >
+                    {voiceOptions.all.map(voice => (
+                      <option key={voice.id} value={voice.id}>{voice.name}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={readReflection}
+                    disabled={!weeklySummary || isGeneratingAudio}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-sm font-medium"
+                  >
+                    {isGeneratingAudio ? (
+                      <>
+                        <span className="inline-block animate-spin mr-2">⌚</span>
+                        Generating...
+                      </>
+                    ) : (
+                      '🔊 Read Aloud'
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="bg-zinc-800 rounded-lg p-6 flex-1 overflow-y-auto">
+                <div className="text-zinc-300 whitespace-pre-wrap">
+                  {weeklySummary}
+                </div>
               </div>
             </div>
           </div>

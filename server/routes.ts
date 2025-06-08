@@ -787,9 +787,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (voiceFacts.length > 0) {
         // Get the most recent voice preference
-        const latestVoiceFact = voiceFacts.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )[0];
+        const latestVoiceFact = voiceFacts.sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        })[0];
         const voiceId = latestVoiceFact.fact.replace('User prefers voice: ', '');
         const voice = getVoiceById(voiceId);
         console.log(`Current voice retrieved: ${voice.name} (${voiceId})`);
@@ -1038,8 +1040,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const bot = await storage.getBotByUserId(1);
       if (bot) {
         await storage.updateBot(bot.id, {
-          stage: 'Infant',
-          wordCount: 0,
+          level: 1,
+          wordsLearned: 0,
           personalityTraits: JSON.stringify({}),
           memories: JSON.stringify([])
         });
