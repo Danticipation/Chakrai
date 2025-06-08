@@ -41,13 +41,7 @@ const AppLayout = () => {
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
-  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('EkK5I93UQWFDigLMpZcX');
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState<boolean>(false);
-  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
-  const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
-  const [horoscope, setHoroscope] = useState<string>('');
-  const [affirmationLoading, setAffirmationLoading] = useState<boolean>(false);
-  const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
+  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('iCrDUkL56s3C8sCRl7wb');
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -62,11 +56,20 @@ const AppLayout = () => {
   ];
 
   const voiceOptions = {
-    all: [
-      { id: 'EkK5I93UQWFDigLMpZcX', name: 'James', description: 'Professional male voice' },
-      { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian', description: 'Deep, resonant male voice' },
-      { id: 'kdmDKE6EkgrWrrykO9Qt', name: 'Alexandra', description: 'Clear female voice' },
-      { id: 'l32B8XDoylOsZKiSdfhE', name: 'Carla', description: 'Warm female voice' }
+    female: [
+      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm, soothing, captivating American female' },
+      { id: 'FA6HhUjVmxBGQLlzA8WZ', name: 'Ophelia', description: 'Calm, articulate British female' },
+      { id: 'oWAxZDx7w5VEj9dCyTzz', name: 'Grace', description: 'Confident, friendly British female' },
+      { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel', description: 'Calm, professional American female' },
+      { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi', description: 'Soft, gentle American female' },
+      { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella', description: 'Warm, engaging voice' }
+    ],
+    male: [
+      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Brian', description: 'Deep, resonant American male' },
+      { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni', description: 'Well-rounded American male' },
+      { id: 'VR6AewLTigWG4xSOukaG', name: 'Arnold', description: 'Crisp, authoritative American male' },
+      { id: 'CYw3kZ02Hs0563khs1Fj', name: 'Dave', description: 'Deep, serious American male' },
+      { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George', description: 'Raspy, casual American male' }
     ]
   };
 
@@ -161,13 +164,6 @@ const AppLayout = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
     
@@ -194,15 +190,10 @@ const AppLayout = () => {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
       
-      // Generate audio for bot response using current voice selection
+      // Generate audio for bot response
       try {
-        // Get current voice selection
-        const currentVoiceResponse = await axios.get('/api/voice/current');
-        const currentVoiceId = currentVoiceResponse.data.voice?.id;
-        
         const audioResponse = await axios.post('/api/text-to-speech', { 
-          text: res.data.response,
-          voiceId: currentVoiceId
+          text: res.data.response 
         }, {
           responseType: 'blob'
         });
@@ -242,6 +233,13 @@ const AppLayout = () => {
       }]);
     }
     setLoading(false);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   const enableAudio = () => {
@@ -334,14 +332,7 @@ const AppLayout = () => {
 
   const generateAudioForText = async (text: string) => {
     try {
-      // Get current voice selection
-      const currentVoiceResponse = await axios.get('/api/voice/current');
-      const currentVoiceId = currentVoiceResponse.data.voice?.id;
-      
-      const response = await axios.post('/api/text-to-speech', { 
-        text,
-        voiceId: currentVoiceId 
-      }, {
+      const response = await axios.post('/api/text-to-speech', { text }, {
         responseType: 'blob'
       });
       
@@ -364,20 +355,9 @@ const AppLayout = () => {
   };
 
   const readReflection = async () => {
-    if (!weeklySummary || isGeneratingAudio) return;
-    
-    // Stop any currently playing audio
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      setCurrentAudio(null);
-    }
-    
-    setIsGeneratingAudio(true);
+    if (!weeklySummary) return;
     
     try {
-      console.log('Generating audio with voice:', selectedReflectionVoice);
-      
       const response = await axios.post('/api/text-to-speech', { 
         text: weeklySummary,
         voiceId: selectedReflectionVoice 
@@ -390,21 +370,15 @@ const AppLayout = () => {
       
       const audio = new Audio(audioUrl);
       audio.volume = 1.0;
-      setCurrentAudio(audio);
-      
-      audio.onended = () => {
-        setCurrentAudio(null);
-        URL.revokeObjectURL(audioUrl);
-      };
-      
-      await audio.play();
-      console.log('Reflection audio playing with voice:', selectedReflectionVoice);
-      setAudioEnabled(true);
-      
+      audio.play().then(() => {
+        console.log('Reflection audio playing');
+        setAudioEnabled(true);
+      }).catch(error => {
+        console.error('Reflection audio blocked:', error);
+        setPendingAudio(audioUrl);
+      });
     } catch (error) {
       console.error('Reflection audio generation failed:', error);
-    } finally {
-      setIsGeneratingAudio(false);
     }
   };
 
@@ -449,374 +423,116 @@ const AppLayout = () => {
     }
   };
 
-  const generateDailyContent = async () => {
-    setAffirmationLoading(true);
-    try {
-      const response = await axios.post('/api/daily-content', { userId: 1 });
-      setDailyAffirmation(response.data.affirmation);
-      setHoroscope(response.data.horoscope);
-    } catch (error) {
-      console.error('Daily content generation failed:', error);
-      setDailyAffirmation('Focus on progress, not perfection. Every small step forward is meaningful.');
-      setHoroscope('Today brings opportunities for growth and learning.');
-    } finally {
-      setAffirmationLoading(false);
-    }
-  };
-
   const renderActiveSection = () => {
     switch (activeSection) {
       case 'chat':
         return (
-          <div className="flex flex-col h-[100vh] lg:h-[calc(100vh-4rem)]">
-            
-            {/* Mobile: Clean Header */}
-            <div className="lg:hidden bg-zinc-800 border-b border-zinc-700 p-4 flex-shrink-0">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h1 className="text-xl font-bold text-white">Reflectibot</h1>
-                  {botStats && (
-                    <p className="text-sm text-zinc-400">Level {botStats.level} • {botStats.wordsLearned} words</p>
-                  )}
-                </div>
-                <button
-                  onClick={() => setShowMobileMenu(!showMobileMenu)}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium"
+          <div className="flex flex-col h-full">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800">
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  Menu
-                </button>
-              </div>
+                  <div
+                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                      message.sender === 'user' 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-zinc-700 text-zinc-100'
+                    }`}
+                  >
+                    <p className="break-words">{message.text}</p>
+                    <p className="text-xs opacity-70 mt-1">{message.time}</p>
+                  </div>
+                </div>
+              ))}
               
-              {/* Mobile Menu */}
-              {showMobileMenu && (
-                <div className="bg-zinc-900 rounded-lg p-3 space-y-2 mb-3">
-                  <button
-                    onClick={() => { generateDailyContent(); setShowMobileMenu(false); }}
-                    disabled={affirmationLoading}
-                    className="w-full text-left px-3 py-3 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-white font-medium"
-                  >
-                    ✨ Daily Affirmation
-                  </button>
-                  <button
-                    onClick={() => { replayLastMessage(); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-3 bg-purple-600 hover:bg-purple-700 rounded text-white font-medium"
-                  >
-                    🔄 Replay Audio
-                  </button>
-                  <button
-                    onClick={() => { setActiveSection('reflect'); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium"
-                  >
-                    🔁 Weekly Reflection
-                  </button>
-                  <button
-                    onClick={() => { setActiveSection('memory'); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-3 bg-cyan-600 hover:bg-cyan-700 rounded text-white font-medium"
-                  >
-                    🧠 Memory Dashboard
-                  </button>
-                  <button
-                    onClick={() => { setActiveSection('voice'); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-3 bg-indigo-600 hover:bg-indigo-700 rounded text-white font-medium"
-                  >
-                    🎤 Voice Settings
-                  </button>
-                  <button
-                    onClick={() => { setActiveSection('settings'); setShowMobileMenu(false); }}
-                    className="w-full text-left px-3 py-3 bg-slate-600 hover:bg-slate-700 rounded text-white font-medium"
-                  >
-                    ⚙️ Settings
-                  </button>
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-zinc-700 text-zinc-100 px-4 py-2 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Daily Affirmation - Simplified */}
-              {(dailyAffirmation || horoscope) && (
-                <div className="bg-purple-800 rounded-lg p-4 border border-purple-600 relative">
-                  <button 
-                    onClick={() => { setDailyAffirmation(''); setHoroscope(''); }}
-                    className="absolute top-2 right-2 w-8 h-8 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white font-bold"
+              {pendingAudio && !audioEnabled && (
+                <div className="fixed top-4 right-4 bg-purple-600 text-white p-4 rounded-lg shadow-lg z-50">
+                  <p className="text-sm mb-2">Click to enable audio</p>
+                  <button
+                    onClick={enableAudio}
+                    className="px-4 py-2 bg-white text-purple-600 rounded font-medium hover:bg-gray-100"
                   >
-                    ×
+                    Enable Audio
                   </button>
-                  <div className="text-sm text-purple-200 font-medium mb-2">Daily Affirmation</div>
-                  {dailyAffirmation && (
-                    <div className="text-base text-white leading-relaxed mb-2 pr-10">{dailyAffirmation}</div>
-                  )}
-                  {horoscope && (
-                    <div className="text-sm text-purple-200 pr-10">{horoscope}</div>
-                  )}
                 </div>
               )}
-
             </div>
 
-            {/* Chat Interface */}
-            <div className="flex-1 flex flex-col min-h-0">
-              {/* Main Chat Container */}
-              <div className="flex-1 flex flex-col bg-zinc-900 lg:bg-zinc-800 lg:max-w-4xl lg:mx-auto lg:rounded-lg lg:border lg:border-zinc-700 lg:shadow-lg lg:m-6 min-h-0">
-                {/* Chat Header - Desktop Only */}
-                <div className="hidden lg:block p-4 border-b border-zinc-700 bg-zinc-800 rounded-t-lg">
-                  <h2 className="text-xl font-bold text-white">Chat with Reflectibot</h2>
-                  {botStats && (
-                    <p className="text-sm text-zinc-400">
-                      Level {botStats.level} • {botStats.stage} • {botStats.wordsLearned} words learned
-                    </p>
-                  )}
-                </div>
-                
-                {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800 min-h-0">
-                  {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-full text-center p-6">
-                      <div className="text-4xl mb-4">🤖</div>
-                      <h3 className="text-lg font-semibold text-white mb-2">Welcome to Reflectibot!</h3>
-                      <p className="text-zinc-400 text-sm max-w-sm">Start a conversation and I'll learn from you, growing smarter with each interaction.</p>
-                    </div>
-                  )}
-                  
-                  {messages.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          message.sender === 'user' 
-                            ? 'bg-blue-600 text-white' 
-                            : 'bg-zinc-700 text-zinc-100'
-                        }`}
-                      >
-                        <p className="break-words">{message.text}</p>
-                        <p className="text-xs opacity-70 mt-1">{message.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {loading && (
-                    <div className="flex justify-start">
-                      <div className="bg-zinc-700 text-zinc-100 px-4 py-2 rounded-lg">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                          <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {pendingAudio && !audioEnabled && (
-                    <div className="fixed top-4 right-4 bg-purple-600 text-white p-4 rounded-lg shadow-lg z-50">
-                      <p className="text-sm mb-2">Click to enable audio</p>
-                      <button
-                        onClick={enableAudio}
-                        className="px-4 py-2 bg-white text-purple-600 rounded font-medium hover:bg-gray-100"
-                      >
-                        Enable Audio
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Input Area - Always Visible */}
-                <div className="p-4 border-t border-zinc-700 bg-zinc-800">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Type your message..."
-                      className="flex-1 px-4 py-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
-                    />
-                    <button
-                      type="button"
-                      onClick={isRecording ? stopRecording : startRecording}
-                      style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px',
-                        backgroundColor: isRecording ? '#ef4444' : '#22c55e',
-                        color: 'white',
-                        border: 'none',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🎤
-                    </button>
-                    <button
-                      type="button"
-                      onClick={sendMessage}
-                      disabled={!input.trim() || loading}
-                      style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px',
-                        backgroundColor: '#3b82f6',
-                        color: 'white',
-                        border: 'none',
-                        cursor: 'pointer',
-                        opacity: (!input.trim() || loading) ? 0.5 : 1
-                      }}
-                    >
-                      ➤
-                    </button>
-                  </div>
-                </div>
-                  
-                  {/* Desktop: Full Input with All Actions */}
-                  <div className="hidden lg:flex items-center space-x-2">
-                    <input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Type your message..."
-                      className="flex-1 p-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                      onClick={isRecording ? stopRecording : startRecording}
-                      className={`p-3 rounded-full ${
-                        isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-600 hover:bg-zinc-500'
-                      }`}
-                    >
-                      {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                    </button>
-                    <button
-                      onClick={replayLastMessage}
-                      className={`p-3 rounded-full ${lastBotAudio ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 opacity-50'}`}
-                      title={lastBotAudio ? "Replay last response" : "Replay button (will activate with audio)"}
-                    >
-                      🔄
-                    </button>
-                    <button
-                      onClick={sendMessage}
-                      disabled={!input.trim() || loading}
-                      className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Send className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
+            {/* Voice Controls Debug Panel - FORCE VISIBLE */}
+            <div className="mt-4 p-3 bg-red-900/30 border border-red-500 rounded-lg">
+              <div className="text-sm text-red-200 mb-2">Voice Debug Panel (Force Visible)</div>
+              <div className="flex gap-2">
+                <button
+                  onClick={replayLastMessage}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                >
+                  🔄 Replay Last
+                </button>
+                <button
+                  onClick={enableAudio}
+                  className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+                >
+                  🔊 Enable Audio
+                </button>
+                <button
+                  onClick={testAudio}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm"
+                >
+                  🎵 Test Audio
+                </button>
               </div>
+              <div className="text-xs text-gray-400 mt-1">
+                Audio: {audioEnabled ? 'ON' : 'OFF'} | Last Audio: {lastBotAudio ? 'Available' : 'None'}
+              </div>
+            </div>
 
-              {/* Desktop Sidebar - Hidden on Mobile */}
-              <div className="hidden lg:flex lg:flex-col lg:flex-1 lg:space-y-4">
-                
-                {/* Bot Progress Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
-                  <h3 className="text-lg font-semibold text-blue-400 mb-3">Bot Development</h3>
-                  {botStats && (
-                    <div className="space-y-3">
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Stage</span>
-                          <span className="text-blue-400">{botStats.stage}</span>
-                        </div>
-                        <div className="w-full bg-zinc-700 rounded-full h-2">
-                          <div 
-                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${(botStats.level / 5) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Words Learned</span>
-                        <span className="text-green-400">{botStats.wordsLearned}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Level</span>
-                        <span className="text-purple-400">{botStats.level}/5</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Voice Controls Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
-                  <h3 className="text-lg font-semibold text-purple-400 mb-3">Voice Controls</h3>
-                  <div className="space-y-2">
-                    <button
-                      onClick={replayLastMessage}
-                      className="w-full px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm transition-colors"
-                    >
-                      🔄 Replay Last Message
-                    </button>
-                    <button
-                      onClick={enableAudio}
-                      className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 rounded text-sm transition-colors"
-                    >
-                      🔊 Enable Audio
-                    </button>
-                    <button
-                      onClick={testAudio}
-                      className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition-colors"
-                    >
-                      🎵 Test Audio
-                    </button>
-                  </div>
-                  <div className="text-xs text-gray-400 mt-2 p-2 bg-zinc-900 rounded">
-                    Audio: {audioEnabled ? 'ON' : 'OFF'} | Last: {lastBotAudio ? 'Available' : 'None'}
-                  </div>
-                </div>
-
-                {/* Daily Inspiration Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
-                  <h3 className="text-lg font-semibold text-yellow-400 mb-3">Daily Inspiration</h3>
-                  <div className="space-y-2">
-                    <button
-                      onClick={generateDailyContent}
-                      disabled={affirmationLoading}
-                      className="w-full px-3 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded text-sm transition-colors"
-                    >
-                      {affirmationLoading ? '✨ Generating...' : '✨ Get Daily Content'}
-                    </button>
-                    {dailyAffirmation && (
-                      <div className="bg-zinc-900 p-2 rounded text-xs text-zinc-300">
-                        <div className="text-yellow-400 font-medium mb-1">Affirmation:</div>
-                        {dailyAffirmation}
-                      </div>
-                    )}
-                    {horoscope && (
-                      <div className="bg-zinc-900 p-2 rounded text-xs text-zinc-300">
-                        <div className="text-yellow-400 font-medium mb-1">Insight:</div>
-                        {horoscope}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Personality Mode Card */}
-                <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-4">
-                  <h3 className="text-lg font-semibold text-emerald-400 mb-3">Personality Mode</h3>
-                  <div className="text-sm text-zinc-300 mb-2">
-                    Current: <span className="text-emerald-400 capitalize">{personalityMode}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1 text-xs">
-                    {personalityModes.slice(0, 6).map(mode => (
-                      <button
-                        key={mode.id}
-                        onClick={() => setPersonalityMode(mode.id)}
-                        className={`p-1 rounded text-left ${
-                          personalityMode === mode.id 
-                            ? 'bg-emerald-600 text-white' 
-                            : 'bg-zinc-700 hover:bg-zinc-600 text-zinc-300'
-                        }`}
-                      >
-                        {mode.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
+            {/* Input Area */}
+            <div className="mt-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Type your message... (or press 'r' to record)"
+                  className="flex-1 p-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  className={`p-3 rounded-full ${
+                    isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-600 hover:bg-zinc-500'
+                  }`}
+                >
+                  {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                </button>
+                <button
+                  onClick={replayLastMessage}
+                  className={`p-3 rounded-full ${lastBotAudio ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 opacity-50'}`}
+                  title={lastBotAudio ? "Replay last response" : "Replay button (will activate with audio)"}
+                >
+                  🔄
+                </button>
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || loading}
+                  className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
               </div>
             </div>
           </div>
@@ -824,52 +540,38 @@ const AppLayout = () => {
 
       case 'reflect':
         return (
-          <div className="flex flex-col h-full">
-            {/* Mobile Back Button */}
-            <div className="lg:hidden flex items-center p-3 bg-zinc-800 border-b border-zinc-700">
-              <button
-                onClick={() => setActiveSection('chat')}
-                className="flex items-center text-white hover:text-blue-400"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Chat
-              </button>
-            </div>
-            <div className="p-4 lg:p-6 max-w-4xl mx-auto h-full flex flex-col">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3">
-                <h2 className="text-xl lg:text-2xl font-bold">Weekly Reflection</h2>
-                <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-3">
-                  <select
-                    value={selectedReflectionVoice}
-                    onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                    className="px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-                  >
-                    {voiceOptions.all.map(voice => (
+          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold">Weekly Reflection</h2>
+              <div className="flex items-center gap-3">
+                <select
+                  value={selectedReflectionVoice}
+                  onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                  className="px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                >
+                  <optgroup label="Female Voices">
+                    {voiceOptions.female.map(voice => (
                       <option key={voice.id} value={voice.id}>{voice.name}</option>
                     ))}
-                  </select>
-                  <button
-                    onClick={readReflection}
-                    disabled={!weeklySummary || isGeneratingAudio}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded font-medium text-white"
-                  >
-                    {isGeneratingAudio ? (
-                      <>
-                        <span className="inline-block animate-spin mr-2">⌚</span>
-                        Generating...
-                      </>
-                    ) : (
-                      '🔊 Read Aloud'
-                    )}
-                  </button>
-                </div>
+                  </optgroup>
+                  <optgroup label="Male Voices">
+                    {voiceOptions.male.map(voice => (
+                      <option key={voice.id} value={voice.id}>{voice.name}</option>
+                    ))}
+                  </optgroup>
+                </select>
+                <button
+                  onClick={readReflection}
+                  disabled={!weeklySummary}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-sm font-medium"
+                >
+                  🔊 Read Aloud
+                </button>
               </div>
-              <div className="bg-zinc-800 rounded-lg p-4 lg:p-6 flex-1 overflow-y-auto">
-                <div className="text-zinc-300 whitespace-pre-wrap text-sm lg:text-base leading-relaxed">
-                  {weeklySummary}
-                </div>
+            </div>
+            <div className="bg-zinc-800 rounded-lg p-6 flex-1 overflow-y-auto">
+              <div className="text-zinc-300 whitespace-pre-wrap">
+                {weeklySummary}
               </div>
             </div>
           </div>
@@ -877,71 +579,30 @@ const AppLayout = () => {
 
       case 'memory':
         return (
-          <div className="flex flex-col h-full">
-            {/* Mobile Back Button */}
-            <div className="lg:hidden flex items-center p-3 bg-zinc-800 border-b border-zinc-700">
-              <button
-                onClick={() => setActiveSection('chat')}
-                className="flex items-center text-white hover:text-blue-400"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Chat
-              </button>
-            </div>
-            <div className="flex-1 p-3 lg:p-6 max-w-4xl mx-auto overflow-y-auto">
-              <MemoryDashboard userId={1} />
-            </div>
+          <div className="p-6 max-w-4xl mx-auto">
+            <MemoryDashboard userId={1} />
           </div>
         );
 
       case 'voice':
         return (
-          <div className="flex flex-col h-full">
-            {/* Mobile Back Button */}
-            <div className="lg:hidden flex items-center p-3 bg-zinc-800 border-b border-zinc-700">
-              <button
-                onClick={() => setActiveSection('chat')}
-                className="flex items-center text-white hover:text-blue-400"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Chat
-              </button>
-            </div>
-            <div className="flex-1 p-3 lg:p-6 max-w-4xl mx-auto overflow-y-auto">
-              <VoiceSelector />
-            </div>
+          <div className="p-6 max-w-4xl mx-auto">
+            <VoiceSelector />
           </div>
         );
 
       case 'settings':
         return (
-          <div className="flex flex-col h-full">
-            {/* Mobile Back Button */}
-            <div className="lg:hidden flex items-center p-3 bg-zinc-800 border-b border-zinc-700">
-              <button
-                onClick={() => setActiveSection('chat')}
-                className="flex items-center text-white hover:text-blue-400"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Chat
-              </button>
-            </div>
-            <div className="flex-1 p-3 lg:p-6 max-w-4xl mx-auto space-y-6 overflow-y-auto">
-              <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">Settings</h2>
+          <div className="p-6 max-w-4xl mx-auto space-y-6">
+            <h2 className="text-2xl font-bold mb-6">Settings</h2>
             
-              <div className="bg-zinc-800 rounded-lg p-6">
-                <h3 className="text-lg font-semibold mb-4 text-blue-400">User Management</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Switch User</label>
-                    <div className="flex space-x-2">
-                      <input
+            <div className="bg-zinc-800 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-blue-400">User Management</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Switch User</label>
+                  <div className="flex space-x-2">
+                    <input
                       type="text"
                       value={newUserName}
                       onChange={(e) => setNewUserName(e.target.value)}
@@ -994,7 +655,6 @@ const AppLayout = () => {
               </button>
               <p className="text-sm text-zinc-400 mt-2">This will clear all learned words and personality traits.</p>
             </div>
-            </div>
           </div>
         );
 
@@ -1004,9 +664,9 @@ const AppLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-zinc-900 text-white overflow-hidden">
-      {/* Sidebar - Hidden on Mobile */}
-      <div className="hidden lg:flex w-20 bg-zinc-800 flex-col items-center py-6 space-y-4">
+    <div className="flex h-screen bg-zinc-900 text-white">
+      {/* Sidebar */}
+      <div className="w-20 bg-zinc-800 flex flex-col items-center py-6 space-y-4">
         {sections.map((section) => {
           const Icon = section.icon;
           return (
@@ -1039,7 +699,7 @@ const AppLayout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col">
         <div className="flex-1 overflow-hidden">
           {renderActiveSection()}
         </div>
