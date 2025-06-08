@@ -432,9 +432,9 @@ const AppLayout = () => {
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center px-6">
                   <img 
-                    src="/trai-logo.svg" 
+                    src="/trai-logo.jpg" 
                     alt="TraI Logo" 
-                    className="w-24 h-24 mb-6 rounded-full shadow-lg"
+                    className="w-24 h-24 mb-6 rounded-full shadow-lg object-cover"
                   />
                   <h2 className="text-3xl font-bold text-white mb-4">Welcome to TraI</h2>
                   <p className="text-zinc-300 text-lg mb-6 max-w-md">
@@ -668,9 +668,9 @@ const AppLayout = () => {
       {/* Mobile Header */}
       <div className="md:hidden bg-zinc-800 p-4 flex items-center justify-between">
         <img 
-          src="/trai-logo.svg" 
+          src="/trai-logo.jpg" 
           alt="TraI Logo" 
-          className="w-8 h-8 rounded-full"
+          className="w-8 h-8 rounded-full object-cover"
         />
         <h1 className="text-xl font-bold">TraI</h1>
         {botStats && (
