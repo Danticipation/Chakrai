@@ -1042,8 +1042,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateBot(bot.id, {
           level: 1,
           wordsLearned: 0,
-          personalityTraits: JSON.stringify({}),
-          memories: JSON.stringify([])
+          personalityTraits: JSON.stringify({})
         });
       }
       
