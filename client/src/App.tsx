@@ -161,6 +161,13 @@ const AppLayout = () => {
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
     
