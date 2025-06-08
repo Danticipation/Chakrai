@@ -555,11 +555,10 @@ const AppLayout = () => {
               )}
             </div>
 
-            {/* Mobile: Full-width Chat / Desktop: Sidebar Layout */}
-            <div className="flex-1 flex flex-col lg:flex-row lg:p-6 lg:max-w-7xl lg:mx-auto lg:gap-6 min-w-0">
-              
+            {/* Chat Interface */}
+            <div className="flex-1 flex flex-col min-h-0">
               {/* Main Chat Container */}
-              <div className="flex-1 lg:flex-[2] flex flex-col bg-zinc-800 lg:rounded-lg lg:border lg:border-zinc-700 lg:shadow-lg min-w-0">
+              <div className="flex-1 flex flex-col bg-zinc-900 lg:bg-zinc-800 lg:max-w-4xl lg:mx-auto lg:rounded-lg lg:border lg:border-zinc-700 lg:shadow-lg lg:m-6 min-h-0">
                 {/* Chat Header - Desktop Only */}
                 <div className="hidden lg:block p-4 border-b border-zinc-700 bg-zinc-800 rounded-t-lg">
                   <h2 className="text-xl font-bold text-white">Chat with Reflectibot</h2>
@@ -571,7 +570,15 @@ const AppLayout = () => {
                 </div>
                 
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800 pb-safe">
+                <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800 min-h-0">
+                  {messages.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-full text-center p-6">
+                      <div className="text-4xl mb-4">🤖</div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Welcome to Reflectibot!</h3>
+                      <p className="text-zinc-400 text-sm max-w-sm">Start a conversation and I'll learn from you, growing smarter with each interaction.</p>
+                    </div>
+                  )}
+                  
                   {messages.map((message, index) => (
                     <div
                       key={index}

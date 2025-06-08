@@ -973,49 +973,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Daily content generation endpoint
   router.post('/api/daily-content', async (req, res) => {
     try {
-      const { userId } = req.body;
-      
-      // Get user context for personalized content
-      const userFacts = await storage.getUserFacts(userId || 1);
-      const memories = await storage.getUserMemories(userId || 1);
-      
-      // Build context for personalization
-      const userContext = {
-        interests: userFacts.filter(f => f.category === 'interest').map(f => f.fact),
-        goals: userFacts.filter(f => f.category === 'goal').map(f => f.fact),
-        recentTopics: memories.slice(-5).map(m => m.content)
-      };
+      // Simple motivational affirmations - no personalization needed
+      const affirmations = [
+        "When days get hard, don't let them win, remember who you are!",
+        "I'm surrounded by a loving and supportive environment that nurtures my well-being, allowing me to thrive.",
+        "Every challenge I face is an opportunity to grow stronger and wiser.",
+        "I have the power to create positive change in my life, one step at a time.",
+        "Today brings new possibilities, and I'm ready to embrace them with confidence.",
+        "I trust in my ability to overcome obstacles and achieve my dreams.",
+        "My potential is limitless, and I'm worthy of all the good things life has to offer.",
+        "I choose to focus on what I can control and let go of what I cannot.",
+        "Each moment is a fresh start, and I have the courage to make it count.",
+        "I am resilient, capable, and deserving of happiness and success.",
+        "Progress, not perfection, is what matters most on my journey.",
+        "I believe in myself and my ability to handle whatever comes my way.",
+        "Today I choose hope, growth, and kindness toward myself and others.",
+        "My inner strength is greater than any external challenge I may face.",
+        "I am exactly where I need to be, learning and growing every day."
+      ];
 
-      // Generate personalized affirmation
-      const affirmationPrompt = `Create a personalized daily affirmation for someone with these characteristics:
-      - Recent conversations: ${userContext.recentTopics.join(', ')}
-      - Interests: ${userContext.interests.join(', ')}
-      - Goals: ${userContext.goals.join(', ')}
-      
-      Make it encouraging, specific to their journey, and actionable. Keep it under 50 words.`;
+      const insights = [
+        "Small consistent actions create remarkable transformations over time.",
+        "Your thoughts shape your reality - choose them wisely and with intention.",
+        "Embracing uncertainty opens doors to unexpected opportunities and growth.",
+        "The only way out is through - trust the process and keep moving forward.",
+        "Every ending is a new beginning waiting to unfold in your life.",
+        "Your current struggles are preparing you for future strength and wisdom.",
+        "Focus on progress, not perfection - every step forward matters.",
+        "The answers you seek often come when you stop forcing and start flowing.",
+        "Your authentic self is your greatest gift to the world around you.",
+        "Patience with yourself creates space for genuine transformation to occur.",
+        "What you practice grows stronger - choose your habits mindfully today.",
+        "Sometimes the best thing you can do is simply show up as you are.",
+        "Your energy is precious - invest it in what truly aligns with your values.",
+        "Every challenge contains wisdom that will serve you in the future.",
+        "The path forward becomes clearer when you trust your inner guidance."
+      ];
 
-      const affirmationResponse = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [{ role: "user", content: affirmationPrompt }],
-        max_tokens: 100
-      });
-
-      // Generate personalized insight/horoscope
-      const insightPrompt = `Create a personalized daily insight for someone based on:
-      - Recent focus: ${userContext.recentTopics.join(', ')}
-      - Personal interests: ${userContext.interests.join(', ')}
-      
-      Provide practical wisdom or perspective that relates to their current journey. Keep it under 60 words.`;
-
-      const insightResponse = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [{ role: "user", content: insightPrompt }],
-        max_tokens: 120
-      });
+      // Select random affirmation and insight
+      const randomAffirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
+      const randomInsight = insights[Math.floor(Math.random() * insights.length)];
 
       res.json({
-        affirmation: affirmationResponse.choices[0].message.content?.trim(),
-        horoscope: insightResponse.choices[0].message.content?.trim()
+        affirmation: randomAffirmation,
+        horoscope: randomInsight
       });
 
     } catch (error) {
