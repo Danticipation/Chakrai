@@ -634,23 +634,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const facts = await storage.getUserFacts(userId);
       
-      // Filter for meaningful facts only, exclude conversation fragments
+      // Filter out voice preferences and show meaningful conversation facts
       const meaningfulFacts = facts.filter(fact => {
         const factText = fact.fact.toLowerCase();
+        // Exclude voice preferences and personality mode preferences
+        if (factText.includes('user prefers voice:') || factText.includes('user prefers personality mode:')) {
+          return false;
+        }
+        
+        // Include meaningful personal facts
         return (
           factText.includes('name:') ||
           factText.includes('age:') ||
           factText.includes('location:') ||
           factText.includes('occupation:') ||
-          factText.includes('pet:') ||
-          factText.includes('education:') ||
-          factText.includes('marital status:') ||
-          factText.includes('has children') ||
-          (factText.length > 20 && !factText.includes('conversation') && !factText.includes('said'))
+          factText.includes('job:') ||
+          factText.includes('work:') ||
+          factText.includes('hobby:') ||
+          factText.includes('interest:') ||
+          factText.includes('likes:') ||
+          factText.includes('enjoys:') ||
+          factText.includes('studying:') ||
+          factText.includes('learning:') ||
+          factText.includes('goal:') ||
+          factText.includes('dream:') ||
+          factText.includes('family:') ||
+          factText.includes('relationship:') ||
+          factText.includes('lives in') ||
+          factText.includes('from ') ||
+          (factText.length > 15 && !factText.includes('user prefers'))
         );
       });
       
-      const formattedFacts = meaningfulFacts.map(fact => ({
+      const formattedFacts = meaningfulFacts.slice(0, 20).map(fact => ({
         id: fact.id,
         fact: fact.fact,
         category: fact.category || 'general',
@@ -802,12 +818,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid voice ID' });
       }
 
-      // Store new voice preference
-      await storage.createUserFact({
-        userId,
-        fact: `User prefers voice: ${voiceId}`,
-        category: 'voice_preference'
-      });
+      // Voice preference stored in session, not as user fact
 
       console.log(`Voice changed to: ${voice.name} (${voiceId})`);
       res.json({ success: true, voice });
@@ -830,13 +841,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!voice) {
         return res.status(400).json({ error: 'Invalid voice ID' });
       }
-
-      // Store new voice preference
-      await storage.createUserFact({
-        userId,
-        fact: `User prefers voice: ${voiceId}`,
-        category: 'voice_preference'
-      });
 
       console.log(`Voice set to: ${voice.name} (${voiceId})`);
       res.json({ message: 'Voice set successfully', voiceId, voice });

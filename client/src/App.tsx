@@ -542,17 +542,7 @@ const AppLayout = () => {
                 </div>
               )}
               
-              {/* Daily Content - Compact */}
-              {(dailyAffirmation || horoscope) && (
-                <div className="mt-3 bg-zinc-900 rounded p-2">
-                  {dailyAffirmation && (
-                    <div className="text-xs text-zinc-300 mb-1">{dailyAffirmation}</div>
-                  )}
-                  {horoscope && (
-                    <div className="text-xs text-zinc-400">{horoscope}</div>
-                  )}
-                </div>
-              )}
+
             </div>
 
             {/* Chat Interface */}
