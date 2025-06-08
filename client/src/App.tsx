@@ -237,13 +237,6 @@ const AppLayout = () => {
     setLoading(false);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
   const enableAudio = () => {
     setAudioEnabled(true);
     if (pendingAudio) {
@@ -632,18 +625,19 @@ const AppLayout = () => {
                     />
                     <button
                       onClick={isRecording ? stopRecording : startRecording}
-                      className={`p-3 rounded-full flex-shrink-0 ${
-                        isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-600 hover:bg-zinc-500'
+                      className={`p-3 rounded-full flex-shrink-0 min-w-12 h-12 flex items-center justify-center ${
+                        isRecording ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-500 text-white'
                       }`}
+                      title={isRecording ? 'Stop recording' : 'Start voice recording'}
                     >
-                      {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                      {isRecording ? <Square className="w-6 h-6 text-white" /> : <Mic className="w-6 h-6 text-white" />}
                     </button>
                     <button
                       onClick={sendMessage}
                       disabled={!input.trim() || loading}
-                      className="p-3 rounded-full flex-shrink-0 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-3 rounded-full flex-shrink-0 min-w-12 h-12 flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white"
                     >
-                      <Send className="w-5 h-5" />
+                      <Send className="w-6 h-6" />
                     </button>
                   </div>
                   
