@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -472,66 +472,42 @@ const AppLayout = () => {
               )}
             </div>
 
-            {/* Voice Controls Debug Panel - FORCE VISIBLE */}
-            <div className="mt-4 p-3 bg-red-900/30 border border-red-500 rounded-lg">
-              <div className="text-sm text-red-200 mb-2">Voice Debug Panel (Force Visible)</div>
-              <div className="flex gap-2">
-                <button
-                  onClick={replayLastMessage}
-                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm"
-                >
-                  🔄 Replay Last
-                </button>
-                <button
-                  onClick={enableAudio}
-                  className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
-                >
-                  🔊 Enable Audio
-                </button>
-                <button
-                  onClick={testAudio}
-                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm"
-                >
-                  🎵 Test Audio
-                </button>
-              </div>
-              <div className="text-xs text-gray-400 mt-1">
-                Audio: {audioEnabled ? 'ON' : 'OFF'} | Last Audio: {lastBotAudio ? 'Available' : 'None'}
-              </div>
-            </div>
 
-            {/* Input Area */}
-            <div className="mt-4">
-              <div className="flex items-center space-x-2">
+
+            {/* Input Area - Mobile Optimized */}
+            <div className="mt-4 px-2">
+              <div className="flex items-center gap-3">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type your message... (or press 'r' to record)"
-                  className="flex-1 p-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Type your message..."
+                  className="flex-1 p-4 text-lg rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
                   onClick={isRecording ? stopRecording : startRecording}
-                  className={`p-3 rounded-full ${
-                    isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-zinc-600 hover:bg-zinc-500'
+                  className={`p-4 rounded-full min-w-[56px] min-h-[56px] flex items-center justify-center ${
+                    isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-zinc-600 hover:bg-zinc-500'
                   }`}
+                  title={isRecording ? "Stop Recording" : "Start Voice Recording"}
                 >
-                  {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
                 </button>
                 <button
                   onClick={replayLastMessage}
-                  className={`p-3 rounded-full ${lastBotAudio ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 opacity-50'}`}
-                  title={lastBotAudio ? "Replay last response" : "Replay button (will activate with audio)"}
+                  className={`p-4 rounded-full min-w-[56px] min-h-[56px] flex items-center justify-center ${lastBotAudio ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 opacity-50'}`}
+                  title={lastBotAudio ? "Replay last response" : "No audio to replay"}
                 >
-                  🔄
+                  <RotateCcw className="w-6 h-6" />
                 </button>
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
-                  className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-4 rounded-full min-w-[56px] min-h-[56px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Send Message"
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-6 h-6" />
                 </button>
               </div>
             </div>
