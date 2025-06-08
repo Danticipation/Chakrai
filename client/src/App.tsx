@@ -47,12 +47,12 @@ const AppLayout = () => {
   const chunksRef = useRef<Blob[]>([]);
 
   const sections = [
-    { id: 'chat', icon: MessageCircle, label: 'Chat', emoji: '💬' },
-    { id: 'reflect', icon: Brain, label: 'Reflect', emoji: '🔁' },
-    { id: 'memory', icon: BookOpen, label: 'Memory', emoji: '📊' },
-    { id: 'progress', icon: Target, label: 'Progress', emoji: '📈' },
-    { id: 'voice', icon: Mic, label: 'Voice', emoji: '🎤' },
-    { id: 'settings', icon: User, label: 'Settings', emoji: '⚙️' }
+    { id: 'chat', icon: MessageCircle, label: 'Chat' },
+    { id: 'reflect', icon: Brain, label: 'Reflect' },
+    { id: 'memory', icon: BookOpen, label: 'Memory' },
+    { id: 'progress', icon: Target, label: 'Progress' },
+    { id: 'voice', icon: Mic, label: 'Voice' },
+    { id: 'settings', icon: User, label: 'Settings' }
   ];
 
   const voiceOptions = {
@@ -429,23 +429,47 @@ const AppLayout = () => {
         return (
           <div className="flex flex-col h-full">
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      message.sender === 'user' 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-zinc-700 text-zinc-100'
-                    }`}
-                  >
-                    <p className="break-words">{message.text}</p>
-                    <p className="text-xs opacity-70 mt-1">{message.time}</p>
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center px-6">
+                  <img 
+                    src="/trai-logo.png" 
+                    alt="TraI Logo" 
+                    className="w-24 h-24 mb-6 rounded-full shadow-lg"
+                  />
+                  <h2 className="text-3xl font-bold text-white mb-4">Welcome to TraI</h2>
+                  <p className="text-zinc-300 text-lg mb-6 max-w-md">
+                    Your intelligent companion that learns and grows with you. Start a conversation to begin our journey together.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
+                    <div className="bg-zinc-800 p-4 rounded-lg">
+                      <Mic className="w-6 h-6 text-blue-400 mb-2" />
+                      <p className="text-sm text-zinc-300">Voice Input</p>
+                    </div>
+                    <div className="bg-zinc-800 p-4 rounded-lg">
+                      <Brain className="w-6 h-6 text-purple-400 mb-2" />
+                      <p className="text-sm text-zinc-300">Smart Memory</p>
+                    </div>
                   </div>
                 </div>
-              ))}
+              ) : (
+                messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        message.sender === 'user' 
+                          ? 'bg-blue-600 text-white' 
+                          : 'bg-zinc-700 text-zinc-100'
+                      }`}
+                    >
+                      <p className="break-words">{message.text}</p>
+                      <p className="text-xs opacity-70 mt-1">{message.time}</p>
+                    </div>
+                  </div>
+                ))
+              )}
               
               {loading && (
                 <div className="flex justify-start">
@@ -499,7 +523,7 @@ const AppLayout = () => {
                   className={`p-4 rounded-full min-w-[56px] min-h-[56px] flex items-center justify-center ${lastBotAudio ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 opacity-50'}`}
                   title={lastBotAudio ? "Replay last response" : "No audio to replay"}
                 >
-                  <RotateCcw className="w-6 h-6" />
+                  🔄
                 </button>
                 <button
                   onClick={sendMessage}
@@ -658,7 +682,7 @@ const AppLayout = () => {
             >
               <Icon className="w-6 h-6" />
               <div className="absolute left-full ml-2 px-2 py-1 bg-zinc-700 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                {section.emoji} {section.label}
+                {section.label}
               </div>
             </button>
           );
