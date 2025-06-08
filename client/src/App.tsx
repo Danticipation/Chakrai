@@ -468,10 +468,10 @@ const AppLayout = () => {
     switch (activeSection) {
       case 'chat':
         return (
-          <div className="flex flex-col h-screen lg:h-[calc(100vh-4rem)]">
+          <div className="flex flex-col h-[100vh] lg:h-[calc(100vh-4rem)]">
             
             {/* Mobile: Simple Header with Quick Actions */}
-            <div className="lg:hidden bg-zinc-800 border-b border-zinc-700 p-3">
+            <div className="lg:hidden bg-zinc-800 border-b border-zinc-700 p-3 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-lg font-bold text-white">Reflectibot</h1>
@@ -558,7 +558,7 @@ const AppLayout = () => {
                 </div>
                 
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800">
+                <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800 pb-safe">
                   {messages.map((message, index) => (
                     <div
                       key={index}
@@ -603,16 +603,16 @@ const AppLayout = () => {
                 </div>
 
                 {/* Input Area */}
-                <div className="p-3 lg:p-4 border-t border-zinc-700 bg-zinc-800 lg:rounded-b-lg">
+                <div className="p-3 lg:p-4 border-t border-zinc-700 bg-zinc-800 lg:rounded-b-lg pb-safe">
                   {/* Mobile: Simple Input */}
-                  <div className="lg:hidden flex items-center space-x-2">
+                  <div className="lg:hidden flex items-center space-x-2 mb-2">
                     <input
                       type="text"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyPress={handleKeyPress}
                       placeholder="Type your message..."
-                      className="flex-1 p-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 p-3 rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
                     />
                     <button
                       onClick={isRecording ? stopRecording : startRecording}
@@ -822,26 +822,67 @@ const AppLayout = () => {
 
       case 'memory':
         return (
-          <div className="p-3 lg:p-6 max-w-4xl mx-auto h-full overflow-y-auto">
-            <MemoryDashboard userId={1} />
+          <div className="flex flex-col h-full">
+            {/* Mobile Back Button */}
+            <div className="lg:hidden flex items-center p-3 bg-zinc-800 border-b border-zinc-700">
+              <button
+                onClick={() => setActiveSection('chat')}
+                className="flex items-center text-white hover:text-blue-400"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Chat
+              </button>
+            </div>
+            <div className="flex-1 p-3 lg:p-6 max-w-4xl mx-auto overflow-y-auto">
+              <MemoryDashboard userId={1} />
+            </div>
           </div>
         );
 
       case 'voice':
         return (
-          <div className="p-3 lg:p-6 max-w-4xl mx-auto h-full overflow-y-auto">
-            <VoiceSelector />
+          <div className="flex flex-col h-full">
+            {/* Mobile Back Button */}
+            <div className="lg:hidden flex items-center p-3 bg-zinc-800 border-b border-zinc-700">
+              <button
+                onClick={() => setActiveSection('chat')}
+                className="flex items-center text-white hover:text-blue-400"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Chat
+              </button>
+            </div>
+            <div className="flex-1 p-3 lg:p-6 max-w-4xl mx-auto overflow-y-auto">
+              <VoiceSelector />
+            </div>
           </div>
         );
 
       case 'settings':
         return (
-          <div className="p-6 max-w-4xl mx-auto space-y-6">
-            <h2 className="text-2xl font-bold mb-6">Settings</h2>
+          <div className="flex flex-col h-full">
+            {/* Mobile Back Button */}
+            <div className="lg:hidden flex items-center p-3 bg-zinc-800 border-b border-zinc-700">
+              <button
+                onClick={() => setActiveSection('chat')}
+                className="flex items-center text-white hover:text-blue-400"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Chat
+              </button>
+            </div>
+            <div className="flex-1 p-3 lg:p-6 max-w-4xl mx-auto space-y-6 overflow-y-auto">
+              <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">Settings</h2>
             
-            <div className="bg-zinc-800 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4 text-blue-400">User Management</h3>
-              <div className="space-y-4">
+              <div className="bg-zinc-800 rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4 text-blue-400">User Management</h3>
+                <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Switch User</label>
                   <div className="flex space-x-2">
@@ -897,6 +938,7 @@ const AppLayout = () => {
                 Reset Bot Memory
               </button>
               <p className="text-sm text-zinc-400 mt-2">This will clear all learned words and personality traits.</p>
+            </div>
             </div>
           </div>
         );
