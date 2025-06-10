@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { createServer } from "http";
+import multer from "multer";
 import { setupVite } from "./vite.js";
 
 const app = express();
@@ -8,6 +9,12 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 
 app.use(cors());
 app.use(express.json());
+
+// Configure multer for file uploads
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -188,10 +195,15 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // Transcription endpoint for voice input
-app.post('/api/transcribe', async (req, res) => {
+app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file provided' });
+    }
+    
+    // Placeholder response - requires OpenAI Whisper API
     res.json({
-      text: "Voice transcription requires OpenAI API configuration. Please type your message instead."
+      text: "Voice transcription requires OpenAI API key configuration. Please type your message instead."
     });
   } catch (error) {
     console.error('Transcription error:', error);
