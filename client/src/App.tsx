@@ -746,9 +746,9 @@ const AppLayout = () => {
             {renderActiveSection()}
           </div>
           
-          {/* Desktop Chat Input - Only show for chat section */}
+          {/* Desktop Chat Input - Always show for debugging */}
           {activeSection === 'chat' && (
-            <div className="p-4 bg-zinc-800 border-t border-zinc-700">
+            <div className="p-4 bg-red-600 border-t-2 border-yellow-400 min-h-[80px]" style={{ backgroundColor: '#ef4444' }}>
               <div className="flex items-center gap-3 max-w-4xl mx-auto">
                 <input
                   type="text"
