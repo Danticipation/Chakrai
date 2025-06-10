@@ -167,24 +167,53 @@ app.get('/api/weekly-summary', async (req, res) => {
   }
 });
 
-// Chat endpoint
+// Chat endpoint using OpenAI GPT-4o
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
     
-    const responses = [
-      "That's a thoughtful perspective. Tell me more about what's on your mind.",
-      "I appreciate you sharing that with me. How does that make you feel?",
-      "Your insights are valuable. What would you like to explore next?",
-      "I'm here to listen and support you. What's most important to you right now?",
-      "Thank you for trusting me with your thoughts. How can I help you today?"
-    ];
-    
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(503).json({ error: 'OpenAI API key not configured' });
+    }
+
+    // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are Reflectibot, a thoughtful AI companion focused on personal reflection and emotional support. You help users explore their thoughts, feelings, and experiences. Be empathetic, insightful, and encouraging. Ask follow-up questions to deepen conversations. Keep responses conversational and supportive, around 1-2 sentences.'
+          },
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        max_tokens: 150,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const botResponse = result.choices[0].message.content;
     
     res.json({
-      response: randomResponse,
-      wordsLearned: 335,
+      response: botResponse,
+      wordsLearned: 335 + Math.floor(message.split(' ').length / 2),
       stage: "Advanced"
     });
     
@@ -262,7 +291,7 @@ app.post('/api/text-to-speech', async (req, res) => {
       'JBFqnCBsd6RMkjVDRZzb': 'echo'     // George -> Echo (male)
     };
 
-    const selectedVoice = voiceMap[voiceId] || 'alloy';
+    const selectedVoice = voiceId ? (voiceMap[voiceId] || 'alloy') : 'alloy';
 
     const response = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
