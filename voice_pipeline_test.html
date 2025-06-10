@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Pipeline Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #111; color: white; }
+        .test-box { background: #222; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        button { padding: 10px 15px; margin: 5px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0088ff; }
+        .status { margin: 10px 0; padding: 10px; background: #333; border-radius: 5px; }
+        .success { background: #004400; }
+        .error { background: #440000; }
+        select { padding: 8px; margin: 5px; background: #333; color: white; border: 1px solid #666; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Voice Pipeline Comprehensive Test</h1>
+    
+    <div class="test-box">
+        <h3>1. Voice Selection Test</h3>
+        <select id="voiceSelect">
+            <option value="iCrDUkL56s3C8sCRl7wb">Hope (Female)</option>
+            <option value="pFZP5JQG7iQjIQuC4Bku">Brian (Male)</option>
+            <option value="ErXwobaYiN019PkySvjV">Antoni (Male)</option>
+            <option value="VR6AewLTigWG4xSOukaG">Arnold (Male)</option>
+        </select>
+        <button onclick="testVoiceSelection()">Test Selected Voice</button>
+        <div id="voiceStatus" class="status">Ready to test voice selection</div>
+    </div>
+
+    <div class="test-box">
+        <h3>2. Complete Chat Pipeline Test</h3>
+        <input type="text" id="testMessage" placeholder="Enter test message" style="width: 300px; padding: 8px; margin: 5px;">
+        <button onclick="testChatPipeline()">Test Complete Pipeline</button>
+        <div id="chatStatus" class="status">Ready to test chat pipeline</div>
+    </div>
+
+    <div class="test-box">
+        <h3>3. Voice Transcription Test</h3>
+        <button onclick="startRecording()" id="recordBtn">Start Recording</button>
+        <button onclick="stopRecording()" id="stopBtn" disabled>Stop Recording</button>
+        <div id="transcriptionStatus" class="status">Ready to test transcription</div>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        async function testVoiceSelection() {
+            const voiceId = document.getElementById('voiceSelect').value;
+            const voiceName = document.getElementById('voiceSelect').selectedOptions[0].text;
+            
+            updateStatus('voiceStatus', `Testing ${voiceName}...`, '');
+            
+            try {
+                const response = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: `Hello! I am ${voiceName}. Voice selection is working correctly.`,
+                        voiceId: voiceId
+                    })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                await audio.play();
+                
+                updateStatus('voiceStatus', `${voiceName} voice test successful`, 'success');
+            } catch (error) {
+                updateStatus('voiceStatus', `Voice test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testChatPipeline() {
+            const message = document.getElementById('testMessage').value || "This is a test message";
+            const voiceId = document.getElementById('voiceSelect').value;
+            
+            updateStatus('chatStatus', 'Testing complete chat pipeline...', '');
+            
+            try {
+                // Step 1: Send message to chat
+                const chatResponse = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                if (!chatResponse.ok) throw new Error(`Chat failed: ${chatResponse.status}`);
+                
+                const chatData = await chatResponse.json();
+                updateStatus('chatStatus', `Chat response: "${chatData.response}"`, '');
+
+                // Step 2: Convert response to speech
+                const ttsResponse = await fetch('/api/text-to-speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: chatData.response,
+                        voiceId: voiceId
+                    })
+                });
+
+                if (!ttsResponse.ok) throw new Error(`TTS failed: ${ttsResponse.status}`);
+
+                const audioBlob = await ttsResponse.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                await audio.play();
+                
+                updateStatus('chatStatus', 'Complete pipeline test successful!', 'success');
+            } catch (error) {
+                updateStatus('chatStatus', `Pipeline test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    await testTranscription(audioBlob);
+                };
+
+                mediaRecorder.start();
+                document.getElementById('recordBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                updateStatus('transcriptionStatus', 'Recording... speak now', '');
+            } catch (error) {
+                updateStatus('transcriptionStatus', `Recording failed: ${error.message}`, 'error');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+                document.getElementById('recordBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                updateStatus('transcriptionStatus', 'Processing transcription...', '');
+            }
+        }
+
+        async function testTranscription(audioBlob) {
+            try {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'recording.wav');
+
+                const response = await fetch('/api/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const result = await response.json();
+                updateStatus('transcriptionStatus', `Transcribed: "${result.text}"`, 'success');
+            } catch (error) {
+                updateStatus('transcriptionStatus', `Transcription failed: ${error.message}`, 'error');
+            }
+        }
+
+        function updateStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+    </script>
+</body>
+</html>
