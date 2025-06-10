@@ -1,8 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { createServer } from "http";
-import { Router } from "express";
-import { storage } from "./storage";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -23,10 +21,8 @@ app.use((req, res, next) => {
   next();
 });
 
-const router = Router();
-
 // Daily content endpoint - working implementation
-router.post('/api/daily-content', async (req, res) => {
+app.get('/api/daily-content', async (req, res) => {
   try {
     const affirmations = [
       "When days get hard, don't let them win, remember who you are!",
@@ -79,7 +75,7 @@ router.post('/api/daily-content', async (req, res) => {
 });
 
 // Basic stats endpoint
-router.get('/api/stats', async (req, res) => {
+app.get('/api/stats', async (req, res) => {
   try {
     res.json({
       wordCount: 334,
@@ -95,7 +91,7 @@ router.get('/api/stats', async (req, res) => {
 });
 
 // Weekly summary endpoint
-router.get('/api/weekly-summary', async (req, res) => {
+app.get('/api/weekly-summary', async (req, res) => {
   try {
     res.json({
       summary: "Your journey this week has shown remarkable growth and self-reflection. You've engaged thoughtfully with complex topics and demonstrated a genuine commitment to personal development. Keep embracing the conversations that challenge and inspire you."
@@ -107,7 +103,7 @@ router.get('/api/weekly-summary', async (req, res) => {
 });
 
 // Chat endpoint
-router.post('/api/chat', async (req, res) => {
+app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
     
@@ -133,7 +129,12 @@ router.post('/api/chat', async (req, res) => {
   }
 });
 
-app.use(router);
+// Test endpoint first
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working' });
+});
+
+// Router removed - using direct app routes
 
 // Error handling
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
