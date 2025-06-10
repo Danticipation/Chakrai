@@ -193,15 +193,15 @@ app.post('/api/chat', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: 'You are Reflectibot, a thoughtful AI companion focused on personal reflection and emotional support. You help users explore their thoughts, feelings, and experiences. Be empathetic, insightful, and encouraging. Ask follow-up questions to deepen conversations. Keep responses conversational and supportive, around 1-2 sentences. You have full voice capabilities for both listening and speaking to users.'
+            content: `You are Reflectibot, an advanced AI companion with full conversational abilities. You can hear the user through voice transcription and respond naturally. Respond directly to what the user says - if they mention testing voice functionality, acknowledge it specifically. If they ask technical questions, provide helpful answers. Be conversational, specific to their input, and avoid generic responses. Personality mode: ${personalityMode}. Always respond contextually to the exact content of their message.`
           },
           {
             role: 'user',
             content: message
           }
         ],
-        max_tokens: 150,
-        temperature: 0.7
+        max_tokens: 300,
+        temperature: 0.8
       })
     });
 
