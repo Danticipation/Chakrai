@@ -3,6 +3,7 @@ import cors from "cors";
 import { createServer } from "http";
 import multer from "multer";
 import { setupVite } from "./vite.js";
+import { baseVoices, getVoiceById, getDefaultVoice } from "./voiceConfig.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
@@ -326,18 +327,38 @@ app.post('/api/text-to-speech', async (req, res) => {
   }
 });
 
+// Voice configuration endpoints
+app.get('/api/voices', (req, res) => {
+  res.json({ voices: baseVoices });
+});
+
+app.get('/api/voice/current', (req, res) => {
+  const defaultVoice = getDefaultVoice();
+  res.json({ voice: defaultVoice });
+});
+
+app.post('/api/voice/set', (req, res) => {
+  const { voiceId } = req.body;
+  const voice = getVoiceById(voiceId);
+  if (voice) {
+    res.json({ success: true, voice });
+  } else {
+    res.status(400).json({ error: 'Voice not found' });
+  }
+});
+
 // Setup Vite for frontend serving
 const server = createServer(app);
 
 // Start server with async setup
 const startServer = async () => {
-  if (process.env.NODE_ENV === "development") {
-    await setupVite(app, server);
-  }
-
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
+  
+  if (process.env.NODE_ENV === "development") {
+    await setupVite(app, server);
+  }
 };
 
 startServer();
