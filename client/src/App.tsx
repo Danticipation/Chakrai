@@ -45,6 +45,7 @@ const AppLayout = () => {
   const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
   const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
   const [zodiacSign, setZodiacSign] = useState<string>('');
+  const [selectedZodiacSign, setSelectedZodiacSign] = useState<string>('');
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -102,8 +103,13 @@ const AppLayout = () => {
       .then(res => setWeeklySummary(res.data.summary))
       .catch(() => setWeeklySummary('No reflection available yet. Start chatting to build your weekly summary!'));
 
+    // Load saved zodiac preference
+    const savedZodiacSign = localStorage.getItem('userZodiacSign') || '';
+    setSelectedZodiacSign(savedZodiacSign);
+
     // Load daily content
-    axios.get('/api/daily-content')
+    const zodiacParam = savedZodiacSign ? `?zodiacSign=${savedZodiacSign}` : '';
+    axios.get(`/api/daily-content${zodiacParam}`)
       .then(res => {
         setDailyAffirmation(res.data.affirmation);
         setDailyHoroscope(res.data.horoscope);
@@ -371,6 +377,22 @@ const AppLayout = () => {
     }
   };
 
+  const handleZodiacChange = async (newZodiacSign: string) => {
+    setSelectedZodiacSign(newZodiacSign);
+    localStorage.setItem('userZodiacSign', newZodiacSign);
+    
+    // Refresh daily content with new zodiac sign
+    try {
+      const zodiacParam = newZodiacSign ? `?zodiacSign=${newZodiacSign}` : '';
+      const res = await axios.get(`/api/daily-content${zodiacParam}`);
+      setDailyAffirmation(res.data.affirmation);
+      setDailyHoroscope(res.data.horoscope);
+      setZodiacSign(res.data.zodiacSign || '');
+    } catch (error) {
+      console.error('Failed to refresh daily content:', error);
+    }
+  };
+
   const readReflection = async () => {
     if (!weeklySummary) return;
     
@@ -558,7 +580,31 @@ const AppLayout = () => {
       case 'daily':
         return (
           <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
-            <h2 className="text-2xl font-bold mb-6 text-center">Daily Inspiration</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Daily Inspiration</h2>
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium text-zinc-300">Your Zodiac Sign:</label>
+                <select
+                  value={selectedZodiacSign}
+                  onChange={(e) => handleZodiacChange(e.target.value)}
+                  className="px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white text-sm"
+                >
+                  <option value="">Random Sign</option>
+                  <option value="aries">♈ Aries (Mar 21 - Apr 19)</option>
+                  <option value="taurus">♉ Taurus (Apr 20 - May 20)</option>
+                  <option value="gemini">♊ Gemini (May 21 - Jun 20)</option>
+                  <option value="cancer">♋ Cancer (Jun 21 - Jul 22)</option>
+                  <option value="leo">♌ Leo (Jul 23 - Aug 22)</option>
+                  <option value="virgo">♍ Virgo (Aug 23 - Sep 22)</option>
+                  <option value="libra">♎ Libra (Sep 23 - Oct 22)</option>
+                  <option value="scorpio">♏ Scorpio (Oct 23 - Nov 21)</option>
+                  <option value="sagittarius">♐ Sagittarius (Nov 22 - Dec 21)</option>
+                  <option value="capricorn">♑ Capricorn (Dec 22 - Jan 19)</option>
+                  <option value="aquarius">♒ Aquarius (Jan 20 - Feb 18)</option>
+                  <option value="pisces">♓ Pisces (Feb 19 - Mar 20)</option>
+                </select>
+              </div>
+            </div>
             
             {/* Daily Affirmation Section */}
             <div className="bg-gradient-to-br from-amber-600/20 to-orange-600/20 rounded-lg p-6 mb-6 border border-amber-500/30">

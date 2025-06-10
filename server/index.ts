@@ -22,6 +22,7 @@ app.use((req, res, next) => {
 
 // Daily content endpoint - working implementation
 app.get('/api/daily-content', async (req, res) => {
+  const { zodiacSign: userZodiacSign } = req.query;
   try {
     const affirmations = [
       "When days get hard, don't let them win, remember who you are!",
@@ -105,8 +106,16 @@ app.get('/api/daily-content', async (req, res) => {
     };
 
     const zodiacSigns = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'] as const;
-    const randomSign = zodiacSigns[Math.floor(Math.random() * zodiacSigns.length)];
-    const signHoroscopes = horoscopes[randomSign];
+    
+    // Use user's zodiac sign if provided, otherwise random
+    let selectedSign: string;
+    if (userZodiacSign && typeof userZodiacSign === 'string' && zodiacSigns.includes(userZodiacSign.toLowerCase() as any)) {
+      selectedSign = userZodiacSign.toLowerCase();
+    } else {
+      selectedSign = zodiacSigns[Math.floor(Math.random() * zodiacSigns.length)];
+    }
+    
+    const signHoroscopes = horoscopes[selectedSign as keyof typeof horoscopes];
     
     const randomAffirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
     const randomHoroscope = signHoroscopes[Math.floor(Math.random() * signHoroscopes.length)];
@@ -114,7 +123,7 @@ app.get('/api/daily-content', async (req, res) => {
     res.json({
       affirmation: randomAffirmation,
       horoscope: randomHoroscope,
-      zodiacSign: randomSign.charAt(0).toUpperCase() + randomSign.slice(1)
+      zodiacSign: selectedSign.charAt(0).toUpperCase() + selectedSign.slice(1)
     });
 
   } catch (error) {
