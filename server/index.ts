@@ -4,6 +4,7 @@ import { createServer } from "http";
 import multer from "multer";
 import { setupVite } from "./vite.js";
 import { baseVoices, getVoiceById, getDefaultVoice } from "./voiceConfig.js";
+import { storage } from "./storage.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
@@ -168,10 +169,10 @@ app.get('/api/weekly-summary', async (req, res) => {
   }
 });
 
-// Chat endpoint using OpenAI GPT-4o
+// Chat endpoint with personalized memory system
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, userId, personalityMode } = req.body;
+    const { message, userId = 1, personalityMode = 'friend' } = req.body;
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -180,6 +181,32 @@ app.post('/api/chat', async (req, res) => {
     if (!process.env.OPENAI_API_KEY) {
       return res.status(503).json({ error: 'OpenAI API key not configured' });
     }
+
+    // Get or create user
+    let user = await storage.getUser(userId);
+    if (!user) {
+      user = await storage.createUser({
+        username: `user_${userId}`,
+        password: 'default'
+      });
+    }
+
+    // Get user's conversation history
+    const userMemories = await storage.getUserMemories(userId);
+    const userFacts = await storage.getUserFacts(userId);
+    
+    // Build personalized context
+    const memoryContext = userMemories.length > 0 
+      ? `Previous conversations: ${userMemories.slice(-5).map(m => m.memory).join('. ')}`
+      : '';
+    
+    const factsContext = userFacts.length > 0
+      ? `What I know about you: ${userFacts.map(f => f.fact).join(', ')}`
+      : '';
+
+    const personalizedPrompt = `You are Reflectibot, a personalized AI companion for ${user.username}. ${factsContext} ${memoryContext}
+
+Respond personally and specifically based on what you know about this user. Reference their previous conversations and interests. Be conversational and personalized, not generic. Mode: ${personalityMode}.`;
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -193,7 +220,7 @@ app.post('/api/chat', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: `You are Claude, an AI assistant created by Anthropic. You should respond naturally and specifically to whatever the user says. If they mention voice testing, acknowledge it. If they ask about technical details, explain them. Never give generic responses - always be specific to their exact message. Current mode: ${personalityMode}.`
+            content: personalizedPrompt
           },
           {
             role: 'user',
@@ -212,13 +239,34 @@ app.post('/api/chat', async (req, res) => {
     const result = await response.json();
     const botResponse = result.choices[0].message.content;
     
-    console.log('OpenAI Response:', botResponse);
-    console.log('User message was:', message);
+    // Store user message and bot response in memory
+    await storage.createUserMemory({
+      userId: userId,
+      memory: `User: ${message}. Bot: ${botResponse}`,
+      importance: 'medium',
+      category: personalityMode
+    });
+
+    // Extract and store new facts about the user
+    if (message.toLowerCase().includes('my name is') || message.toLowerCase().includes('i am') || message.toLowerCase().includes('i like') || message.toLowerCase().includes('i work')) {
+      await storage.createUserFact({
+        userId: userId,
+        fact: message,
+        category: 'personal',
+        confidence: 'high'
+      });
+    }
+    
+    console.log('Personalized response for user:', userId);
+    console.log('User facts count:', userFacts.length);
+    console.log('Memory entries:', userMemories.length);
     
     res.json({
       response: botResponse,
       wordsLearned: 335 + Math.floor(message.split(' ').length / 2),
-      stage: "Advanced"
+      stage: "Advanced",
+      memories: userMemories.length,
+      facts: userFacts.length
     });
     
   } catch (error) {
@@ -327,6 +375,88 @@ app.post('/api/text-to-speech', async (req, res) => {
   } catch (error) {
     console.error('TTS error:', error);
     res.status(500).json({ error: 'Text-to-speech failed' });
+  }
+});
+
+// User memory and profile endpoints
+app.get('/api/user/:userId/memories', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const memories = await storage.getUserMemories(userId);
+    res.json({ memories });
+  } catch (error) {
+    console.error('Error fetching memories:', error);
+    res.status(500).json({ error: 'Failed to fetch memories' });
+  }
+});
+
+app.get('/api/user/:userId/facts', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const facts = await storage.getUserFacts(userId);
+    res.json({ facts });
+  } catch (error) {
+    console.error('Error fetching facts:', error);
+    res.status(500).json({ error: 'Failed to fetch facts' });
+  }
+});
+
+app.post('/api/user/initialize', async (req, res) => {
+  try {
+    const { name, interests, preferences } = req.body;
+    
+    // Create or update user
+    let user = await storage.getUser(1);
+    if (!user) {
+      user = await storage.createUser({
+        username: name || 'User',
+        password: 'default'
+      });
+    }
+    
+    // Store initial facts about the user
+    if (name) {
+      await storage.createUserFact({
+        userId: 1,
+        fact: `My name is ${name}`,
+        category: 'personal',
+        confidence: 'high'
+      });
+    }
+    
+    if (interests) {
+      await storage.createUserFact({
+        userId: 1,
+        fact: `I am interested in ${interests}`,
+        category: 'interests',
+        confidence: 'high'
+      });
+    }
+    
+    if (preferences) {
+      await storage.createUserFact({
+        userId: 1,
+        fact: `My preferences: ${preferences}`,
+        category: 'preferences',
+        confidence: 'high'
+      });
+    }
+    
+    res.json({ success: true, user });
+  } catch (error) {
+    console.error('Error initializing user:', error);
+    res.status(500).json({ error: 'Failed to initialize user' });
+  }
+});
+
+app.delete('/api/user/:userId/memories', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    await storage.clearUserMemories(userId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error clearing memories:', error);
+    res.status(500).json({ error: 'Failed to clear memories' });
   }
 });
 
