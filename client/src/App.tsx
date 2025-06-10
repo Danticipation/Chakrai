@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -42,12 +42,15 @@ const AppLayout = () => {
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
   const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('iCrDUkL56s3C8sCRl7wb');
+  const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
+  const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
   const sections = [
     { id: 'chat', icon: MessageCircle, label: 'Chat' },
+    { id: 'daily', icon: Sun, label: 'Daily' },
     { id: 'reflect', icon: Brain, label: 'Reflect' },
     { id: 'memory', icon: BookOpen, label: 'Memory' },
     { id: 'progress', icon: Target, label: 'Progress' },
@@ -97,6 +100,17 @@ const AppLayout = () => {
     axios.get('/api/weekly-summary?userId=1')
       .then(res => setWeeklySummary(res.data.summary))
       .catch(() => setWeeklySummary('No reflection available yet. Start chatting to build your weekly summary!'));
+
+    // Load daily content
+    axios.post('/api/daily-content')
+      .then(res => {
+        setDailyAffirmation(res.data.affirmation);
+        setDailyHoroscope(res.data.horoscope);
+      })
+      .catch(() => {
+        setDailyAffirmation('Today is a new beginning. Embrace the possibilities that await you.');
+        setDailyHoroscope('The universe is aligning to bring positive energy into your life today.');
+      });
   }, []);
 
   const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -534,6 +548,72 @@ const AppLayout = () => {
               <div className="text-zinc-300 whitespace-pre-wrap">
                 {weeklySummary}
               </div>
+            </div>
+          </div>
+        );
+
+      case 'daily':
+        return (
+          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
+            <h2 className="text-2xl font-bold mb-6 text-center">Daily Inspiration</h2>
+            
+            {/* Daily Affirmation Section */}
+            <div className="bg-gradient-to-br from-amber-600/20 to-orange-600/20 rounded-lg p-6 mb-6 border border-amber-500/30">
+              <div className="flex items-center mb-4">
+                <Sun className="w-6 h-6 text-amber-400 mr-3" />
+                <h3 className="text-xl font-semibold text-amber-300">Daily Affirmation</h3>
+              </div>
+              <div className="bg-zinc-800/50 rounded-lg p-4">
+                <p className="text-zinc-100 text-lg leading-relaxed italic">
+                  "{dailyAffirmation}"
+                </p>
+              </div>
+              <button
+                onClick={() => generateAudioForText(dailyAffirmation)}
+                className="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 rounded text-white text-sm font-medium transition-colors"
+              >
+                🔊 Listen to Affirmation
+              </button>
+            </div>
+
+            {/* Daily Horoscope Section */}
+            <div className="bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-lg p-6 border border-purple-500/30">
+              <div className="flex items-center mb-4">
+                <Star className="w-6 h-6 text-purple-400 mr-3" />
+                <h3 className="text-xl font-semibold text-purple-300">Daily Insight</h3>
+              </div>
+              <div className="bg-zinc-800/50 rounded-lg p-4">
+                <p className="text-zinc-100 text-lg leading-relaxed">
+                  {dailyHoroscope}
+                </p>
+              </div>
+              <button
+                onClick={() => generateAudioForText(dailyHoroscope)}
+                className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium transition-colors"
+              >
+                🔊 Listen to Insight
+              </button>
+            </div>
+
+            {/* Refresh Daily Content */}
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => {
+                  axios.post('/api/daily-content')
+                    .then(res => {
+                      setDailyAffirmation(res.data.affirmation);
+                      setDailyHoroscope(res.data.horoscope);
+                    })
+                    .catch(() => {
+                      setDailyAffirmation('Today is a new beginning. Embrace the possibilities that await you.');
+                      setDailyHoroscope('The universe is aligning to bring positive energy into your life today.');
+                    });
+                }}
+                className="px-6 py-2 bg-zinc-700 hover:bg-zinc-600 rounded text-white text-sm font-medium transition-colors flex items-center mx-auto"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Get New Daily Content
+              </button>
             </div>
           </div>
         );
