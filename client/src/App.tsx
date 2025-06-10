@@ -745,6 +745,39 @@ const AppLayout = () => {
           <div className="flex-1 overflow-hidden">
             {renderActiveSection()}
           </div>
+          
+          {/* Desktop Chat Input - Only show for chat section */}
+          {activeSection === 'chat' && (
+            <div className="p-4 bg-zinc-800 border-t border-zinc-700">
+              <div className="flex items-center gap-3 max-w-4xl mx-auto">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Type your message..."
+                  className="flex-1 p-3 text-base rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  className={`p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center ${
+                    isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-zinc-600 hover:bg-zinc-500'
+                  }`}
+                  title={isRecording ? "Stop Recording" : "Start Voice Recording"}
+                >
+                  {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                </button>
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || loading}
+                  className="p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Send Message"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
