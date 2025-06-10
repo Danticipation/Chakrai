@@ -92,6 +92,17 @@ const AppLayout = () => {
   ];
 
   useEffect(() => {
+    // Check user profile first
+    axios.get('/api/user/1/facts')
+      .then(res => {
+        const facts = res.data.facts || [];
+        setUserFacts(facts);
+        setShowProfileSetup(facts.length === 0);
+      })
+      .catch(() => {
+        setShowProfileSetup(true);
+      });
+
     axios.get('/api/stats?userId=1')
       .then(res => {
         setBotStats({
@@ -871,6 +882,22 @@ const AppLayout = () => {
         return <div>Section not found</div>;
     }
   };
+
+  // Show profile setup for new users
+  if (showProfileSetup) {
+    return (
+      <UserProfileSetup onComplete={() => {
+        setShowProfileSetup(false);
+        // Reload user facts after setup
+        axios.get('/api/user/1/facts')
+          .then(res => {
+            const facts = res.data.facts || [];
+            setUserFacts(facts);
+          })
+          .catch(console.error);
+      }} />
+    );
+  }
 
   return (
     <div className="h-screen bg-zinc-900 text-white">
