@@ -102,7 +102,7 @@ const AppLayout = () => {
       .catch(() => setWeeklySummary('No reflection available yet. Start chatting to build your weekly summary!'));
 
     // Load daily content
-    axios.post('/api/daily-content')
+    axios.get('/api/daily-content')
       .then(res => {
         setDailyAffirmation(res.data.affirmation);
         setDailyHoroscope(res.data.horoscope);

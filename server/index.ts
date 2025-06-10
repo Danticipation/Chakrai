@@ -1,9 +1,8 @@
 import express from "express";
 import cors from "cors";
-import { createServer } from "http";
 
 const app = express();
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT || '5000', 10);
 
 app.use(cors());
 app.use(express.json());
