@@ -217,7 +217,8 @@ const AppLayout = () => {
       // Generate audio for bot response
       try {
         const audioResponse = await axios.post('/api/text-to-speech', { 
-          text: res.data.response 
+          text: res.data.response,
+          voiceId: selectedReflectionVoice
         }, {
           responseType: 'blob'
         });
@@ -761,8 +762,9 @@ const AppLayout = () => {
             </div>
 
             <div className="bg-zinc-800 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">Reflection Voice</h3>
+              <h3 className="text-lg font-semibold mb-4 text-purple-400">Bot Voice Selection</h3>
               <div className="space-y-4">
+                <p className="text-sm text-zinc-400">Choose the voice for all bot responses (chat, reflections, etc.)</p>
                 <select
                   value={selectedReflectionVoice}
                   onChange={(e) => setSelectedReflectionVoice(e.target.value)}
@@ -779,11 +781,16 @@ const AppLayout = () => {
                     ))}
                   </optgroup>
                 </select>
+                <div className="text-sm text-zinc-300">
+                  Currently selected: <span className="font-medium text-purple-400">
+                    {[...voiceOptions.female, ...voiceOptions.male].find(v => v.id === selectedReflectionVoice)?.name || 'Hope'}
+                  </span>
+                </div>
                 <button
-                  onClick={() => generateAudioForText("This is a test of the selected voice.")}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white"
+                  onClick={() => generateAudioForText("Hello! This is how I will sound in our conversations.")}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white w-full"
                 >
-                  Test Voice
+                  Test Selected Voice
                 </button>
               </div>
             </div>
