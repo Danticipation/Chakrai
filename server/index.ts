@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import { createServer } from "http";
+import { setupVite } from "./vite.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
@@ -126,7 +128,14 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// Setup Vite for frontend serving
+const server = createServer(app);
+
+if (process.env.NODE_ENV === "development") {
+  await setupVite(app, server);
+}
+
 // Start server
-app.listen(PORT, "0.0.0.0", () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
