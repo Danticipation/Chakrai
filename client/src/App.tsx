@@ -427,27 +427,28 @@ const AppLayout = () => {
     switch (activeSection) {
       case 'chat':
         return (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full bg-zinc-900">
+            {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800">
               {messages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center px-6">
+                <div className="flex flex-col items-center justify-center h-full text-center px-6 pb-20">
                   <img 
                     src="/trai-logo.jpg" 
                     alt="TraI Logo" 
-                    className="w-24 h-24 mb-6 rounded-full shadow-lg object-cover"
+                    className="w-20 h-20 mb-4 rounded-full shadow-lg object-cover"
                   />
-                  <h2 className="text-3xl font-bold text-white mb-4">Welcome to TraI</h2>
-                  <p className="text-zinc-300 text-lg mb-6 max-w-md">
-                    Your intelligent companion that learns and grows with you. Start a conversation to begin our journey together.
+                  <h2 className="text-2xl font-bold text-white mb-3">Welcome to TraI</h2>
+                  <p className="text-zinc-300 text-base mb-4 max-w-xs">
+                    Your intelligent companion that learns and grows with you. Start a conversation below.
                   </p>
-                  <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
-                    <div className="bg-zinc-800 p-4 rounded-lg">
-                      <Mic className="w-6 h-6 text-blue-400 mb-2" />
-                      <p className="text-sm text-zinc-300">Voice Input</p>
+                  <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
+                    <div className="bg-zinc-800 p-3 rounded-lg">
+                      <Mic className="w-5 h-5 text-blue-400 mb-1" />
+                      <p className="text-xs text-zinc-300">Voice Input</p>
                     </div>
-                    <div className="bg-zinc-800 p-4 rounded-lg">
-                      <Brain className="w-6 h-6 text-purple-400 mb-2" />
-                      <p className="text-sm text-zinc-300">Smart Memory</p>
+                    <div className="bg-zinc-800 p-3 rounded-lg">
+                      <Brain className="w-5 h-5 text-purple-400 mb-1" />
+                      <p className="text-xs text-zinc-300">Smart Memory</p>
                     </div>
                   </div>
                 </div>
@@ -458,7 +459,7 @@ const AppLayout = () => {
                     className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                      className={`max-w-xs px-4 py-2 rounded-lg ${
                         message.sender === 'user' 
                           ? 'bg-blue-600 text-white' 
                           : 'bg-zinc-700 text-zinc-100'
@@ -496,10 +497,8 @@ const AppLayout = () => {
               )}
             </div>
 
-
-
-            {/* Input Area - Mobile Optimized */}
-            <div className="mt-4 px-2">
+            {/* Input Area - Fixed at bottom */}
+            <div className="shrink-0 p-3 bg-zinc-800 border-t border-zinc-700">
               <div className="flex items-center gap-3">
                 <input
                   type="text"
@@ -507,31 +506,24 @@ const AppLayout = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Type your message..."
-                  className="flex-1 p-4 text-lg rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 p-3 text-base rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
                   onClick={isRecording ? stopRecording : startRecording}
-                  className={`p-4 rounded-full min-w-[56px] min-h-[56px] flex items-center justify-center ${
+                  className={`p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center ${
                     isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-zinc-600 hover:bg-zinc-500'
                   }`}
                   title={isRecording ? "Stop Recording" : "Start Voice Recording"}
                 >
-                  {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-                </button>
-                <button
-                  onClick={replayLastMessage}
-                  className={`p-4 rounded-full min-w-[56px] min-h-[56px] flex items-center justify-center ${lastBotAudio ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 opacity-50'}`}
-                  title={lastBotAudio ? "Replay last response" : "No audio to replay"}
-                >
-                  🔄
+                  {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                 </button>
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
-                  className="p-4 rounded-full min-w-[56px] min-h-[56px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Send Message"
                 >
-                  <Send className="w-6 h-6" />
+                  <Send className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -683,12 +675,12 @@ const AppLayout = () => {
         </div>
 
         {/* Mobile Content */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden pb-safe">
           {renderActiveSection()}
         </div>
 
         {/* Mobile Bottom Navigation - Fixed */}
-        <div className="bg-zinc-800 border-t border-zinc-700 shrink-0 safe-area-inset-bottom">
+        <div className="bg-zinc-800 border-t border-zinc-700 shrink-0 mobile-nav">
           <div className="flex justify-around py-3 px-2">
             {sections.map((section) => {
               const Icon = section.icon;
@@ -696,13 +688,13 @@ const AppLayout = () => {
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`flex flex-col items-center p-2 min-w-[60px] rounded-lg transition-colors ${
+                  className={`flex flex-col items-center p-2 min-w-[50px] rounded-lg transition-colors ${
                     activeSection === section.id 
                       ? 'text-blue-400 bg-blue-900/30' 
                       : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
                   }`}
                 >
-                  <Icon className="w-6 h-6 mb-1" />
+                  <Icon className="w-5 h-5 mb-1" />
                   <span className="text-xs font-medium">{section.label}</span>
                 </button>
               );
