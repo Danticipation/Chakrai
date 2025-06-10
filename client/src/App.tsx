@@ -649,17 +649,7 @@ const AppLayout = () => {
             {/* Refresh Daily Content */}
             <div className="mt-6 text-center">
               <button
-                onClick={() => {
-                  axios.post('/api/daily-content')
-                    .then(res => {
-                      setDailyAffirmation(res.data.affirmation);
-                      setDailyHoroscope(res.data.horoscope);
-                    })
-                    .catch(() => {
-                      setDailyAffirmation('Today is a new beginning. Embrace the possibilities that await you.');
-                      setDailyHoroscope('The universe is aligning to bring positive energy into your life today.');
-                    });
-                }}
+                onClick={() => handleZodiacChange(selectedZodiacSign)}
                 className="px-6 py-2 bg-zinc-700 hover:bg-zinc-600 rounded text-white text-sm font-medium transition-colors flex items-center mx-auto"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
@@ -676,10 +666,125 @@ const AppLayout = () => {
           </div>
         );
 
+      case 'progress':
+        return (
+          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
+            <h2 className="text-2xl font-bold mb-6">Progress Tracking</h2>
+            
+            {/* Bot Growth Stats */}
+            <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded-lg p-6 mb-6 border border-green-500/30">
+              <div className="flex items-center mb-4">
+                <Target className="w-6 h-6 text-green-400 mr-3" />
+                <h3 className="text-xl font-semibold text-green-300">Bot Development</h3>
+              </div>
+              {botStats && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-zinc-800/50 rounded-lg p-4">
+                    <div className="text-2xl font-bold text-green-400">{botStats.level}</div>
+                    <div className="text-sm text-zinc-300">Current Level</div>
+                  </div>
+                  <div className="bg-zinc-800/50 rounded-lg p-4">
+                    <div className="text-2xl font-bold text-green-400">{botStats.stage}</div>
+                    <div className="text-sm text-zinc-300">Development Stage</div>
+                  </div>
+                  <div className="bg-zinc-800/50 rounded-lg p-4">
+                    <div className="text-2xl font-bold text-green-400">{botStats.wordsLearned}</div>
+                    <div className="text-sm text-zinc-300">Words Learned</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Conversation Insights */}
+            <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-lg p-6 border border-blue-500/30">
+              <div className="flex items-center mb-4">
+                <Brain className="w-6 h-6 text-blue-400 mr-3" />
+                <h3 className="text-xl font-semibold text-blue-300">Conversation Stats</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-zinc-800/50 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-blue-400">{messages.length}</div>
+                  <div className="text-sm text-zinc-300">Total Messages</div>
+                </div>
+                <div className="bg-zinc-800/50 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-blue-400">{personalityMode}</div>
+                  <div className="text-sm text-zinc-300">Active Mode</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       case 'voice':
         return (
-          <div className="p-6 max-w-4xl mx-auto">
-            <VoiceSelector />
+          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
+            <h2 className="text-2xl font-bold mb-6">Voice Settings</h2>
+            
+            <div className="bg-zinc-800 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-purple-400">Audio Status</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span>Audio Enabled</span>
+                  <span className={`px-3 py-1 rounded-full text-sm ${audioEnabled ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+                    {audioEnabled ? 'Active' : 'Disabled'}
+                  </span>
+                </div>
+                {!audioEnabled && (
+                  <button
+                    onClick={enableAudio}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white"
+                  >
+                    Enable Audio
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-zinc-800 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-purple-400">Voice Controls</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span>Voice Recording</span>
+                  <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`px-4 py-2 rounded ${isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                  >
+                    {isRecording ? 'Stop Recording' : 'Start Recording'}
+                  </button>
+                </div>
+                <div className="text-sm text-zinc-400">
+                  Press 'R' key in chat to quickly toggle voice recording
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-zinc-800 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-purple-400">Reflection Voice</h3>
+              <div className="space-y-4">
+                <select
+                  value={selectedReflectionVoice}
+                  onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                >
+                  <optgroup label="Female Voices">
+                    {voiceOptions.female.map(voice => (
+                      <option key={voice.id} value={voice.id}>{voice.name} - {voice.description}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Male Voices">
+                    {voiceOptions.male.map(voice => (
+                      <option key={voice.id} value={voice.id}>{voice.name} - {voice.description}</option>
+                    ))}
+                  </optgroup>
+                </select>
+                <button
+                  onClick={() => generateAudioForText("This is a test of the selected voice.")}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white"
+                >
+                  Test Voice
+                </button>
+              </div>
+            </div>
           </div>
         );
 
