@@ -428,10 +428,10 @@ const AppLayout = () => {
       case 'chat':
         return (
           <div className="flex flex-col h-full bg-zinc-900">
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800">
+            {/* Messages Area - Account for mobile input */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800" style={{ paddingBottom: '120px' }}>
               {messages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center px-6 pb-20">
+                <div className="flex flex-col items-center justify-center h-full text-center px-6">
                   <img 
                     src="/trai-logo.jpg" 
                     alt="TraI Logo" 
@@ -495,37 +495,6 @@ const AppLayout = () => {
                   </button>
                 </div>
               )}
-            </div>
-
-            {/* Input Area - Fixed at bottom */}
-            <div className="shrink-0 p-3 bg-zinc-800 border-t border-zinc-700">
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
-                  className="flex-1 p-3 text-base rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center ${
-                    isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-zinc-600 hover:bg-zinc-500'
-                  }`}
-                  title={isRecording ? "Stop Recording" : "Start Voice Recording"}
-                >
-                  {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                </button>
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || loading}
-                  className="p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Send Message"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
             </div>
           </div>
         );
@@ -674,14 +643,47 @@ const AppLayout = () => {
           )}
         </div>
 
-        {/* Mobile Content */}
-        <div className="flex-1 overflow-hidden pb-safe">
+        {/* Mobile Content - Above navigation and input */}
+        <div className="flex-1 overflow-hidden" style={{ paddingBottom: '140px' }}>
           {renderActiveSection()}
         </div>
 
-        {/* Mobile Bottom Navigation - Fixed */}
-        <div className="bg-zinc-800 border-t border-zinc-700 shrink-0 mobile-nav">
-          <div className="flex justify-around py-3 px-2">
+        {/* Mobile Input Area - Fixed above navigation */}
+        {activeSection === 'chat' && (
+          <div className="fixed bottom-16 left-0 right-0 p-3 bg-zinc-800 border-t border-zinc-700 z-40">
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                className="flex-1 p-3 text-base rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center ${
+                  isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-zinc-600 hover:bg-zinc-500'
+                }`}
+                title={isRecording ? "Stop Recording" : "Start Voice Recording"}
+              >
+                {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+              <button
+                onClick={sendMessage}
+                disabled={!input.trim() || loading}
+                className="p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Send Message"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Mobile Bottom Navigation - Fixed position */}
+        <div className="fixed bottom-0 left-0 right-0 bg-zinc-800 border-t border-zinc-700 mobile-nav z-50">
+          <div className="flex justify-around py-2 px-1">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
