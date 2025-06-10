@@ -184,6 +184,7 @@ const AppLayout = () => {
       }
     } catch (error) {
       console.error('Transcription failed:', error);
+      setInput('Voice transcription not available - please type your message');
     }
   };
 
@@ -374,6 +375,7 @@ const AppLayout = () => {
       });
     } catch (error) {
       console.error('Audio generation failed:', error);
+      alert('Audio generation requires ElevenLabs API configuration. The text content is available to read above.');
     }
   };
 

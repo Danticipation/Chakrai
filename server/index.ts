@@ -187,6 +187,28 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// Transcription endpoint for voice input
+app.post('/api/transcribe', async (req, res) => {
+  try {
+    res.json({
+      text: "Voice transcription requires OpenAI API configuration. Please type your message instead."
+    });
+  } catch (error) {
+    console.error('Transcription error:', error);
+    res.status(500).json({ error: 'Transcription failed' });
+  }
+});
+
+// Text-to-speech endpoint for audio responses
+app.post('/api/text-to-speech', async (req, res) => {
+  try {
+    res.status(503).json({ error: 'Text-to-speech requires ElevenLabs API configuration' });
+  } catch (error) {
+    console.error('TTS error:', error);
+    res.status(500).json({ error: 'Text-to-speech failed' });
+  }
+});
+
 // Setup Vite for frontend serving
 const server = createServer(app);
 
