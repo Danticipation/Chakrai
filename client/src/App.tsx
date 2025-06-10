@@ -184,7 +184,7 @@ const AppLayout = () => {
       }
     } catch (error) {
       console.error('Transcription failed:', error);
-      setInput('Voice transcription not available - please type your message');
+      setInput('Could not transcribe audio - please try again or type your message');
     }
   };
 

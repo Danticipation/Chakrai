@@ -194,27 +194,103 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// Transcription endpoint for voice input
+// Transcription endpoint for voice input using OpenAI Whisper
 app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No audio file provided' });
     }
-    
-    // Placeholder response - requires OpenAI Whisper API
-    res.json({
-      text: "Voice transcription requires OpenAI API key configuration. Please type your message instead."
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(503).json({ error: 'OpenAI API key not configured' });
+    }
+
+    // Create FormData for OpenAI API
+    const formData = new FormData();
+    formData.append('file', new Blob([req.file.buffer], { type: 'audio/wav' }), 'audio.wav');
+    formData.append('model', 'whisper-1');
+
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: formData
     });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    res.json({
+      text: result.text || "No speech detected in audio"
+    });
+
   } catch (error) {
     console.error('Transcription error:', error);
     res.status(500).json({ error: 'Transcription failed' });
   }
 });
 
-// Text-to-speech endpoint for audio responses
+// Text-to-speech endpoint using OpenAI TTS
 app.post('/api/text-to-speech', async (req, res) => {
   try {
-    res.status(503).json({ error: 'Text-to-speech requires ElevenLabs API configuration' });
+    const { text, voiceId } = req.body as { text: string; voiceId?: string };
+
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(503).json({ error: 'OpenAI API key not configured' });
+    }
+
+    // Map voice selection to OpenAI voices
+    const voiceMap: Record<string, string> = {
+      'iCrDUkL56s3C8sCRl7wb': 'nova',   // Hope -> Nova (female)
+      'FA6HhUjVmxBGQLlzA8WZ': 'shimmer', // Ophelia -> Shimmer (female)
+      'oWAxZDx7w5VEj9dCyTzz': 'alloy',   // Grace -> Alloy (neutral)
+      '21m00Tcm4TlvDq8ikWAM': 'echo',    // Rachel -> Echo (male)
+      'AZnzlk1XvdvUeBnXmlld': 'fable',   // Domi -> Fable (female)
+      'EXAVITQu4vr4xnSDxMaL': 'nova',    // Bella -> Nova (female)
+      'pFZP5JQG7iQjIQuC4Bku': 'onyx',    // Brian -> Onyx (male)
+      'ErXwobaYiN019PkySvjV': 'echo',    // Antoni -> Echo (male)
+      'VR6AewLTigWG4xSOukaG': 'onyx',    // Arnold -> Onyx (male)
+      'CYw3kZ02Hs0563khs1Fj': 'onyx',    // Dave -> Onyx (male)
+      'JBFqnCBsd6RMkjVDRZzb': 'echo'     // George -> Echo (male)
+    };
+
+    const selectedVoice = voiceMap[voiceId] || 'alloy';
+
+    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'tts-1',
+        input: text,
+        voice: selectedVoice,
+        response_format: 'mp3'
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI TTS API error: ${response.status}`);
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': audioBuffer.byteLength.toString()
+    });
+    
+    res.send(Buffer.from(audioBuffer));
+
   } catch (error) {
     console.error('TTS error:', error);
     res.status(500).json({ error: 'Text-to-speech failed' });
