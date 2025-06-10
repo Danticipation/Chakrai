@@ -41,30 +41,80 @@ app.get('/api/daily-content', async (req, res) => {
       "I am exactly where I need to be, learning and growing every day."
     ];
 
-    const insights = [
-      "Small consistent actions create remarkable transformations over time.",
-      "Your thoughts shape your reality - choose them wisely and with intention.",
-      "Embracing uncertainty opens doors to unexpected opportunities and growth.",
-      "The only way out is through - trust the process and keep moving forward.",
-      "Every ending is a new beginning waiting to unfold in your life.",
-      "Your current struggles are preparing you for future strength and wisdom.",
-      "Focus on progress, not perfection - every step forward matters.",
-      "The answers you seek often come when you stop forcing and start flowing.",
-      "Your authentic self is your greatest gift to the world around you.",
-      "Patience with yourself creates space for genuine transformation to occur.",
-      "What you practice grows stronger - choose your habits mindfully today.",
-      "Sometimes the best thing you can do is simply show up as you are.",
-      "Your energy is precious - invest it in what truly aligns with your values.",
-      "Every challenge contains wisdom that will serve you in the future.",
-      "The path forward becomes clearer when you trust your inner guidance."
-    ];
+    const horoscopes = {
+      aries: [
+        "Your leadership qualities shine today. Take initiative on projects that matter to you.",
+        "Mars energizes your ambition. A bold move could lead to unexpected opportunities.",
+        "Your competitive spirit serves you well. Channel that energy into productive pursuits."
+      ],
+      taurus: [
+        "Venus brings harmony to your relationships. Focus on building stronger connections.",
+        "Your practical nature helps you solve a financial matter. Trust your instincts.",
+        "Slow and steady progress in your goals brings lasting satisfaction today."
+      ],
+      gemini: [
+        "Mercury enhances your communication skills. Important conversations flow easily.",
+        "Your curiosity leads to valuable discoveries. Stay open to learning something new.",
+        "Networking and social connections bring unexpected benefits your way."
+      ],
+      cancer: [
+        "The Moon illuminates your intuitive powers. Trust your emotional guidance today.",
+        "Family and home matters receive positive attention. Nurturing brings rewards.",
+        "Your empathetic nature helps someone in need, creating good karma."
+      ],
+      leo: [
+        "The Sun spotlights your creative talents. Express yourself boldly and authentically.",
+        "Your natural charisma attracts positive attention from others today.",
+        "Leadership opportunities present themselves. Step into your power confidently."
+      ],
+      virgo: [
+        "Your attention to detail pays off in a significant way. Perfectionism serves you well.",
+        "Health and wellness routines bring noticeable improvements to your energy.",
+        "Practical solutions to complex problems come naturally to you today."
+      ],
+      libra: [
+        "Balance and harmony guide your decisions. Diplomatic approaches yield success.",
+        "Venus enhances your charm and social appeal. Relationships flourish today.",
+        "Artistic or aesthetic projects receive inspiration and positive feedback."
+      ],
+      scorpio: [
+        "Your intensity and focus help you uncover hidden truths or opportunities.",
+        "Transformation energy is strong. Embrace changes that serve your highest good.",
+        "Your investigative nature leads to valuable insights about a situation."
+      ],
+      sagittarius: [
+        "Jupiter expands your horizons. Travel, learning, or philosophy captures your interest.",
+        "Your optimistic outlook inspires others and opens new doors for you.",
+        "Adventure calls to you. Take calculated risks that align with your goals."
+      ],
+      capricorn: [
+        "Saturn rewards your hard work and dedication with tangible progress.",
+        "Your disciplined approach to goals shows impressive results today.",
+        "Authority figures or mentors provide valuable guidance for your career path."
+      ],
+      aquarius: [
+        "Uranus brings innovative ideas and fresh perspectives to your projects.",
+        "Your humanitarian nature guides you toward meaningful social connections.",
+        "Technology or unconventional approaches solve problems others cannot."
+      ],
+      pisces: [
+        "Neptune enhances your intuition and creative inspiration flows freely.",
+        "Your compassionate nature attracts kindred spirits and meaningful relationships.",
+        "Dreams and subconscious insights provide guidance for important decisions."
+      ]
+    };
 
+    const zodiacSigns = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'] as const;
+    const randomSign = zodiacSigns[Math.floor(Math.random() * zodiacSigns.length)];
+    const signHoroscopes = horoscopes[randomSign];
+    
     const randomAffirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
-    const randomInsight = insights[Math.floor(Math.random() * insights.length)];
+    const randomHoroscope = signHoroscopes[Math.floor(Math.random() * signHoroscopes.length)];
 
     res.json({
       affirmation: randomAffirmation,
-      horoscope: randomInsight
+      horoscope: randomHoroscope,
+      zodiacSign: randomSign.charAt(0).toUpperCase() + randomSign.slice(1)
     });
 
   } catch (error) {
@@ -131,11 +181,15 @@ app.post('/api/chat', async (req, res) => {
 // Setup Vite for frontend serving
 const server = createServer(app);
 
-if (process.env.NODE_ENV === "development") {
-  await setupVite(app, server);
-}
+// Start server with async setup
+const startServer = async () => {
+  if (process.env.NODE_ENV === "development") {
+    await setupVite(app, server);
+  }
 
-// Start server
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+};
+
+startServer();

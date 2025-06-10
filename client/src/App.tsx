@@ -44,6 +44,7 @@ const AppLayout = () => {
   const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('iCrDUkL56s3C8sCRl7wb');
   const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
   const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
+  const [zodiacSign, setZodiacSign] = useState<string>('');
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -106,10 +107,12 @@ const AppLayout = () => {
       .then(res => {
         setDailyAffirmation(res.data.affirmation);
         setDailyHoroscope(res.data.horoscope);
+        setZodiacSign(res.data.zodiacSign || '');
       })
       .catch(() => {
         setDailyAffirmation('Today is a new beginning. Embrace the possibilities that await you.');
         setDailyHoroscope('The universe is aligning to bring positive energy into your life today.');
+        setZodiacSign('');
       });
   }, []);
 
@@ -580,7 +583,9 @@ const AppLayout = () => {
             <div className="bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-lg p-6 border border-purple-500/30">
               <div className="flex items-center mb-4">
                 <Star className="w-6 h-6 text-purple-400 mr-3" />
-                <h3 className="text-xl font-semibold text-purple-300">Daily Insight</h3>
+                <h3 className="text-xl font-semibold text-purple-300">
+                  Daily Horoscope {zodiacSign && `- ${zodiacSign}`}
+                </h3>
               </div>
               <div className="bg-zinc-800/50 rounded-lg p-4">
                 <p className="text-zinc-100 text-lg leading-relaxed">
@@ -591,7 +596,7 @@ const AppLayout = () => {
                 onClick={() => generateAudioForText(dailyHoroscope)}
                 className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium transition-colors"
               >
-                🔊 Listen to Insight
+                🔊 Listen to Horoscope
               </button>
             </div>
 
