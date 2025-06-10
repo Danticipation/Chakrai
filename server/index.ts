@@ -193,7 +193,7 @@ app.post('/api/chat', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: `You are Reflectibot, an advanced AI companion with full conversational abilities. You can hear the user through voice transcription and respond naturally. Respond directly to what the user says - if they mention testing voice functionality, acknowledge it specifically. If they ask technical questions, provide helpful answers. Be conversational, specific to their input, and avoid generic responses. Personality mode: ${personalityMode}. Always respond contextually to the exact content of their message.`
+            content: `You are Claude, an AI assistant created by Anthropic. You should respond naturally and specifically to whatever the user says. If they mention voice testing, acknowledge it. If they ask about technical details, explain them. Never give generic responses - always be specific to their exact message. Current mode: ${personalityMode}.`
           },
           {
             role: 'user',
@@ -211,6 +211,9 @@ app.post('/api/chat', async (req, res) => {
 
     const result = await response.json();
     const botResponse = result.choices[0].message.content;
+    
+    console.log('OpenAI Response:', botResponse);
+    console.log('User message was:', message);
     
     res.json({
       response: botResponse,
