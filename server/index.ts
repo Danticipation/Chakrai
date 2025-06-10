@@ -170,7 +170,7 @@ app.get('/api/weekly-summary', async (req, res) => {
 // Chat endpoint using OpenAI GPT-4o
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, userId, personalityMode } = req.body;
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
