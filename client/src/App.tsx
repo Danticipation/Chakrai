@@ -43,7 +43,7 @@ const AppLayout = () => {
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
-  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('pFZP5JQG7iQjIQuC4Bku'); // Brian - male voice
+  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('EkK5I93UQWFDigLMpZcX'); // James - default voice
   const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
   const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
   const [zodiacSign, setZodiacSign] = useState<string>('');
