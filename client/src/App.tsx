@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star } from 'lucide-react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -999,31 +1000,55 @@ const AppLayout = () => {
               </div>
               <h2 className="text-xl font-semibold">Horoscope</h2>
             </div>
-            <div className="mb-4">
-              <select
-                value={selectedZodiacSign}
-                onChange={(e) => handleZodiacChange(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
-              >
-                <option value="">Random Sign</option>
-                <option value="aries">♈ Aries</option>
-                <option value="taurus">♉ Taurus</option>
-                <option value="gemini">♊ Gemini</option>
-                <option value="cancer">♋ Cancer</option>
-                <option value="leo">♌ Leo</option>
-                <option value="virgo">♍ Virgo</option>
-                <option value="libra">♎ Libra</option>
-                <option value="scorpio">♏ Scorpio</option>
-                <option value="sagittarius">♐ Sagittarius</option>
-                <option value="capricorn">♑ Capricorn</option>
-                <option value="aquarius">♒ Aquarius</option>
-                <option value="pisces">♓ Pisces</option>
-              </select>
-            </div>
             <div className="bg-zinc-900 rounded-lg p-4 h-48 overflow-y-auto">
+              <div className="text-sm text-zinc-300 mb-3">
+                <strong>Your Sign:</strong>
+              </div>
+              <div className="mb-4">
+                <select
+                  value={selectedZodiacSign}
+                  onChange={(e) => handleZodiacChange(e.target.value)}
+                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                >
+                  <option value="">Random Sign</option>
+                  <option value="aries">♈ Aries</option>
+                  <option value="taurus">♉ Taurus</option>
+                  <option value="gemini">♊ Gemini</option>
+                  <option value="cancer">♋ Cancer</option>
+                  <option value="leo">♌ Leo</option>
+                  <option value="virgo">♍ Virgo</option>
+                  <option value="libra">♎ Libra</option>
+                  <option value="scorpio">♏ Scorpio</option>
+                  <option value="sagittarius">♐ Sagittarius</option>
+                  <option value="capricorn">♑ Capricorn</option>
+                  <option value="aquarius">♒ Aquarius</option>
+                  <option value="pisces">♓ Pisces</option>
+                </select>
+              </div>
+              <div className="text-sm text-zinc-300 mb-2">
+                <strong>Today's Reading:</strong>
+              </div>
               <div className="text-sm text-zinc-300 leading-relaxed">
                 {dailyHoroscope}
               </div>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <select
+                value={selectedReflectionVoice}
+                onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+              >
+                {voiceOptions.map(voice => (
+                  <option key={voice.id} value={voice.id}>{voice.name}</option>
+                ))}
+              </select>
+              <button
+                onClick={() => generateAudioForText(dailyHoroscope)}
+                disabled={!dailyHoroscope}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-sm"
+              >
+                🔊 Read
+              </button>
             </div>
           </div>
         </div>
