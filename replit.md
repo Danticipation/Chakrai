@@ -13,9 +13,9 @@ TraI is a professional mental wellness and therapy application designed for peop
 
 ## Recent Changes
 ### June 18, 2025 - Fixed Logo Display and ElevenLabs Voice Issues
-- **Logo corrected**: Now using actual TrAI Vision logo file instead of screenshot display
+- **Logo corrected**: Now using actual TrAI logo with brain design and eye symbol (/TrAI-Logo.png)
 - **ElevenLabs API fixed**: Removed improper browser TTS fallback that was causing voice issues
-- **Logo file management**: Copied user's actual logo to /client/public/TrAI.png for proper display
+- **Logo file management**: Copied user's actual professional logo to client/public directory for proper display
 - **Voice functionality restored**: ElevenLabs API working correctly with HTTP 200 responses
 
 ### June 18, 2025 - Completed and Tested Adaptive Onboarding Experience with Personality Quiz
