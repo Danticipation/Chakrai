@@ -36,10 +36,20 @@ body {
   box-sizing: border-box;
 }
 
-/* Ensure root element uses therapeutic background */
-#root {
-  background-color: var(--soft-blue) !important;
-  min-height: 100vh;
+/* Global therapeutic background enforcement */
+html, body, #root {
+  background-color: #ADD8E6 !important;
+  min-height: 100vh !important;
+}
+
+/* Override any white backgrounds in the app */
+.min-h-screen, .h-screen, .h-full {
+  background-color: #ADD8E6 !important;
+}
+
+/* Ensure all main containers use therapeutic colors */
+div[class*="h-screen"], div[class*="min-h-screen"] {
+  background-color: #ADD8E6 !important;
 }
 
 /* Mobile safe area support */
