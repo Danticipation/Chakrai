@@ -1145,9 +1145,9 @@ const AppLayout = () => {
                 <button
                   onClick={() => setPersonalityMode(personalityMode === 'friendly' ? 'professional' : 'friendly')}
                   className="px-3 py-1 bg-zinc-600 hover:bg-zinc-500 rounded text-sm font-medium"
-                  title="Toggle Personality Mode"
+                  title={`Current: ${personalityMode} mode - Click to switch`}
                 >
-                  {personalityMode === 'friendly' ? '😊' : '💼'}
+                  {personalityMode === 'friendly' ? 'Friendly' : 'Professional'}
                 </button>
 
                 <button
