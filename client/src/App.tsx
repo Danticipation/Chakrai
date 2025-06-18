@@ -1379,6 +1379,16 @@ const AppLayout = () => {
         </div>
       </div>
 
+      {/* Onboarding Quiz Overlay for Profile Updates */}
+      {showOnboarding && (
+        <div className="fixed inset-0 z-50">
+          <OnboardingQuiz 
+            userId={1} 
+            onComplete={() => setShowOnboarding(false)} 
+          />
+        </div>
+      )}
+
       {/* Therapeutic Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1487,6 +1497,18 @@ const AppLayout = () => {
                       className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
                     >
                       Reset
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Retake Personality Quiz</span>
+                    <button
+                      onClick={() => {
+                        setShowOnboarding(true);
+                        setShowSettings(false);
+                      }}
+                      className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                    >
+                      Update Profile
                     </button>
                   </div>
                 </div>
@@ -1689,8 +1711,8 @@ function AppWithOnboarding() {
     );
   }
 
-  // Show onboarding quiz for new users
-  if (!onboardingStatus?.isComplete && !onboardingComplete) {
+  // Show onboarding quiz for new users or when manually requested
+  if ((!onboardingStatus?.isComplete && !onboardingComplete)) {
     return (
       <OnboardingQuiz 
         userId={1} 
