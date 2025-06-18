@@ -62,23 +62,12 @@ const AppLayout = () => {
     { id: 'settings', icon: User, label: 'Settings' }
   ];
 
-  const voiceOptions = {
-    female: [
-      { id: 'iCrDUkL56s3C8sCRl7wb', name: 'Hope', description: 'Warm, soothing, captivating American female' },
-      { id: 'FA6HhUjVmxBGQLlzA8WZ', name: 'Ophelia', description: 'Calm, articulate British female' },
-      { id: 'oWAxZDx7w5VEj9dCyTzz', name: 'Grace', description: 'Confident, friendly British female' },
-      { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel', description: 'Calm, professional American female' },
-      { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi', description: 'Soft, gentle American female' },
-      { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella', description: 'Warm, engaging voice' }
-    ],
-    male: [
-      { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Brian', description: 'Deep, resonant American male' },
-      { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni', description: 'Well-rounded American male' },
-      { id: 'VR6AewLTigWG4xSOukaG', name: 'Arnold', description: 'Crisp, authoritative American male' },
-      { id: 'CYw3kZ02Hs0563khs1Fj', name: 'Dave', description: 'Deep, serious American male' },
-      { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George', description: 'Raspy, casual American male' }
-    ]
-  };
+  const voiceOptions = [
+    { id: 'EkK5I93UQWFDigLMpZcX', name: 'James', description: 'Professional male voice', gender: 'Male', default: true },
+    { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian', description: 'Deep, resonant male voice', gender: 'Male' },
+    { id: 'kdmDKE6EkgrWrrykO9Qt', name: 'Alexandra', description: 'Clear female voice', gender: 'Female' },
+    { id: 'l32B8XDoylOsZKiSdfhE', name: 'Carla', description: 'Warm female voice', gender: 'Female' }
+  ];
 
   const personalityModes = [
     { id: 'friend', name: 'Friend Mode', emoji: '😊', description: 'Casual conversation and friendly banter' },
@@ -554,16 +543,9 @@ const AppLayout = () => {
                   onChange={(e) => setSelectedReflectionVoice(e.target.value)}
                   className="px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
                 >
-                  <optgroup label="Female Voices">
-                    {voiceOptions.female.map(voice => (
-                      <option key={voice.id} value={voice.id}>{voice.name}</option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Male Voices">
-                    {voiceOptions.male.map(voice => (
-                      <option key={voice.id} value={voice.id}>{voice.name}</option>
-                    ))}
-                  </optgroup>
+                  {voiceOptions.map(voice => (
+                    <option key={voice.id} value={voice.id}>{voice.name} - {voice.description}</option>
+                  ))}
                 </select>
                 <button
                   onClick={readReflection}
@@ -772,20 +754,13 @@ const AppLayout = () => {
                   onChange={(e) => setSelectedReflectionVoice(e.target.value)}
                   className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
                 >
-                  <optgroup label="Female Voices">
-                    {voiceOptions.female.map(voice => (
-                      <option key={voice.id} value={voice.id}>{voice.name} - {voice.description}</option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Male Voices">
-                    {voiceOptions.male.map(voice => (
-                      <option key={voice.id} value={voice.id}>{voice.name} - {voice.description}</option>
-                    ))}
-                  </optgroup>
+                  {voiceOptions.map(voice => (
+                    <option key={voice.id} value={voice.id}>{voice.name} - {voice.description}</option>
+                  ))}
                 </select>
                 <div className="text-sm text-zinc-300">
                   Currently selected: <span className="font-medium text-purple-400">
-                    {[...voiceOptions.female, ...voiceOptions.male].find(v => v.id === selectedReflectionVoice)?.name || 'Hope'}
+                    {voiceOptions.find(v => v.id === selectedReflectionVoice)?.name || 'James'}
                   </span>
                 </div>
                 <button
