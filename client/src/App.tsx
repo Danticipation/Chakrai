@@ -275,12 +275,21 @@ const AppLayout = () => {
       
       // Generate audio for bot response
       try {
+        console.log('Requesting TTS for:', botResponse.substring(0, 50), 'with voice:', selectedReflectionVoice);
+        
         const audioResponse = await axios.post('/api/text-to-speech', { 
           text: botResponse,
           voiceId: selectedReflectionVoice
         }, {
           responseType: 'blob'
         });
+        
+        console.log('TTS response received, size:', audioResponse.data.size, 'bytes');
+        
+        // Ensure we have valid audio data
+        if (audioResponse.data.size === 0) {
+          throw new Error('Empty audio response from ElevenLabs');
+        }
         
         const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -289,18 +298,22 @@ const AppLayout = () => {
         const audio = new Audio(audioUrl);
         audio.volume = 1.0;
         
+        // Add audio event listeners for debugging
+        audio.addEventListener('loadstart', () => console.log('Audio load started'));
+        audio.addEventListener('canplay', () => console.log('Audio can play'));
+        audio.addEventListener('error', (e) => console.error('Audio error:', e));
+        
         const playPromise = audio.play();
         playPromise.then(() => {
-          console.log('Audio playing successfully');
+          console.log('ElevenLabs audio playing successfully');
           setAudioEnabled(true);
         }).catch(error => {
-          console.log('Audio blocked by browser:', error.message);
+          console.error('Audio play failed:', error);
           setPendingAudio(audioUrl);
         });
       } catch (voiceError) {
         console.error('ElevenLabs TTS failed:', voiceError);
-        // Only fall back to browser TTS if explicitly requested
-        // For now, we'll just log the error and not play audio
+        console.error('Voice error details:', voiceError.response?.data || voiceError.message);
       }
       
       setBotStats(prev => prev ? {

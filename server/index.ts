@@ -670,8 +670,11 @@ app.post('/api/text-to-speech', async (req, res) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`ElevenLabs API error: ${response.status} - ${errorText}`);
-      throw new Error(`ElevenLabs API error: ${response.status}`);
+      console.error('Request details:', { text: text.substring(0, 100), voiceId: selectedVoiceId });
+      throw new Error(`ElevenLabs API error: ${response.status} - ${errorText}`);
     }
+    
+    console.log('ElevenLabs API success, response size:', response.headers.get('content-length'));
 
     const audioBuffer = await response.arrayBuffer();
     
