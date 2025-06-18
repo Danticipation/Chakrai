@@ -4,7 +4,7 @@ import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, Rotate
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
-import UserProfileSetup from './components/UserProfileSetup';
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,8 +29,7 @@ interface Message {
 const AppLayout = () => {
   const [activeSection, setActiveSection] = useState('chat');
   const [isRecording, setIsRecording] = useState(false);
-  const [showProfileSetup, setShowProfileSetup] = useState(false);
-  const [userFacts, setUserFacts] = useState([]);
+
   const [input, setInput] = useState('');
   const [botStats, setBotStats] = useState<BotStats | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -92,17 +91,6 @@ const AppLayout = () => {
   ];
 
   useEffect(() => {
-    // Check user profile first
-    axios.get('/api/user/1/facts')
-      .then(res => {
-        const facts = res.data.facts || [];
-        setUserFacts(facts);
-        setShowProfileSetup(facts.length === 0);
-      })
-      .catch(() => {
-        setShowProfileSetup(true);
-      });
-
     axios.get('/api/stats?userId=1')
       .then(res => {
         setBotStats({
@@ -883,21 +871,7 @@ const AppLayout = () => {
     }
   };
 
-  // Show profile setup for new users
-  if (showProfileSetup) {
-    return (
-      <UserProfileSetup onComplete={() => {
-        setShowProfileSetup(false);
-        // Reload user facts after setup
-        axios.get('/api/user/1/facts')
-          .then(res => {
-            const facts = res.data.facts || [];
-            setUserFacts(facts);
-          })
-          .catch(console.error);
-      }} />
-    );
-  }
+
 
   return (
     <div className="h-screen bg-zinc-900 text-white">

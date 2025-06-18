@@ -196,7 +196,7 @@ app.post('/api/chat', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: personalizedPrompt
+            content: systemPrompt
           },
           {
             role: 'user',
@@ -215,34 +215,10 @@ app.post('/api/chat', async (req, res) => {
     const result = await response.json();
     const botResponse = result.choices[0].message.content;
     
-    // Store user message and bot response in memory
-    await storage.createUserMemory({
-      userId: userId,
-      memory: `User: ${message}. Bot: ${botResponse}`,
-      importance: 'medium',
-      category: personalityMode
-    });
-
-    // Extract and store new facts about the user
-    if (message.toLowerCase().includes('my name is') || message.toLowerCase().includes('i am') || message.toLowerCase().includes('i like') || message.toLowerCase().includes('i work')) {
-      await storage.createUserFact({
-        userId: userId,
-        fact: message,
-        category: 'personal',
-        confidence: 'high'
-      });
-    }
-    
-    console.log('Personalized response for user:', userId);
-    console.log('User facts count:', userFacts.length);
-    console.log('Memory entries:', userMemories.length);
-    
     res.json({
       response: botResponse,
       wordsLearned: 335 + Math.floor(message.split(' ').length / 2),
-      stage: "Advanced",
-      memories: userMemories.length,
-      facts: userFacts.length
+      stage: "Advanced"
     });
     
   } catch (error) {
@@ -354,98 +330,7 @@ app.post('/api/text-to-speech', async (req, res) => {
   }
 });
 
-// User memory and profile endpoints
-app.get('/api/user/:userId/memories', async (req, res) => {
-  try {
-    const userId = parseInt(req.params.userId);
-    const memories = await storage.getUserMemories(userId);
-    res.json({ memories });
-  } catch (error) {
-    console.error('Error fetching memories:', error);
-    res.status(500).json({ error: 'Failed to fetch memories' });
-  }
-});
 
-app.get('/api/user/:userId/facts', async (req, res) => {
-  try {
-    const userId = parseInt(req.params.userId);
-    const facts = await storage.getUserFacts(userId);
-    res.json({ facts });
-  } catch (error) {
-    console.error('Error fetching facts:', error);
-    res.status(500).json({ error: 'Failed to fetch facts' });
-  }
-});
-
-app.post('/api/user/initialize', async (req, res) => {
-  try {
-    const { name, interests, preferences } = req.body;
-    
-    // Create or update user
-    let user = await storage.getUser(1);
-    if (!user) {
-      user = await storage.createUser({
-        username: name || 'User',
-        password: 'default'
-      });
-    }
-    
-    // Store initial facts about the user
-    if (name) {
-      await storage.createUserFact({
-        userId: 1,
-        fact: `My name is ${name}`,
-        category: 'personal',
-        confidence: 'high'
-      });
-    }
-    
-    if (interests) {
-      await storage.createUserFact({
-        userId: 1,
-        fact: `I am interested in ${interests}`,
-        category: 'interests',
-        confidence: 'high'
-      });
-    }
-    
-    if (preferences) {
-      await storage.createUserFact({
-        userId: 1,
-        fact: `My preferences: ${preferences}`,
-        category: 'preferences',
-        confidence: 'high'
-      });
-    }
-    
-    res.json({ success: true, user });
-  } catch (error) {
-    console.error('Error initializing user:', error);
-    res.status(500).json({ error: 'Failed to initialize user' });
-  }
-});
-
-app.delete('/api/user/:userId/memories', async (req, res) => {
-  try {
-    const userId = parseInt(req.params.userId);
-    await storage.clearUserMemories(userId);
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error clearing memories:', error);
-    res.status(500).json({ error: 'Failed to clear memories' });
-  }
-});
-
-app.delete('/api/user/:userId/facts', async (req, res) => {
-  try {
-    const userId = parseInt(req.params.userId);
-    await storage.clearUserFacts(userId);
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error clearing facts:', error);
-    res.status(500).json({ error: 'Failed to clear facts' });
-  }
-});
 
 // Voice configuration endpoints
 app.get('/api/voices', (req, res) => {
