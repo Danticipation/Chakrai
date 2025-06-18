@@ -11,7 +11,15 @@ TraI is an AI companion web application featuring voice interaction, daily conte
 - **Communication style**: Direct, technical communication preferred
 
 ## Recent Changes
-### June 18, 2025 - Unauthorized Modifications Removed
+### June 18, 2025 - Voice System Fixed & UI Improved
+- Fixed ElevenLabs API integration - all 4 approved voices now working correctly
+- Restored proper UI proportions - chat area no longer consumes 95% of screen
+- Added voice selector to chat interface for easy voice switching
+- Confirmed distinct audio output for James, Brian, Alexandra, and Carla voices
+- Maintained original 4-voice system as specified by user
+- Voice recording functionality working properly with Whisper transcription
+
+### Earlier - Unauthorized Modifications Removed  
 - Removed unauthorized "Alex" user profile data from database
 - Eliminated personalized memory system that was added without permission
 - Restored original voice configuration (4 voices only)
