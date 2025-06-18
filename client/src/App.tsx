@@ -461,8 +461,8 @@ const AppLayout = () => {
       case 'chat':
         return (
           <div className="flex flex-col h-full bg-zinc-900">
-            {/* Messages Area - Account for mobile input */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800" style={{ paddingBottom: '120px' }}>
+            {/* Messages Area - Reduced height */}
+            <div className="h-96 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center px-6">
                   <img 

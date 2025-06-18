@@ -267,7 +267,7 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
   }
 });
 
-// Text-to-speech endpoint using OpenAI TTS
+// Text-to-speech endpoint using ElevenLabs
 app.post('/api/text-to-speech', async (req, res) => {
   try {
     const { text, voiceId } = req.body as { text: string; voiceId?: string };
@@ -276,43 +276,32 @@ app.post('/api/text-to-speech', async (req, res) => {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(503).json({ error: 'OpenAI API key not configured' });
+    if (!process.env.ELEVENLABS_API_KEY) {
+      return res.status(503).json({ error: 'ElevenLabs API key not configured' });
     }
 
-    // Map voice selection to OpenAI voices
-    const voiceMap: Record<string, string> = {
-      'iCrDUkL56s3C8sCRl7wb': 'nova',   // Hope -> Nova (female)
-      'FA6HhUjVmxBGQLlzA8WZ': 'shimmer', // Ophelia -> Shimmer (female)
-      'oWAxZDx7w5VEj9dCyTzz': 'alloy',   // Grace -> Alloy (neutral)
-      '21m00Tcm4TlvDq8ikWAM': 'echo',    // Rachel -> Echo (male)
-      'AZnzlk1XvdvUeBnXmlld': 'fable',   // Domi -> Fable (female)
-      'EXAVITQu4vr4xnSDxMaL': 'nova',    // Bella -> Nova (female)
-      'pFZP5JQG7iQjIQuC4Bku': 'onyx',    // Brian -> Onyx (male)
-      'ErXwobaYiN019PkySvjV': 'echo',    // Antoni -> Echo (male)
-      'VR6AewLTigWG4xSOukaG': 'onyx',    // Arnold -> Onyx (male)
-      'CYw3kZ02Hs0563khs1Fj': 'onyx',    // Dave -> Onyx (male)
-      'JBFqnCBsd6RMkjVDRZzb': 'echo'     // George -> Echo (male)
-    };
+    // Use the actual ElevenLabs voice ID or default to James
+    const selectedVoiceId = voiceId || 'EkK5I93UQWFDigLMpZcX';
 
-    const selectedVoice = voiceId ? (voiceMap[voiceId] || 'alloy') : 'alloy';
-
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${selectedVoiceId}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Accept': 'audio/mpeg',
         'Content-Type': 'application/json',
+        'xi-api-key': process.env.ELEVENLABS_API_KEY,
       },
       body: JSON.stringify({
-        model: 'tts-1',
-        input: text,
-        voice: selectedVoice,
-        response_format: 'mp3'
+        text,
+        model_id: 'eleven_monolingual_v1',
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.5
+        }
       })
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI TTS API error: ${response.status}`);
+      throw new Error(`ElevenLabs API error: ${response.status}`);
     }
 
     const audioBuffer = await response.arrayBuffer();
