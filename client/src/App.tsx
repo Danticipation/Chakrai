@@ -1072,8 +1072,12 @@ const AppLayout = () => {
         {/* Center Panel - Chat Window */}
         <div className="w-1/2 flex flex-col bg-zinc-900">
           <div className="border-l border-r border-zinc-700 h-full flex flex-col">
-            <div className="p-4 border-b border-zinc-700 bg-zinc-800">
-              <h1 className="text-xl font-bold text-center">Chat Window</h1>
+            <div className="p-4 border-b border-zinc-700 bg-zinc-800 flex items-center justify-center">
+              <img 
+                src="/trai-logo.jpg" 
+                alt="TraI Logo" 
+                className="w-10 h-10 rounded-full shadow-lg object-cover"
+              />
             </div>
             
             {/* Chat Messages */}
@@ -1125,11 +1129,11 @@ const AppLayout = () => {
             
             {/* Chat Input */}
             <div className="p-4 border-t border-zinc-700 bg-zinc-800">
-              <div className="mb-2">
+              <div className="mb-2 flex gap-2">
                 <select
                   value={selectedReflectionVoice}
                   onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                  className="w-full px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                  className="flex-1 px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
                 >
                   {voiceOptions.map(voice => (
                     <option key={voice.id} value={voice.id}>
@@ -1137,6 +1141,22 @@ const AppLayout = () => {
                     </option>
                   ))}
                 </select>
+                
+                <button
+                  onClick={() => setPersonalityMode(personalityMode === 'friendly' ? 'professional' : 'friendly')}
+                  className="px-3 py-1 bg-zinc-600 hover:bg-zinc-500 rounded text-sm font-medium"
+                  title="Toggle Personality Mode"
+                >
+                  {personalityMode === 'friendly' ? '😊' : '💼'}
+                </button>
+
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="px-3 py-1 bg-zinc-600 hover:bg-zinc-500 rounded text-sm font-medium"
+                  title="Settings"
+                >
+                  ⚙️
+                </button>
               </div>
               <div className="flex items-center gap-3">
                 <input
@@ -1167,23 +1187,8 @@ const AppLayout = () => {
           </div>
         </div>
 
-        {/* Right Panel - Logo & Goal Tracking */}
+        {/* Right Panel - Goal Tracking */}
         <div className="w-1/4 bg-zinc-800 flex flex-col">
-          {/* Welcome Section */}
-          <div className="p-6 text-center border-b border-zinc-700">
-            <div className="mb-6">
-              <img 
-                src="/trai-logo.jpg" 
-                alt="TraI Logo" 
-                className="w-20 h-20 mx-auto mb-4 rounded-full object-cover"
-              />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">Welcome to TraI</h2>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              Your intelligent companion that learns and grows with you. Start exploring TraI's features and track your journey.
-            </p>
-          </div>
-          
           {/* Goal Tracking Section */}
           <div className="flex-1 p-6">
             <div className="flex items-center gap-3 mb-6">
@@ -1338,6 +1343,126 @@ const AppLayout = () => {
           )}
         </div>
       </div>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-zinc-800 rounded-lg p-6 w-96 max-w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold">Settings</h3>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="text-zinc-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Voice Settings */}
+              <div>
+                <h4 className="text-lg font-medium mb-3 text-blue-400">Voice Settings</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Default Voice</label>
+                    <select
+                      value={selectedReflectionVoice}
+                      onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                      className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
+                    >
+                      {voiceOptions.map(voice => (
+                        <option key={voice.id} value={voice.id}>
+                          {voice.name} - {voice.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Audio Enabled</span>
+                    <span className={`px-2 py-1 rounded text-xs ${audioEnabled ? 'bg-green-600' : 'bg-red-600'}`}>
+                      {audioEnabled ? 'On' : 'Off'}
+                    </span>
+                  </div>
+                  {!audioEnabled && (
+                    <button
+                      onClick={enableAudio}
+                      className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm"
+                    >
+                      Enable Audio
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Personality Settings */}
+              <div>
+                <h4 className="text-lg font-medium mb-3 text-purple-400">Personality</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Current Mode</span>
+                    <button
+                      onClick={() => setPersonalityMode(personalityMode === 'friendly' ? 'professional' : 'friendly')}
+                      className="px-3 py-1 bg-zinc-600 hover:bg-zinc-500 rounded text-sm"
+                    >
+                      {personalityMode === 'friendly' ? '😊 Friendly' : '💼 Professional'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Data Management */}
+              <div>
+                <h4 className="text-lg font-medium mb-3 text-yellow-400">Data Management</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Clear Chat History</span>
+                    <button
+                      onClick={() => {
+                        setMessages([]);
+                        setShowSettings(false);
+                      }}
+                      className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-sm"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Reset All Goals</span>
+                    <button
+                      onClick={() => {
+                        setGoals([]);
+                        setShowSettings(false);
+                      }}
+                      className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* App Info */}
+              <div>
+                <h4 className="text-lg font-medium mb-3 text-green-400">App Information</h4>
+                <div className="space-y-2 text-sm text-zinc-400">
+                  <div className="flex items-center justify-between">
+                    <span>Version</span>
+                    <span>1.0.0</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Total Messages</span>
+                    <span>{messages.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Active Goals</span>
+                    <span>{goals.length}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Goal Editor Modal */}
       {showGoalEditor && (
