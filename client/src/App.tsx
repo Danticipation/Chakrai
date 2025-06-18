@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
+import OnboardingQuiz from './components/OnboardingQuiz';
 
 
 const queryClient = new QueryClient({
@@ -37,6 +38,7 @@ interface Goal {
 const AppLayout = () => {
   const [activeSection, setActiveSection] = useState('chat');
   const [isRecording, setIsRecording] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const [input, setInput] = useState('');
   const [botStats, setBotStats] = useState<BotStats | null>(null);
@@ -48,6 +50,7 @@ const AppLayout = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [personalityMode, setPersonalityMode] = useState<string>('friend');
+
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
@@ -1662,10 +1665,48 @@ function GoalEditor({ goal, onSave, onCancel, onDelete }: GoalEditorProps) {
   );
 }
 
+function AppWithOnboarding() {
+  const { data: onboardingStatus, isLoading: onboardingLoading } = useQuery({
+    queryKey: ['/api/onboarding-status'],
+    queryFn: async () => {
+      const response = await fetch('/api/onboarding-status?userId=1');
+      if (!response.ok) throw new Error('Failed to check onboarding status');
+      return response.json();
+    }
+  });
+
+  const [onboardingComplete, setOnboardingComplete] = useState(false);
+
+  // Show loading while checking onboarding status
+  if (onboardingLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading TraI...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show onboarding quiz for new users
+  if (!onboardingStatus?.isComplete && !onboardingComplete) {
+    return (
+      <OnboardingQuiz 
+        userId={1} 
+        onComplete={() => setOnboardingComplete(true)} 
+      />
+    );
+  }
+
+  // Show main application for users who completed onboarding
+  return <AppLayout />;
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppLayout />
+      <AppWithOnboarding />
     </QueryClientProvider>
   );
 }

@@ -257,7 +257,7 @@ app.post('/api/onboarding-profile', async (req, res) => {
       });
     } else {
       await storage.updateBot(bot.id, {
-        personalityTraits: { ...bot.personalityTraits, ...profileData.initialTraits }
+        personalityTraits: profileData.initialTraits
       });
     }
 
