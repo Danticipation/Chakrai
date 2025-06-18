@@ -5,6 +5,7 @@ import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import OnboardingQuiz from './components/OnboardingQuiz';
+import traiLogo from '@assets/TrAI Vision_1750238040780.png';
 
 
 const queryClient = new QueryClient({
@@ -921,8 +922,8 @@ const AppLayout = () => {
         {/* Mobile Header */}
         <div className="bg-zinc-800 p-4 flex items-center justify-between shrink-0">
           <img 
-            src="/trai-logo.jpg" 
-            alt="TraI Logo" 
+            src={traiLogo}
+            alt="TraI Vision Logo" 
             className="w-8 h-8 rounded-full object-cover"
           />
           <h1 className="text-xl font-bold">TraI</h1>
@@ -1148,8 +1149,8 @@ const AppLayout = () => {
           <div className="h-full flex flex-col" style={{ borderLeft: '1px solid var(--gentle-lavender-dark)', borderRight: '1px solid var(--gentle-lavender-dark)' }}>
             <div className="p-6 flex items-center justify-center" style={{ borderBottom: '1px solid var(--gentle-lavender-dark)' }}>
               <img 
-                src="/trai-logo.jpg" 
-                alt="TraI Logo" 
+                src={traiLogo}
+                alt="TraI Vision Logo" 
                 className="w-36 h-36 rounded-2xl shadow-lg object-cover"
               />
             </div>
