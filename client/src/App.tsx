@@ -461,8 +461,8 @@ const AppLayout = () => {
       case 'chat':
         return (
           <div className="flex flex-col h-full bg-zinc-900">
-            {/* Messages Area - Reduced height */}
-            <div className="h-96 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800">
+            {/* Messages Area - Proper height */}
+            <div className="flex-1 h-full overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center px-6">
                   <img 
@@ -868,14 +868,30 @@ const AppLayout = () => {
         </div>
 
         {/* Mobile Content - Above navigation and input */}
-        <div className="flex-1 overflow-hidden" style={{ paddingBottom: '140px' }}>
+        <div className="flex-1 overflow-hidden pb-40">
           {renderActiveSection()}
         </div>
 
         {/* Mobile Input Area - Fixed above navigation */}
         {activeSection === 'chat' && (
-          <div className="fixed bottom-16 left-0 right-0 p-3 bg-zinc-800 border-t border-zinc-700 z-40">
-            <div className="flex items-center gap-3">
+          <div className="fixed bottom-16 left-0 right-0 bg-zinc-800 border-t border-zinc-700 z-40">
+            {/* Voice Selector */}
+            <div className="px-3 pt-2 pb-1">
+              <select
+                value={selectedReflectionVoice}
+                onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                className="w-full px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+              >
+                {voiceOptions.map(voice => (
+                  <option key={voice.id} value={voice.id}>
+                    {voice.name} - {voice.description}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Input Area */}
+            <div className="flex items-center gap-3 p-3">
               <input
                 type="text"
                 value={input}
