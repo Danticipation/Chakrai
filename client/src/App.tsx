@@ -56,6 +56,7 @@ const AppLayout = () => {
   const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
   const [zodiacSign, setZodiacSign] = useState<string>('');
   const [selectedZodiacSign, setSelectedZodiacSign] = useState<string>('');
+  const [dailyReflection, setDailyReflection] = useState<string>('Your reflection will appear here as you interact with your therapeutic companion.');
   
   // Goal tracking state
   const [goals, setGoals] = useState<Goal[]>([
@@ -196,12 +197,53 @@ const AppLayout = () => {
     }
   };
 
+  const updateDailyReflection = (userMessage: string, botResponse: string) => {
+    const currentTime = new Date();
+    const timeOfDay = currentTime.getHours() < 12 ? 'morning' : currentTime.getHours() < 17 ? 'afternoon' : 'evening';
+    
+    // Analyze conversation themes
+    const userLower = userMessage.toLowerCase();
+    const themes = [];
+    
+    if (userLower.includes('stress') || userLower.includes('anxious') || userLower.includes('worry')) {
+      themes.push('stress management');
+    }
+    if (userLower.includes('goal') || userLower.includes('achieve') || userLower.includes('success')) {
+      themes.push('goal setting');
+    }
+    if (userLower.includes('feel') || userLower.includes('emotion') || userLower.includes('mood')) {
+      themes.push('emotional awareness');
+    }
+    if (userLower.includes('grateful') || userLower.includes('thank') || userLower.includes('appreciate')) {
+      themes.push('gratitude practice');
+    }
+    if (userLower.includes('mindful') || userLower.includes('present') || userLower.includes('moment')) {
+      themes.push('mindfulness');
+    }
+    
+    const reflectionPrompts = themes.length > 0 ? [
+      `This ${timeOfDay}, your exploration of ${themes.join(' and ')} shows meaningful self-awareness and growth.`,
+      `Your willingness to discuss ${themes.join(' and ')} demonstrates courage in facing life's challenges.`,
+      `Today's focus on ${themes.join(' and ')} reflects your commitment to personal development.`,
+      `The depth of your conversation about ${themes.join(' and ')} reveals genuine introspection.`
+    ] : [
+      `This ${timeOfDay}, you've engaged in meaningful dialogue that shows your commitment to growth.`,
+      `Your thoughtful conversation today demonstrates self-awareness and emotional intelligence.`,
+      `Today's interaction reflects your journey toward greater understanding and wellness.`,
+      `The openness in your communication today highlights your strength and resilience.`
+    ];
+    
+    const newReflection = reflectionPrompts[Math.floor(Math.random() * reflectionPrompts.length)];
+    setDailyReflection(newReflection);
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
     
+    const userMessageText = input.trim();
     const newMessage: Message = {
       sender: 'user',
-      text: input.trim(),
+      text: userMessageText,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     
@@ -211,21 +253,25 @@ const AppLayout = () => {
     
     try {
       const res = await axios.post('/api/chat', { 
-        message: input.trim(),
+        message: userMessageText,
         userId: 1,
         personalityMode: personalityMode
       });
       
+      const botResponse = res.data.response;
       setMessages(prev => [...prev, {
         sender: 'bot',
-        text: res.data.response,
+        text: botResponse,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
+      
+      // Update daily reflection based on this interaction
+      updateDailyReflection(userMessageText, botResponse);
       
       // Generate audio for bot response
       try {
         const audioResponse = await axios.post('/api/text-to-speech', { 
-          text: res.data.response,
+          text: botResponse,
           voiceId: selectedReflectionVoice
         }, {
           responseType: 'blob'
@@ -982,9 +1028,9 @@ const AppLayout = () => {
                 </p>
               </div>
               <div>
-                <h3 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Weekly Summary</h3>
+                <h3 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Daily Reflection</h3>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>
-                  {weeklySummary}
+                  {dailyReflection}
                 </p>
               </div>
             </div>

@@ -26,9 +26,20 @@
 }
 
 body {
-  background-color: var(--soft-blue);
-  color: var(--text-primary);
+  background-color: var(--soft-blue) !important;
+  color: var(--text-primary) !important;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Force therapeutic color scheme */
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure root element uses therapeutic background */
+#root {
+  background-color: var(--soft-blue) !important;
+  min-height: 100vh;
 }
 
 /* Mobile safe area support */
