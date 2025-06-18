@@ -9,6 +9,7 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **No personalized memory system**: User does not want AI responses that reference personal data or "remember" conversations
 - **Voice functionality**: All voices must work properly when tested, not produce identical outputs
 - **Communication style**: Direct, technical communication preferred
+- **User preference**: Wants to handle color scheme modifications directly without assistance
 
 ## Recent Changes
 ### June 18, 2025 - Enhanced Visual Design with Personality & Dynamics
