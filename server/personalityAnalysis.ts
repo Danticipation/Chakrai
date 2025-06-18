@@ -42,49 +42,55 @@ export async function analyzeConversationForPersonality(
   existingProfile?: PersonalityProfile
 ): Promise<ConversationAnalysis> {
   try {
-    const context = previousMessages.slice(-10).join('\n'); // Last 10 messages for context
+    // Quick extraction for basic facts
+    const personalInfo = extractBasicPersonalInfo(message);
+    const emotionalTone = detectBasicEmotion(message);
     
-    const prompt = `
-Analyze this conversation message for personality insights and personal information. Focus on extracting:
+    // Only call OpenAI for complex analysis if message is substantial
+    if (message.length < 20) {
+      return {
+        personalInfo,
+        emotionalTone,
+        communicationPatterns: [],
+        interests: [],
+        values: [],
+        stressIndicators: message.toLowerCase().includes('stress') || message.toLowerCase().includes('worried') ? ['stress indicators detected'] : [],
+        goals: [],
+        relationships: [],
+        workLife: [],
+        hobbies: [],
+        uniqueExpressions: []
+      };
+    }
 
-1. Personal information (names, locations, relationships, work, etc.)
-2. Communication patterns (formal/casual, verbose/concise, emotional/logical)
-3. Interests and hobbies mentioned
-4. Values and beliefs expressed
-5. Stress indicators or emotional state
-6. Goals or aspirations mentioned
-7. Relationship dynamics
-8. Work/career context
-9. Unique speech patterns or expressions
+    const context = previousMessages.slice(-3).join('\n'); // Reduced context for speed
+    
+    const prompt = `Analyze this message for key personality insights. Be concise.
 
-Recent conversation context:
-${context}
+Context: ${context}
+Message: ${message}
 
-Current message to analyze:
-${message}
-
-Respond with JSON in this exact format:
+Extract in JSON format:
 {
-  "personalInfo": ["extracted personal facts"],
-  "emotionalTone": "current emotional state",
-  "communicationPatterns": ["communication style observations"],
-  "interests": ["topics of interest mentioned"],
-  "values": ["values or beliefs expressed"],
-  "stressIndicators": ["signs of stress or emotional state"],
-  "goals": ["goals or aspirations mentioned"],
-  "relationships": ["relationship context mentioned"],
-  "workLife": ["work or career context"],
-  "hobbies": ["hobbies or activities mentioned"],
-  "uniqueExpressions": ["unique phrases or speech patterns"]
-}
-`;
+  "personalInfo": ["key personal facts"],
+  "emotionalTone": "emotional state",
+  "communicationPatterns": ["style observations"],
+  "interests": ["interests mentioned"],
+  "values": ["values expressed"],
+  "stressIndicators": ["stress signs"],
+  "goals": ["goals mentioned"],
+  "relationships": ["relationship context"],
+  "workLife": ["work context"],
+  "hobbies": ["hobbies mentioned"],
+  "uniqueExpressions": ["unique expressions"]
+}`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are an expert personality analyst. Analyze conversations to extract deep personality insights and personal information. Be specific and detailed."
+          content: "Extract personality insights quickly and concisely."
         },
         {
           role: "user",
@@ -92,16 +98,31 @@ Respond with JSON in this exact format:
         }
       ],
       response_format: { type: "json_object" },
-      temperature: 0.3
+      temperature: 0.1,
+      max_tokens: 300
     });
 
-    return JSON.parse(response.choices[0].message.content || '{}');
+    const result = JSON.parse(response.choices[0].message.content || '{}');
+    
+    // Merge with basic analysis
+    return {
+      personalInfo: [...personalInfo, ...(result.personalInfo || [])],
+      emotionalTone: result.emotionalTone || emotionalTone,
+      communicationPatterns: result.communicationPatterns || [],
+      interests: result.interests || [],
+      values: result.values || [],
+      stressIndicators: result.stressIndicators || [],
+      goals: result.goals || [],
+      relationships: result.relationships || [],
+      workLife: result.workLife || [],
+      hobbies: result.hobbies || [],
+      uniqueExpressions: result.uniqueExpressions || []
+    };
   } catch (error) {
     console.error("Error analyzing conversation:", error);
-    // Return basic analysis if OpenAI fails
     return {
-      personalInfo: [],
-      emotionalTone: "neutral",
+      personalInfo: extractBasicPersonalInfo(message),
+      emotionalTone: detectBasicEmotion(message),
       communicationPatterns: [],
       interests: [],
       values: [],
@@ -113,6 +134,34 @@ Respond with JSON in this exact format:
       uniqueExpressions: []
     };
   }
+}
+
+function extractBasicPersonalInfo(message: string): string[] {
+  const info: string[] = [];
+  
+  // Name extraction
+  const nameMatch = message.match(/(?:my name is|i'm|i am)\s+([a-zA-Z]+)/i);
+  if (nameMatch) info.push(`Name: ${nameMatch[1]}`);
+  
+  // Job extraction
+  const jobMatch = message.match(/(?:work as|job as|i'm a|i am a)\s+([\w\s]+?)(?:\.|,|$)/i);
+  if (jobMatch) info.push(`Occupation: ${jobMatch[1].trim()}`);
+  
+  return info;
+}
+
+function detectBasicEmotion(message: string): string {
+  const stressWords = ['stress', 'worried', 'anxious', 'overwhelmed'];
+  const happyWords = ['happy', 'excited', 'great', 'awesome', 'love'];
+  const sadWords = ['sad', 'down', 'depressed', 'upset'];
+  
+  const lowerMessage = message.toLowerCase();
+  
+  if (stressWords.some(word => lowerMessage.includes(word))) return 'stressed';
+  if (happyWords.some(word => lowerMessage.includes(word))) return 'positive';
+  if (sadWords.some(word => lowerMessage.includes(word))) return 'sad';
+  
+  return 'neutral';
 }
 
 export async function buildPersonalityProfile(userId: number): Promise<PersonalityProfile> {
