@@ -866,7 +866,7 @@ const AppLayout = () => {
 
 
   return (
-    <div className="h-screen bg-zinc-900 text-white">
+    <div className="h-screen text-slate-700" style={{ backgroundColor: 'var(--soft-blue)' }}>
       {/* Mobile Layout */}
       <div className="md:hidden h-full flex flex-col">
         {/* Mobile Header */}
@@ -965,34 +965,39 @@ const AppLayout = () => {
       {/* Desktop Layout - 3 Panel Design */}
       <div className="hidden md:flex h-full">
         {/* Left Panel - Daily Reflection & Horoscope */}
-        <div className="w-1/4 bg-zinc-800 flex flex-col">
+        <div className="w-1/4 flex flex-col" style={{ backgroundColor: 'var(--surface-elevated)' }}>
           {/* Daily Reflection Section */}
-          <div className="h-1/2 p-6 border-b border-zinc-700">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-lg">
+          <div className="h-1/2 p-6" style={{ borderBottom: '1px solid var(--gentle-lavender-dark)' }}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
                 ❤️
               </div>
-              <h2 className="text-xl font-semibold">Daily Reflection</h2>
+              <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Reflection</h2>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-4 h-48 overflow-y-auto">
-              <div className="text-sm text-zinc-300 mb-3">
-                <strong>Today's Affirmation:</strong>
+            <div className="rounded-2xl p-5 h-48 overflow-y-auto shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+              <div className="mb-4">
+                <h3 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Today's Affirmation</h3>
+                <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-secondary)' }}>
+                  {dailyAffirmation}
+                </p>
               </div>
-              <div className="text-sm text-zinc-300 mb-4 italic leading-relaxed">
-                {dailyAffirmation}
-              </div>
-              <div className="text-sm text-zinc-300 mb-2">
-                <strong>Weekly Summary:</strong>
-              </div>
-              <div className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
-                {weeklySummary}
+              <div>
+                <h3 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Weekly Summary</h3>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>
+                  {weeklySummary}
+                </p>
               </div>
             </div>
             <div className="mt-4 flex gap-2">
               <select
                 value={selectedReflectionVoice}
                 onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                className="flex-1 px-3 py-2 rounded-xl text-sm border shadow-sm"
+                style={{ 
+                  backgroundColor: 'var(--surface-elevated)',
+                  borderColor: 'var(--gentle-lavender-dark)',
+                  color: 'var(--text-primary)'
+                }}
               >
                 {voiceOptions.map(voice => (
                   <option key={voice.id} value={voice.id}>{voice.name}</option>
@@ -1001,7 +1006,13 @@ const AppLayout = () => {
               <button
                 onClick={readReflection}
                 disabled={!weeklySummary}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-sm"
+                className="px-4 py-2 rounded-xl text-sm font-medium shadow-sm transition-all duration-200 disabled:opacity-50"
+                style={{ 
+                  backgroundColor: 'var(--gentle-lavender)',
+                  color: 'var(--text-primary)'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = 'var(--gentle-lavender-dark)'}
+                onMouseOut={(e) => e.target.style.backgroundColor = 'var(--gentle-lavender)'}
               >
                 🔊 Read
               </button>
@@ -1010,21 +1021,24 @@ const AppLayout = () => {
           
           {/* Horoscope Section */}
           <div className="h-1/2 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
                 ⭐
               </div>
-              <h2 className="text-xl font-semibold">Horoscope</h2>
+              <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Guidance</h2>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-4 h-48 overflow-y-auto">
-              <div className="text-sm text-zinc-300 mb-3">
-                <strong>Your Sign:</strong>
-              </div>
+            <div className="rounded-2xl p-5 h-48 overflow-y-auto shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
               <div className="mb-4">
+                <h3 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Your Sign</h3>
                 <select
                   value={selectedZodiacSign}
                   onChange={(e) => handleZodiacChange(e.target.value)}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                  className="w-full px-3 py-2 rounded-xl text-sm border shadow-sm"
+                  style={{ 
+                    backgroundColor: 'var(--surface-elevated)',
+                    borderColor: 'var(--gentle-lavender-dark)',
+                    color: 'var(--text-primary)'
+                  }}
                 >
                   <option value="">Random Sign</option>
                   <option value="aries">♈ Aries</option>
@@ -1041,18 +1055,23 @@ const AppLayout = () => {
                   <option value="pisces">♓ Pisces</option>
                 </select>
               </div>
-              <div className="text-sm text-zinc-300 mb-2">
-                <strong>Today's Reading:</strong>
-              </div>
-              <div className="text-sm text-zinc-300 leading-relaxed">
-                {dailyHoroscope}
+              <div>
+                <h3 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Today's Reading</h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  {dailyHoroscope}
+                </p>
               </div>
             </div>
             <div className="mt-4 flex gap-2">
               <select
                 value={selectedReflectionVoice}
                 onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                className="flex-1 px-3 py-2 rounded-xl text-sm border shadow-sm"
+                style={{ 
+                  backgroundColor: 'var(--surface-elevated)',
+                  borderColor: 'var(--gentle-lavender-dark)',
+                  color: 'var(--text-primary)'
+                }}
               >
                 {voiceOptions.map(voice => (
                   <option key={voice.id} value={voice.id}>{voice.name}</option>
@@ -1061,7 +1080,13 @@ const AppLayout = () => {
               <button
                 onClick={() => generateAudioForText(dailyHoroscope)}
                 disabled={!dailyHoroscope}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-sm"
+                className="px-4 py-2 rounded-xl text-sm font-medium shadow-sm transition-all duration-200 disabled:opacity-50"
+                style={{ 
+                  backgroundColor: 'var(--gentle-lavender)',
+                  color: 'var(--text-primary)'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = 'var(--gentle-lavender-dark)'}
+                onMouseOut={(e) => e.target.style.backgroundColor = 'var(--gentle-lavender)'}
               >
                 🔊 Read
               </button>
@@ -1069,29 +1094,24 @@ const AppLayout = () => {
           </div>
         </div>
 
-        {/* Center Panel - Chat Window */}
-        <div className="w-1/2 flex flex-col bg-zinc-900">
-          <div className="border-l border-r border-zinc-700 h-full flex flex-col">
-            <div className="p-4 border-b border-zinc-700 bg-zinc-800 flex items-center justify-center">
+        {/* Center Panel - Therapeutic Chat Interface */}
+        <div className="w-1/2 flex flex-col" style={{ backgroundColor: 'var(--surface-elevated)' }}>
+          <div className="h-full flex flex-col" style={{ borderLeft: '1px solid var(--gentle-lavender-dark)', borderRight: '1px solid var(--gentle-lavender-dark)' }}>
+            <div className="p-6 flex items-center justify-center" style={{ borderBottom: '1px solid var(--gentle-lavender-dark)' }}>
               <img 
                 src="/trai-logo.jpg" 
                 alt="TraI Logo" 
-                className="w-10 h-10 rounded-full shadow-lg object-cover"
+                className="w-12 h-12 rounded-2xl shadow-lg object-cover"
               />
             </div>
             
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
-                  <img 
-                    src="/trai-logo.jpg" 
-                    alt="TraI Logo" 
-                    className="w-16 h-16 mb-4 rounded-full shadow-lg object-cover"
-                  />
-                  <h2 className="text-xl font-bold text-white mb-2">Welcome to TraI</h2>
-                  <p className="text-zinc-300 text-sm">
-                    Start a conversation below
+                  <h2 className="text-2xl font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Welcome to Your Safe Space</h2>
+                  <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    I'm here to listen and support you. Share what's on your mind.
                   </p>
                 </div>
               ) : (
@@ -1101,14 +1121,16 @@ const AppLayout = () => {
                     className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-xs px-4 py-2 rounded-lg ${
-                        message.sender === 'user' 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-zinc-700 text-zinc-100'
-                      }`}
+                      className="max-w-sm px-5 py-3 rounded-2xl shadow-sm"
+                      style={{
+                        backgroundColor: message.sender === 'user' 
+                          ? 'var(--pale-green)' 
+                          : 'var(--surface-secondary)',
+                        color: 'var(--text-primary)'
+                      }}
                     >
-                      <p className="text-sm">{message.text}</p>
-                      <p className="text-xs opacity-70 mt-1">{message.time}</p>
+                      <p className="leading-relaxed">{message.text}</p>
+                      <p className="text-xs mt-2 opacity-70">{message.time}</p>
                     </div>
                   </div>
                 ))

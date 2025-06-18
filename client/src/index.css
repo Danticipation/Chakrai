@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Therapeutic Color Palette */
+  --soft-blue: #ADD8E6;      /* Main calming background */
+  --pale-green: #98FB98;     /* Accent for success/wellness */
+  --gentle-lavender: #E6E6FA; /* Accent for highlights */
+  
+  /* Derived therapeutic colors */
+  --soft-blue-dark: #87CEEB;
+  --soft-blue-darker: #6BB6E6;
+  --pale-green-dark: #7AE17A;
+  --gentle-lavender-dark: #D8D8F5;
+  
+  /* Text colors for therapeutic design */
+  --text-primary: #2C3E50;    /* Calm dark blue-grey */
+  --text-secondary: #5A6C7D;  /* Medium blue-grey */
+  --text-muted: #7B8794;      /* Light blue-grey */
+  
+  /* Surface colors */
+  --surface-primary: #FAFBFC;   /* Very light blue-white */
+  --surface-secondary: #F5F7FA; /* Light blue-grey */
+  --surface-elevated: #FFFFFF;  /* Pure white for cards */
+}
+
+body {
+  background-color: var(--soft-blue);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 /* Mobile safe area support */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
