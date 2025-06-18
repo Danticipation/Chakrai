@@ -5,7 +5,7 @@ import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import OnboardingQuiz from './components/OnboardingQuiz';
-import traiLogo from '@assets/TrAI Vision_1750238040780.png';
+import traiLogo from '@assets/image_1750241015036.png';
 
 
 const queryClient = new QueryClient({
@@ -297,7 +297,9 @@ const AppLayout = () => {
           setPendingAudio(audioUrl);
         });
       } catch (voiceError) {
-        console.log('Voice synthesis unavailable');
+        console.error('ElevenLabs TTS failed:', voiceError);
+        // Only fall back to browser TTS if explicitly requested
+        // For now, we'll just log the error and not play audio
       }
       
       setBotStats(prev => prev ? {
