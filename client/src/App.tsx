@@ -945,10 +945,223 @@ const AppLayout = () => {
         </div>
       </div>
 
-      {/* Desktop Layout */}
+      {/* Desktop Layout - 3 Panel Design */}
       <div className="hidden md:flex h-full">
-        {/* Desktop Sidebar */}
-        <div className="w-20 bg-zinc-800 flex flex-col items-center py-6 space-y-4">
+        {/* Left Panel - Reflection & Horoscope */}
+        <div className="w-80 bg-zinc-800 flex flex-col">
+          {/* Reflection Section */}
+          <div className="flex-1 p-4 border-b border-zinc-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                ❤️
+              </div>
+              <h2 className="text-lg font-semibold">Reflection</h2>
+            </div>
+            <div className="bg-zinc-900 rounded-lg p-4 h-64 overflow-y-auto">
+              <div className="text-sm text-zinc-300 whitespace-pre-wrap">
+                {weeklySummary}
+              </div>
+            </div>
+            <div className="mt-3 flex gap-2">
+              <select
+                value={selectedReflectionVoice}
+                onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                className="flex-1 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-xs text-white"
+              >
+                {voiceOptions.map(voice => (
+                  <option key={voice.id} value={voice.id}>{voice.name}</option>
+                ))}
+              </select>
+              <button
+                onClick={readReflection}
+                disabled={!weeklySummary}
+                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-xs"
+              >
+                🔊
+              </button>
+            </div>
+          </div>
+          
+          {/* Horoscope Section */}
+          <div className="flex-1 p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                ⭐
+              </div>
+              <h2 className="text-lg font-semibold">Horoscope</h2>
+            </div>
+            <div className="bg-zinc-900 rounded-lg p-4 h-64 overflow-y-auto">
+              <div className="text-sm text-zinc-300 mb-3">
+                <select
+                  value={selectedZodiacSign}
+                  onChange={(e) => handleZodiacChange(e.target.value)}
+                  className="w-full px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-xs text-white mb-3"
+                >
+                  <option value="">Random Sign</option>
+                  <option value="aries">♈ Aries</option>
+                  <option value="taurus">♉ Taurus</option>
+                  <option value="gemini">♊ Gemini</option>
+                  <option value="cancer">♋ Cancer</option>
+                  <option value="leo">♌ Leo</option>
+                  <option value="virgo">♍ Virgo</option>
+                  <option value="libra">♎ Libra</option>
+                  <option value="scorpio">♏ Scorpio</option>
+                  <option value="sagittarius">♐ Sagittarius</option>
+                  <option value="capricorn">♑ Capricorn</option>
+                  <option value="aquarius">♒ Aquarius</option>
+                  <option value="pisces">♓ Pisces</option>
+                </select>
+              </div>
+              <div className="text-sm text-zinc-300">
+                {dailyHoroscope}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Center Panel - Chat Window */}
+        <div className="flex-1 flex flex-col bg-zinc-900">
+          <div className="border-l border-r border-zinc-700 h-full flex flex-col">
+            <div className="p-4 border-b border-zinc-700 bg-zinc-800">
+              <h1 className="text-xl font-bold text-center">Chat Window</h1>
+            </div>
+            
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <img 
+                    src="/trai-logo.jpg" 
+                    alt="TraI Logo" 
+                    className="w-16 h-16 mb-4 rounded-full shadow-lg object-cover"
+                  />
+                  <h2 className="text-xl font-bold text-white mb-2">Welcome to TraI</h2>
+                  <p className="text-zinc-300 text-sm">
+                    Start a conversation below
+                  </p>
+                </div>
+              ) : (
+                messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-xs px-4 py-2 rounded-lg ${
+                        message.sender === 'user' 
+                          ? 'bg-blue-600 text-white' 
+                          : 'bg-zinc-700 text-zinc-100'
+                      }`}
+                    >
+                      <p className="text-sm">{message.text}</p>
+                      <p className="text-xs opacity-70 mt-1">{message.time}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+              
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-zinc-700 text-zinc-100 px-4 py-2 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Chat Input */}
+            <div className="p-4 border-t border-zinc-700 bg-zinc-800">
+              <div className="mb-2">
+                <select
+                  value={selectedReflectionVoice}
+                  onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                  className="w-full px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                >
+                  {voiceOptions.map(voice => (
+                    <option key={voice.id} value={voice.id}>
+                      {voice.name} - {voice.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Type your message..."
+                  className="flex-1 p-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  className={`p-3 rounded-lg ${
+                    isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-zinc-600 hover:bg-zinc-500'
+                  }`}
+                >
+                  {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                </button>
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || loading}
+                  className="p-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Panel - Logo & Widgets */}
+        <div className="w-80 bg-zinc-800 flex flex-col">
+          <div className="p-4 text-center border-b border-zinc-700">
+            <img 
+              src="/trai-logo.jpg" 
+              alt="TraI Logo" 
+              className="w-16 h-16 mx-auto mb-3 rounded-full object-cover"
+            />
+            <h2 className="text-lg font-semibold">Logo</h2>
+          </div>
+          
+          <div className="flex-1 p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                ✓
+              </div>
+              <h2 className="text-lg font-semibold">Widgets</h2>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-4xl font-bold text-red-500 mb-2">100</div>
+              <p className="text-sm text-zinc-400">Active Widgets</p>
+            </div>
+            
+            {botStats && (
+              <div className="mt-6 space-y-3">
+                <div className="bg-zinc-900 rounded-lg p-3">
+                  <div className="text-sm text-zinc-400">Level</div>
+                  <div className="text-lg font-semibold">{botStats.level}</div>
+                </div>
+                <div className="bg-zinc-900 rounded-lg p-3">
+                  <div className="text-sm text-zinc-400">Stage</div>
+                  <div className="text-lg font-semibold">{botStats.stage}</div>
+                </div>
+                <div className="bg-zinc-900 rounded-lg p-3">
+                  <div className="text-sm text-zinc-400">Words Learned</div>
+                  <div className="text-lg font-semibold">{botStats.wordsLearned}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Desktop Legacy Sidebar - Hidden */}
+        <div className="hidden w-20 bg-zinc-800 flex flex-col items-center py-6 space-y-4">
           {sections.map((section) => {
             const Icon = section.icon;
             return (
