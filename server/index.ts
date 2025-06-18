@@ -222,17 +222,22 @@ app.post('/api/onboarding-profile', async (req, res) => {
       return res.status(400).json({ error: 'Answers are required' });
     }
 
-    // Ensure user exists, create if not
+    // For new users (userId > 10), create a new user account
+    // For existing users (userId <= 10), update their existing profile
     let user = await storage.getUser(userId);
     let actualUserId = userId;
-    if (!user) {
-      const username = answers.name || `user_${userId}`;
+    
+    if (!user && userId > 10) {
+      // Create new user for demo purposes
+      const username = answers.name || `user_${Date.now()}`;
       user = await storage.createUser({
         username,
-        password: 'temp_password' // Will be replaced by proper auth system
+        password: 'temp_password'
       });
-      // Use the newly created user's ID for all subsequent operations
       actualUserId = user.id;
+    } else if (!user) {
+      // For demo, create user with specific ID (this would normally be handled by auth)
+      return res.status(400).json({ error: 'User not found. Please use userId > 10 for new users.' });
     }
 
     // Process onboarding answers into structured data
