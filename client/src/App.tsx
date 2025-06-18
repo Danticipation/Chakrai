@@ -1150,12 +1150,17 @@ const AppLayout = () => {
             </div>
             
             {/* Chat Input */}
-            <div className="p-4 border-t border-zinc-700 bg-zinc-800">
-              <div className="mb-2 flex gap-2">
+            <div className="p-6" style={{ borderTop: '1px solid var(--gentle-lavender-dark)', backgroundColor: 'var(--surface-secondary)' }}>
+              <div className="mb-4 flex gap-3">
                 <select
                   value={selectedReflectionVoice}
                   onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                  className="flex-1 px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                  className="flex-1 px-3 py-2 rounded-xl text-sm border shadow-sm"
+                  style={{ 
+                    backgroundColor: 'var(--surface-elevated)',
+                    borderColor: 'var(--gentle-lavender-dark)',
+                    color: 'var(--text-primary)'
+                  }}
                 >
                   {voiceOptions.map(voice => (
                     <option key={voice.id} value={voice.id}>
@@ -1170,7 +1175,11 @@ const AppLayout = () => {
                     const nextIndex = (currentIndex + 1) % personalityModes.length;
                     setPersonalityMode(personalityModes[nextIndex].id);
                   }}
-                  className="px-3 py-1 bg-zinc-600 hover:bg-zinc-500 rounded text-sm font-medium"
+                  className="px-4 py-2 rounded-xl text-sm font-medium shadow-sm transition-all duration-200"
+                  style={{ 
+                    backgroundColor: 'var(--gentle-lavender)',
+                    color: 'var(--text-primary)'
+                  }}
                   title={`Current: ${personalityModes.find(mode => mode.id === personalityMode)?.name || personalityMode} - Click to cycle`}
                 >
                   {personalityModes.find(mode => mode.id === personalityMode)?.emoji || '🤖'} {personalityModes.find(mode => mode.id === personalityMode)?.name || personalityMode}
@@ -1178,7 +1187,11 @@ const AppLayout = () => {
 
                 <button
                   onClick={() => setShowSettings(!showSettings)}
-                  className="px-3 py-1 bg-zinc-600 hover:bg-zinc-500 rounded text-sm font-medium"
+                  className="px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition-all duration-200"
+                  style={{ 
+                    backgroundColor: 'var(--gentle-lavender)',
+                    color: 'var(--text-primary)'
+                  }}
                   title="Settings"
                 >
                   ⚙️
@@ -1190,21 +1203,34 @@ const AppLayout = () => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
-                  className="flex-1 p-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Share your thoughts..."
+                  className="flex-1 p-4 rounded-2xl border shadow-sm transition-all duration-200"
+                  style={{ 
+                    backgroundColor: 'var(--surface-elevated)',
+                    borderColor: 'var(--gentle-lavender-dark)',
+                    color: 'var(--text-primary)'
+                  }}
                 />
                 <button
                   onClick={isRecording ? stopRecording : startRecording}
-                  className={`p-3 rounded-lg ${
-                    isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-zinc-600 hover:bg-zinc-500'
+                  className={`p-4 rounded-2xl shadow-sm transition-all duration-200 ${
+                    isRecording ? 'animate-pulse' : ''
                   }`}
+                  style={{
+                    backgroundColor: isRecording ? '#FF9999' : 'var(--pale-green)',
+                    color: 'var(--text-primary)'
+                  }}
                 >
                   {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                 </button>
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
-                  className="p-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                  className="p-4 rounded-2xl shadow-sm transition-all duration-200 disabled:opacity-50"
+                  style={{ 
+                    backgroundColor: 'var(--pale-green)',
+                    color: 'var(--text-primary)'
+                  }}
                 >
                   <Send className="w-5 h-5" />
                 </button>
@@ -1213,51 +1239,53 @@ const AppLayout = () => {
           </div>
         </div>
 
-        {/* Right Panel - Goal Tracking */}
-        <div className="w-1/4 bg-zinc-800 flex flex-col">
+        {/* Right Panel - Wellness Goals */}
+        <div className="w-1/4 flex flex-col" style={{ backgroundColor: 'var(--surface-elevated)' }}>
           {/* Goal Tracking Section */}
           <div className="flex-1 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-lg">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
                 ✓
               </div>
-              <h2 className="text-xl font-semibold">Goal Tracking</h2>
+              <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Wellness Goals</h2>
             </div>
             
             {/* Customizable Goal Progress Widgets */}
             <div className="space-y-4">
               {goals.map((goal) => (
-                <div key={goal.id} className="bg-zinc-900 rounded-lg p-4 group">
+                <div key={goal.id} className="rounded-2xl p-5 group shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="font-medium">{goal.name}</span>
+                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{goal.name}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-zinc-400">{goal.current}/{goal.target}</span>
+                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{goal.current}/{goal.target}</span>
                       <button
                         onClick={() => {
                           setEditingGoal(goal);
                           setShowGoalEditor(true);
                         }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-zinc-500 hover:text-zinc-300"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity text-sm px-2 py-1 rounded-lg"
+                        style={{ backgroundColor: 'var(--gentle-lavender)', color: 'var(--text-primary)' }}
                       >
                         ✏️
                       </button>
                     </div>
                   </div>
-                  <div className="w-full bg-zinc-700 rounded-full h-3">
+                  <div className="w-full rounded-full h-3 shadow-inner" style={{ backgroundColor: 'var(--surface-elevated)' }}>
                     <div 
-                      className={`h-3 rounded-full transition-all duration-300 ${
-                        goal.color === 'blue' ? 'bg-blue-500' :
-                        goal.color === 'green' ? 'bg-green-500' :
-                        goal.color === 'purple' ? 'bg-purple-500' :
-                        goal.color === 'red' ? 'bg-red-500' :
-                        goal.color === 'yellow' ? 'bg-yellow-500' :
-                        'bg-blue-500'
-                      }`}
-                      style={{ width: `${Math.min(100, (goal.current / goal.target) * 100)}%` }}
+                      className="h-3 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${Math.min(100, (goal.current / goal.target) * 100)}%`,
+                        backgroundColor: goal.color === 'blue' ? 'var(--soft-blue-darker)' :
+                          goal.color === 'green' ? 'var(--pale-green-dark)' :
+                          goal.color === 'purple' ? 'var(--gentle-lavender-dark)' :
+                          goal.color === 'red' ? '#FFB6B6' :
+                          goal.color === 'yellow' ? '#FFE4B5' :
+                          'var(--soft-blue-darker)'
+                      }}
                     ></div>
                   </div>
-                  <div className="text-xs text-zinc-400 mt-2">
-                    {goal.current >= goal.target ? 'Goal completed!' : `${goal.target - goal.current} to go`}
+                  <div className="text-xs mt-2" style={{ color: 'var(--text-secondary)' }}>
+                    {goal.current >= goal.target ? 'Goal completed! 🎉' : `${goal.target - goal.current} to go`}
                   </div>
                 </div>
               ))}
@@ -1267,9 +1295,14 @@ const AppLayout = () => {
                   setEditingGoal(null);
                   setShowGoalEditor(true);
                 }}
-                className="w-full bg-zinc-700 hover:bg-zinc-600 rounded-lg p-4 text-center text-sm text-zinc-400 hover:text-white transition-colors border-2 border-dashed border-zinc-600"
+                className="w-full rounded-2xl p-5 text-center text-sm transition-all duration-200 border-2 border-dashed shadow-sm"
+                style={{ 
+                  borderColor: 'var(--gentle-lavender-dark)',
+                  backgroundColor: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)'
+                }}
               >
-                + Add New Goal
+                + Add New Wellness Goal
               </button>
             </div>
             
@@ -1370,15 +1403,16 @@ const AppLayout = () => {
         </div>
       </div>
 
-      {/* Settings Modal */}
+      {/* Therapeutic Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-zinc-800 rounded-lg p-6 w-96 max-w-full mx-4 max-h-[80vh] overflow-y-auto">
+          <div className="rounded-2xl p-6 w-96 max-w-full mx-4 max-h-[80vh] overflow-y-auto shadow-xl" style={{ backgroundColor: 'var(--surface-elevated)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold">Settings</h3>
+              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Settings</h3>
               <button
                 onClick={() => setShowSettings(false)}
-                className="text-zinc-400 hover:text-white"
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200"
+                style={{ backgroundColor: 'var(--gentle-lavender)', color: 'var(--text-primary)' }}
               >
                 ✕
               </button>

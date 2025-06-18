@@ -1,7 +1,7 @@
-# TraI - AI Companion Project
+# TraI - Mental Wellness & Therapy Application
 
 ## Overview
-TraI is an AI companion web application featuring voice interaction, daily content, and personality modes. The project has experienced unauthorized modifications that need to be carefully managed going forward.
+TraI is a professional mental wellness and therapy application designed for people in need of therapeutic support. The interface features a calming, thoughtful design with soothing pastel colors (#ADD8E6 soft blue, #98FB98 pale green, #E6E6FA gentle lavender) to create a welcoming, professional environment for mental health support. The application includes voice interaction, daily affirmations, therapeutic personality modes, and wellness goal tracking.
 
 ## User Preferences
 - **No unauthorized changes**: All modifications must be explicitly approved before implementation
@@ -22,13 +22,16 @@ TraI is an AI companion web application featuring voice interaction, daily conte
 - Voice recording functionality working properly with Whisper transcription
 - Goal tracking widgets show actual progress instead of static numbers
 
-### Later - Layout Fixes & Settings Implementation
-- Removed duplicate chat window that appeared on right side
-- Moved TraI logo to center above main chat interface
-- Removed "Chat Window" text label from header
-- Added comprehensive settings modal with gear icon button
-- Customizable goal tracking widgets with edit/add/delete functionality
-- Improved personality mode button to show current mode clearly (Friendly/Professional)
+### June 18, 2025 - Professional Therapeutic Interface Redesign
+- **Complete visual transformation**: Replaced cold, dark interface with warm therapeutic design
+- **Therapeutic color palette**: Implemented calming pastel colors (#ADD8E6 soft blue, #98FB98 pale green, #E6E6FA gentle lavender)
+- **Professional mental health focus**: Redesigned for people seeking therapy and mental wellness support
+- **Rounded corners and shadows**: Added 2xl border radius and subtle shadows for welcoming feel
+- **Typography improvements**: Enhanced spacing, improved text hierarchy for therapeutic environment
+- **Wellness-focused copy**: Changed "Chat Window" to "Welcome to Your Safe Space", "Goal Tracking" to "Wellness Goals"
+- **Therapeutic messaging**: Updated placeholder text from "Type your message..." to "Share your thoughts..."
+- **Fixed personality mode cycling**: Now properly cycles through all 7 therapeutic modes (Friend, Counsel, Study, Diary, Goal-Setting, Wellness, Creative)
+- **Comprehensive settings modal**: Professional design with therapeutic color scheme
 
 ### Earlier - Unauthorized Modifications Removed  
 - Removed unauthorized "Alex" user profile data from database
