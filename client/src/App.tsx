@@ -1071,7 +1071,7 @@ const AppLayout = () => {
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
                 ⭐
               </div>
-              <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Guidance</h2>
+              <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Horoscope</h2>
             </div>
             <div className="rounded-2xl p-5 h-48 overflow-y-auto shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
               <div className="mb-4">
@@ -1147,7 +1147,7 @@ const AppLayout = () => {
               <img 
                 src="/trai-logo.jpg" 
                 alt="TraI Logo" 
-                className="w-12 h-12 rounded-2xl shadow-lg object-cover"
+                className="w-36 h-36 rounded-2xl shadow-lg object-cover"
               />
             </div>
             

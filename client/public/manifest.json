@@ -1,6 +1,6 @@
 {
-  "name": "Reflectibot - AI Memory Companion",
-  "short_name": "Reflectibot",
+  "name": "TrAI - AI Memory Companion",
+  "short_name": "TrAI",
   "description": "AI companion that learns and adapts through intelligent conversation modeling",
   "start_url": "/",
   "display": "standalone",
