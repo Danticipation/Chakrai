@@ -12,10 +12,19 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
 ## Recent Changes
+### June 18, 2025 - Implemented Adaptive Onboarding Experience with Personality Quiz
+- **Comprehensive personality quiz**: 10-question onboarding flow captures communication style, values, interests, and goals
+- **Adaptive flow control**: New users automatically see personality quiz, existing users proceed directly to main application
+- **Profile update capability**: Existing users can retake the personality quiz through settings to update their profile
+- **Structured data processing**: Quiz answers are systematically processed into facts, memories, and personality traits
+- **Enhanced personality mirroring**: Initial personality data from quiz creates stronger foundation for self-reflection responses
+- **Professional quiz interface**: Beautiful, therapeutic design with progress tracking and smooth transitions
+- **Database integration**: Quiz results automatically populate user facts, memories, and bot personality traits
+
 ### June 18, 2025 - Implemented Comprehensive Persistent Memory System
 - **Persistent personality mirroring**: Bot now remembers users across sessions and builds detailed personality profiles
 - **Self-reflection engine**: Core functionality implemented - bot mirrors user's communication style, traits, and mannerisms
-- **Personality analysis**: Advanced OpenAI-powered analysis extracts personality insights from conversations
+- **Personality analysis**: Advanced analysis extracts personality insights from conversations
 - **Memory storage**: All conversations, personal facts, and personality traits stored in database
 - **Dynamic response generation**: Bot responses now reflect user's own personality patterns back to them
 - **Memory dashboard**: Updated interface shows personality profile, core traits, interests, and conversation history

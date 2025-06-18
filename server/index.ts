@@ -222,13 +222,26 @@ app.post('/api/onboarding-profile', async (req, res) => {
       return res.status(400).json({ error: 'Answers are required' });
     }
 
+    // Ensure user exists, create if not
+    let user = await storage.getUser(userId);
+    let actualUserId = userId;
+    if (!user) {
+      const username = answers.name || `user_${userId}`;
+      user = await storage.createUser({
+        username,
+        password: 'temp_password' // Will be replaced by proper auth system
+      });
+      // Use the newly created user's ID for all subsequent operations
+      actualUserId = user.id;
+    }
+
     // Process onboarding answers into structured data
     const profileData = processOnboardingAnswers(answers);
     
     // Store basic facts
     for (const fact of profileData.facts) {
       await storage.createUserFact({
-        userId,
+        userId: actualUserId,
         fact: fact.fact,
         category: fact.category,
         confidence: 'high'
@@ -238,7 +251,7 @@ app.post('/api/onboarding-profile', async (req, res) => {
     // Store personality insights as memories
     for (const insight of profileData.memories) {
       await storage.createUserMemory({
-        userId,
+        userId: actualUserId,
         memory: insight.memory,
         category: insight.category,
         importance: insight.importance
@@ -246,10 +259,10 @@ app.post('/api/onboarding-profile', async (req, res) => {
     }
 
     // Get or create bot and update with initial personality data
-    let bot = await storage.getBotByUserId(userId);
+    let bot = await storage.getBotByUserId(actualUserId);
     if (!bot) {
       bot = await storage.createBot({
-        userId,
+        userId: actualUserId,
         name: "Mirror",
         level: 1,
         wordsLearned: 0,
