@@ -213,6 +213,86 @@ app.get('/api/memory-profile', async (req, res) => {
   }
 });
 
+// Onboarding profile endpoint
+app.post('/api/onboarding-profile', async (req, res) => {
+  try {
+    const { userId = 1, answers } = req.body;
+    
+    if (!answers) {
+      return res.status(400).json({ error: 'Answers are required' });
+    }
+
+    // Process onboarding answers into structured data
+    const profileData = processOnboardingAnswers(answers);
+    
+    // Store basic facts
+    for (const fact of profileData.facts) {
+      await storage.createUserFact({
+        userId,
+        fact: fact.fact,
+        category: fact.category,
+        confidence: 'high'
+      });
+    }
+
+    // Store personality insights as memories
+    for (const insight of profileData.memories) {
+      await storage.createUserMemory({
+        userId,
+        memory: insight.memory,
+        category: insight.category,
+        importance: insight.importance
+      });
+    }
+
+    // Get or create bot and update with initial personality data
+    let bot = await storage.getBotByUserId(userId);
+    if (!bot) {
+      bot = await storage.createBot({
+        userId,
+        name: "Mirror",
+        level: 1,
+        wordsLearned: 0,
+        personalityTraits: profileData.initialTraits
+      });
+    } else {
+      await storage.updateBot(bot.id, {
+        personalityTraits: { ...bot.personalityTraits, ...profileData.initialTraits }
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Onboarding profile created successfully',
+      profileSummary: profileData.summary
+    });
+    
+  } catch (error) {
+    console.error('Onboarding profile error:', error);
+    res.status(500).json({ error: 'Failed to create onboarding profile' });
+  }
+});
+
+// Check onboarding status
+app.get('/api/onboarding-status', async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId as string) || 1;
+    
+    const facts = await storage.getUserFacts(userId);
+    const hasName = facts.some(f => f.fact.toLowerCase().includes('name:'));
+    const hasBasicInfo = facts.length >= 3;
+    
+    res.json({
+      isComplete: hasBasicInfo && hasName,
+      factCount: facts.length,
+      hasBasicProfile: hasName
+    });
+  } catch (error) {
+    console.error('Onboarding status error:', error);
+    res.status(500).json({ error: 'Failed to check onboarding status' });
+  }
+});
+
 // Chat endpoint with persistent memory and personality mirroring
 app.post('/api/chat', async (req, res) => {
   try {
@@ -326,6 +406,140 @@ function generatePersonalityResponse(message: string, facts: any[], memories: an
   } else {
     return responses.general + " What would you like to talk about?";
   }
+}
+
+// Process onboarding answers into structured personality data
+function processOnboardingAnswers(answers: Record<string, string>) {
+  const facts: Array<{ fact: string; category: string }> = [];
+  const memories: Array<{ memory: string; category: string; importance: string }> = [];
+  const initialTraits: Record<string, any> = {};
+
+  // Process basic information
+  if (answers.name) {
+    facts.push({ fact: `Name: ${answers.name}`, category: 'personal' });
+    initialTraits.name = answers.name;
+  }
+
+  if (answers.age_range) {
+    facts.push({ fact: `Age Range: ${answers.age_range}`, category: 'personal' });
+    initialTraits.ageRange = answers.age_range;
+  }
+
+  if (answers.occupation) {
+    facts.push({ fact: `Occupation: ${answers.occupation}`, category: 'personal' });
+    initialTraits.occupation = answers.occupation;
+  }
+
+  // Process communication style
+  if (answers.communication_style) {
+    memories.push({
+      memory: `Communication preference: ${answers.communication_style}`,
+      category: 'personality',
+      importance: 'high'
+    });
+    initialTraits.communicationStyle = answers.communication_style;
+  }
+
+  if (answers.stress_response) {
+    memories.push({
+      memory: `Stress response pattern: ${answers.stress_response}`,
+      category: 'personality', 
+      importance: 'high'
+    });
+    initialTraits.stressResponse = answers.stress_response;
+  }
+
+  if (answers.support_preference) {
+    memories.push({
+      memory: `Preferred support style: ${answers.support_preference}`,
+      category: 'personality',
+      importance: 'high'
+    });
+    initialTraits.supportPreference = answers.support_preference;
+  }
+
+  // Process interests
+  if (answers.primary_interests) {
+    facts.push({ fact: `Interests: ${answers.primary_interests}`, category: 'interests' });
+    memories.push({
+      memory: `Primary interests and hobbies: ${answers.primary_interests}`,
+      category: 'interests',
+      importance: 'medium'
+    });
+    initialTraits.interests = answers.primary_interests;
+  }
+
+  // Process values and philosophy
+  if (answers.core_values) {
+    facts.push({ fact: `Core Value: ${answers.core_values}`, category: 'values' });
+    memories.push({
+      memory: `Core value alignment: ${answers.core_values}`,
+      category: 'values',
+      importance: 'high'
+    });
+    initialTraits.coreValue = answers.core_values;
+  }
+
+  if (answers.life_philosophy) {
+    memories.push({
+      memory: `Life philosophy: ${answers.life_philosophy}`,
+      category: 'values',
+      importance: 'high'
+    });
+    initialTraits.lifePhilosophy = answers.life_philosophy;
+  }
+
+  // Process goals
+  if (answers.wellness_goals) {
+    memories.push({
+      memory: `Wellness goals: ${answers.wellness_goals}`,
+      category: 'goals',
+      importance: 'high'
+    });
+    initialTraits.wellnessGoals = answers.wellness_goals;
+  }
+
+  // Generate profile summary
+  const summary = generateProfileSummary(answers);
+
+  return {
+    facts,
+    memories,
+    initialTraits,
+    summary
+  };
+}
+
+// Generate a comprehensive profile summary
+function generateProfileSummary(answers: Record<string, string>): string {
+  const name = answers.name || 'User';
+  const parts: string[] = [];
+
+  if (answers.communication_style) {
+    parts.push(`communicates in a ${answers.communication_style.toLowerCase()} manner`);
+  }
+
+  if (answers.core_values) {
+    parts.push(`values ${answers.core_values.toLowerCase()}`);
+  }
+
+  if (answers.primary_interests) {
+    parts.push(`enjoys ${answers.primary_interests.toLowerCase()}`);
+  }
+
+  if (answers.stress_response) {
+    const response = answers.stress_response.toLowerCase();
+    parts.push(`handles stress by ${response.startsWith('analyze') ? 'analyzing problems logically' : 
+                response.startsWith('talk') ? 'talking through issues' :
+                response.startsWith('take') ? 'taking time to process' :
+                response.startsWith('jump') ? 'taking immediate action' : 'seeking creative outlets'}`);
+  }
+
+  const summary = parts.length > 0 
+    ? `${name} ${parts.join(', ')}.`
+    : `${name} has completed their personality profile setup.`;
+
+  return summary;
 }
 
 // Async personality processing function
