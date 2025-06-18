@@ -1,207 +1,181 @@
-import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-interface MemoryStats {
-  wordCount: number;
-  factCount: number;
-  memoryCount: number;
+interface MemoryProfile {
+  totalMemories: number;
+  totalFacts: number;
+  recentMemories: Array<{
+    id: number;
+    memory: string;
+    category: string;
+    importance: string;
+    createdAt: string;
+  }>;
+  keyFacts: Array<{
+    id: number;
+    fact: string;
+    category: string;
+    confidence: string;
+    createdAt: string;
+  }>;
+  personalityProfile: {
+    communicationStyle: string;
+    emotionalPatterns: string[];
+    interests: string[];
+    values: string[];
+    coreTraits: string[];
+    lifePhilosophy: string;
+    uniqueMannerisms: string[];
+  };
   stage: string;
-  nextStageAt: number;
-}
-
-interface Memory {
-  id: number;
-  memory: string;
-  type: 'fact' | 'memory';
-  createdAt: string;
 }
 
 export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
-  const { data: stats, isLoading: statsLoading } = useQuery<MemoryStats>({
-    queryKey: ['/api/stats', userId],
-    queryFn: async () => {
-      const response = await fetch(`/api/stats?userId=${userId}`);
-      if (!response.ok) throw new Error('Failed to fetch stats');
-      return response.json();
-    },
-    refetchInterval: 5000 // Refresh every 5 seconds
+  const { data: memoryProfile, isLoading } = useQuery<MemoryProfile>({
+    queryKey: ['/api/memory-profile', userId],
+    refetchInterval: 10000,
   });
 
-  const { data: facts = [], isLoading: factsLoading } = useQuery<any[]>({
-    queryKey: ['/api/facts', userId],
-    queryFn: async () => {
-      const response = await fetch(`/api/facts?userId=${userId}`);
-      if (!response.ok) throw new Error('Failed to fetch facts');
-      const data = await response.json();
-      return data.facts || [];
-    },
-    refetchInterval: 5000
-  });
-
-  if (statsLoading) {
+  if (isLoading) {
     return (
-      <div className="p-6 bg-gray-800 rounded-xl shadow-lg text-white">
+      <div className="space-y-4">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-700 rounded mb-4"></div>
-          <div className="space-y-3">
-            <div className="h-4 bg-gray-700 rounded"></div>
-            <div className="h-4 bg-gray-700 rounded w-2/3"></div>
-            <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+          <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+            <div className="h-4 bg-gray-200 rounded w-4/6"></div>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!stats) {
-    return (
-      <div className="p-6 bg-gray-800 rounded-xl shadow-lg text-white">
-        <p className="text-gray-400">Unable to load memory stats</p>
-      </div>
-    );
-  }
-
-  const progressToNext = stats.nextStageAt > 0 ? (stats.wordCount / stats.nextStageAt) * 100 : 100;
-  const stageEmojis = {
-    'Infant': '👶',
-    'Toddler': '🧒',
-    'Child': '👦',
-    'Adolescent': '👨‍🎓',
-    'Adult': '🧠'
-  };
-
-  const stageColors = {
-    'Infant': 'from-red-500 to-pink-500',
-    'Toddler': 'from-orange-500 to-yellow-500',
-    'Child': 'from-yellow-500 to-green-500',
-    'Adolescent': 'from-blue-500 to-purple-500',
-    'Adult': 'from-purple-500 to-emerald-500'
-  };
+  const profile = memoryProfile?.personalityProfile;
 
   return (
-    <div className="space-y-6 max-h-screen overflow-y-auto">
-      {/* Main Stats Card */}
-      <div className="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg text-white border border-gray-700">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
-          <h2 className="text-2xl font-bold text-emerald-400 mb-4 lg:mb-0">Memory Dashboard</h2>
-          <div className="text-left lg:text-right">
-            <div className="text-sm text-gray-400 mb-1">Current Stage</div>
-            <div className="text-2xl font-bold">
-              {stageEmojis[stats.stage as keyof typeof stageEmojis]} {stats.stage}
+    <div className="space-y-6">
+      {/* Memory Statistics */}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-2xl border border-blue-200/50 dark:border-blue-700/50 shadow-lg">
+        <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4 flex items-center">
+          <svg className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Self-Reflection Progress
+        </h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-800 dark:text-blue-200">{memoryProfile?.totalMemories || 0}</div>
+            <div className="text-sm text-blue-600 dark:text-blue-400">Memories</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-800 dark:text-green-200">{memoryProfile?.totalFacts || 0}</div>
+            <div className="text-sm text-green-600 dark:text-green-400">Personal Facts</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-semibold text-purple-800 dark:text-purple-200">{memoryProfile?.stage || 'Learning'}</div>
+            <div className="text-sm text-purple-600 dark:text-purple-400">Mirror Stage</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-semibold text-indigo-800 dark:text-indigo-200">{profile?.coreTraits?.length || 0}</div>
+            <div className="text-sm text-indigo-600 dark:text-indigo-400">Core Traits</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Personality Profile */}
+      {profile && (
+        <div className="bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 p-6 rounded-2xl border border-purple-200/50 dark:border-purple-700/50 shadow-lg">
+          <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-4 flex items-center">
+            <svg className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Your Personality Mirror
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-purple-800 dark:text-purple-200 mb-2">Communication Style</h4>
+              <p className="text-sm text-purple-700 dark:text-purple-300 bg-white/50 dark:bg-gray-800/50 p-2 rounded">
+                {profile.communicationStyle}
+              </p>
             </div>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="flex flex-col lg:flex-row lg:justify-between gap-1 lg:gap-0 text-sm mb-3">
-            <span className="text-gray-300">Progress to Next Stage</span>
-            <span className="text-emerald-400 font-medium">{stats.wordCount} / {stats.nextStageAt} words</span>
-          </div>
-          <div className="w-full bg-gray-700 rounded-full h-3">
-            <div 
-              className={`h-3 rounded-full bg-gradient-to-r ${stageColors[stats.stage as keyof typeof stageColors]} transition-all duration-500`}
-              style={{ width: `${Math.min(progressToNext, 100)}%` }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-3 lg:gap-4">
-          <div className="bg-gray-700/50 p-3 lg:p-4 rounded-lg text-center">
-            <div className="text-xl lg:text-2xl font-bold text-blue-400">{stats.wordCount}</div>
-            <div className="text-xs lg:text-sm text-gray-400 leading-tight">Words<br/>Learned</div>
-          </div>
-          <div className="bg-gray-700/50 p-3 lg:p-4 rounded-lg text-center">
-            <div className="text-xl lg:text-2xl font-bold text-emerald-400">{stats.factCount}</div>
-            <div className="text-xs lg:text-sm text-gray-400 leading-tight">Facts<br/>Remembered</div>
-          </div>
-          <div className="bg-gray-700/50 p-3 lg:p-4 rounded-lg text-center">
-            <div className="text-xl lg:text-2xl font-bold text-purple-400">{stats.memoryCount}</div>
-            <div className="text-xs lg:text-sm text-gray-400 leading-tight">Conversations</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Facts Panel */}
-      <div className="p-3 lg:p-6 bg-gray-800 rounded-xl shadow-lg text-white border border-gray-700">
-        <h3 className="text-base lg:text-lg font-semibold mb-3 lg:mb-4 text-emerald-400 flex items-center">
-          <span className="mr-2">📌</span>
-          Personal Facts
-        </h3>
-        
-        {factsLoading ? (
-          <div className="space-y-2">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-4 bg-gray-700 rounded animate-pulse"></div>
-            ))}
-          </div>
-        ) : facts.length === 0 ? (
-          <p className="text-gray-400 italic text-sm">
-            Share details to see facts here
-          </p>
-        ) : (
-          <div className="space-y-2 lg:space-y-3 max-h-48 lg:max-h-64 overflow-y-auto">
-            {facts.slice(-8).reverse().map((fact) => (
-              <div 
-                key={fact.id} 
-                className="p-2 lg:p-3 bg-gray-700/50 rounded-lg border-l-2 lg:border-l-4 border-emerald-500"
-              >
-                <div className="text-gray-300 text-sm lg:text-base">{fact.fact}</div>
-                <div className="text-xs text-gray-500 mt-1 flex justify-between">
-                  <span>{new Date(fact.createdAt).toLocaleDateString()}</span>
-                  <span className="text-emerald-400">{fact.category}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Learning Milestones */}
-      <div className="p-3 lg:p-6 bg-gray-800 rounded-xl shadow-lg text-white border border-gray-700">
-        <h3 className="text-base lg:text-lg font-semibold mb-3 lg:mb-4 text-blue-400 flex items-center">
-          <span className="mr-2">🎯</span>
-          Growth Stages
-        </h3>
-        
-        <div className="space-y-2 lg:space-y-3 max-h-64 overflow-y-auto">
-          {[
-            { stage: 'Infant', threshold: 10, emoji: '👶' },
-            { stage: 'Toddler', threshold: 25, emoji: '🧒' },
-            { stage: 'Child', threshold: 50, emoji: '👦' },
-            { stage: 'Adolescent', threshold: 100, emoji: '👨‍🎓' },
-            { stage: 'Adult', threshold: 1000, emoji: '🧠' }
-          ].map((milestone) => {
-            const isCompleted = stats.wordCount >= milestone.threshold;
-            const isCurrent = stats.stage === milestone.stage;
             
-            return (
-              <div 
-                key={milestone.stage}
-                className={`flex items-center p-2 lg:p-3 rounded-lg ${
-                  isCurrent ? 'bg-emerald-600/20 border border-emerald-500' :
-                  isCompleted ? 'bg-gray-700/50' : 'bg-gray-700/30'
-                }`}
-              >
-                <span className="text-lg lg:text-2xl mr-2 lg:mr-3">{milestone.emoji}</span>
-                <div className="flex-1">
-                  <div className={`font-medium text-sm lg:text-base ${isCurrent ? 'text-emerald-400' : 'text-white'}`}>
-                    {milestone.stage}
-                  </div>
-                  <div className="text-xs lg:text-sm text-gray-400">
-                    {milestone.threshold} words
-                  </div>
-                </div>
-                <div className={`text-xs lg:text-sm px-2 py-1 rounded ${
-                  isCompleted ? 'bg-green-600 text-white' :
-                  isCurrent ? 'bg-emerald-600 text-white' : 'bg-gray-600 text-gray-300'
-                }`}>
-                  {isCompleted ? '✓' : isCurrent ? 'Now' : 'Locked'}
+            {profile.coreTraits?.length > 0 && (
+              <div>
+                <h4 className="font-medium text-purple-800 dark:text-purple-200 mb-2">Core Traits</h4>
+                <div className="flex flex-wrap gap-2">
+                  {profile.coreTraits.slice(0, 4).map((trait, idx) => (
+                    <span key={idx} className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200 rounded-full text-sm">
+                      {trait}
+                    </span>
+                  ))}
                 </div>
               </div>
-            );
-          })}
+            )}
+
+            {profile.interests?.length > 0 && (
+              <div>
+                <h4 className="font-medium text-purple-800 dark:text-purple-200 mb-2">Interests</h4>
+                <div className="flex flex-wrap gap-2">
+                  {profile.interests.slice(0, 3).map((interest, idx) => (
+                    <span key={idx} className="px-3 py-1 bg-pink-100 dark:bg-pink-900/50 text-pink-800 dark:text-pink-200 rounded-full text-sm">
+                      {interest}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {profile.lifePhilosophy && (
+              <div>
+                <h4 className="font-medium text-purple-800 dark:text-purple-200 mb-2">Life Philosophy</h4>
+                <p className="text-sm text-purple-700 dark:text-purple-300 bg-white/50 dark:bg-gray-800/50 p-2 rounded italic">
+                  "{profile.lifePhilosophy}"
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Memories */}
+      <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 p-6 rounded-2xl border border-green-200/50 dark:border-green-700/50 shadow-lg">
+        <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-4 flex items-center">
+          <svg className="w-5 h-5 mr-2 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Recent Conversations
+        </h3>
+        <div className="space-y-3 max-h-64 overflow-y-auto">
+          {memoryProfile?.recentMemories && memoryProfile.recentMemories.length > 0 ? (
+            memoryProfile.recentMemories.slice(-8).map((memory) => (
+              <div key={memory.id} className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg border border-green-200/30 dark:border-green-700/30">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">{memory.memory}</p>
+                    <div className="flex items-center space-x-2">
+                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                        memory.importance === 'high' 
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200' 
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
+                      }`}>
+                        {memory.importance}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {new Date(memory.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8">
+              <svg className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <p className="text-gray-500 dark:text-gray-400">Start conversations to build your reflection mirror</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

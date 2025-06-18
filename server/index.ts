@@ -157,19 +157,63 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-// Weekly summary endpoint
+// Weekly summary endpoint with personalized reflection
 app.get('/api/weekly-summary', async (req, res) => {
   try {
-    res.json({
-      summary: "Your journey this week has shown remarkable growth and self-reflection. You've engaged thoughtfully with complex topics and demonstrated a genuine commitment to personal development. Keep embracing the conversations that challenge and inspire you."
-    });
+    const userId = parseInt(req.query.userId as string) || 1;
+    
+    // Get user's memories and facts for personalized summary
+    const memories = await storage.getUserMemories(userId);
+    const facts = await storage.getUserFacts(userId);
+    
+    if (memories.length === 0 && facts.length === 0) {
+      res.json({
+        summary: "Begin your journey of self-reflection. Each conversation helps build a deeper understanding of who you are."
+      });
+      return;
+    }
+
+    // Import personality analysis for summary generation
+    const { buildPersonalityProfile } = await import('./personalityAnalysis.js');
+    const profile = await buildPersonalityProfile(userId);
+    
+    const recentMemories = memories.slice(-5).map(m => m.memory).join(' ');
+    const summary = `Your recent conversations reveal ${profile.communicationStyle.toLowerCase()}. You've shown ${profile.coreTraits.slice(0, 2).join(' and ').toLowerCase()} qualities, with interests in ${profile.interests.slice(0, 3).join(', ').toLowerCase()}. Your journey reflects ${profile.lifePhilosophy.toLowerCase()}.`;
+    
+    res.json({ summary });
   } catch (error) {
     console.error('Weekly summary error:', error);
     res.status(500).json({ error: 'Failed to get weekly summary' });
   }
 });
 
-// Chat endpoint with personalized memory system
+// Memory profile endpoint
+app.get('/api/memory-profile', async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId as string) || 1;
+    
+    const memories = await storage.getUserMemories(userId);
+    const facts = await storage.getUserFacts(userId);
+    
+    // Import personality analysis
+    const { buildPersonalityProfile } = await import('./personalityAnalysis.js');
+    const profile = await buildPersonalityProfile(userId);
+    
+    res.json({
+      totalMemories: memories.length,
+      totalFacts: facts.length,
+      recentMemories: memories.slice(-10),
+      keyFacts: facts.slice(-15),
+      personalityProfile: profile,
+      stage: memories.length > 50 ? "Advanced" : memories.length > 20 ? "Developing" : "Learning"
+    });
+  } catch (error) {
+    console.error('Memory profile error:', error);
+    res.status(500).json({ error: 'Failed to get memory profile' });
+  }
+});
+
+// Chat endpoint with persistent memory and personality mirroring
 app.post('/api/chat', async (req, res) => {
   try {
     const { message, userId = 1, personalityMode = 'friend' } = req.body;
@@ -182,43 +226,104 @@ app.post('/api/chat', async (req, res) => {
       return res.status(503).json({ error: 'OpenAI API key not configured' });
     }
 
-    const systemPrompt = `You are TraI, an AI companion app. Respond conversationally and helpfully in ${personalityMode} mode.`;
-
-    // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          {
-            role: 'user',
-            content: message
-          }
-        ],
-        max_tokens: 300,
-        temperature: 0.8
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+    // Import personality analysis
+    const { analyzeConversationForPersonality, buildPersonalityProfile, generateMirroredResponse } = await import('./personalityAnalysis.js');
+    
+    // Get or create bot for user
+    let bot = await storage.getBotByUserId(userId);
+    if (!bot) {
+      bot = await storage.createBot({
+        userId,
+        name: "Mirror",
+        level: 1,
+        wordsLearned: 0,
+        personalityTraits: {}
+      });
     }
 
-    const result = await response.json();
-    const botResponse = result.choices[0].message.content;
-    
+    // Get recent conversation history
+    const recentMessages = await storage.getMessages(bot.id);
+    const conversationHistory = recentMessages
+      .slice(-10)
+      .map(m => `${m.sender}: ${m.text}`);
+
+    // Store the user's message
+    await storage.createMessage({
+      botId: bot.id,
+      sender: 'user',
+      text: message
+    });
+
+    // Analyze current message for personality insights
+    const analysis = await analyzeConversationForPersonality(
+      message,
+      conversationHistory.map(h => h.split(': ')[1]).filter(Boolean)
+    );
+
+    // Store new facts and memories
+    for (const info of analysis.personalInfo) {
+      if (info.trim()) {
+        await storage.createUserFact({
+          userId,
+          fact: info,
+          category: 'personal',
+          confidence: 'high'
+        });
+      }
+    }
+
+    // Store conversation memory
+    if (message.length > 10) {
+      await storage.createUserMemory({
+        userId,
+        memory: `User said: "${message}" [Tone: ${analysis.emotionalTone}]`,
+        category: 'conversation',
+        importance: analysis.stressIndicators.length > 0 ? 'high' : 'medium'
+      });
+    }
+
+    // Build comprehensive personality profile
+    const personalityProfile = await buildPersonalityProfile(userId);
+
+    // Generate response that mirrors user's personality
+    const botResponse = await generateMirroredResponse(
+      message,
+      personalityProfile,
+      conversationHistory,
+      personalityMode
+    );
+
+    // Store bot's response
+    await storage.createMessage({
+      botId: bot.id,
+      sender: 'bot',
+      text: botResponse
+    });
+
+    // Update bot's learned words count
+    const wordCount = message.split(' ').length;
+    await storage.updateBot(bot.id, {
+      wordsLearned: bot.wordsLearned + wordCount,
+      personalityTraits: personalityProfile
+    });
+
+    // Calculate stage based on total words
+    const totalWords = bot.wordsLearned + wordCount;
+    let stage = "Infant";
+    if (totalWords > 500) stage = "Adult";
+    else if (totalWords > 300) stage = "Adolescent";
+    else if (totalWords > 150) stage = "Child";
+    else if (totalWords > 50) stage = "Toddler";
+
     res.json({
       response: botResponse,
-      wordsLearned: 335 + Math.floor(message.split(' ').length / 2),
-      stage: "Advanced"
+      wordsLearned: totalWords,
+      stage: stage,
+      personalityInsights: {
+        emotionalTone: analysis.emotionalTone,
+        communicationStyle: personalityProfile.communicationStyle,
+        coreTraits: personalityProfile.coreTraits.slice(0, 3)
+      }
     });
     
   } catch (error) {
