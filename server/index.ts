@@ -242,38 +242,25 @@ app.post('/api/onboarding-profile', async (req, res) => {
 
     // Process onboarding answers into structured data
     const profileData = processOnboardingAnswers(answers);
-    console.log('Profile data generated:', JSON.stringify(profileData, null, 2));
     
-    // Store basic facts with debug logging
-    console.log('Storing facts:', profileData.facts);
+    // Store basic facts
     for (const fact of profileData.facts) {
-      try {
-        const result = await storage.createUserFact({
-          userId: actualUserId,
-          fact: fact.fact,
-          category: fact.category,
-          confidence: 'high'
-        });
-        console.log('Fact stored:', result);
-      } catch (error) {
-        console.error('Error storing fact:', error);
-      }
+      await storage.createUserFact({
+        userId: actualUserId,
+        fact: fact.fact,
+        category: fact.category,
+        confidence: 'high'
+      });
     }
 
-    // Store personality insights as memories with debug logging
-    console.log('Storing memories:', profileData.memories);
+    // Store personality insights as memories
     for (const insight of profileData.memories) {
-      try {
-        const result = await storage.createUserMemory({
-          userId: actualUserId,
-          memory: insight.memory,
-          category: insight.category,
-          importance: insight.importance
-        });
-        console.log('Memory stored:', result);
-      } catch (error) {
-        console.error('Error storing memory:', error);
-      }
+      await storage.createUserMemory({
+        userId: actualUserId,
+        memory: insight.memory,
+        category: insight.category,
+        importance: insight.importance
+      });
     }
 
     // Get or create bot and update with initial personality data
