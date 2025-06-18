@@ -1143,11 +1143,15 @@ const AppLayout = () => {
                 </select>
                 
                 <button
-                  onClick={() => setPersonalityMode(personalityMode === 'friendly' ? 'professional' : 'friendly')}
+                  onClick={() => {
+                    const currentIndex = personalityModes.findIndex(mode => mode.id === personalityMode);
+                    const nextIndex = (currentIndex + 1) % personalityModes.length;
+                    setPersonalityMode(personalityModes[nextIndex].id);
+                  }}
                   className="px-3 py-1 bg-zinc-600 hover:bg-zinc-500 rounded text-sm font-medium"
-                  title={`Current: ${personalityMode} mode - Click to switch`}
+                  title={`Current: ${personalityModes.find(mode => mode.id === personalityMode)?.name || personalityMode} - Click to cycle`}
                 >
-                  {personalityMode === 'friendly' ? 'Friendly' : 'Professional'}
+                  {personalityModes.find(mode => mode.id === personalityMode)?.emoji || '🤖'} {personalityModes.find(mode => mode.id === personalityMode)?.name || personalityMode}
                 </button>
 
                 <button
@@ -1398,14 +1402,29 @@ const AppLayout = () => {
               <div>
                 <h4 className="text-lg font-medium mb-3 text-purple-400">Personality</h4>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Current Mode</span>
-                    <button
-                      onClick={() => setPersonalityMode(personalityMode === 'friendly' ? 'professional' : 'friendly')}
-                      className="px-3 py-1 bg-zinc-600 hover:bg-zinc-500 rounded text-sm"
-                    >
-                      {personalityMode === 'friendly' ? '😊 Friendly' : '💼 Professional'}
-                    </button>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Current Mode</label>
+                    <div className="grid gap-2">
+                      {personalityModes.map(mode => (
+                        <button
+                          key={mode.id}
+                          onClick={() => setPersonalityMode(mode.id)}
+                          className={`p-2 rounded text-left transition-colors text-sm ${
+                            personalityMode === mode.id 
+                              ? 'bg-purple-600/20 border border-purple-500' 
+                              : 'bg-zinc-700 hover:bg-zinc-600'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm">{mode.emoji}</span>
+                            <div>
+                              <div className="font-medium text-xs">{mode.name}</div>
+                              <div className="text-xs text-zinc-400">{mode.description}</div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
