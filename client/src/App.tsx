@@ -947,17 +947,26 @@ const AppLayout = () => {
 
       {/* Desktop Layout - 3 Panel Design */}
       <div className="hidden md:flex h-full">
-        {/* Left Panel - Reflection & Horoscope */}
+        {/* Left Panel - Daily Reflection & Horoscope */}
         <div className="w-80 bg-zinc-800 flex flex-col">
-          {/* Reflection Section */}
+          {/* Daily Reflection Section */}
           <div className="flex-1 p-4 border-b border-zinc-700">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
                 ❤️
               </div>
-              <h2 className="text-lg font-semibold">Reflection</h2>
+              <h2 className="text-lg font-semibold">Daily Reflection</h2>
             </div>
             <div className="bg-zinc-900 rounded-lg p-4 h-64 overflow-y-auto">
+              <div className="text-sm text-zinc-300 mb-4">
+                <strong>Today's Affirmation:</strong>
+              </div>
+              <div className="text-sm text-zinc-300 mb-4 italic">
+                {dailyAffirmation}
+              </div>
+              <div className="text-sm text-zinc-300 mb-2">
+                <strong>Weekly Summary:</strong>
+              </div>
               <div className="text-sm text-zinc-300 whitespace-pre-wrap">
                 {weeklySummary}
               </div>
@@ -1117,7 +1126,7 @@ const AppLayout = () => {
           </div>
         </div>
 
-        {/* Right Panel - Logo & Widgets */}
+        {/* Right Panel - Logo & Goal Tracking */}
         <div className="w-80 bg-zinc-800 flex flex-col">
           <div className="p-4 text-center border-b border-zinc-700">
             <img 
@@ -1125,35 +1134,70 @@ const AppLayout = () => {
               alt="TraI Logo" 
               className="w-16 h-16 mx-auto mb-3 rounded-full object-cover"
             />
-            <h2 className="text-lg font-semibold">Logo</h2>
+            <h2 className="text-lg font-semibold">TraI</h2>
           </div>
           
           <div className="flex-1 p-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
                 ✓
               </div>
-              <h2 className="text-lg font-semibold">Widgets</h2>
+              <h2 className="text-lg font-semibold">Goal Tracking</h2>
             </div>
             
-            <div className="text-center">
-              <div className="text-4xl font-bold text-red-500 mb-2">100</div>
-              <p className="text-sm text-zinc-400">Active Widgets</p>
+            {/* Goal Progress Widgets */}
+            <div className="space-y-4">
+              <div className="bg-zinc-900 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Daily Chat Goal</span>
+                  <span className="text-xs text-zinc-400">7/10</span>
+                </div>
+                <div className="w-full bg-zinc-700 rounded-full h-2">
+                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: '70%' }}></div>
+                </div>
+                <div className="text-xs text-zinc-400 mt-1">3 messages to go</div>
+              </div>
+              
+              <div className="bg-zinc-900 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Weekly Reflection</span>
+                  <span className="text-xs text-zinc-400">4/7</span>
+                </div>
+                <div className="w-full bg-zinc-700 rounded-full h-2">
+                  <div className="bg-green-500 h-2 rounded-full" style={{ width: '57%' }}></div>
+                </div>
+                <div className="text-xs text-zinc-400 mt-1">3 days remaining</div>
+              </div>
+              
+              <div className="bg-zinc-900 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Voice Practice</span>
+                  <span className="text-xs text-zinc-400">12/15</span>
+                </div>
+                <div className="w-full bg-zinc-700 rounded-full h-2">
+                  <div className="bg-purple-500 h-2 rounded-full" style={{ width: '80%' }}></div>
+                </div>
+                <div className="text-xs text-zinc-400 mt-1">3 sessions left</div>
+              </div>
             </div>
             
+            {/* Bot Stats */}
             {botStats && (
-              <div className="mt-6 space-y-3">
-                <div className="bg-zinc-900 rounded-lg p-3">
-                  <div className="text-sm text-zinc-400">Level</div>
-                  <div className="text-lg font-semibold">{botStats.level}</div>
-                </div>
-                <div className="bg-zinc-900 rounded-lg p-3">
-                  <div className="text-sm text-zinc-400">Stage</div>
-                  <div className="text-lg font-semibold">{botStats.stage}</div>
-                </div>
-                <div className="bg-zinc-900 rounded-lg p-3">
-                  <div className="text-sm text-zinc-400">Words Learned</div>
-                  <div className="text-lg font-semibold">{botStats.wordsLearned}</div>
+              <div className="mt-6 pt-4 border-t border-zinc-700">
+                <h3 className="text-sm font-medium mb-3 text-zinc-300">Bot Progress</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-400">Level:</span>
+                    <span className="font-semibold">{botStats.level}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-400">Stage:</span>
+                    <span className="font-semibold">{botStats.stage}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-400">Words:</span>
+                    <span className="font-semibold">{botStats.wordsLearned}</span>
+                  </div>
                 </div>
               </div>
             )}
