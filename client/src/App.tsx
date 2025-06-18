@@ -1374,79 +1374,6 @@ const AppLayout = () => {
             )}
           </div>
         </div>
-
-        {/* Desktop Legacy Sidebar - Hidden */}
-        <div className="hidden w-20 bg-zinc-800 flex flex-col items-center py-6 space-y-4">
-          {sections.map((section) => {
-            const Icon = section.icon;
-            return (
-              <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id)}
-                className={`p-3 rounded-lg transition-colors relative group ${
-                  activeSection === section.id 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
-                }`}
-                title={section.label}
-              >
-                <Icon className="w-6 h-6" />
-                <div className="absolute left-full ml-2 px-2 py-1 bg-zinc-700 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  {section.label}
-                </div>
-              </button>
-            );
-          })}
-
-          {/* Bot Stats in Sidebar */}
-          {botStats && (
-            <div className="mt-auto text-center text-xs">
-              <div className="text-zinc-400">Level {botStats.level}</div>
-              <div className="text-zinc-500">{botStats.stage}</div>
-              <div className="text-zinc-500">{botStats.wordsLearned}w</div>
-            </div>
-          )}
-        </div>
-
-        {/* Desktop Main Content */}
-        <div className="flex-1 flex flex-col">
-          <div className="flex-1 overflow-hidden">
-            {renderActiveSection()}
-          </div>
-          
-          {/* Desktop Chat Input */}
-          {activeSection === 'chat' && (
-            <div className="p-4 bg-zinc-800 border-t border-zinc-700">
-              <div className="flex items-center gap-3 max-w-4xl mx-auto">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
-                  className="flex-1 p-3 text-base rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center ${
-                    isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-zinc-600 hover:bg-zinc-500'
-                  }`}
-                  title={isRecording ? "Stop Recording" : "Start Voice Recording"}
-                >
-                  {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                </button>
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || loading}
-                  className="p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Send Message"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Therapeutic Settings Modal */}
@@ -1613,7 +1540,7 @@ const AppLayout = () => {
                 setEditingGoal(null);
               }}
               onDelete={editingGoal ? () => {
-                setGoals(goals.filter(g => g.id !== editingGoal.id));
+                setGoals(goals.filter(g => g.id !== editingGoal!.id));
                 setShowGoalEditor(false);
                 setEditingGoal(null);
               } : undefined}
