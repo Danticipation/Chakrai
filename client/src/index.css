@@ -64,15 +64,22 @@ div[style*="var(--surface-elevated)"] {
   background-color: #F5F7FA !important;
 }
 
-/* Target specific white background elements */
-div:not(.bg-zinc-800):not(.bg-zinc-900):not(.bg-zinc-700):not([class*="bg-"]) {
-  background-color: #F5F7FA !important;
+/* Force therapeutic colors on main containers only */
+.w-1\/4, .w-1\/2, .flex-1, .h-full, .min-h-screen {
+  background-color: #ADD8E6 !important;
+}
+
+/* Override white card backgrounds */
+div[style*="backgroundColor: 'var(--surface-elevated')"],
+div[style*="backgroundColor: 'var(--surface-secondary')"] {
+  background-color: #ADD8E6 !important;
 }
 
 /* Override CSS variables that might be causing white backgrounds */
 :root {
-  --surface-elevated: #F5F7FA !important;
-  --surface-primary: #F5F7FA !important;
+  --surface-elevated: #ADD8E6 !important;
+  --surface-primary: #ADD8E6 !important;
+  --surface-secondary: #ADD8E6 !important;
 }
 
 /* Mobile safe area support */

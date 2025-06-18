@@ -1,0 +1,33 @@
+/* AGGRESSIVE COLOR OVERRIDE - ELIMINATE ALL WHITE */
+
+/* Force therapeutic blue on absolutely everything */
+* {
+  background-color: #ADD8E6 !important;
+  background: #ADD8E6 !important;
+}
+
+/* Override any white or light backgrounds */
+div, section, main, article, aside, header, footer, nav {
+  background-color: #ADD8E6 !important;
+  background: #ADD8E6 !important;
+}
+
+/* Target specific white elements */
+[style*="white"], [style*="#fff"], [style*="#ffffff"], [style*="rgb(255"] {
+  background-color: #ADD8E6 !important;
+  background: #ADD8E6 !important;
+}
+
+/* Override CSS variables */
+:root {
+  --white: #ADD8E6 !important;
+  --bg-white: #ADD8E6 !important;
+  --surface-elevated: #ADD8E6 !important;
+  --surface-primary: #ADD8E6 !important;
+  --surface-secondary: #ADD8E6 !important;
+}
+
+/* Tailwind overrides */
+.bg-white, .bg-gray-50, .bg-gray-100 {
+  background-color: #ADD8E6 !important;
+}
