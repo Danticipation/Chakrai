@@ -12,6 +12,12 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
 ## Recent Changes
+### June 18, 2025 - Fixed Logo Display and ElevenLabs Voice Issues
+- **Logo corrected**: Now using actual TrAI Vision logo file instead of screenshot display
+- **ElevenLabs API fixed**: Removed improper browser TTS fallback that was causing voice issues
+- **Logo file management**: Copied user's actual logo to /client/public/TrAI.png for proper display
+- **Voice functionality restored**: ElevenLabs API working correctly with HTTP 200 responses
+
 ### June 18, 2025 - Completed and Tested Adaptive Onboarding Experience with Personality Quiz
 - **Comprehensive personality quiz**: 10-question onboarding flow captures communication style, values, interests, and goals
 - **Adaptive flow control**: New users automatically see personality quiz, existing users proceed directly to main application

@@ -5,8 +5,8 @@ import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import OnboardingQuiz from './components/OnboardingQuiz';
-// Use the SVG logo from public directory
-const traiLogo = '/TrAI.svg';
+// Use the actual TrAI logo from public directory
+const traiLogo = '/TrAI.png';
 
 
 const queryClient = new QueryClient({
