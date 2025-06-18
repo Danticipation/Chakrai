@@ -182,31 +182,7 @@ app.post('/api/chat', async (req, res) => {
       return res.status(503).json({ error: 'OpenAI API key not configured' });
     }
 
-    // Get or create user
-    let user = await storage.getUser(userId);
-    if (!user) {
-      user = await storage.createUser({
-        username: `user_${userId}`,
-        password: 'default'
-      });
-    }
-
-    // Get user's conversation history
-    const userMemories = await storage.getUserMemories(userId);
-    const userFacts = await storage.getUserFacts(userId);
-    
-    // Build personalized context
-    const memoryContext = userMemories.length > 0 
-      ? `Previous conversations: ${userMemories.slice(-5).map(m => m.memory).join('. ')}`
-      : '';
-    
-    const factsContext = userFacts.length > 0
-      ? `What I know about you: ${userFacts.map(f => f.fact).join(', ')}`
-      : '';
-
-    const personalizedPrompt = `You are Reflectibot, a personalized AI companion for ${user.username}. ${factsContext} ${memoryContext}
-
-Respond personally and specifically based on what you know about this user. Reference their previous conversations and interests. Be conversational and personalized, not generic. Mode: ${personalityMode}.`;
+    const systemPrompt = `You are TraI, an AI companion app. Respond conversationally and helpfully in ${personalityMode} mode.`;
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -457,6 +433,17 @@ app.delete('/api/user/:userId/memories', async (req, res) => {
   } catch (error) {
     console.error('Error clearing memories:', error);
     res.status(500).json({ error: 'Failed to clear memories' });
+  }
+});
+
+app.delete('/api/user/:userId/facts', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    await storage.clearUserFacts(userId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error clearing facts:', error);
+    res.status(500).json({ error: 'Failed to clear facts' });
   }
 });
 
