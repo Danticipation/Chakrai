@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star } from 'lucide-react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -27,6 +26,14 @@ interface Message {
   time: string;
 }
 
+interface Goal {
+  id: number;
+  name: string;
+  current: number;
+  target: number;
+  color: string;
+}
+
 const AppLayout = () => {
   const [activeSection, setActiveSection] = useState('chat');
   const [isRecording, setIsRecording] = useState(false);
@@ -49,6 +56,15 @@ const AppLayout = () => {
   const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
   const [zodiacSign, setZodiacSign] = useState<string>('');
   const [selectedZodiacSign, setSelectedZodiacSign] = useState<string>('');
+  
+  // Goal tracking state
+  const [goals, setGoals] = useState<Goal[]>([
+    { id: 1, name: 'Daily Chat Goal', current: 7, target: 10, color: 'blue' },
+    { id: 2, name: 'Weekly Reflection', current: 4, target: 7, color: 'green' },
+    { id: 3, name: 'Voice Practice', current: 12, target: 15, color: 'purple' }
+  ]);
+  const [showGoalEditor, setShowGoalEditor] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -1177,40 +1193,53 @@ const AppLayout = () => {
               <h2 className="text-xl font-semibold">Goal Tracking</h2>
             </div>
             
-            {/* Goal Progress Widgets */}
+            {/* Customizable Goal Progress Widgets */}
             <div className="space-y-4">
-              <div className="bg-zinc-900 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-medium">Daily Chat Goal</span>
-                  <span className="text-sm text-zinc-400">7/10</span>
+              {goals.map((goal) => (
+                <div key={goal.id} className="bg-zinc-900 rounded-lg p-4 group">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-medium">{goal.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-zinc-400">{goal.current}/{goal.target}</span>
+                      <button
+                        onClick={() => {
+                          setEditingGoal(goal);
+                          setShowGoalEditor(true);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-zinc-500 hover:text-zinc-300"
+                      >
+                        ✏️
+                      </button>
+                    </div>
+                  </div>
+                  <div className="w-full bg-zinc-700 rounded-full h-3">
+                    <div 
+                      className={`h-3 rounded-full transition-all duration-300 ${
+                        goal.color === 'blue' ? 'bg-blue-500' :
+                        goal.color === 'green' ? 'bg-green-500' :
+                        goal.color === 'purple' ? 'bg-purple-500' :
+                        goal.color === 'red' ? 'bg-red-500' :
+                        goal.color === 'yellow' ? 'bg-yellow-500' :
+                        'bg-blue-500'
+                      }`}
+                      style={{ width: `${Math.min(100, (goal.current / goal.target) * 100)}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-zinc-400 mt-2">
+                    {goal.current >= goal.target ? 'Goal completed!' : `${goal.target - goal.current} to go`}
+                  </div>
                 </div>
-                <div className="w-full bg-zinc-700 rounded-full h-3">
-                  <div className="bg-blue-500 h-3 rounded-full transition-all duration-300" style={{ width: '70%' }}></div>
-                </div>
-                <div className="text-xs text-zinc-400 mt-2">3 messages to go</div>
-              </div>
+              ))}
               
-              <div className="bg-zinc-900 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-medium">Weekly Reflection</span>
-                  <span className="text-sm text-zinc-400">4/7</span>
-                </div>
-                <div className="w-full bg-zinc-700 rounded-full h-3">
-                  <div className="bg-green-500 h-3 rounded-full transition-all duration-300" style={{ width: '57%' }}></div>
-                </div>
-                <div className="text-xs text-zinc-400 mt-2">3 days remaining</div>
-              </div>
-              
-              <div className="bg-zinc-900 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-medium">Voice Practice</span>
-                  <span className="text-sm text-zinc-400">12/15</span>
-                </div>
-                <div className="w-full bg-zinc-700 rounded-full h-3">
-                  <div className="bg-purple-500 h-3 rounded-full transition-all duration-300" style={{ width: '80%' }}></div>
-                </div>
-                <div className="text-xs text-zinc-400 mt-2">3 sessions left</div>
-              </div>
+              <button
+                onClick={() => {
+                  setEditingGoal(null);
+                  setShowGoalEditor(true);
+                }}
+                className="w-full bg-zinc-700 hover:bg-zinc-600 rounded-lg p-4 text-center text-sm text-zinc-400 hover:text-white transition-colors border-2 border-dashed border-zinc-600"
+              >
+                + Add New Goal
+              </button>
             </div>
             
             {/* Bot Progress */}
@@ -1309,9 +1338,156 @@ const AppLayout = () => {
           )}
         </div>
       </div>
+
+      {/* Goal Editor Modal */}
+      {showGoalEditor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-zinc-800 rounded-lg p-6 w-96 max-w-full mx-4">
+            <h3 className="text-xl font-semibold mb-4">
+              {editingGoal ? 'Edit Goal' : 'Add New Goal'}
+            </h3>
+            
+            <GoalEditor
+              goal={editingGoal}
+              onSave={(goalData) => {
+                if (editingGoal) {
+                  setGoals(goals.map(g => g.id === editingGoal.id ? { ...g, ...goalData } : g));
+                } else {
+                  const newGoal = {
+                    id: Math.max(...goals.map(g => g.id)) + 1,
+                    ...goalData
+                  };
+                  setGoals([...goals, newGoal]);
+                }
+                setShowGoalEditor(false);
+                setEditingGoal(null);
+              }}
+              onCancel={() => {
+                setShowGoalEditor(false);
+                setEditingGoal(null);
+              }}
+              onDelete={editingGoal ? () => {
+                setGoals(goals.filter(g => g.id !== editingGoal.id));
+                setShowGoalEditor(false);
+                setEditingGoal(null);
+              } : undefined}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+// Goal Editor Component
+interface GoalEditorProps {
+  goal: Goal | null;
+  onSave: (goalData: Omit<Goal, 'id'>) => void;
+  onCancel: () => void;
+  onDelete?: () => void;
+}
+
+function GoalEditor({ goal, onSave, onCancel, onDelete }: GoalEditorProps) {
+  const [name, setName] = useState(goal?.name || '');
+  const [current, setCurrent] = useState(goal?.current || 0);
+  const [target, setTarget] = useState(goal?.target || 10);
+  const [color, setColor] = useState(goal?.color || 'blue');
+
+  const handleSave = () => {
+    if (!name.trim()) return;
+    onSave({ name: name.trim(), current, target, color });
+  };
+
+  const colors = [
+    { name: 'Blue', value: 'blue', class: 'bg-blue-500' },
+    { name: 'Green', value: 'green', class: 'bg-green-500' },
+    { name: 'Purple', value: 'purple', class: 'bg-purple-500' },
+    { name: 'Red', value: 'red', class: 'bg-red-500' },
+    { name: 'Yellow', value: 'yellow', class: 'bg-yellow-500' }
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-2">Goal Name</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g., Read 30 minutes daily"
+          className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Current Progress</label>
+          <input
+            type="number"
+            value={current}
+            onChange={(e) => setCurrent(parseInt(e.target.value) || 0)}
+            min="0"
+            className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Target</label>
+          <input
+            type="number"
+            value={target}
+            onChange={(e) => setTarget(parseInt(e.target.value) || 1)}
+            min="1"
+            className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2">Progress Bar Color</label>
+        <div className="flex gap-2">
+          {colors.map((colorOption) => (
+            <button
+              key={colorOption.value}
+              onClick={() => setColor(colorOption.value)}
+              className={`w-8 h-8 rounded-full ${colorOption.class} ${
+                color === colorOption.value ? 'ring-2 ring-white ring-offset-2 ring-offset-zinc-800' : ''
+              }`}
+              title={colorOption.name}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-between pt-4">
+        <div>
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm"
+            >
+              Delete Goal
+            </button>
+          )}
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 bg-zinc-600 hover:bg-zinc-500 rounded text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!name.trim()}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-sm"
+          >
+            Save Goal
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   return (
