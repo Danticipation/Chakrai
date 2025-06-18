@@ -948,34 +948,34 @@ const AppLayout = () => {
       {/* Desktop Layout - 3 Panel Design */}
       <div className="hidden md:flex h-full">
         {/* Left Panel - Daily Reflection & Horoscope */}
-        <div className="w-80 bg-zinc-800 flex flex-col">
+        <div className="w-1/4 bg-zinc-800 flex flex-col">
           {/* Daily Reflection Section */}
-          <div className="flex-1 p-4 border-b border-zinc-700">
+          <div className="h-1/2 p-6 border-b border-zinc-700">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-lg">
                 ❤️
               </div>
-              <h2 className="text-lg font-semibold">Daily Reflection</h2>
+              <h2 className="text-xl font-semibold">Daily Reflection</h2>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-4 h-64 overflow-y-auto">
-              <div className="text-sm text-zinc-300 mb-4">
+            <div className="bg-zinc-900 rounded-lg p-4 h-48 overflow-y-auto">
+              <div className="text-sm text-zinc-300 mb-3">
                 <strong>Today's Affirmation:</strong>
               </div>
-              <div className="text-sm text-zinc-300 mb-4 italic">
+              <div className="text-sm text-zinc-300 mb-4 italic leading-relaxed">
                 {dailyAffirmation}
               </div>
               <div className="text-sm text-zinc-300 mb-2">
                 <strong>Weekly Summary:</strong>
               </div>
-              <div className="text-sm text-zinc-300 whitespace-pre-wrap">
+              <div className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
                 {weeklySummary}
               </div>
             </div>
-            <div className="mt-3 flex gap-2">
+            <div className="mt-4 flex gap-2">
               <select
                 value={selectedReflectionVoice}
                 onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                className="flex-1 px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-xs text-white"
+                className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
               >
                 {voiceOptions.map(voice => (
                   <option key={voice.id} value={voice.id}>{voice.name}</option>
@@ -984,44 +984,44 @@ const AppLayout = () => {
               <button
                 onClick={readReflection}
                 disabled={!weeklySummary}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-xs"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-sm"
               >
-                🔊
+                🔊 Read
               </button>
             </div>
           </div>
           
           {/* Horoscope Section */}
-          <div className="flex-1 p-4">
+          <div className="h-1/2 p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-lg">
                 ⭐
               </div>
-              <h2 className="text-lg font-semibold">Horoscope</h2>
+              <h2 className="text-xl font-semibold">Horoscope</h2>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-4 h-64 overflow-y-auto">
-              <div className="text-sm text-zinc-300 mb-3">
-                <select
-                  value={selectedZodiacSign}
-                  onChange={(e) => handleZodiacChange(e.target.value)}
-                  className="w-full px-2 py-1 bg-zinc-700 border border-zinc-600 rounded text-xs text-white mb-3"
-                >
-                  <option value="">Random Sign</option>
-                  <option value="aries">♈ Aries</option>
-                  <option value="taurus">♉ Taurus</option>
-                  <option value="gemini">♊ Gemini</option>
-                  <option value="cancer">♋ Cancer</option>
-                  <option value="leo">♌ Leo</option>
-                  <option value="virgo">♍ Virgo</option>
-                  <option value="libra">♎ Libra</option>
-                  <option value="scorpio">♏ Scorpio</option>
-                  <option value="sagittarius">♐ Sagittarius</option>
-                  <option value="capricorn">♑ Capricorn</option>
-                  <option value="aquarius">♒ Aquarius</option>
-                  <option value="pisces">♓ Pisces</option>
-                </select>
-              </div>
-              <div className="text-sm text-zinc-300">
+            <div className="mb-4">
+              <select
+                value={selectedZodiacSign}
+                onChange={(e) => handleZodiacChange(e.target.value)}
+                className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+              >
+                <option value="">Random Sign</option>
+                <option value="aries">♈ Aries</option>
+                <option value="taurus">♉ Taurus</option>
+                <option value="gemini">♊ Gemini</option>
+                <option value="cancer">♋ Cancer</option>
+                <option value="leo">♌ Leo</option>
+                <option value="virgo">♍ Virgo</option>
+                <option value="libra">♎ Libra</option>
+                <option value="scorpio">♏ Scorpio</option>
+                <option value="sagittarius">♐ Sagittarius</option>
+                <option value="capricorn">♑ Capricorn</option>
+                <option value="aquarius">♒ Aquarius</option>
+                <option value="pisces">♓ Pisces</option>
+              </select>
+            </div>
+            <div className="bg-zinc-900 rounded-lg p-4 h-48 overflow-y-auto">
+              <div className="text-sm text-zinc-300 leading-relaxed">
                 {dailyHoroscope}
               </div>
             </div>
@@ -1029,7 +1029,7 @@ const AppLayout = () => {
         </div>
 
         {/* Center Panel - Chat Window */}
-        <div className="flex-1 flex flex-col bg-zinc-900">
+        <div className="w-1/2 flex flex-col bg-zinc-900">
           <div className="border-l border-r border-zinc-700 h-full flex flex-col">
             <div className="p-4 border-b border-zinc-700 bg-zinc-800">
               <h1 className="text-xl font-bold text-center">Chat Window</h1>
@@ -1127,76 +1127,83 @@ const AppLayout = () => {
         </div>
 
         {/* Right Panel - Logo & Goal Tracking */}
-        <div className="w-80 bg-zinc-800 flex flex-col">
-          <div className="p-4 text-center border-b border-zinc-700">
-            <img 
-              src="/trai-logo.jpg" 
-              alt="TraI Logo" 
-              className="w-16 h-16 mx-auto mb-3 rounded-full object-cover"
-            />
-            <h2 className="text-lg font-semibold">TraI</h2>
+        <div className="w-1/4 bg-zinc-800 flex flex-col">
+          {/* Welcome Section */}
+          <div className="p-6 text-center border-b border-zinc-700">
+            <div className="mb-6">
+              <img 
+                src="/trai-logo.jpg" 
+                alt="TraI Logo" 
+                className="w-20 h-20 mx-auto mb-4 rounded-full object-cover"
+              />
+            </div>
+            <h2 className="text-2xl font-bold mb-2">Welcome to TraI</h2>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Your intelligent companion that learns and grows with you. Start exploring TraI's features and track your journey.
+            </p>
           </div>
           
-          <div className="flex-1 p-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+          {/* Goal Tracking Section */}
+          <div className="flex-1 p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-lg">
                 ✓
               </div>
-              <h2 className="text-lg font-semibold">Goal Tracking</h2>
+              <h2 className="text-xl font-semibold">Goal Tracking</h2>
             </div>
             
             {/* Goal Progress Widgets */}
             <div className="space-y-4">
               <div className="bg-zinc-900 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Daily Chat Goal</span>
-                  <span className="text-xs text-zinc-400">7/10</span>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-medium">Daily Chat Goal</span>
+                  <span className="text-sm text-zinc-400">7/10</span>
                 </div>
-                <div className="w-full bg-zinc-700 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: '70%' }}></div>
+                <div className="w-full bg-zinc-700 rounded-full h-3">
+                  <div className="bg-blue-500 h-3 rounded-full transition-all duration-300" style={{ width: '70%' }}></div>
                 </div>
-                <div className="text-xs text-zinc-400 mt-1">3 messages to go</div>
+                <div className="text-xs text-zinc-400 mt-2">3 messages to go</div>
               </div>
               
               <div className="bg-zinc-900 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Weekly Reflection</span>
-                  <span className="text-xs text-zinc-400">4/7</span>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-medium">Weekly Reflection</span>
+                  <span className="text-sm text-zinc-400">4/7</span>
                 </div>
-                <div className="w-full bg-zinc-700 rounded-full h-2">
-                  <div className="bg-green-500 h-2 rounded-full" style={{ width: '57%' }}></div>
+                <div className="w-full bg-zinc-700 rounded-full h-3">
+                  <div className="bg-green-500 h-3 rounded-full transition-all duration-300" style={{ width: '57%' }}></div>
                 </div>
-                <div className="text-xs text-zinc-400 mt-1">3 days remaining</div>
+                <div className="text-xs text-zinc-400 mt-2">3 days remaining</div>
               </div>
               
               <div className="bg-zinc-900 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Voice Practice</span>
-                  <span className="text-xs text-zinc-400">12/15</span>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-medium">Voice Practice</span>
+                  <span className="text-sm text-zinc-400">12/15</span>
                 </div>
-                <div className="w-full bg-zinc-700 rounded-full h-2">
-                  <div className="bg-purple-500 h-2 rounded-full" style={{ width: '80%' }}></div>
+                <div className="w-full bg-zinc-700 rounded-full h-3">
+                  <div className="bg-purple-500 h-3 rounded-full transition-all duration-300" style={{ width: '80%' }}></div>
                 </div>
-                <div className="text-xs text-zinc-400 mt-1">3 sessions left</div>
+                <div className="text-xs text-zinc-400 mt-2">3 sessions left</div>
               </div>
             </div>
             
-            {/* Bot Stats */}
+            {/* Bot Progress */}
             {botStats && (
-              <div className="mt-6 pt-4 border-t border-zinc-700">
-                <h3 className="text-sm font-medium mb-3 text-zinc-300">Bot Progress</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Level:</span>
-                    <span className="font-semibold">{botStats.level}</span>
+              <div className="mt-8 pt-6 border-t border-zinc-700">
+                <h3 className="font-medium mb-4 text-zinc-300">Bot Progress</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-400">{botStats.level}</div>
+                    <div className="text-xs text-zinc-400">Level</div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Stage:</span>
-                    <span className="font-semibold">{botStats.stage}</span>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-green-400">{botStats.stage}</div>
+                    <div className="text-xs text-zinc-400">Stage</div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Words:</span>
-                    <span className="font-semibold">{botStats.wordsLearned}</span>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-400">{botStats.wordsLearned}</div>
+                    <div className="text-xs text-zinc-400">Words</div>
                   </div>
                 </div>
               </div>
