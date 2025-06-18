@@ -1,26 +1,21 @@
-<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with therapeutic gradient -->
+  <circle cx="32" cy="32" r="28" fill="url(#therapeuticGradient)" stroke="#E6E6FA" stroke-width="2"/>
+  
+  <!-- TraI text with modern typography -->
+  <text x="32" y="24" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#4A5568">Tr</text>
+  <text x="32" y="40" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#2D3748">AI</text>
+  
+  <!-- Subtle brain/mind icon -->
+  <path d="M20 28c0-6.627 5.373-12 12-12s12 5.373 12 12c0 3.314-1.343 6.314-3.515 8.485" stroke="#98FB98" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M24 32c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="#ADD8E6" stroke-width="1.5" fill="none" opacity="0.8"/>
+  
+  <!-- Therapeutic gradient definition -->
   <defs>
-    <linearGradient id="faceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    <linearGradient id="therapeuticGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F7FAFC;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#EDF2F7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E2E8F0;stop-opacity:1" />
     </linearGradient>
   </defs>
-  
-  <!-- Background circle -->
-  <circle cx="50" cy="50" r="48" fill="#1F2937" stroke="url(#faceGradient)" stroke-width="2"/>
-  
-  <!-- Left face profile (facing right) -->
-  <path d="M20 35 C15 30, 15 35, 15 40 C15 45, 15 50, 15 55 C15 60, 15 65, 20 70 C25 72, 30 70, 35 65 C40 60, 42 55, 42 50 C42 45, 40 40, 35 35 C30 30, 25 32, 20 35 Z" 
-        fill="url(#faceGradient)" opacity="0.8"/>
-  
-  <!-- Right face profile (facing left) -->
-  <path d="M80 35 C85 30, 85 35, 85 40 C85 45, 85 50, 85 55 C85 60, 85 65, 80 70 C75 72, 70 70, 65 65 C60 60, 58 55, 58 50 C58 45, 60 40, 65 35 C70 30, 75 32, 80 35 Z" 
-        fill="url(#faceGradient)" opacity="0.8"/>
-  
-  <!-- Reflection line in the middle -->
-  <line x1="50" y1="25" x2="50" y2="75" stroke="url(#faceGradient)" stroke-width="1" opacity="0.5"/>
-  
-  <!-- Small dots for eyes -->
-  <circle cx="25" cy="45" r="1.5" fill="#E5E7EB"/>
-  <circle cx="75" cy="45" r="1.5" fill="#E5E7EB"/>
 </svg>
