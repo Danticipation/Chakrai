@@ -1011,7 +1011,7 @@ const AppLayout = () => {
       {/* Desktop Layout - 3 Panel Design */}
       <div className="hidden md:flex h-full">
         {/* Left Panel - Daily Reflection & Horoscope */}
-        <div className="w-1/4 flex flex-col" style={{ backgroundColor: 'var(--surface-elevated)' }}>
+        <div className="w-1/4 flex flex-col" style={{ backgroundColor: '#F5F7FA' }}>
           {/* Daily Reflection Section */}
           <div className="h-1/2 p-6" style={{ borderBottom: '1px solid var(--gentle-lavender-dark)' }}>
             <div className="flex items-center gap-3 mb-6">
@@ -1141,7 +1141,7 @@ const AppLayout = () => {
         </div>
 
         {/* Center Panel - Therapeutic Chat Interface */}
-        <div className="w-1/2 flex flex-col" style={{ backgroundColor: 'var(--surface-elevated)' }}>
+        <div className="w-1/2 flex flex-col" style={{ backgroundColor: '#F5F7FA' }}>
           <div className="h-full flex flex-col" style={{ borderLeft: '1px solid var(--gentle-lavender-dark)', borderRight: '1px solid var(--gentle-lavender-dark)' }}>
             <div className="p-6 flex items-center justify-center" style={{ borderBottom: '1px solid var(--gentle-lavender-dark)' }}>
               <img 
@@ -1286,7 +1286,7 @@ const AppLayout = () => {
         </div>
 
         {/* Right Panel - Wellness Goals */}
-        <div className="w-1/4 flex flex-col" style={{ backgroundColor: 'var(--surface-elevated)' }}>
+        <div className="w-1/4 flex flex-col" style={{ backgroundColor: '#F5F7FA' }}>
           {/* Goal Tracking Section */}
           <div className="flex-1 p-6">
             <div className="flex items-center gap-3 mb-6">
