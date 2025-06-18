@@ -222,13 +222,6 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(503).json({ error: 'OpenAI API key not configured' });
-    }
-
-    // Import personality analysis
-    const { analyzeConversationForPersonality, buildPersonalityProfile, generateMirroredResponse } = await import('./personalityAnalysis.js');
-    
     // Get or create bot for user
     let bot = await storage.getBotByUserId(userId);
     if (!bot) {
@@ -241,28 +234,111 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
-    // Get recent conversation history
-    const recentMessages = await storage.getMessages(bot.id);
-    const conversationHistory = recentMessages
-      .slice(-10)
-      .map(m => `${m.sender}: ${m.text}`);
-
-    // Store the user's message
+    // Store the user's message immediately
     await storage.createMessage({
       botId: bot.id,
       sender: 'user',
       text: message
     });
 
-    // Analyze current message for personality insights
-    const analysis = await analyzeConversationForPersonality(
-      message,
-      conversationHistory.map(h => h.split(': ')[1]).filter(Boolean)
-    );
+    // Get existing personality data for response generation
+    const memories = await storage.getUserMemories(userId);
+    const facts = await storage.getUserFacts(userId);
+    
+    // Generate personality-aware response based on stored data
+    let botResponse = generatePersonalityResponse(message, facts, memories, personalityMode);
 
-    // Store new facts and memories
+    // Store bot's response
+    await storage.createMessage({
+      botId: bot.id,
+      sender: 'bot',
+      text: botResponse
+    });
+
+    // Update word count
+    const wordCount = message.split(' ').length;
+    const totalWords = bot.wordsLearned + wordCount;
+    await storage.updateBot(bot.id, {
+      wordsLearned: totalWords
+    });
+
+    // Calculate stage
+    let stage = "Infant";
+    if (totalWords > 500) stage = "Adult";
+    else if (totalWords > 300) stage = "Adolescent";
+    else if (totalWords > 150) stage = "Child";
+    else if (totalWords > 50) stage = "Toddler";
+
+    // Send response immediately
+    res.json({
+      response: botResponse,
+      wordsLearned: totalWords,
+      stage: stage
+    });
+
+    // Process personality analysis asynchronously (don't await)
+    processPersonalityAnalysisAsync(message, userId);
+    
+  } catch (error) {
+    console.error('Chat error:', error);
+    res.status(500).json({ error: 'Chat failed' });
+  }
+});
+
+// Generate personality-aware response based on stored data
+function generatePersonalityResponse(message: string, facts: any[], memories: any[], personalityMode: string): string {
+  const name = facts.find(f => f.fact.includes('Name:'))?.fact.split(':')[1]?.trim();
+  const occupation = facts.find(f => f.fact.includes('Occupation:'))?.fact.split(':')[1]?.trim();
+  
+  const messageLower = message.toLowerCase();
+  
+  // Personality mode responses
+  const modeResponses = {
+    friend: {
+      greeting: name ? `Hey ${name}! Great to hear from you.` : "Hey there! Great to hear from you.",
+      stress: name ? `I hear you, ${name}. That sounds really tough.` : "I hear you. That sounds really tough.",
+      work: occupation ? `Being a ${occupation.toLowerCase()} can be demanding.` : "Work can definitely be challenging.",
+      general: name ? `${name}, I'm here for you.` : "I'm here for you."
+    },
+    counsel: {
+      greeting: name ? `Hello ${name}. How are you feeling today?` : "Hello. How are you feeling today?",
+      stress: name ? `${name}, it's understandable to feel this way.` : "It's understandable to feel this way.",
+      work: occupation ? `The pressures of being a ${occupation.toLowerCase()} are real.` : "Work pressures can be overwhelming.",
+      general: "Let's explore what's on your mind together."
+    },
+    wellness: {
+      greeting: name ? `Hi ${name}! How's your wellbeing today?` : "Hi! How's your wellbeing today?",
+      stress: "Stress affects both mind and body. Let's work through this.",
+      work: "Work-life balance is crucial for your overall health.",
+      general: "Taking care of yourself is so important."
+    }
+  };
+  
+  const responses = modeResponses[personalityMode as keyof typeof modeResponses] || modeResponses.friend;
+  
+  // Determine response type based on message content
+  if (messageLower.includes('hello') || messageLower.includes('hi')) {
+    return responses.greeting;
+  } else if (messageLower.includes('stress') || messageLower.includes('anxious') || messageLower.includes('worried')) {
+    return responses.stress + " What's weighing on your mind?";
+  } else if (messageLower.includes('work') || messageLower.includes('job')) {
+    return responses.work + " Tell me more about what's happening.";
+  } else {
+    return responses.general + " What would you like to talk about?";
+  }
+}
+
+// Async personality processing function
+async function processPersonalityAnalysisAsync(message: string, userId: number) {
+  try {
+    const { analyzeConversationForPersonality } = await import('./personalityAnalysis.js');
+    
+    // Analyze message for personality insights
+    const analysis = await analyzeConversationForPersonality(message, []);
+
+    // Store new facts
     for (const info of analysis.personalInfo) {
-      if (info.trim()) {
+      if (info.trim() && info.length > 3) {
         await storage.createUserFact({
           userId,
           fact: info,
@@ -281,56 +357,10 @@ app.post('/api/chat', async (req, res) => {
         importance: analysis.stressIndicators.length > 0 ? 'high' : 'medium'
       });
     }
-
-    // Build comprehensive personality profile
-    const personalityProfile = await buildPersonalityProfile(userId);
-
-    // Generate response that mirrors user's personality
-    const botResponse = await generateMirroredResponse(
-      message,
-      personalityProfile,
-      conversationHistory,
-      personalityMode
-    );
-
-    // Store bot's response
-    await storage.createMessage({
-      botId: bot.id,
-      sender: 'bot',
-      text: botResponse
-    });
-
-    // Update bot's learned words count
-    const wordCount = message.split(' ').length;
-    await storage.updateBot(bot.id, {
-      wordsLearned: bot.wordsLearned + wordCount,
-      personalityTraits: personalityProfile
-    });
-
-    // Calculate stage based on total words
-    const totalWords = bot.wordsLearned + wordCount;
-    let stage = "Infant";
-    if (totalWords > 500) stage = "Adult";
-    else if (totalWords > 300) stage = "Adolescent";
-    else if (totalWords > 150) stage = "Child";
-    else if (totalWords > 50) stage = "Toddler";
-
-    res.json({
-      response: botResponse,
-      wordsLearned: totalWords,
-      stage: stage,
-      personalityInsights: {
-        emotionalTone: analysis.emotionalTone,
-        communicationStyle: personalityProfile.communicationStyle,
-        coreTraits: personalityProfile.coreTraits.slice(0, 3)
-      }
-    });
-    
   } catch (error) {
-    console.error('Chat error:', error);
-    res.status(500).json({ error: 'Chat failed' });
+    console.error('Async personality analysis error:', error);
   }
-});
+}
 
 // Transcription endpoint for voice input using OpenAI Whisper
 app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
