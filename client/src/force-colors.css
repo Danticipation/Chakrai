@@ -1,33 +1,126 @@
-/* AGGRESSIVE COLOR OVERRIDE - ELIMINATE ALL WHITE */
+/* THERAPEUTIC COLOR SCHEME WITH VISUAL HIERARCHY */
 
-/* Force therapeutic blue on absolutely everything */
-* {
+/* Main background - soft blue */
+body, html, #root {
   background-color: #ADD8E6 !important;
-  background: #ADD8E6 !important;
+  background: linear-gradient(135deg, #ADD8E6 0%, #B8E6F0 100%) !important;
 }
 
-/* Override any white or light backgrounds */
-div, section, main, article, aside, header, footer, nav {
-  background-color: #ADD8E6 !important;
-  background: #ADD8E6 !important;
+/* Panel backgrounds with subtle gradients */
+.w-1\/4, .w-1\/2 {
+  background: linear-gradient(180deg, #F5F7FA 0%, #E8F4F8 100%) !important;
+  border: 1px solid rgba(173, 216, 230, 0.3) !important;
 }
 
-/* Target specific white elements */
-[style*="white"], [style*="#fff"], [style*="#ffffff"], [style*="rgb(255"] {
-  background-color: #ADD8E6 !important;
-  background: #ADD8E6 !important;
+/* Cards and content areas - layered depth */
+div[class*="rounded-2xl"] {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F0F8FF 100%) !important;
+  border: 1px solid rgba(173, 216, 230, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(173, 216, 230, 0.15) !important;
 }
 
-/* Override CSS variables */
-:root {
-  --white: #ADD8E6 !important;
-  --bg-white: #ADD8E6 !important;
-  --surface-elevated: #ADD8E6 !important;
-  --surface-primary: #ADD8E6 !important;
-  --surface-secondary: #ADD8E6 !important;
+/* Buttons with personality */
+button {
+  background: linear-gradient(145deg, #98FB98 0%, #90EE90 100%) !important;
+  border: 1px solid rgba(152, 251, 152, 0.6) !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(152, 251, 152, 0.2) !important;
 }
 
-/* Tailwind overrides */
-.bg-white, .bg-gray-50, .bg-gray-100 {
-  background-color: #ADD8E6 !important;
+button:hover {
+  background: linear-gradient(145deg, #90EE90 0%, #7FDD7F 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(152, 251, 152, 0.3) !important;
+}
+
+/* Input fields */
+input, select, textarea {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F8FFFE 100%) !important;
+  border: 2px solid rgba(173, 216, 230, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #98FB98 !important;
+  box-shadow: 0 0 0 3px rgba(152, 251, 152, 0.2) !important;
+}
+
+/* Progress bars with gradient */
+div[class*="rounded-full"] {
+  background: linear-gradient(90deg, #E6E6FA 0%, #D8D8F5 100%) !important;
+}
+
+/* Icons and accent elements */
+div[style*="backgroundColor: 'var(--pale-green')"] {
+  background: linear-gradient(145deg, #98FB98 0%, #90EE90 100%) !important;
+  box-shadow: 0 3px 8px rgba(152, 251, 152, 0.25) !important;
+}
+
+div[style*="backgroundColor: 'var(--gentle-lavender')"] {
+  background: linear-gradient(145deg, #E6E6FA 0%, #D8D8F5 100%) !important;
+  box-shadow: 0 3px 8px rgba(230, 230, 250, 0.25) !important;
+}
+
+/* Add personality to goal progress bars */
+div[style*="width:"] {
+  background: linear-gradient(90deg, #98FB98 0%, #90EE90 50%, #7FDD7F 100%) !important;
+  border-radius: 20px !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+div[style*="width:"]:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Message bubbles with personality */
+div[class*="space-y-4"] > div {
+  border-radius: 20px !important;
+  padding: 16px !important;
+  margin: 8px 0 !important;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1) !important;
+  transition: transform 0.2s ease !important;
+}
+
+div[class*="space-y-4"] > div:hover {
+  transform: translateY(-2px) !important;
+}
+
+/* Floating animations for icons */
+div[class*="w-12 h-12"] {
+  animation: float 3s ease-in-out infinite !important;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Gradient borders for panels */
+.w-1\/4:first-child {
+  border-right: 3px solid transparent !important;
+  background-image: linear-gradient(180deg, #F5F7FA 0%, #E8F4F8 100%), 
+                    linear-gradient(180deg, #98FB98, #ADD8E6) !important;
+  background-origin: border-box !important;
+  background-clip: content-box, border-box !important;
+}
+
+.w-1\/4:last-child {
+  border-left: 3px solid transparent !important;
+  background-image: linear-gradient(180deg, #F5F7FA 0%, #E8F4F8 100%), 
+                    linear-gradient(180deg, #E6E6FA, #ADD8E6) !important;
+  background-origin: border-box !important;
+  background-clip: content-box, border-box !important;
 }

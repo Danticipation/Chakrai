@@ -11,6 +11,14 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Communication style**: Direct, technical communication preferred
 
 ## Recent Changes
+### June 18, 2025 - Enhanced Visual Design with Personality & Dynamics
+- **Added visual hierarchy**: Implemented gradients, shadows, and depth to differentiate interface elements
+- **Enhanced personality**: Added floating animations, shimmer effects, hover states, and interactive feedback
+- **Improved user experience**: Buttons, cards, inputs each have distinct visual treatments and animations
+- **Welcome message updated**: Changed from "Welcome to Your Safe Space" to "Welcome to TraI" per user request
+- **Therapeutic color scheme maintained**: Kept calming therapeutic colors while adding visual interest and depth
+- **Interactive elements**: Progress bars shimmer, buttons lift on hover, icons gently float for engaging experience
+
 ### June 18, 2025 - Fixed Color Display & Dynamic Daily Reflection System
 - **Fixed bright white background**: Implemented stronger CSS enforcement to ensure therapeutic color scheme displays properly
 - **Dynamic daily reflection**: Replaced static weekly summary with fluid daily reflection that updates based on user interactions

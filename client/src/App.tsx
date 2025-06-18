@@ -1155,7 +1155,7 @@ const AppLayout = () => {
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
-                  <h2 className="text-2xl font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Welcome to Your Safe Space</h2>
+                  <h2 className="text-2xl font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Welcome to TraI</h2>
                   <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                     I'm here to listen and support you. Share what's on your mind.
                   </p>
