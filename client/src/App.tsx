@@ -303,12 +303,18 @@ const AppLayout = () => {
         audio.addEventListener('canplay', () => console.log('Audio can play'));
         audio.addEventListener('error', (e) => console.error('Audio error:', e));
         
+        // Force user interaction for audio playback
+        if (!audioEnabled) {
+          console.log('Audio requires user interaction, storing for later');
+          setPendingAudio(audioUrl);
+          return;
+        }
+        
         const playPromise = audio.play();
         playPromise.then(() => {
           console.log('ElevenLabs audio playing successfully');
-          setAudioEnabled(true);
         }).catch(error => {
-          console.error('Audio play failed:', error);
+          console.error('ElevenLabs audio blocked by browser, requires user interaction:', error);
           setPendingAudio(audioUrl);
         });
       } catch (voiceError) {

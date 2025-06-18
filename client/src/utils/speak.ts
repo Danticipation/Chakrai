@@ -33,21 +33,4 @@ export const speakWithElevenLabs = async (text: string): Promise<void> => {
   }
 };
 
-export const speakWithBrowserTTS = (text: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    if (!('speechSynthesis' in window)) {
-      reject(new Error('Browser speech synthesis not supported'));
-      return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    utterance.pitch = 1.0;
-    utterance.volume = 0.8;
-    
-    utterance.onend = () => resolve();
-    utterance.onerror = (event) => reject(new Error(`Speech synthesis failed: ${event.error}`));
-    
-    speechSynthesis.speak(utterance);
-  });
-};
+// Browser TTS removed - only ElevenLabs voice supported
