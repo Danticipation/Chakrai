@@ -295,21 +295,23 @@ Respond as if you are reflecting their own personality back to them. Use their c
 Keep the response conversational and natural, as if it's coming from someone who truly understands them.
 `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are an AI companion that mirrors the user's personality and communication style back to them, creating a reflective conversation experience."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 200
-    });
+    const response = await retryOpenAIRequest(() =>
+      openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "You are an AI companion that mirrors the user's personality and communication style back to them, creating a reflective conversation experience."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 200
+      })
+    );
 
     return response.choices[0].message.content || "I understand what you're saying, and I can see how that reflects who you are.";
   } catch (error) {

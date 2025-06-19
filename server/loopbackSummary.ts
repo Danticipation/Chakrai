@@ -1,5 +1,5 @@
 // Loopback summary generation for enhanced memory reflection
-import OpenAI from "openai";
+import { openai, retryOpenAIRequest } from "./openaiRetry";
 
 export interface SummaryContext {
   userMessages: string[];
@@ -19,27 +19,27 @@ export interface MemorySummary {
   recommendations: string[];
 }
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 export async function generateLoopbackSummary(context: SummaryContext): Promise<MemorySummary> {
   try {
     const prompt = constructSummaryPrompt(context);
     
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      messages: [
-        {
-          role: "system",
-          content: "You are an AI companion analyzing conversation patterns and personal growth. Generate insightful summaries that help understand the user's journey and emotional development."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.7
-    });
+    const response = await retryOpenAIRequest(() =>
+      openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: "You are an AI companion analyzing conversation patterns and personal growth. Generate insightful summaries that help understand the user's journey and emotional development."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.7
+      })
+    );
 
     const summary = JSON.parse(response.choices[0].message.content || "{}");
     
