@@ -1605,20 +1605,72 @@ const AppLayout = () => {
                       ))}
                     </select>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Audio Enabled</span>
-                    <span className={`px-2 py-1 rounded text-xs ${audioEnabled ? 'bg-green-600' : 'bg-red-600'}`}>
-                      {audioEnabled ? 'On' : 'Off'}
+                  <div className="text-sm text-zinc-300">
+                    Currently selected: <span className="font-medium text-purple-400">
+                      {voiceOptions.find(v => v.id === selectedReflectionVoice)?.name || 'James'}
                     </span>
                   </div>
-                  {!audioEnabled && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Audio Status</span>
+                    <span className={`px-2 py-1 rounded text-xs ${audioEnabled ? 'bg-green-600' : 'bg-red-600'}`}>
+                      {audioEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
                     <button
-                      onClick={enableAudio}
-                      className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm"
+                      onClick={() => generateAudioForText("Hello! This is how I will sound in our conversations.")}
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white w-full"
                     >
-                      Enable Audio
+                      Test Selected Voice
                     </button>
-                  )}
+                    <button
+                      onClick={async () => {
+                        const response = await fetch('/api/text-to-speech', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ 
+                            text: 'Direct audio test with visible controls',
+                            voiceId: selectedReflectionVoice
+                          })
+                        });
+                        const blob = await response.blob();
+                        const url = URL.createObjectURL(blob);
+                        const audio = new Audio(url);
+                        audio.controls = true;
+                        audio.style.width = '100%';
+                        document.body.appendChild(audio);
+                        console.log('Audio element added to page with controls');
+                      }}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white w-full"
+                    >
+                      Direct Audio Test (With Controls)
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const response = await fetch('/api/text-to-speech', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ 
+                            text: 'Download test - this file should play the selected voice when downloaded',
+                            voiceId: selectedReflectionVoice
+                          })
+                        });
+                        const blob = await response.blob();
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `elevenlabs-voice-test-${Date.now()}.mp3`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                        console.log('Audio file downloaded');
+                      }}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white w-full"
+                    >
+                      Download Audio Test
+                    </button>
+                  </div>
                 </div>
               </div>
 
