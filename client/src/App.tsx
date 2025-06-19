@@ -812,14 +812,14 @@ const AppLayout = () => {
           </div>
           
           {/* Input Area */}
-          <div className="flex items-center gap-2 px-3 pb-3">
+          <div className="flex items-center gap-2 px-2 pb-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Share your thoughts..."
-              className="flex-1 p-3 text-sm rounded-xl border focus:outline-none focus:ring-0"
+              className="flex-1 p-3 text-sm rounded-xl border focus:outline-none focus:ring-0 min-w-0"
               style={{ 
                 borderColor: 'var(--gentle-lavender-dark)',
                 backgroundColor: 'var(--surface-secondary)',
@@ -828,7 +828,7 @@ const AppLayout = () => {
             />
             <button
               onClick={isRecording ? stopRecording : startRecording}
-              className={`p-3 rounded-xl w-12 h-12 flex items-center justify-center shadow-md transition-all ${
+              className={`p-2 rounded-xl w-10 h-10 flex items-center justify-center shadow-md transition-all flex-shrink-0 ${
                 isRecording ? 'animate-pulse' : ''
               }`}
               style={{ 
@@ -837,19 +837,19 @@ const AppLayout = () => {
               }}
               title={isRecording ? "Stop Recording" : "Start Voice Recording"}
             >
-              {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </button>
             <button
               onClick={sendMessage}
               disabled={!input.trim() || loading}
-              className="p-3 rounded-xl w-12 h-12 flex items-center justify-center shadow-md transition-all disabled:opacity-50"
+              className="p-2 rounded-xl w-10 h-10 flex items-center justify-center shadow-md transition-all disabled:opacity-50 flex-shrink-0"
               style={{ 
                 backgroundColor: '#4F46E5',
                 color: 'white'
               }}
               title="Send Message"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4" />
             </button>
           </div>
         </div>
