@@ -102,6 +102,24 @@ div[style*="var(--surface-elevated)"] {
     left: -4px !important;
     right: 4px !important;
   }
+  
+  /* Shift welcome section left */
+  .mobile-welcome-shift {
+    margin-left: -4px !important;
+    padding-left: 8px !important;
+  }
+  
+  /* Shift voice selector left */  
+  .mobile-voice-shift {
+    margin-left: -4px !important;
+    padding-left: 8px !important;
+  }
+  
+  /* Shift bottom navigation left */
+  .mobile-nav-shift {
+    left: -4px !important;
+    right: 4px !important;
+  }
 }
 
 /* Force therapeutic colors on main containers only */

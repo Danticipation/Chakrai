@@ -457,7 +457,7 @@ const AppLayout = () => {
         return (
           <div className="flex flex-col h-full">
             {/* Compact Welcome Section for Mobile */}
-            <div className="p-3 text-center" style={{ backgroundColor: 'var(--soft-blue)' }}>
+            <div className="p-3 text-center mobile-welcome-shift" style={{ backgroundColor: 'var(--soft-blue)' }}>
               <div className="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
                 <img src={traiLogo} alt="TrAI Logo" className="w-8 h-8" />
               </div>
@@ -792,7 +792,7 @@ const AppLayout = () => {
         {/* Mobile Chat Input - Always visible and floating */}
         <div className="fixed bottom-16 left-0 right-0 bg-white shadow-lg z-50 border-t mobile-input-shift" style={{ borderColor: 'var(--gentle-lavender-dark)' }}>
           {/* Voice Selector */}
-          <div className="px-2 pt-2 pb-1">
+          <div className="px-2 pt-2 pb-1 mobile-voice-shift">
             <select
               value={selectedReflectionVoice}
               onChange={(e) => setSelectedReflectionVoice(e.target.value)}
@@ -859,7 +859,7 @@ const AppLayout = () => {
         </div>
 
         {/* Mobile Bottom Navigation - Fixed position */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg mobile-nav z-50" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
+        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg mobile-nav z-50 mobile-nav-shift" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
           <div className="flex justify-around py-2">
             {sections.map((section) => {
               const IconComponent = section.icon;
