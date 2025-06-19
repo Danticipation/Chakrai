@@ -72,7 +72,20 @@ export default function WhisperRecorder({ onTranscription, onResponse }: Whisper
       onResponse(data.response);
     }
 
-    // Audio playback handled by main app, not here
+    // Play TTS response
+    const ttsRes = await fetch('/api/text-to-speech', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: data.response })
+    });
+
+    if (ttsRes.ok) {
+      const audioBlob = await ttsRes.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.onended = () => URL.revokeObjectURL(audioUrl);
+      audio.play();
+    }
 
     setTranscription('');
     setAudioUrl('');

@@ -136,20 +136,7 @@ const AppLayout = () => {
       });
   }, []);
 
-  // Disable ALL browser speech synthesis globally
-  useEffect(() => {
-    const disableBrowserTTS = () => {
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-    
-    // Block immediately and continuously
-    disableBrowserTTS();
-    const intervalId = setInterval(disableBrowserTTS, 50);
-    
-    return () => clearInterval(intervalId);
-  }, []);
+
 
   const handleGlobalKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'r' && activeSection === 'chat') {
@@ -279,27 +266,18 @@ const AppLayout = () => {
       });
       
       const botResponse = res.data.response;
-      setMessages(prev => [...prev, {
-        sender: 'bot',
+      // Add bot message without triggering screen readers
+      const botMessage = {
+        sender: 'bot' as const,
         text: botResponse,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }]);
+      };
+      setMessages(prev => [...prev, botMessage]);
       
       // Update daily reflection based on this interaction
       updateDailyReflection(userMessageText, botResponse);
       
-      // ONLY USE ELEVENLABS - NO FALLBACKS
-      console.log('=== VOICE DEBUG START ===');
-      console.log('Bot response:', botResponse);
-      console.log('Selected voice ID:', selectedReflectionVoice);
-      console.log('Audio enabled state:', audioEnabled);
-      
-      // Block all browser speech synthesis
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-        console.log('Cancelled any browser speech synthesis');
-      }
-      
+      // Generate audio for bot response
       try {
         const audioResponse = await axios.post('/api/text-to-speech', { 
           text: botResponse,
@@ -308,37 +286,24 @@ const AppLayout = () => {
           responseType: 'blob'
         });
         
-        console.log('ElevenLabs response size:', audioResponse.data.size, 'bytes');
-        
-        if (audioResponse.data.size === 0) {
-          throw new Error('Empty audio response from ElevenLabs');
-        }
-        
         const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
         const audioUrl = URL.createObjectURL(audioBlob);
         setLastBotAudio(audioUrl);
         
         const audio = new Audio(audioUrl);
         audio.volume = 1.0;
-        audio.muted = false;
-        
-        console.log('Created Audio object, attempting play...');
         
         const playPromise = audio.play();
         playPromise.then(() => {
-          console.log('SUCCESS: ElevenLabs audio is playing');
+          console.log('Audio playing successfully');
           setAudioEnabled(true);
         }).catch(error => {
-          console.error('FAILED: ElevenLabs audio blocked:', error);
+          console.log('Audio blocked by browser:', error.message);
           setPendingAudio(audioUrl);
         });
-        
       } catch (voiceError) {
-        console.error('CRITICAL: ElevenLabs API failed completely:', voiceError);
-        // DO NOT FALLBACK TO ANYTHING - JUST FAIL
+        console.log('Voice synthesis unavailable');
       }
-      
-      console.log('=== VOICE DEBUG END ===');
       
       setBotStats(prev => prev ? {
         ...prev,
