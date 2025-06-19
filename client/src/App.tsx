@@ -308,21 +308,37 @@ const AppLayout = () => {
             const audio = new Audio(audioUrl);
             audio.volume = 1.0;
             
+            // Force audio to load and play immediately
+            audio.preload = 'auto';
+            audio.autoplay = false;
+            
             // Add detailed audio event listeners
             audio.addEventListener('loadstart', () => console.log('Audio loadstart'));
             audio.addEventListener('loadeddata', () => console.log('Audio loaded data'));
             audio.addEventListener('canplay', () => console.log('Audio can play'));
             audio.addEventListener('playing', () => console.log('Audio started playing'));
-            audio.addEventListener('error', (e) => console.log('Audio error event:', e));
-            
-            const playPromise = audio.play();
-            playPromise.then(() => {
-              console.log('ElevenLabs audio play() promise resolved');
-              setAudioEnabled(true);
-            }).catch(error => {
-              console.log('Audio play() promise rejected:', error.message, error.name);
-              setPendingAudio(audioUrl);
+            audio.addEventListener('ended', () => console.log('Audio playback ended'));
+            audio.addEventListener('error', (e) => {
+              console.log('Audio error event:', e);
+              console.log('Audio error code:', audio.error?.code);
+              console.log('Audio error message:', audio.error?.message);
             });
+            
+            // Try to load the audio first
+            audio.load();
+            
+            // Wait a moment then try to play
+            setTimeout(() => {
+              const playPromise = audio.play();
+              playPromise.then(() => {
+                console.log('ElevenLabs audio play() promise resolved - AUDIO SHOULD BE PLAYING NOW');
+                setAudioEnabled(true);
+              }).catch(error => {
+                console.log('Audio play() promise rejected:', error.message, error.name);
+                console.log('Trying manual user interaction workaround...');
+                setPendingAudio(audioUrl);
+              });
+            }, 100);
           } else {
             console.log('Empty audio blob received');
           }
@@ -903,6 +919,28 @@ const AppLayout = () => {
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white w-full"
                 >
                   Test Selected Voice
+                </button>
+                <button
+                  onClick={async () => {
+                    const response = await fetch('/api/text-to-speech', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ 
+                        text: 'Direct audio test with visible controls',
+                        voiceId: selectedReflectionVoice
+                      })
+                    });
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const audio = new Audio(url);
+                    audio.controls = true;
+                    audio.style.width = '100%';
+                    document.body.appendChild(audio);
+                    console.log('Audio element added to page with controls');
+                  }}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white w-full mt-2"
+                >
+                  Direct Audio Test (With Controls)
                 </button>
               </div>
             </div>
