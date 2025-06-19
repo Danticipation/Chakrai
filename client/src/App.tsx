@@ -327,47 +327,67 @@ const AppLayout = () => {
             // Try to load the audio first
             audio.load();
             
-            // Wait a moment then try to play
-            setTimeout(() => {
-              const playPromise = audio.play();
-              playPromise.then(() => {
-                console.log('ElevenLabs audio play() promise resolved - AUDIO SHOULD BE PLAYING NOW');
+            // Try Web Audio API approach for better browser compatibility
+            setTimeout(async () => {
+              try {
+                // First try standard HTML audio
+                const playPromise = audio.play();
+                await playPromise;
+                console.log('ElevenLabs audio playing successfully');
                 setAudioEnabled(true);
-              }).catch(error => {
-                console.log('Audio autoplay blocked:', error.message);
-                // Create a user-clickable play button for this audio
-                const playButton = document.createElement('button');
-                playButton.textContent = '🔊 Click to play bot response';
-                playButton.style.cssText = `
-                  position: fixed;
-                  top: 20px;
-                  right: 20px;
-                  background: #7c3aed;
-                  color: white;
-                  border: none;
-                  padding: 12px 16px;
-                  border-radius: 8px;
-                  font-size: 14px;
-                  cursor: pointer;
-                  z-index: 1000;
-                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                `;
-                playButton.onclick = () => {
-                  audio.play().then(() => {
-                    console.log('Manual audio playback successful');
-                    document.body.removeChild(playButton);
-                    setAudioEnabled(true);
-                  });
-                };
-                document.body.appendChild(playButton);
+              } catch (error) {
+                console.log('HTML audio blocked, trying Web Audio API');
                 
-                // Auto-remove after 10 seconds
-                setTimeout(() => {
-                  if (document.body.contains(playButton)) {
-                    document.body.removeChild(playButton);
-                  }
-                }, 10000);
-              });
+                try {
+                  // Use Web Audio API for better control
+                  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                  const arrayBuffer = await audioBlob.arrayBuffer();
+                  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                  
+                  const source = audioContext.createBufferSource();
+                  source.buffer = audioBuffer;
+                  source.connect(audioContext.destination);
+                  source.start(0);
+                  
+                  console.log('Web Audio API playback started');
+                  setAudioEnabled(true);
+                } catch (webAudioError) {
+                  console.log('Web Audio API also failed, showing manual button');
+                  
+                  // Create manual play button as fallback
+                  const playButton = document.createElement('button');
+                  playButton.textContent = '🔊 Click to play bot response';
+                  playButton.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #7c3aed;
+                    color: white;
+                    border: none;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  `;
+                  playButton.onclick = () => {
+                    audio.play().then(() => {
+                      console.log('Manual audio playback successful');
+                      document.body.removeChild(playButton);
+                      setAudioEnabled(true);
+                    });
+                  };
+                  document.body.appendChild(playButton);
+                  
+                  // Auto-remove after 15 seconds
+                  setTimeout(() => {
+                    if (document.body.contains(playButton)) {
+                      document.body.removeChild(playButton);
+                    }
+                  }, 15000);
+                }
+              }
             }, 100);
           } else {
             console.log('Empty audio blob received');
@@ -971,6 +991,31 @@ const AppLayout = () => {
                   className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white w-full mt-2"
                 >
                   Direct Audio Test (With Controls)
+                </button>
+                <button
+                  onClick={async () => {
+                    const response = await fetch('/api/text-to-speech', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ 
+                        text: 'Download test - this file should play the selected voice when downloaded',
+                        voiceId: selectedReflectionVoice
+                      })
+                    });
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `elevenlabs-voice-test-${Date.now()}.mp3`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    console.log('Audio file downloaded');
+                  }}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white w-full mt-2"
+                >
+                  Download Audio Test
                 </button>
               </div>
             </div>
