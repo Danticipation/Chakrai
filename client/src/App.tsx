@@ -352,40 +352,20 @@ const AppLayout = () => {
                   console.log('Web Audio API playback started');
                   setAudioEnabled(true);
                 } catch (webAudioError) {
-                  console.log('Web Audio API also failed, showing manual button');
+                  console.log('Both audio methods blocked - using fallback TTS');
                   
-                  // Create manual play button as fallback
-                  const playButton = document.createElement('button');
-                  playButton.textContent = '🔊 Click to play bot response';
-                  playButton.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #7c3aed;
-                    color: white;
-                    border: none;
-                    padding: 12px 16px;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    cursor: pointer;
-                    z-index: 1000;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                  `;
-                  playButton.onclick = () => {
-                    audio.play().then(() => {
-                      console.log('Manual audio playback successful');
-                      document.body.removeChild(playButton);
-                      setAudioEnabled(true);
-                    });
-                  };
-                  document.body.appendChild(playButton);
-                  
-                  // Auto-remove after 15 seconds
-                  setTimeout(() => {
-                    if (document.body.contains(playButton)) {
-                      document.body.removeChild(playButton);
-                    }
-                  }, 15000);
+                  // Fallback to browser TTS if ElevenLabs is blocked
+                  try {
+                    const utterance = new SpeechSynthesisUtterance(botResponse);
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.0;
+                    utterance.volume = 0.8;
+                    speechSynthesis.speak(utterance);
+                    console.log('Browser TTS fallback used');
+                    setAudioEnabled(true);
+                  } catch (fallbackError) {
+                    console.log('All audio methods failed');
+                  }
                 }
               }
             }, 100);
@@ -1618,10 +1598,25 @@ const AppLayout = () => {
                   </div>
                   <div className="space-y-2">
                     <button
-                      onClick={() => generateAudioForText("Hello! This is how I will sound in our conversations.")}
+                      onClick={async () => {
+                        // Enable audio context first
+                        try {
+                          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                          if (audioContext.state === 'suspended') {
+                            await audioContext.resume();
+                          }
+                          setAudioEnabled(true);
+                          console.log('Audio context enabled');
+                        } catch (error) {
+                          console.log('Audio context enable failed:', error);
+                        }
+                        
+                        // Then test the voice
+                        generateAudioForText("Hello! This is how I will sound in our conversations.");
+                      }}
                       className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white w-full"
                     >
-                      Test Selected Voice
+                      Enable Audio & Test Voice
                     </button>
                     <button
                       onClick={async () => {
