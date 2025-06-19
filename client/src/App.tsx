@@ -334,9 +334,39 @@ const AppLayout = () => {
                 console.log('ElevenLabs audio play() promise resolved - AUDIO SHOULD BE PLAYING NOW');
                 setAudioEnabled(true);
               }).catch(error => {
-                console.log('Audio play() promise rejected:', error.message, error.name);
-                console.log('Trying manual user interaction workaround...');
-                setPendingAudio(audioUrl);
+                console.log('Audio autoplay blocked:', error.message);
+                // Create a user-clickable play button for this audio
+                const playButton = document.createElement('button');
+                playButton.textContent = '🔊 Click to play bot response';
+                playButton.style.cssText = `
+                  position: fixed;
+                  top: 20px;
+                  right: 20px;
+                  background: #7c3aed;
+                  color: white;
+                  border: none;
+                  padding: 12px 16px;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  cursor: pointer;
+                  z-index: 1000;
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                `;
+                playButton.onclick = () => {
+                  audio.play().then(() => {
+                    console.log('Manual audio playback successful');
+                    document.body.removeChild(playButton);
+                    setAudioEnabled(true);
+                  });
+                };
+                document.body.appendChild(playButton);
+                
+                // Auto-remove after 10 seconds
+                setTimeout(() => {
+                  if (document.body.contains(playButton)) {
+                    document.body.removeChild(playButton);
+                  }
+                }, 10000);
               });
             }, 100);
           } else {
