@@ -641,28 +641,28 @@ const AppLayout = () => {
     switch (activeSection) {
       case 'chat':
         return (
-          <div className="flex flex-col h-full bg-zinc-900">
-            {/* Messages Area - Proper height */}
-            <div className="flex-1 h-full overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-zinc-900 to-zinc-800">
+          <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--surface-primary)' }}>
+            {/* Messages Area - Mobile optimized */}
+            <div className="flex-1 h-full overflow-y-auto p-4 space-y-4">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center px-6">
                   <img 
-                    src="/trai-logo.jpg" 
+                    src={traiLogo}
                     alt="TraI Logo" 
-                    className="w-20 h-20 mb-4 rounded-full shadow-lg object-cover"
+                    className="w-24 h-24 mb-6 rounded-full shadow-lg object-cover"
                   />
-                  <h2 className="text-2xl font-bold text-white mb-3">Welcome to TraI</h2>
-                  <p className="text-zinc-300 text-base mb-4 max-w-xs">
-                    Your intelligent companion that learns and grows with you. Start a conversation below.
+                  <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Welcome to TraI</h2>
+                  <p className="text-base mb-6 max-w-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    Your therapeutic companion for mental wellness and self-reflection. Start sharing your thoughts below.
                   </p>
-                  <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
-                    <div className="bg-zinc-800 p-3 rounded-lg">
-                      <Mic className="w-5 h-5 text-blue-400 mb-1" />
-                      <p className="text-xs text-zinc-300">Voice Input</p>
+                  <div className="grid grid-cols-2 gap-4 w-full max-w-xs">
+                    <div className="p-4 rounded-2xl shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
+                      <Mic className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
+                      <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Voice Input</p>
                     </div>
-                    <div className="bg-zinc-800 p-3 rounded-lg">
-                      <Brain className="w-5 h-5 text-purple-400 mb-1" />
-                      <p className="text-xs text-zinc-300">Smart Memory</p>
+                    <div className="p-4 rounded-2xl shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+                      <Brain className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
+                      <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Memory</p>
                     </div>
                   </div>
                 </div>
@@ -670,14 +670,22 @@ const AppLayout = () => {
                 messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
                   >
                     <div
-                      className={`max-w-xs px-4 py-2 rounded-lg ${
+                      className={`max-w-[85%] px-4 py-3 rounded-2xl shadow-sm ${
                         message.sender === 'user' 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-zinc-700 text-zinc-100'
+                          ? 'rounded-br-md' 
+                          : 'rounded-bl-md'
                       }`}
+                      style={{
+                        backgroundColor: message.sender === 'user' 
+                          ? 'var(--soft-blue-dark)' 
+                          : 'var(--surface-secondary)',
+                        color: message.sender === 'user' 
+                          ? 'white' 
+                          : 'var(--text-primary)'
+                      }}
                     >
                       <p className="break-words">{message.text}</p>
                       <p className="text-xs opacity-70 mt-1">{message.time}</p>
@@ -715,30 +723,26 @@ const AppLayout = () => {
 
       case 'reflect':
         return (
-          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">Weekly Reflection</h2>
-              <div className="flex items-center gap-3">
-                <select
-                  value={selectedReflectionVoice}
-                  onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                  className="px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
-                >
-                  {voiceOptions.map(voice => (
-                    <option key={voice.id} value={voice.id}>{voice.name} - {voice.description}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={readReflection}
-                  disabled={!weeklySummary}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-sm font-medium"
-                >
-                  🔊 Read Aloud
-                </button>
-              </div>
+          <div className="p-4 h-full flex flex-col">
+            {/* Mobile-optimized header */}
+            <div className="mb-4">
+              <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Daily Reflection</h2>
+              <button
+                onClick={readReflection}
+                disabled={!weeklySummary}
+                className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm disabled:opacity-50"
+                style={{ 
+                  backgroundColor: 'var(--soft-blue-dark)',
+                  color: 'white'
+                }}
+              >
+                🔊 Listen to Reflection
+              </button>
             </div>
-            <div className="bg-zinc-800 rounded-lg p-6 flex-1 overflow-y-auto">
-              <div className="text-zinc-300 whitespace-pre-wrap">
+
+            {/* Mobile-optimized content */}
+            <div className="flex-1 overflow-y-auto rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+              <div className="whitespace-pre-wrap text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
                 {weeklySummary}
               </div>
             </div>
@@ -836,47 +840,47 @@ const AppLayout = () => {
 
       case 'progress':
         return (
-          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
-            <h2 className="text-2xl font-bold mb-6">Progress Tracking</h2>
+          <div className="p-4 h-full flex flex-col">
+            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Wellness Progress</h2>
             
-            {/* Bot Growth Stats */}
-            <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded-lg p-6 mb-6 border border-green-500/30">
-              <div className="flex items-center mb-4">
-                <Target className="w-6 h-6 text-green-400 mr-3" />
-                <h3 className="text-xl font-semibold text-green-300">Bot Development</h3>
+            {/* Bot Growth Stats - Mobile optimized */}
+            <div className="rounded-2xl p-4 mb-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
+              <div className="flex items-center mb-3">
+                <Target className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Your Growth</h3>
               </div>
               {botStats && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-zinc-800/50 rounded-lg p-4">
-                    <div className="text-2xl font-bold text-green-400">{botStats.level}</div>
-                    <div className="text-sm text-zinc-300">Current Level</div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white/60 rounded-xl p-3">
+                    <div className="text-xl font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{botStats.level}</div>
+                    <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Level</div>
                   </div>
-                  <div className="bg-zinc-800/50 rounded-lg p-4">
-                    <div className="text-2xl font-bold text-green-400">{botStats.stage}</div>
-                    <div className="text-sm text-zinc-300">Development Stage</div>
+                  <div className="bg-white/60 rounded-xl p-3">
+                    <div className="text-xl font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{botStats.stage}</div>
+                    <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Stage</div>
                   </div>
-                  <div className="bg-zinc-800/50 rounded-lg p-4">
-                    <div className="text-2xl font-bold text-green-400">{botStats.wordsLearned}</div>
-                    <div className="text-sm text-zinc-300">Words Learned</div>
+                  <div className="bg-white/60 rounded-xl p-3 col-span-2">
+                    <div className="text-xl font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{botStats.wordsLearned} words</div>
+                    <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Words Learned</div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Conversation Insights */}
-            <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-lg p-6 border border-blue-500/30">
-              <div className="flex items-center mb-4">
-                <Brain className="w-6 h-6 text-blue-400 mr-3" />
-                <h3 className="text-xl font-semibold text-blue-300">Conversation Stats</h3>
+            {/* Conversation Insights - Mobile optimized */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+              <div className="flex items-center mb-3">
+                <Brain className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Conversation Stats</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-zinc-800/50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-blue-400">{messages.length}</div>
-                  <div className="text-sm text-zinc-300">Total Messages</div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white/60 rounded-xl p-3">
+                  <div className="text-xl font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{messages.length}</div>
+                  <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Messages</div>
                 </div>
-                <div className="bg-zinc-800/50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-blue-400">{personalityMode}</div>
-                  <div className="text-sm text-zinc-300">Active Mode</div>
+                <div className="bg-white/60 rounded-xl p-3">
+                  <div className="text-sm font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{personalityMode}</div>
+                  <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Mode</div>
                 </div>
               </div>
             </div>
@@ -1102,13 +1106,18 @@ const AppLayout = () => {
 
         {/* Mobile Input Area - Fixed above navigation */}
         {activeSection === 'chat' && (
-          <div className="fixed bottom-16 left-0 right-0 bg-zinc-800 border-t border-zinc-700 z-40">
+          <div className="fixed bottom-16 left-0 right-0 bg-white shadow-lg z-40" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
             {/* Voice Selector */}
-            <div className="px-3 pt-2 pb-1">
+            <div className="px-4 pt-3 pb-2">
               <select
                 value={selectedReflectionVoice}
                 onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                className="w-full px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-sm text-white"
+                className="w-full px-3 py-2 bg-white border rounded-lg text-sm font-medium"
+                style={{ 
+                  borderColor: 'var(--gentle-lavender-dark)', 
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--surface-secondary)'
+                }}
               >
                 {voiceOptions.map(voice => (
                   <option key={voice.id} value={voice.id}>
@@ -1119,53 +1128,71 @@ const AppLayout = () => {
             </div>
             
             {/* Input Area */}
-            <div className="flex items-center gap-3 p-3">
+            <div className="flex items-center gap-3 px-4 pb-4">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                className="flex-1 p-3 text-base rounded-full bg-zinc-700 border border-zinc-600 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Share your thoughts..."
+                className="flex-1 p-4 text-base rounded-2xl border-2 focus:outline-none focus:ring-0"
+                style={{ 
+                  borderColor: 'var(--gentle-lavender-dark)',
+                  backgroundColor: 'var(--surface-secondary)',
+                  color: 'var(--text-primary)'
+                }}
               />
               <button
                 onClick={isRecording ? stopRecording : startRecording}
-                className={`p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center ${
-                  isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-zinc-600 hover:bg-zinc-500'
+                className={`p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all ${
+                  isRecording ? 'animate-pulse' : ''
                 }`}
+                style={{ 
+                  backgroundColor: isRecording ? '#EF4444' : 'var(--pale-green)',
+                  color: isRecording ? 'white' : 'var(--text-primary)'
+                }}
                 title={isRecording ? "Stop Recording" : "Start Voice Recording"}
               >
-                {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
               </button>
               <button
                 onClick={sendMessage}
                 disabled={!input.trim() || loading}
-                className="p-3 rounded-full min-w-[48px] min-h-[48px] flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all disabled:opacity-50"
+                style={{ 
+                  backgroundColor: 'var(--soft-blue-dark)',
+                  color: 'white'
+                }}
                 title="Send Message"
               >
-                <Send className="w-5 h-5" />
+                <Send className="w-6 h-6" />
               </button>
             </div>
           </div>
         )}
 
         {/* Mobile Bottom Navigation - Fixed position */}
-        <div className="fixed bottom-0 left-0 right-0 bg-zinc-800 border-t border-zinc-700 mobile-nav z-50">
-          <div className="flex justify-around py-2 px-1">
+        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg mobile-nav z-50" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
+          <div className="flex justify-around py-3 px-2 safe-area-inset-bottom">
             {sections.map((section) => {
               const Icon = section.icon;
+              const isActive = activeSection === section.id;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`flex flex-col items-center p-2 min-w-[50px] rounded-lg transition-colors ${
-                    activeSection === section.id 
-                      ? 'text-blue-400 bg-blue-900/30' 
-                      : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
+                  className={`flex flex-col items-center p-3 min-w-[60px] rounded-xl transition-all duration-200 ${
+                    isActive ? 'scale-105' : 'scale-100'
                   }`}
+                  style={{
+                    backgroundColor: isActive ? 'var(--soft-blue-dark)' : 'transparent',
+                    color: isActive ? 'white' : 'var(--text-secondary)'
+                  }}
                 >
-                  <Icon className="w-5 h-5 mb-1" />
-                  <span className="text-xs font-medium">{section.label}</span>
+                  <Icon className={`w-6 h-6 mb-1 ${isActive ? 'drop-shadow-sm' : ''}`} />
+                  <span className={`text-xs font-medium ${isActive ? 'text-white' : ''}`}>
+                    {section.label}
+                  </span>
                 </button>
               );
             })}
