@@ -812,7 +812,7 @@ const AppLayout = () => {
           </div>
           
           {/* Input Area */}
-          <div className="flex items-stretch gap-1 px-1 pb-2">
+          <div className="flex items-stretch gap-1 pl-0 pr-1 pb-2">
             <div className="flex-1 flex">
               <input
                 type="text"
