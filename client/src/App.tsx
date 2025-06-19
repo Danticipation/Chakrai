@@ -279,6 +279,10 @@ const AppLayout = () => {
       
       // Generate audio for bot response
       try {
+        console.log('=== CHAT AUDIO DEBUG START ===');
+        console.log('Selected voice ID:', selectedReflectionVoice);
+        console.log('Bot response text:', botResponse.substring(0, 50) + '...');
+        
         const audioResponse = await fetch('/api/text-to-speech', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -288,23 +292,35 @@ const AppLayout = () => {
           })
         });
         
+        console.log('Audio response status:', audioResponse.status);
+        console.log('Audio response headers:', Object.fromEntries(audioResponse.headers.entries()));
+        
         if (audioResponse.ok) {
           const audioBlob = await audioResponse.blob();
           console.log('Audio blob size:', audioBlob.size);
+          console.log('Audio blob type:', audioBlob.type);
           
           if (audioBlob.size > 0) {
             const audioUrl = URL.createObjectURL(audioBlob);
+            console.log('Audio URL created:', audioUrl);
             setLastBotAudio(audioUrl);
             
             const audio = new Audio(audioUrl);
             audio.volume = 1.0;
             
+            // Add detailed audio event listeners
+            audio.addEventListener('loadstart', () => console.log('Audio loadstart'));
+            audio.addEventListener('loadeddata', () => console.log('Audio loaded data'));
+            audio.addEventListener('canplay', () => console.log('Audio can play'));
+            audio.addEventListener('playing', () => console.log('Audio started playing'));
+            audio.addEventListener('error', (e) => console.log('Audio error event:', e));
+            
             const playPromise = audio.play();
             playPromise.then(() => {
-              console.log('ElevenLabs audio playing successfully');
+              console.log('ElevenLabs audio play() promise resolved');
               setAudioEnabled(true);
             }).catch(error => {
-              console.log('Audio playback failed:', error.message);
+              console.log('Audio play() promise rejected:', error.message, error.name);
               setPendingAudio(audioUrl);
             });
           } else {
@@ -312,7 +328,10 @@ const AppLayout = () => {
           }
         } else {
           console.log('Audio API request failed:', audioResponse.status);
+          const errorText = await audioResponse.text();
+          console.log('Error response:', errorText);
         }
+        console.log('=== CHAT AUDIO DEBUG END ===');
       } catch (voiceError) {
         console.log('Voice generation error:', voiceError);
       }

@@ -72,19 +72,41 @@ export default function WhisperRecorder({ onTranscription, onResponse }: Whisper
       onResponse(data.response);
     }
 
-    // Play TTS response
-    const ttsRes = await fetch('/api/text-to-speech', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: data.response })
-    });
+    // Play TTS response using ElevenLabs
+    try {
+      const ttsRes = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text: data.response,
+          voiceId: 'EkK5I93UQWFDigLMpZcX' // Default James voice
+        })
+      });
 
-    if (ttsRes.ok) {
-      const audioBlob = await ttsRes.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audio.onended = () => URL.revokeObjectURL(audioUrl);
-      audio.play();
+      if (ttsRes.ok) {
+        const audioBlob = await ttsRes.blob();
+        console.log('WhisperRecorder audio blob size:', audioBlob.size);
+        
+        if (audioBlob.size > 0) {
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioUrl);
+          audio.volume = 1.0;
+          
+          audio.onended = () => URL.revokeObjectURL(audioUrl);
+          
+          audio.play().then(() => {
+            console.log('WhisperRecorder audio playing successfully');
+          }).catch(error => {
+            console.log('WhisperRecorder audio playback failed:', error);
+          });
+        } else {
+          console.log('WhisperRecorder received empty audio blob');
+        }
+      } else {
+        console.log('WhisperRecorder TTS request failed:', ttsRes.status);
+      }
+    } catch (error) {
+      console.log('WhisperRecorder TTS error:', error);
     }
 
     setTranscription('');
