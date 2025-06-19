@@ -1,8 +1,7 @@
-import OpenAI from "openai";
 import { storage } from "./storage";
+import { openai, retryOpenAIRequest } from "./openaiRetry";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export interface PersonalityProfile {
   communicationStyle: string;
@@ -85,22 +84,24 @@ Extract in JSON format:
   "uniqueExpressions": ["unique expressions"]
 }`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "Extract personality insights quickly and concisely."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.1,
-      max_tokens: 300
-    });
+    const response = await retryOpenAIRequest(() => 
+      openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "Extract personality insights quickly and concisely."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.1,
+        max_tokens: 300
+      })
+    );
 
     const result = JSON.parse(response.choices[0].message.content || '{}');
     
@@ -219,21 +220,23 @@ Respond with JSON in this exact format:
 }
 `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert personality psychologist. Create detailed personality profiles that capture the essence of a person's communication style and identity."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.4
-    });
+    const response = await retryOpenAIRequest(() =>
+      openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert personality psychologist. Create detailed personality profiles that capture the essence of a person's communication style and identity."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.4
+      })
+    );
 
     return JSON.parse(response.choices[0].message.content || '{}');
   } catch (error) {

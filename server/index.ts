@@ -610,16 +610,46 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     formData.append('file', new Blob([req.file.buffer], { type: 'audio/wav' }), 'audio.wav');
     formData.append('model', 'whisper-1');
 
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: formData
-    });
+    // Retry mechanism for OpenAI API with exponential backoff
+    let response;
+    let lastError;
+    
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          },
+          body: formData
+        });
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+        if (response.ok) {
+          break; // Success, exit retry loop
+        }
+        
+        lastError = new Error(`OpenAI API error: ${response.status}`);
+        if (response.status === 429 || response.status >= 500) {
+          // Retry on rate limit or server errors
+          await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+          continue;
+        } else {
+          // Don't retry on client errors
+          throw lastError;
+        }
+      } catch (error) {
+        lastError = error;
+        if (attempt < 3 && (error.code === 'EAI_AGAIN' || error.code === 'ENOTFOUND')) {
+          // Retry on DNS/network errors
+          await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    if (!response || !response.ok) {
+      throw lastError || new Error('OpenAI API failed after retries');
     }
 
     const result = await response.json();
