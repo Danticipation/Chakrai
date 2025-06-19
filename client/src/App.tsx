@@ -279,30 +279,42 @@ const AppLayout = () => {
       
       // Generate audio for bot response
       try {
-        const audioResponse = await axios.post('/api/text-to-speech', { 
-          text: botResponse,
-          voiceId: selectedReflectionVoice
-        }, {
-          responseType: 'blob'
+        const audioResponse = await fetch('/api/text-to-speech', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            text: botResponse,
+            voiceId: selectedReflectionVoice
+          })
         });
         
-        const audioBlob = new Blob([audioResponse.data], { type: 'audio/mpeg' });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        setLastBotAudio(audioUrl);
-        
-        const audio = new Audio(audioUrl);
-        audio.volume = 1.0;
-        
-        const playPromise = audio.play();
-        playPromise.then(() => {
-          console.log('Audio playing successfully');
-          setAudioEnabled(true);
-        }).catch(error => {
-          console.log('Audio blocked by browser:', error.message);
-          setPendingAudio(audioUrl);
-        });
+        if (audioResponse.ok) {
+          const audioBlob = await audioResponse.blob();
+          console.log('Audio blob size:', audioBlob.size);
+          
+          if (audioBlob.size > 0) {
+            const audioUrl = URL.createObjectURL(audioBlob);
+            setLastBotAudio(audioUrl);
+            
+            const audio = new Audio(audioUrl);
+            audio.volume = 1.0;
+            
+            const playPromise = audio.play();
+            playPromise.then(() => {
+              console.log('ElevenLabs audio playing successfully');
+              setAudioEnabled(true);
+            }).catch(error => {
+              console.log('Audio playback failed:', error.message);
+              setPendingAudio(audioUrl);
+            });
+          } else {
+            console.log('Empty audio blob received');
+          }
+        } else {
+          console.log('Audio API request failed:', audioResponse.status);
+        }
       } catch (voiceError) {
-        console.log('Voice synthesis unavailable');
+        console.log('Voice generation error:', voiceError);
       }
       
       setBotStats(prev => prev ? {
@@ -420,26 +432,41 @@ const AppLayout = () => {
 
   const generateAudioForText = async (text: string) => {
     try {
-      const response = await axios.post('/api/text-to-speech', { text }, {
-        responseType: 'blob'
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text,
+          voiceId: selectedReflectionVoice
+        })
       });
       
-      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      setLastBotAudio(audioUrl);
-      
-      const audio = new Audio(audioUrl);
-      audio.volume = 1.0;
-      audio.play().then(() => {
-        console.log('Generated audio playing');
-        setAudioEnabled(true);
-      }).catch(error => {
-        console.error('Generated audio blocked:', error);
-        setPendingAudio(audioUrl);
-      });
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        console.log('Test audio blob size:', audioBlob.size);
+        
+        if (audioBlob.size > 0) {
+          const audioUrl = URL.createObjectURL(audioBlob);
+          setLastBotAudio(audioUrl);
+          
+          const audio = new Audio(audioUrl);
+          audio.volume = 1.0;
+          
+          audio.play().then(() => {
+            console.log('ElevenLabs test audio playing successfully');
+            setAudioEnabled(true);
+          }).catch(error => {
+            console.log('Test audio playback failed:', error.message);
+            setPendingAudio(audioUrl);
+          });
+        } else {
+          console.log('Empty test audio blob received');
+        }
+      } else {
+        console.log('Test audio API request failed:', response.status);
+      }
     } catch (error) {
-      console.error('Audio generation failed:', error);
-      alert('Audio generation requires ElevenLabs API configuration. The text content is available to read above.');
+      console.log('Test audio generation error:', error);
     }
   };
 
