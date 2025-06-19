@@ -792,7 +792,7 @@ const AppLayout = () => {
         {/* Mobile Chat Input - Always visible and floating */}
         <div className="fixed bottom-16 left-0 right-0 bg-white shadow-lg z-50 border-t" style={{ borderColor: 'var(--gentle-lavender-dark)' }}>
           {/* Voice Selector */}
-          <div className="px-3 pt-2 pb-1">
+          <div className="px-2 pt-2 pb-1">
             <select
               value={selectedReflectionVoice}
               onChange={(e) => setSelectedReflectionVoice(e.target.value)}
@@ -812,14 +812,14 @@ const AppLayout = () => {
           </div>
           
           {/* Input Area */}
-          <div className="flex items-center gap-2 px-2 pb-3">
+          <div className="flex items-center gap-1 pl-2 pr-1 pb-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Share your thoughts..."
-              className="flex-1 p-3 text-sm rounded-xl border focus:outline-none focus:ring-0 min-w-0"
+              className="flex-1 p-2 text-sm rounded-lg border focus:outline-none focus:ring-0 min-w-0"
               style={{ 
                 borderColor: 'var(--gentle-lavender-dark)',
                 backgroundColor: 'var(--surface-secondary)',
@@ -828,7 +828,7 @@ const AppLayout = () => {
             />
             <button
               onClick={isRecording ? stopRecording : startRecording}
-              className={`p-2 rounded-xl w-10 h-10 flex items-center justify-center shadow-md transition-all flex-shrink-0 ${
+              className={`p-2 rounded-lg w-9 h-9 flex items-center justify-center shadow-sm transition-all flex-shrink-0 ${
                 isRecording ? 'animate-pulse' : ''
               }`}
               style={{ 
@@ -842,7 +842,7 @@ const AppLayout = () => {
             <button
               onClick={sendMessage}
               disabled={!input.trim() || loading}
-              className="p-2 rounded-xl w-10 h-10 flex items-center justify-center shadow-md transition-all disabled:opacity-50 flex-shrink-0"
+              className="p-2 rounded-lg w-9 h-9 flex items-center justify-center shadow-sm transition-all disabled:opacity-50 flex-shrink-0"
               style={{ 
                 backgroundColor: '#4F46E5',
                 color: 'white'
