@@ -343,8 +343,31 @@ app.post('/api/chat', async (req, res) => {
     const memories = await storage.getUserMemories(userId);
     const facts = await storage.getUserFacts(userId);
     
-    // Generate personality-aware response based on stored data
-    let botResponse = generatePersonalityResponse(message, facts, memories, personalityMode);
+    // Generate dynamic OpenAI-powered response with personality mirroring
+    let botResponse;
+    try {
+      console.log(`=== CHAT DEBUG: Attempting OpenAI response for user ${userId} ===`);
+      const { generateMirroredResponse, buildPersonalityProfile } = await import('./personalityAnalysis.js');
+      
+      console.log('Building personality profile...');
+      const personalityProfile = await buildPersonalityProfile(userId);
+      console.log('Personality profile built, generating response...');
+      
+      // Generate intelligent, personality-mirrored response using OpenAI
+      botResponse = await generateMirroredResponse(
+        message,
+        personalityProfile,
+        memories.slice(-5).map(m => m.memory), // Recent conversation context
+        personalityMode
+      );
+      console.log('OpenAI response generated successfully:', botResponse.substring(0, 50) + '...');
+    } catch (error) {
+      console.error('OpenAI response generation failed, using fallback:', error);
+      console.error('Error stack:', error.stack);
+      // Fallback to basic personality response only if OpenAI fails
+      botResponse = generatePersonalityResponse(message, facts, memories, personalityMode);
+      console.log('Using fallback response:', botResponse);
+    }
 
     // Store bot's response
     await storage.createMessage({
