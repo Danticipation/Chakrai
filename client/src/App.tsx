@@ -136,18 +136,24 @@ const AppLayout = () => {
       });
   }, []);
 
-  // Check onboarding status on load
+  // Check onboarding status on load - only show if explicitly incomplete
   useEffect(() => {
-    axios.get('/api/onboarding-status?userId=1')
-      .then(res => {
-        if (!res.data.completed) {
-          setShowOnboarding(true);
-        }
-      })
-      .catch(() => {
-        // If endpoint doesn't exist or fails, show onboarding
-        setShowOnboarding(true);
-      });
+    const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
+    
+    if (!hasCompletedOnboarding) {
+      axios.get('/api/onboarding-status?userId=1')
+        .then(res => {
+          if (!res.data.completed) {
+            setShowOnboarding(true);
+          } else {
+            localStorage.setItem('onboardingCompleted', 'true');
+          }
+        })
+        .catch(() => {
+          // Don't force onboarding if API fails
+          localStorage.setItem('onboardingCompleted', 'true');
+        });
+    }
   }, []);
 
   const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -278,7 +284,6 @@ const AppLayout = () => {
       });
       
       const botResponse = res.data.response;
-      // Add bot message without triggering screen readers
       const botMessage = {
         sender: 'bot' as const,
         text: botResponse,
@@ -286,15 +291,10 @@ const AppLayout = () => {
       };
       setMessages(prev => [...prev, botMessage]);
       
-      // Update daily reflection based on this interaction
       updateDailyReflection(userMessageText, botResponse);
       
       // Generate audio for bot response
       try {
-        console.log('=== CHAT AUDIO DEBUG START ===');
-        console.log('Selected voice ID:', selectedReflectionVoice);
-        console.log('Bot response text:', botResponse.substring(0, 50) + '...');
-        
         const audioResponse = await fetch('/api/text-to-speech', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -304,50 +304,21 @@ const AppLayout = () => {
           })
         });
         
-        console.log('Audio response status:', audioResponse.status);
-        console.log('Audio response headers:', Object.fromEntries(audioResponse.headers.entries()));
-        
         if (audioResponse.ok) {
           const audioBlob = await audioResponse.blob();
-          console.log('Audio blob size:', audioBlob.size);
-          console.log('Audio blob type:', audioBlob.type);
           
           if (audioBlob.size > 0) {
             const audioUrl = URL.createObjectURL(audioBlob);
-            console.log('Audio URL created:', audioUrl);
             setLastBotAudio(audioUrl);
             
             const audio = new Audio(audioUrl);
             audio.volume = 1.0;
             
-            // Force audio to load and play immediately
-            audio.preload = 'auto';
-            audio.autoplay = false;
-            
-            // Add detailed audio event listeners
-            audio.addEventListener('loadstart', () => console.log('Audio loadstart'));
-            audio.addEventListener('loadeddata', () => console.log('Audio loadeddata'));
-            audio.addEventListener('canplay', () => console.log('Audio canplay'));
-            audio.addEventListener('canplaythrough', () => console.log('Audio canplaythrough'));
-            audio.addEventListener('play', () => console.log('Audio play event'));
-            audio.addEventListener('playing', () => console.log('Audio playing'));
-            audio.addEventListener('pause', () => console.log('Audio pause'));
             audio.addEventListener('ended', () => {
-              console.log('Audio ended');
               URL.revokeObjectURL(audioUrl);
             });
-            audio.addEventListener('error', (e) => {
-              console.error('Audio error:', e);
-              console.error('Audio error details:', audio.error);
-            });
             
-            // Load the audio first
-            console.log('Loading audio...');
-            audio.load();
-            
-            // Wait for audio to be ready and try to play
             const playAttempt = audio.play();
-            console.log('Play attempt:', playAttempt);
             
             if (playAttempt !== undefined) {
               playAttempt
@@ -356,23 +327,14 @@ const AppLayout = () => {
                 })
                 .catch(error => {
                   console.error('Audio play failed:', error);
-                  console.error('Error name:', error.name);
-                  console.error('Error message:', error.message);
                   
-                  // Store for manual play if autoplay fails
                   if (error.name === 'NotAllowedError') {
-                    console.log('Storing audio for manual play due to autoplay restriction');
                     setPendingAudio(audioUrl);
                   }
                 });
             }
-          } else {
-            console.error('Audio blob is empty');
           }
-        } else {
-          console.error('Audio response not ok:', audioResponse.status, audioResponse.statusText);
         }
-        console.log('=== CHAT AUDIO DEBUG END ===');
       } catch (audioError) {
         console.error('Error generating audio:', audioError);
       }
@@ -399,10 +361,6 @@ const AppLayout = () => {
 
   const generateAudioForText = async (text: string) => {
     try {
-      console.log('=== MANUAL AUDIO GENERATION START ===');
-      console.log('Generating audio for text:', text.substring(0, 50) + '...');
-      console.log('Using voice ID:', selectedReflectionVoice);
-      
       const response = await fetch('/api/text-to-speech', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -412,11 +370,8 @@ const AppLayout = () => {
         })
       });
       
-      console.log('Response status:', response.status);
-      
       if (response.ok) {
         const audioBlob = await response.blob();
-        console.log('Audio blob size:', audioBlob.size);
         
         if (audioBlob.size > 0) {
           const audioUrl = URL.createObjectURL(audioBlob);
@@ -424,10 +379,6 @@ const AppLayout = () => {
           
           audio.addEventListener('ended', () => {
             URL.revokeObjectURL(audioUrl);
-          });
-          
-          audio.addEventListener('error', (e) => {
-            console.error('Manual audio error:', e);
           });
           
           const playPromise = audio.play();
@@ -441,10 +392,7 @@ const AppLayout = () => {
               });
           }
         }
-      } else {
-        console.error('Audio response failed:', response.status);
       }
-      console.log('=== MANUAL AUDIO GENERATION END ===');
     } catch (error) {
       console.error('Error generating manual audio:', error);
     }
@@ -452,18 +400,14 @@ const AppLayout = () => {
 
   const enableAudio = async () => {
     try {
-      // Create and resume audio context
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       if (audioContext.state === 'suspended') {
         await audioContext.resume();
       }
       
       setAudioEnabled(true);
-      console.log('Audio enabled successfully');
       
-      // Play pending audio if any
       if (pendingAudio) {
-        console.log('Playing pending audio...');
         const audio = new Audio(pendingAudio);
         audio.addEventListener('ended', () => {
           URL.revokeObjectURL(pendingAudio);
@@ -521,26 +465,6 @@ const AppLayout = () => {
               <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                 Your therapeutic companion for mental wellness and self-reflection. Start sharing your thoughts below.
               </p>
-              
-              {/* Quick Action Buttons */}
-              <div className="flex gap-3 justify-center">
-                <button 
-                  onClick={() => setActiveSection('voice')}
-                  className="flex items-center justify-center w-24 h-12 rounded-2xl shadow-sm"
-                  style={{ backgroundColor: 'var(--pale-green)' }}
-                >
-                  <Mic className="w-5 h-5 mr-1" style={{ color: 'var(--text-primary)' }} />
-                  <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Voice Input</span>
-                </button>
-                <button 
-                  onClick={() => setActiveSection('memory')}
-                  className="flex items-center justify-center w-24 h-12 rounded-2xl shadow-sm"
-                  style={{ backgroundColor: 'var(--gentle-lavender)' }}
-                >
-                  <Brain className="w-5 h-5 mr-1" style={{ color: 'var(--text-primary)' }} />
-                  <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Memory</span>
-                </button>
-              </div>
             </div>
 
             {/* Chat Messages */}
@@ -601,7 +525,6 @@ const AppLayout = () => {
       case 'reflect':
         return (
           <div className="p-4 h-full flex flex-col">
-            {/* Mobile-optimized header */}
             <div className="mb-4">
               <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Daily Reflection</h2>
               <button
@@ -617,7 +540,6 @@ const AppLayout = () => {
               </button>
             </div>
 
-            {/* Mobile-optimized content */}
             <div className="flex-1 overflow-y-auto rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
               <div className="whitespace-pre-wrap text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
                 {weeklySummary}
@@ -628,99 +550,102 @@ const AppLayout = () => {
 
       case 'daily':
         return (
-          <div className="p-4 h-full flex flex-col space-y-4">
-            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Daily Inspiration</h2>
+          <div className="p-4 h-full flex flex-col">
+            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Daily Inspiration</h2>
             
-            {/* Zodiac Sign Selector - Mobile optimized */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Your Zodiac Sign:</label>
-              <select
-                value={selectedZodiacSign}
-                onChange={(e) => handleZodiacChange(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg text-sm border"
-                style={{ 
-                  borderColor: 'var(--gentle-lavender-dark)',
-                  backgroundColor: 'var(--surface-secondary)',
-                  color: 'var(--text-primary)'
-                }}
-              >
-                <option value="">Random Sign</option>
-                <option value="aries">♈ Aries (Mar 21 - Apr 19)</option>
-                <option value="taurus">♉ Taurus (Apr 20 - May 20)</option>
-                <option value="gemini">♊ Gemini (May 21 - Jun 20)</option>
-                <option value="cancer">♋ Cancer (Jun 21 - Jul 22)</option>
-                <option value="leo">♌ Leo (Jul 23 - Aug 22)</option>
-                <option value="virgo">♍ Virgo (Aug 23 - Sep 22)</option>
-                <option value="libra">♎ Libra (Sep 23 - Oct 22)</option>
-                <option value="scorpio">♏ Scorpio (Oct 23 - Nov 21)</option>
-                <option value="sagittarius">♐ Sagittarius (Nov 22 - Dec 21)</option>
-                <option value="capricorn">♑ Capricorn (Dec 22 - Jan 19)</option>
-                <option value="aquarius">♒ Aquarius (Jan 20 - Feb 18)</option>
-                <option value="pisces">♓ Pisces (Feb 19 - Mar 20)</option>
-              </select>
-            </div>
-            
-            {/* Daily Affirmation Section - Mobile optimized */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
-              <div className="flex items-center mb-3">
-                <Sun className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Affirmation</h3>
+            {/* Scrollable content area */}
+            <div className="flex-1 overflow-y-auto space-y-4 pb-4">
+              {/* Zodiac Sign Selector - Mobile optimized */}
+              <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Your Zodiac Sign:</label>
+                <select
+                  value={selectedZodiacSign}
+                  onChange={(e) => handleZodiacChange(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg text-sm border"
+                  style={{ 
+                    borderColor: 'var(--gentle-lavender-dark)',
+                    backgroundColor: 'var(--surface-secondary)',
+                    color: 'var(--text-primary)'
+                  }}
+                >
+                  <option value="">Random Sign</option>
+                  <option value="aries">♈ Aries (Mar 21 - Apr 19)</option>
+                  <option value="taurus">♉ Taurus (Apr 20 - May 20)</option>
+                  <option value="gemini">♊ Gemini (May 21 - Jun 20)</option>
+                  <option value="cancer">♋ Cancer (Jun 21 - Jul 22)</option>
+                  <option value="leo">♌ Leo (Jul 23 - Aug 22)</option>
+                  <option value="virgo">♍ Virgo (Aug 23 - Sep 22)</option>
+                  <option value="libra">♎ Libra (Sep 23 - Oct 22)</option>
+                  <option value="scorpio">♏ Scorpio (Oct 23 - Nov 21)</option>
+                  <option value="sagittarius">♐ Sagittarius (Nov 22 - Dec 21)</option>
+                  <option value="capricorn">♑ Capricorn (Dec 22 - Jan 19)</option>
+                  <option value="aquarius">♒ Aquarius (Jan 20 - Feb 18)</option>
+                  <option value="pisces">♓ Pisces (Feb 19 - Mar 20)</option>
+                </select>
               </div>
-              <div className="bg-white/60 rounded-xl p-3 mb-3">
-                <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-primary)' }}>
-                  "{dailyAffirmation}"
-                </p>
+              
+              {/* Daily Affirmation Section - Mobile optimized */}
+              <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
+                <div className="flex items-center mb-3">
+                  <Sun className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Affirmation</h3>
+                </div>
+                <div className="bg-white/60 rounded-xl p-3 mb-3">
+                  <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-primary)' }}>
+                    "{dailyAffirmation}"
+                  </p>
+                </div>
+                <button
+                  onClick={() => generateAudioForText(dailyAffirmation)}
+                  className="w-full px-4 py-2 rounded-xl text-sm font-medium shadow-sm"
+                  style={{ 
+                    backgroundColor: 'var(--soft-blue-dark)',
+                    color: 'white'
+                  }}
+                >
+                  🔊 Listen to Affirmation
+                </button>
               </div>
-              <button
-                onClick={() => generateAudioForText(dailyAffirmation)}
-                className="w-full px-4 py-2 rounded-xl text-sm font-medium shadow-sm"
-                style={{ 
-                  backgroundColor: 'var(--soft-blue-dark)',
-                  color: 'white'
-                }}
-              >
-                🔊 Listen to Affirmation
-              </button>
-            </div>
 
-            {/* Daily Horoscope Section - Mobile optimized */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
-              <div className="flex items-center mb-3">
-                <Star className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  Daily Horoscope {zodiacSign && `- ${zodiacSign}`}
-                </h3>
+              {/* Daily Horoscope Section - Mobile optimized */}
+              <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+                <div className="flex items-center mb-3">
+                  <Star className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                    Daily Horoscope {zodiacSign && `- ${zodiacSign}`}
+                  </h3>
+                </div>
+                <div className="bg-white/60 rounded-xl p-3 mb-3">
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+                    {dailyHoroscope}
+                  </p>
+                </div>
+                <button
+                  onClick={() => generateAudioForText(dailyHoroscope)}
+                  className="w-full px-4 py-2 rounded-xl text-sm font-medium shadow-sm"
+                  style={{ 
+                    backgroundColor: 'var(--soft-blue-dark)',
+                    color: 'white'
+                  }}
+                >
+                  🔊 Listen to Horoscope
+                </button>
               </div>
-              <div className="bg-white/60 rounded-xl p-3 mb-3">
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
-                  {dailyHoroscope}
-                </p>
-              </div>
-              <button
-                onClick={() => generateAudioForText(dailyHoroscope)}
-                className="w-full px-4 py-2 rounded-xl text-sm font-medium shadow-sm"
-                style={{ 
-                  backgroundColor: 'var(--soft-blue-dark)',
-                  color: 'white'
-                }}
-              >
-                🔊 Listen to Horoscope
-              </button>
-            </div>
 
-            {/* Refresh Daily Content - Mobile optimized */}
-            <div className="mt-4">
-              <button
-                onClick={() => handleZodiacChange(selectedZodiacSign)}
-                className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm flex items-center justify-center"
-                style={{ 
-                  backgroundColor: 'var(--surface-secondary)',
-                  color: 'var(--text-primary)'
-                }}
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Get New Daily Content
-              </button>
+              {/* Refresh Daily Content - Mobile optimized */}
+              <div className="mt-4">
+                <button
+                  onClick={() => handleZodiacChange(selectedZodiacSign)}
+                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm flex items-center justify-center"
+                  style={{ 
+                    backgroundColor: 'var(--surface-secondary)',
+                    color: 'var(--text-primary)'
+                  }}
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Get New Daily Content
+                </button>
+              </div>
             </div>
           </div>
         );
@@ -810,29 +735,6 @@ const AppLayout = () => {
               )}
             </div>
 
-            {/* Voice Controls - Mobile optimized */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
-              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Voice Controls</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Voice Recording</span>
-                  <button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium shadow-sm ${isRecording ? 'animate-pulse' : ''}`}
-                    style={{ 
-                      backgroundColor: isRecording ? '#EF4444' : 'var(--soft-blue-dark)',
-                      color: 'white'
-                    }}
-                  >
-                    {isRecording ? 'Stop Recording' : 'Start Recording'}
-                  </button>
-                </div>
-                <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Press 'R' key in chat to quickly toggle voice recording
-                </div>
-              </div>
-            </div>
-
             {/* Voice Selection - Mobile optimized */}
             <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
               <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Voice Selection</h3>
@@ -857,7 +759,10 @@ const AppLayout = () => {
       <QueryClientProvider client={queryClient}>
         <OnboardingQuiz 
           userId={1} 
-          onComplete={() => setShowOnboarding(false)} 
+          onComplete={() => {
+            setShowOnboarding(false);
+            localStorage.setItem('onboardingCompleted', 'true');
+          }} 
         />
       </QueryClientProvider>
     );
@@ -975,111 +880,6 @@ const AppLayout = () => {
   );
 };
 
-interface GoalEditorProps {
-  goal: Goal | null;
-  onSave: (goalData: Omit<Goal, 'id'>) => void;
-  onCancel: () => void;
-  onDelete?: () => void;
-}
-
-function GoalEditor({ goal, onSave, onCancel, onDelete }: GoalEditorProps) {
-  const [name, setName] = useState(goal?.name || '');
-  const [current, setCurrent] = useState(goal?.current || 0);
-  const [target, setTarget] = useState(goal?.target || 10);
-  const [color, setColor] = useState(goal?.color || 'blue');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim()) {
-      onSave({ name: name.trim(), current, target, color });
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-2">Goal Name</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-          placeholder="Enter goal name"
-          required
-        />
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">Current</label>
-          <input
-            type="number"
-            value={current}
-            onChange={(e) => setCurrent(Number(e.target.value))}
-            className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-            min="0"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">Target</label>
-          <input
-            type="number"
-            value={target}
-            onChange={(e) => setTarget(Number(e.target.value))}
-            className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-            min="1"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-2">Color</label>
-        <select
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-          className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-        >
-          <option value="blue">Blue</option>
-          <option value="green">Green</option>
-          <option value="purple">Purple</option>
-          <option value="red">Red</option>
-          <option value="yellow">Yellow</option>
-          <option value="pink">Pink</option>
-        </select>
-      </div>
-
-      <div className="flex gap-3">
-        <button
-          type="submit"
-          className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium"
-        >
-          {goal ? 'Update Goal' : 'Create Goal'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 bg-zinc-600 hover:bg-zinc-700 rounded text-white font-medium"
-        >
-          Cancel
-        </button>
-        {goal && onDelete && (
-          <button
-            type="button"
-            onClick={onDelete}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-medium"
-          >
-            Delete
-          </button>
-        )}
-      </div>
-    </form>
-  );
-}
-
-function AppWithOnboarding() {
-  return <AppLayout />;
-}
-
 export default function App() {
-  return <AppWithOnboarding />;
+  return <AppLayout />;
 }
