@@ -12,6 +12,14 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
 ## Recent Changes
+### June 19, 2025 - Mobile Interface Critical Fixes Completed
+- **Voice input accessibility fixed**: Chat input with microphone button now always visible on all sections for immediate voice access
+- **Send button visibility restored**: Fixed missing send button in mobile chat input for message submission
+- **Content scrolling enabled**: All sections now properly scrollable to view complete content without cutoff
+- **Mobile horoscope functionality**: Added zodiac sign selection and daily horoscope content to Daily section
+- **Mobile-optimized layouts**: Converted all sections to mobile-first design with therapeutic color scheme maintained
+- **Touch interaction improvements**: Enhanced button sizing and spacing for optimal mobile usability
+
 ### June 18, 2025 - Mobile-First Interface Redesign Completed
 - **Primary mobile optimization**: Complete mobile-first redesign as requested by user for mobile-primary usage
 - **Therapeutic mobile UI**: Implemented calming pastel design with rounded corners, larger touch targets, and mobile-optimized layouts
