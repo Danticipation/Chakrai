@@ -524,7 +524,7 @@ const AppLayout = () => {
 
       case 'reflect':
         return (
-          <div className="p-4 h-full flex flex-col">
+          <div className="p-4">
             <div className="mb-4">
               <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Daily Reflection</h2>
               <button
@@ -540,7 +540,7 @@ const AppLayout = () => {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
               <div className="whitespace-pre-wrap text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
                 {weeklySummary}
               </div>
@@ -550,11 +550,11 @@ const AppLayout = () => {
 
       case 'daily':
         return (
-          <div className="p-4 h-full flex flex-col">
+          <div className="p-4">
             <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Daily Inspiration</h2>
             
-            {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto space-y-4 pb-4">
+            {/* Content area */}
+            <div className="space-y-4 pb-4">
               {/* Zodiac Sign Selector - Mobile optimized */}
               <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Your Zodiac Sign:</label>
@@ -652,14 +652,14 @@ const AppLayout = () => {
 
       case 'memory':
         return (
-          <div className="p-6 max-w-4xl mx-auto">
+          <div className="p-4">
             <MemoryDashboard userId={1} />
           </div>
         );
 
       case 'progress':
         return (
-          <div className="p-4 h-full flex flex-col">
+          <div className="p-4">
             <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Wellness Progress</h2>
             
             {/* Bot Growth Stats - Mobile optimized */}
@@ -708,7 +708,7 @@ const AppLayout = () => {
 
       case 'voice':
         return (
-          <div className="p-4 h-full flex flex-col space-y-4">
+          <div className="p-4 space-y-4">
             <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Voice Settings</h2>
             
             {/* Audio Status - Mobile optimized */}
@@ -783,8 +783,10 @@ const AppLayout = () => {
         </div>
 
         {/* Mobile Content */}
-        <div className="flex-1 overflow-y-auto" style={{ paddingBottom: '200px' }}>
-          {renderActiveSection()}
+        <div className="mobile-scroll-container">
+          <div className="mobile-content">
+            {renderActiveSection()}
+          </div>
         </div>
 
         {/* Mobile Chat Input - Always visible and floating */}
