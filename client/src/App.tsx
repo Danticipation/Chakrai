@@ -812,45 +812,49 @@ const AppLayout = () => {
           </div>
           
           {/* Input Area */}
-          <div className="flex items-center gap-1 pl-2 pr-1 pb-3">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Share your thoughts..."
-              className="flex-1 p-2 text-sm rounded-lg border focus:outline-none focus:ring-0 min-w-0"
-              style={{ 
-                borderColor: 'var(--gentle-lavender-dark)',
-                backgroundColor: 'var(--surface-secondary)',
-                color: 'var(--text-primary)'
-              }}
-            />
-            <button
-              onClick={isRecording ? stopRecording : startRecording}
-              className={`p-2 rounded-lg w-9 h-9 flex items-center justify-center shadow-sm transition-all flex-shrink-0 ${
-                isRecording ? 'animate-pulse' : ''
-              }`}
-              style={{ 
-                backgroundColor: isRecording ? '#EF4444' : 'var(--pale-green)',
-                color: isRecording ? 'white' : 'var(--text-primary)'
-              }}
-              title={isRecording ? "Stop Recording" : "Start Voice Recording"}
-            >
-              {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </button>
-            <button
-              onClick={sendMessage}
-              disabled={!input.trim() || loading}
-              className="p-2 rounded-lg w-9 h-9 flex items-center justify-center shadow-sm transition-all disabled:opacity-50 flex-shrink-0"
-              style={{ 
-                backgroundColor: '#4F46E5',
-                color: 'white'
-              }}
-              title="Send Message"
-            >
-              <Send className="w-4 h-4" />
-            </button>
+          <div className="flex items-stretch gap-1 px-1 pb-2">
+            <div className="flex-1 flex">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Share your thoughts..."
+                className="w-full p-2 text-sm rounded-l-lg border-r-0 border focus:outline-none focus:ring-0"
+                style={{ 
+                  borderColor: 'var(--gentle-lavender-dark)',
+                  backgroundColor: 'var(--surface-secondary)',
+                  color: 'var(--text-primary)'
+                }}
+              />
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`px-3 border-l-0 border border-r-0 bg-blue-100 flex items-center justify-center transition-all ${
+                  isRecording ? 'animate-pulse bg-red-500' : ''
+                }`}
+                style={{ 
+                  borderColor: 'var(--gentle-lavender-dark)',
+                  backgroundColor: isRecording ? '#EF4444' : '#E0F2FE',
+                  color: isRecording ? 'white' : '#0369A1'
+                }}
+                title={isRecording ? "Stop Recording" : "Start Voice Recording"}
+              >
+                {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </button>
+              <button
+                onClick={sendMessage}
+                disabled={!input.trim() || loading}
+                className="px-3 rounded-r-lg border transition-all disabled:opacity-50"
+                style={{ 
+                  backgroundColor: '#4F46E5',
+                  borderColor: '#4338CA',
+                  color: 'white'
+                }}
+                title="Send Message"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
