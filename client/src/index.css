@@ -51,7 +51,7 @@ html, body, #root {
 
 /* Mobile scrolling fixes */
 .mobile-scroll-container {
-  height: calc(100vh - 140px); /* Account for header + nav */
+  height: calc(100vh - 240px); /* Account for header + nav + input area */
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -60,7 +60,7 @@ html, body, #root {
 /* Fix mobile viewport issues */
 @supports (-webkit-touch-callout: none) {
   .mobile-scroll-container {
-    height: calc(100vh - 140px - env(safe-area-inset-bottom));
+    height: calc(100vh - 240px - env(safe-area-inset-bottom));
   }
 }
 

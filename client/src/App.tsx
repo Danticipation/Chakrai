@@ -456,14 +456,14 @@ const AppLayout = () => {
       case 'chat':
         return (
           <div className="flex flex-col h-full">
-            {/* Welcome Section for Mobile */}
-            <div className="p-4 text-center" style={{ backgroundColor: 'var(--soft-blue)' }}>
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                <img src={traiLogo} alt="TrAI Logo" className="w-12 h-12" />
+            {/* Compact Welcome Section for Mobile */}
+            <div className="p-3 text-center" style={{ backgroundColor: 'var(--soft-blue)' }}>
+              <div className="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                <img src={traiLogo} alt="TrAI Logo" className="w-8 h-8" />
               </div>
-              <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Welcome to TraI</h2>
-              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                Your therapeutic companion for mental wellness and self-reflection. Start sharing your thoughts below.
+              <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Welcome to TraI</h2>
+              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                Your therapeutic companion for mental wellness
               </p>
             </div>
 
@@ -812,14 +812,14 @@ const AppLayout = () => {
           </div>
           
           {/* Input Area */}
-          <div className="flex items-center gap-2 px-4 pb-4">
+          <div className="flex items-center gap-3 px-4 pb-4">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Share your thoughts..."
-              className="flex-1 p-3 text-base rounded-2xl border-2 focus:outline-none focus:ring-0"
+              className="flex-1 p-4 text-base rounded-2xl border-2 focus:outline-none focus:ring-0"
               style={{ 
                 borderColor: 'var(--gentle-lavender-dark)',
                 backgroundColor: 'var(--surface-secondary)',
@@ -828,7 +828,7 @@ const AppLayout = () => {
             />
             <button
               onClick={isRecording ? stopRecording : startRecording}
-              className={`p-3 rounded-2xl min-w-[48px] min-h-[48px] flex items-center justify-center shadow-lg transition-all ${
+              className={`p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all ${
                 isRecording ? 'animate-pulse' : ''
               }`}
               style={{ 
@@ -837,19 +837,20 @@ const AppLayout = () => {
               }}
               title={isRecording ? "Stop Recording" : "Start Voice Recording"}
             >
-              {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
             </button>
             <button
               onClick={sendMessage}
               disabled={!input.trim() || loading}
-              className="p-3 rounded-2xl min-w-[48px] min-h-[48px] flex items-center justify-center shadow-lg transition-all disabled:opacity-50"
+              className="p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all disabled:opacity-50 border-2"
               style={{ 
-                backgroundColor: 'var(--soft-blue-dark)',
+                backgroundColor: '#4F46E5',
+                borderColor: '#4338CA',
                 color: 'white'
               }}
               title="Send Message"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-6 h-6" />
             </button>
           </div>
         </div>
