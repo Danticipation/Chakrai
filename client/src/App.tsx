@@ -61,7 +61,7 @@ const AppLayout = () => {
   const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
   const [zodiacSign, setZodiacSign] = useState<string>('');
   const [selectedZodiacSign, setSelectedZodiacSign] = useState<string>('');
-  const [dailyReflection, setDailyReflection] = useState<string>('Your reflection will appear here as you interact with your therapeutic companion.');
+  const [dailyReflection, setDailyReflection] = useState<string>('Your reflection will appear here as you interact with your TrAI.');
   
   // Goal tracking state
   const [goals, setGoals] = useState<Goal[]>([
@@ -751,78 +751,95 @@ const AppLayout = () => {
 
       case 'daily':
         return (
-          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Daily Inspiration</h2>
-              <div className="flex items-center gap-3">
-                <label className="text-sm font-medium text-zinc-300">Your Zodiac Sign:</label>
-                <select
-                  value={selectedZodiacSign}
-                  onChange={(e) => handleZodiacChange(e.target.value)}
-                  className="px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white text-sm"
-                >
-                  <option value="">Random Sign</option>
-                  <option value="aries">♈ Aries (Mar 21 - Apr 19)</option>
-                  <option value="taurus">♉ Taurus (Apr 20 - May 20)</option>
-                  <option value="gemini">♊ Gemini (May 21 - Jun 20)</option>
-                  <option value="cancer">♋ Cancer (Jun 21 - Jul 22)</option>
-                  <option value="leo">♌ Leo (Jul 23 - Aug 22)</option>
-                  <option value="virgo">♍ Virgo (Aug 23 - Sep 22)</option>
-                  <option value="libra">♎ Libra (Sep 23 - Oct 22)</option>
-                  <option value="scorpio">♏ Scorpio (Oct 23 - Nov 21)</option>
-                  <option value="sagittarius">♐ Sagittarius (Nov 22 - Dec 21)</option>
-                  <option value="capricorn">♑ Capricorn (Dec 22 - Jan 19)</option>
-                  <option value="aquarius">♒ Aquarius (Jan 20 - Feb 18)</option>
-                  <option value="pisces">♓ Pisces (Feb 19 - Mar 20)</option>
-                </select>
-              </div>
+          <div className="p-4 h-full flex flex-col space-y-4">
+            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Daily Inspiration</h2>
+            
+            {/* Zodiac Sign Selector - Mobile optimized */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Your Zodiac Sign:</label>
+              <select
+                value={selectedZodiacSign}
+                onChange={(e) => handleZodiacChange(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg text-sm border"
+                style={{ 
+                  borderColor: 'var(--gentle-lavender-dark)',
+                  backgroundColor: 'var(--surface-secondary)',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                <option value="">Random Sign</option>
+                <option value="aries">♈ Aries (Mar 21 - Apr 19)</option>
+                <option value="taurus">♉ Taurus (Apr 20 - May 20)</option>
+                <option value="gemini">♊ Gemini (May 21 - Jun 20)</option>
+                <option value="cancer">♋ Cancer (Jun 21 - Jul 22)</option>
+                <option value="leo">♌ Leo (Jul 23 - Aug 22)</option>
+                <option value="virgo">♍ Virgo (Aug 23 - Sep 22)</option>
+                <option value="libra">♎ Libra (Sep 23 - Oct 22)</option>
+                <option value="scorpio">♏ Scorpio (Oct 23 - Nov 21)</option>
+                <option value="sagittarius">♐ Sagittarius (Nov 22 - Dec 21)</option>
+                <option value="capricorn">♑ Capricorn (Dec 22 - Jan 19)</option>
+                <option value="aquarius">♒ Aquarius (Jan 20 - Feb 18)</option>
+                <option value="pisces">♓ Pisces (Feb 19 - Mar 20)</option>
+              </select>
             </div>
             
-            {/* Daily Affirmation Section */}
-            <div className="bg-gradient-to-br from-amber-600/20 to-orange-600/20 rounded-lg p-6 mb-6 border border-amber-500/30">
-              <div className="flex items-center mb-4">
-                <Sun className="w-6 h-6 text-amber-400 mr-3" />
-                <h3 className="text-xl font-semibold text-amber-300">Daily Affirmation</h3>
+            {/* Daily Affirmation Section - Mobile optimized */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
+              <div className="flex items-center mb-3">
+                <Sun className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Affirmation</h3>
               </div>
-              <div className="bg-zinc-800/50 rounded-lg p-4">
-                <p className="text-zinc-100 text-lg leading-relaxed italic">
+              <div className="bg-white/60 rounded-xl p-3 mb-3">
+                <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-primary)' }}>
                   "{dailyAffirmation}"
                 </p>
               </div>
               <button
                 onClick={() => generateAudioForText(dailyAffirmation)}
-                className="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 rounded text-white text-sm font-medium transition-colors"
+                className="w-full px-4 py-2 rounded-xl text-sm font-medium shadow-sm"
+                style={{ 
+                  backgroundColor: 'var(--soft-blue-dark)',
+                  color: 'white'
+                }}
               >
                 🔊 Listen to Affirmation
               </button>
             </div>
 
-            {/* Daily Horoscope Section */}
-            <div className="bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-lg p-6 border border-purple-500/30">
-              <div className="flex items-center mb-4">
-                <Star className="w-6 h-6 text-purple-400 mr-3" />
-                <h3 className="text-xl font-semibold text-purple-300">
+            {/* Daily Horoscope Section - Mobile optimized */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+              <div className="flex items-center mb-3">
+                <Star className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                   Daily Horoscope {zodiacSign && `- ${zodiacSign}`}
                 </h3>
               </div>
-              <div className="bg-zinc-800/50 rounded-lg p-4">
-                <p className="text-zinc-100 text-lg leading-relaxed">
+              <div className="bg-white/60 rounded-xl p-3 mb-3">
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
                   {dailyHoroscope}
                 </p>
               </div>
               <button
                 onClick={() => generateAudioForText(dailyHoroscope)}
-                className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium transition-colors"
+                className="w-full px-4 py-2 rounded-xl text-sm font-medium shadow-sm"
+                style={{ 
+                  backgroundColor: 'var(--soft-blue-dark)',
+                  color: 'white'
+                }}
               >
                 🔊 Listen to Horoscope
               </button>
             </div>
 
-            {/* Refresh Daily Content */}
-            <div className="mt-6 text-center">
+            {/* Refresh Daily Content - Mobile optimized */}
+            <div className="mt-4">
               <button
                 onClick={() => handleZodiacChange(selectedZodiacSign)}
-                className="px-6 py-2 bg-zinc-700 hover:bg-zinc-600 rounded text-white text-sm font-medium transition-colors flex items-center mx-auto"
+                className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm flex items-center justify-center"
+                style={{ 
+                  backgroundColor: 'var(--surface-secondary)',
+                  color: 'var(--text-primary)'
+                }}
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Get New Daily Content
@@ -889,119 +906,60 @@ const AppLayout = () => {
 
       case 'voice':
         return (
-          <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
-            <h2 className="text-2xl font-bold mb-6">Voice Settings</h2>
+          <div className="p-4 h-full flex flex-col space-y-4">
+            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Voice Settings</h2>
             
-            <div className="bg-zinc-800 rounded-lg p-6 mb-6">
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">Audio Status</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span>Audio Enabled</span>
-                  <span className={`px-3 py-1 rounded-full text-sm ${audioEnabled ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
-                    {audioEnabled ? 'Active' : 'Disabled'}
-                  </span>
-                </div>
-                {!audioEnabled && (
-                  <button
-                    onClick={enableAudio}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white"
-                  >
-                    Enable Audio
-                  </button>
-                )}
+            {/* Audio Status - Mobile optimized */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Audio Status</h3>
+              <div className="flex items-center justify-between mb-4">
+                <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Audio Enabled</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${audioEnabled ? 'text-white' : 'text-white'}`}
+                  style={{ backgroundColor: audioEnabled ? '#10B981' : '#EF4444' }}>
+                  {audioEnabled ? 'Active' : 'Disabled'}
+                </span>
               </div>
+              {!audioEnabled && (
+                <button
+                  onClick={enableAudio}
+                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
+                  style={{ 
+                    backgroundColor: 'var(--soft-blue-dark)',
+                    color: 'white'
+                  }}
+                >
+                  🔊 Enable Audio
+                </button>
+              )}
             </div>
 
-            <div className="bg-zinc-800 rounded-lg p-6 mb-6">
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">Voice Controls</h3>
-              <div className="space-y-4">
+            {/* Voice Controls - Mobile optimized */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
+              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Voice Controls</h3>
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span>Voice Recording</span>
+                  <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Voice Recording</span>
                   <button
                     onClick={isRecording ? stopRecording : startRecording}
-                    className={`px-4 py-2 rounded ${isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium shadow-sm ${isRecording ? 'animate-pulse' : ''}`}
+                    style={{ 
+                      backgroundColor: isRecording ? '#EF4444' : 'var(--soft-blue-dark)',
+                      color: 'white'
+                    }}
                   >
                     {isRecording ? 'Stop Recording' : 'Start Recording'}
                   </button>
                 </div>
-                <div className="text-sm text-zinc-400">
+                <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                   Press 'R' key in chat to quickly toggle voice recording
                 </div>
               </div>
             </div>
 
-            <div className="bg-zinc-800 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">Bot Voice Selection</h3>
-              <div className="space-y-4">
-                <p className="text-sm text-zinc-400">Choose the voice for all bot responses (chat, reflections, etc.)</p>
-                <select
-                  value={selectedReflectionVoice}
-                  onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                  className="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded text-white"
-                >
-                  {voiceOptions.map(voice => (
-                    <option key={voice.id} value={voice.id}>{voice.name} - {voice.description}</option>
-                  ))}
-                </select>
-                <div className="text-sm text-zinc-300">
-                  Currently selected: <span className="font-medium text-purple-400">
-                    {voiceOptions.find(v => v.id === selectedReflectionVoice)?.name || 'James'}
-                  </span>
-                </div>
-                <button
-                  onClick={() => generateAudioForText("Hello! This is how I will sound in our conversations.")}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white w-full"
-                >
-                  Test Selected Voice
-                </button>
-                <button
-                  onClick={async () => {
-                    const response = await fetch('/api/text-to-speech', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ 
-                        text: 'Direct audio test with visible controls',
-                        voiceId: selectedReflectionVoice
-                      })
-                    });
-                    const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
-                    const audio = new Audio(url);
-                    audio.controls = true;
-                    audio.style.width = '100%';
-                    document.body.appendChild(audio);
-                    console.log('Audio element added to page with controls');
-                  }}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white w-full mt-2"
-                >
-                  Direct Audio Test (With Controls)
-                </button>
-                <button
-                  onClick={async () => {
-                    const response = await fetch('/api/text-to-speech', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ 
-                        text: 'Download test - this file should play the selected voice when downloaded',
-                        voiceId: selectedReflectionVoice
-                      })
-                    });
-                    const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `elevenlabs-voice-test-${Date.now()}.mp3`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                    console.log('Audio file downloaded');
-                  }}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white w-full mt-2"
-                >
-                  Download Audio Test
-                </button>
-              </div>
+            {/* Voice Selection - Mobile optimized */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Voice Selection</h3>
+              <VoiceSelector userId={1} onVoiceChange={() => {}} />
             </div>
           </div>
         );
@@ -1100,7 +1058,7 @@ const AppLayout = () => {
         </div>
 
         {/* Mobile Content */}
-        <div className="flex-1 overflow-hidden" style={{ paddingBottom: '200px' }}>
+        <div className="flex-1 overflow-y-auto" style={{ paddingBottom: '200px' }}>
           {renderActiveSection()}
         </div>
 
@@ -1127,14 +1085,14 @@ const AppLayout = () => {
           </div>
           
           {/* Input Area */}
-          <div className="flex items-center gap-3 px-4 pb-4">
+          <div className="flex items-center gap-2 px-4 pb-4">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Share your thoughts..."
-              className="flex-1 p-4 text-base rounded-2xl border-2 focus:outline-none focus:ring-0"
+              className="flex-1 p-3 text-base rounded-2xl border-2 focus:outline-none focus:ring-0"
               style={{ 
                 borderColor: 'var(--gentle-lavender-dark)',
                 backgroundColor: 'var(--surface-secondary)',
@@ -1143,7 +1101,7 @@ const AppLayout = () => {
             />
             <button
               onClick={isRecording ? stopRecording : startRecording}
-              className={`p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all ${
+              className={`p-3 rounded-2xl min-w-[48px] min-h-[48px] flex items-center justify-center shadow-lg transition-all ${
                 isRecording ? 'animate-pulse' : ''
               }`}
               style={{ 
@@ -1152,19 +1110,19 @@ const AppLayout = () => {
               }}
               title={isRecording ? "Stop Recording" : "Start Voice Recording"}
             >
-              {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+              {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
             <button
               onClick={sendMessage}
               disabled={!input.trim() || loading}
-              className="p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all disabled:opacity-50"
+              className="p-3 rounded-2xl min-w-[48px] min-h-[48px] flex items-center justify-center shadow-lg transition-all disabled:opacity-50"
               style={{ 
                 backgroundColor: 'var(--soft-blue-dark)',
                 color: 'white'
               }}
               title="Send Message"
             >
-              <Send className="w-6 h-6" />
+              <Send className="w-5 h-5" />
             </button>
           </div>
         </div>
