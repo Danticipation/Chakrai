@@ -382,26 +382,35 @@ const AppLayout = () => {
       }
       
       // Test ElevenLabs API
-      const response = await axios.post('/api/text-to-speech', { 
-        text: 'Audio test successful' 
-      }, {
-        responseType: 'blob'
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text: 'Audio test successful',
+          voiceId: selectedReflectionVoice
+        })
       });
       
-      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      
-      audio.volume = 1.0;
-      audio.muted = false;
-      
-      audio.play().then(() => {
-        console.log('ElevenLabs TTS test successful');
-        setAudioEnabled(true);
-      }).catch(error => {
-        console.error('Audio playback blocked:', error);
-        setPendingAudio(audioUrl);
-      });
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        console.log('Test audio blob size:', audioBlob.size);
+        
+        if (audioBlob.size > 0) {
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioUrl);
+          
+          audio.volume = 1.0;
+          audio.muted = false;
+          
+          audio.play().then(() => {
+            console.log('ElevenLabs TTS test successful');
+            setAudioEnabled(true);
+          }).catch(error => {
+            console.log('Audio playback blocked:', error);
+            setPendingAudio(audioUrl);
+          });
+        }
+      }
       
       console.log('=== AUDIO TEST COMPLETE ===');
     } catch (error: any) {
@@ -490,27 +499,35 @@ const AppLayout = () => {
     if (!weeklySummary) return;
     
     try {
-      const response = await axios.post('/api/text-to-speech', { 
-        text: weeklySummary,
-        voiceId: selectedReflectionVoice 
-      }, {
-        responseType: 'blob'
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text: weeklySummary,
+          voiceId: selectedReflectionVoice 
+        })
       });
       
-      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      const audio = new Audio(audioUrl);
-      audio.volume = 1.0;
-      audio.play().then(() => {
-        console.log('Reflection audio playing');
-        setAudioEnabled(true);
-      }).catch(error => {
-        console.error('Reflection audio blocked:', error);
-        setPendingAudio(audioUrl);
-      });
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        console.log('Reflection audio blob size:', audioBlob.size);
+        
+        if (audioBlob.size > 0) {
+          const audioUrl = URL.createObjectURL(audioBlob);
+          
+          const audio = new Audio(audioUrl);
+          audio.volume = 1.0;
+          audio.play().then(() => {
+            console.log('Reflection audio playing successfully');
+            setAudioEnabled(true);
+          }).catch(error => {
+            console.log('Reflection audio playback failed:', error.message);
+            setPendingAudio(audioUrl);
+          });
+        }
+      }
     } catch (error) {
-      console.error('Reflection audio generation failed:', error);
+      console.log('Reflection audio generation error:', error);
     }
   };
 
