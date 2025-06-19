@@ -1081,22 +1081,22 @@ const AppLayout = () => {
       {/* Mobile Layout */}
       <div className="md:hidden h-full flex flex-col">
         {/* Mobile Header */}
-        <div className="bg-zinc-800 p-4 flex items-center justify-between shrink-0">
+        <div className="bg-white shadow-sm p-4 flex items-center justify-between shrink-0" style={{ borderBottom: '1px solid var(--gentle-lavender)' }}>
           <img 
             src={traiLogo}
             alt="TraI Vision Logo" 
             className="w-8 h-8 rounded-full object-cover"
           />
-          <h1 className="text-xl font-bold">TraI</h1>
+          <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>TraI</h1>
           {botStats && (
-            <div className="text-xs text-zinc-400">
-              Level {botStats.level} • {botStats.stage}
+            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+              Level {botStats.level}
             </div>
           )}
         </div>
 
-        {/* Mobile Content - Above navigation and input */}
-        <div className="flex-1 overflow-hidden pb-40">
+        {/* Mobile Content */}
+        <div className="flex-1 overflow-hidden" style={{ paddingBottom: activeSection === 'chat' ? '140px' : '80px' }}>
           {renderActiveSection()}
         </div>
 
