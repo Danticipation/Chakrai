@@ -1100,76 +1100,74 @@ const AppLayout = () => {
         </div>
 
         {/* Mobile Content */}
-        <div className="flex-1 overflow-hidden" style={{ paddingBottom: activeSection === 'chat' ? '140px' : '80px' }}>
+        <div className="flex-1 overflow-hidden" style={{ paddingBottom: '200px' }}>
           {renderActiveSection()}
         </div>
 
-        {/* Mobile Input Area - Fixed above navigation */}
-        {activeSection === 'chat' && (
-          <div className="fixed bottom-16 left-0 right-0 bg-white shadow-lg z-40" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
-            {/* Voice Selector */}
-            <div className="px-4 pt-3 pb-2">
-              <select
-                value={selectedReflectionVoice}
-                onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-                className="w-full px-3 py-2 bg-white border rounded-lg text-sm font-medium"
-                style={{ 
-                  borderColor: 'var(--gentle-lavender-dark)', 
-                  color: 'var(--text-primary)',
-                  backgroundColor: 'var(--surface-secondary)'
-                }}
-              >
-                {voiceOptions.map(voice => (
-                  <option key={voice.id} value={voice.id}>
-                    {voice.name} - {voice.description}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            {/* Input Area */}
-            <div className="flex items-center gap-3 px-4 pb-4">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Share your thoughts..."
-                className="flex-1 p-4 text-base rounded-2xl border-2 focus:outline-none focus:ring-0"
-                style={{ 
-                  borderColor: 'var(--gentle-lavender-dark)',
-                  backgroundColor: 'var(--surface-secondary)',
-                  color: 'var(--text-primary)'
-                }}
-              />
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all ${
-                  isRecording ? 'animate-pulse' : ''
-                }`}
-                style={{ 
-                  backgroundColor: isRecording ? '#EF4444' : 'var(--pale-green)',
-                  color: isRecording ? 'white' : 'var(--text-primary)'
-                }}
-                title={isRecording ? "Stop Recording" : "Start Voice Recording"}
-              >
-                {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-              </button>
-              <button
-                onClick={sendMessage}
-                disabled={!input.trim() || loading}
-                className="p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all disabled:opacity-50"
-                style={{ 
-                  backgroundColor: 'var(--soft-blue-dark)',
-                  color: 'white'
-                }}
-                title="Send Message"
-              >
-                <Send className="w-6 h-6" />
-              </button>
-            </div>
+        {/* Mobile Chat Input - Always visible and floating */}
+        <div className="fixed bottom-16 left-0 right-0 bg-white shadow-lg z-50 border-t" style={{ borderColor: 'var(--gentle-lavender-dark)' }}>
+          {/* Voice Selector */}
+          <div className="px-4 pt-3 pb-2">
+            <select
+              value={selectedReflectionVoice}
+              onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+              className="w-full px-3 py-2 bg-white border rounded-lg text-sm font-medium"
+              style={{ 
+                borderColor: 'var(--gentle-lavender-dark)', 
+                color: 'var(--text-primary)',
+                backgroundColor: 'var(--surface-secondary)'
+              }}
+            >
+              {voiceOptions.map(voice => (
+                <option key={voice.id} value={voice.id}>
+                  {voice.name} - {voice.description}
+                </option>
+              ))}
+            </select>
           </div>
-        )}
+          
+          {/* Input Area */}
+          <div className="flex items-center gap-3 px-4 pb-4">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Share your thoughts..."
+              className="flex-1 p-4 text-base rounded-2xl border-2 focus:outline-none focus:ring-0"
+              style={{ 
+                borderColor: 'var(--gentle-lavender-dark)',
+                backgroundColor: 'var(--surface-secondary)',
+                color: 'var(--text-primary)'
+              }}
+            />
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              className={`p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all ${
+                isRecording ? 'animate-pulse' : ''
+              }`}
+              style={{ 
+                backgroundColor: isRecording ? '#EF4444' : 'var(--pale-green)',
+                color: isRecording ? 'white' : 'var(--text-primary)'
+              }}
+              title={isRecording ? "Stop Recording" : "Start Voice Recording"}
+            >
+              {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+            </button>
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || loading}
+              className="p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all disabled:opacity-50"
+              style={{ 
+                backgroundColor: 'var(--soft-blue-dark)',
+                color: 'white'
+              }}
+              title="Send Message"
+            >
+              <Send className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
 
         {/* Mobile Bottom Navigation - Fixed position */}
         <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg mobile-nav z-50" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
