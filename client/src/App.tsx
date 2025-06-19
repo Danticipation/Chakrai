@@ -792,11 +792,11 @@ const AppLayout = () => {
         {/* Mobile Chat Input - Always visible and floating */}
         <div className="fixed bottom-16 left-0 right-0 bg-white shadow-lg z-50 border-t" style={{ borderColor: 'var(--gentle-lavender-dark)' }}>
           {/* Voice Selector */}
-          <div className="px-4 pt-3 pb-2">
+          <div className="px-3 pt-2 pb-1">
             <select
               value={selectedReflectionVoice}
               onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-              className="w-full px-3 py-2 bg-white border rounded-lg text-sm font-medium"
+              className="w-full px-2 py-1 bg-white border rounded-lg text-xs font-medium"
               style={{ 
                 borderColor: 'var(--gentle-lavender-dark)', 
                 color: 'var(--text-primary)',
@@ -812,14 +812,14 @@ const AppLayout = () => {
           </div>
           
           {/* Input Area */}
-          <div className="flex items-center gap-3 px-4 pb-4">
+          <div className="flex items-center gap-2 px-3 pb-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Share your thoughts..."
-              className="flex-1 p-4 text-base rounded-2xl border-2 focus:outline-none focus:ring-0"
+              className="flex-1 p-3 text-sm rounded-xl border focus:outline-none focus:ring-0"
               style={{ 
                 borderColor: 'var(--gentle-lavender-dark)',
                 backgroundColor: 'var(--surface-secondary)',
@@ -828,7 +828,7 @@ const AppLayout = () => {
             />
             <button
               onClick={isRecording ? stopRecording : startRecording}
-              className={`p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all ${
+              className={`p-3 rounded-xl w-12 h-12 flex items-center justify-center shadow-md transition-all ${
                 isRecording ? 'animate-pulse' : ''
               }`}
               style={{ 
@@ -837,20 +837,19 @@ const AppLayout = () => {
               }}
               title={isRecording ? "Stop Recording" : "Start Voice Recording"}
             >
-              {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+              {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
             <button
               onClick={sendMessage}
               disabled={!input.trim() || loading}
-              className="p-4 rounded-2xl min-w-[56px] min-h-[56px] flex items-center justify-center shadow-lg transition-all disabled:opacity-50 border-2"
+              className="p-3 rounded-xl w-12 h-12 flex items-center justify-center shadow-md transition-all disabled:opacity-50"
               style={{ 
                 backgroundColor: '#4F46E5',
-                borderColor: '#4338CA',
                 color: 'white'
               }}
               title="Send Message"
             >
-              <Send className="w-6 h-6" />
+              <Send className="w-5 h-5" />
             </button>
           </div>
         </div>
