@@ -245,10 +245,9 @@ export default function MoodTracker({ userId = 1 }: { userId?: number }) {
                     {entry.intensity}%
                   </div>
                   {entry.riskLevel !== 'low' && (
-                    <AlertTriangle 
-                      className="w-4 h-4 text-orange-500 ml-auto" 
-                      title={`Risk level: ${entry.riskLevel}`}
-                    />
+                    <div title={`Risk level: ${entry.riskLevel}`}>
+                      <AlertTriangle className="w-4 h-4 text-orange-500 ml-auto" />
+                    </div>
                   )}
                 </div>
               </div>

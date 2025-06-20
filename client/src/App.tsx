@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -81,6 +81,7 @@ const AppLayout = () => {
     { id: 'daily', icon: Sun, label: 'Daily' },
     { id: 'reflect', icon: Brain, label: 'Reflect' },
     { id: 'memory', icon: BookOpen, label: 'Memory' },
+    { id: 'mood', icon: Heart, label: 'Mood' },
     { id: 'progress', icon: Target, label: 'Progress' },
     { id: 'voice', icon: Mic, label: 'Voice' },
     { id: 'settings', icon: User, label: 'Settings' }
@@ -656,6 +657,13 @@ const AppLayout = () => {
         return (
           <div className="p-4">
             <MemoryDashboard userId={1} />
+          </div>
+        );
+
+      case 'mood':
+        return (
+          <div className="p-4">
+            <MoodTracker userId={1} />
           </div>
         );
 
