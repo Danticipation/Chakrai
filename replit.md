@@ -12,6 +12,13 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
 ## Recent Changes
+### June 19, 2025 - Real Horoscope API Integration Completed
+- **Live horoscope data**: Replaced static horoscope arrays with external horoscope API (horoscope-app-api.vercel.app)
+- **Daily fresh content**: Horoscopes now pull real daily readings that change each day based on actual astrological data
+- **Multi-layer fallback system**: External API → OpenAI-generated backup → static fallback for maximum reliability
+- **Authentic therapeutic experience**: Users now receive genuine daily horoscope guidance instead of repeating static messages
+- **Tested and verified**: API integration confirmed working with real-time data for all zodiac signs
+
 ### June 19, 2025 - Mobile Interface Optimization Completed
 - **Critical mobile scrolling fixes**: Resolved scrolling issues across all sections (Daily, Voice, Progress, Memory, Reflect)
 - **Enhanced mobile chat interface**: Increased send button size (56x56px) with bright purple color for better visibility  
