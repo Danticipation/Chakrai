@@ -764,6 +764,78 @@ const AppLayout = () => {
           </div>
         );
 
+      case 'settings':
+        return (
+          <div className="p-4 space-y-4">
+            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Settings</h2>
+            
+            {/* Profile Management */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Profile</h3>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('onboardingCompleted');
+                  window.location.reload();
+                }}
+                className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
+                style={{ 
+                  backgroundColor: 'var(--soft-blue-dark)',
+                  color: 'white'
+                }}
+              >
+                Retake Personality Quiz
+              </button>
+            </div>
+
+            {/* Data Management */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Data Management</h3>
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setMessages([]);
+                  }}
+                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
+                  style={{ 
+                    backgroundColor: '#F59E0B',
+                    color: 'white'
+                  }}
+                >
+                  Clear Chat History
+                </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      await axios.post('/api/clear-memories', { userId: 1 });
+                      setMessages([]);
+                    } catch (error) {
+                      console.error('Failed to clear memories:', error);
+                    }
+                  }}
+                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
+                  style={{ 
+                    backgroundColor: '#EF4444',
+                    color: 'white'
+                  }}
+                >
+                  Reset Bot Memory
+                </button>
+              </div>
+            </div>
+
+            {/* App Information */}
+            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
+              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>About TraI</h3>
+              <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
+                Your AI companion for mental wellness and self-reflection.
+              </p>
+              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                Version 2.0 - Enhanced with crisis detection and emotional intelligence
+              </p>
+            </div>
+          </div>
+        );
+
       default:
         return (
           <div className="flex flex-col h-full">
