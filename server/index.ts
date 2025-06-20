@@ -1482,7 +1482,7 @@ app.get('/api/journal/export/:id/download', async (req, res) => {
 app.get('/api/therapists', async (req, res) => {
   try {
     const { userId } = req.query;
-    const therapists = await storage.getTherapistsByUser(userId as string);
+    const therapists = await storage.getTherapistsByUser(parseInt(userId as string));
     res.json(therapists);
   } catch (error) {
     console.error('Failed to fetch therapists:', error);

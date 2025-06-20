@@ -79,16 +79,16 @@ export interface IStorage {
   updateJournalExport(id: number, updates: Partial<JournalExport>): Promise<JournalExport | undefined>;
 
   // Therapist integration methods
-  getTherapistsByUser(userId: string): Promise<Therapist[]>;
+  getTherapistsByUser(userId: number): Promise<Therapist[]>;
   createTherapist(therapist: InsertTherapist): Promise<Therapist>;
-  getTherapistSessionsByUser(userId: string): Promise<TherapistSession[]>;
+  getTherapistSessionsByUser(userId: number): Promise<TherapistSession[]>;
   createTherapistSession(session: InsertTherapistSession): Promise<TherapistSession>;
   updateTherapistSession(id: number, updates: Partial<TherapistSession>): Promise<TherapistSession | undefined>;
-  getTherapistSharedInsightsByUser(userId: string): Promise<TherapistSharedInsight[]>;
+  getTherapistSharedInsightsByUser(userId: number): Promise<TherapistSharedInsight[]>;
   createTherapistSharedInsight(insight: InsertTherapistSharedInsight): Promise<TherapistSharedInsight>;
-  getCollaborationSettings(userId: string): Promise<CollaborationSettings | undefined>;
+  getCollaborationSettings(userId: number): Promise<CollaborationSettings | undefined>;
   createCollaborationSettings(settings: InsertCollaborationSettings): Promise<CollaborationSettings>;
-  updateCollaborationSettings(userId: string, updates: Partial<CollaborationSettings>): Promise<CollaborationSettings | undefined>;
+  updateCollaborationSettings(userId: number, updates: Partial<CollaborationSettings>): Promise<CollaborationSettings | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -394,7 +394,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Therapist integration methods
-  async getTherapistsByUser(userId: string): Promise<Therapist[]> {
+  async getTherapistsByUser(userId: number): Promise<Therapist[]> {
     return await db.select().from(therapists)
       .where(eq(therapists.userId, userId))
       .orderBy(desc(therapists.createdAt));
@@ -405,7 +405,7 @@ export class DatabaseStorage implements IStorage {
     return therapist;
   }
 
-  async getTherapistSessionsByUser(userId: string): Promise<TherapistSession[]> {
+  async getTherapistSessionsByUser(userId: number): Promise<TherapistSession[]> {
     return await db.select().from(therapistSessions)
       .where(eq(therapistSessions.userId, userId))
       .orderBy(desc(therapistSessions.scheduledAt));
@@ -424,7 +424,7 @@ export class DatabaseStorage implements IStorage {
     return updated || undefined;
   }
 
-  async getTherapistSharedInsightsByUser(userId: string): Promise<TherapistSharedInsight[]> {
+  async getTherapistSharedInsightsByUser(userId: number): Promise<TherapistSharedInsight[]> {
     return await db.select().from(therapistSharedInsights)
       .where(eq(therapistSharedInsights.userId, userId))
       .orderBy(desc(therapistSharedInsights.sharedAt));
@@ -435,7 +435,7 @@ export class DatabaseStorage implements IStorage {
     return insight;
   }
 
-  async getCollaborationSettings(userId: string): Promise<CollaborationSettings | undefined> {
+  async getCollaborationSettings(userId: number): Promise<CollaborationSettings | undefined> {
     const [settings] = await db.select().from(collaborationSettings)
       .where(eq(collaborationSettings.userId, userId));
     return settings || undefined;
@@ -446,7 +446,7 @@ export class DatabaseStorage implements IStorage {
     return settings;
   }
 
-  async updateCollaborationSettings(userId: string, updates: Partial<CollaborationSettings>): Promise<CollaborationSettings | undefined> {
+  async updateCollaborationSettings(userId: number, updates: Partial<CollaborationSettings>): Promise<CollaborationSettings | undefined> {
     const [updated] = await db.update(collaborationSettings)
       .set(updates)
       .where(eq(collaborationSettings.userId, userId))

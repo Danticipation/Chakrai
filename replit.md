@@ -12,6 +12,16 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
 ## Recent Changes
+### June 20, 2025 - Professional Therapist Integration & Hybrid Therapy Model Completed
+- **Therapist Collaboration Portal**: Complete professional integration system enabling users to connect with licensed therapists and share therapeutic insights
+- **Scheduled Professional Check-Ins**: Full session management system with video/phone/in-person scheduling, AI-generated session preparation, and meeting link generation
+- **Automated Insight Sharing**: Intelligent system automatically shares journal summaries, mood patterns, crisis alerts, and progress reports with therapists based on user preferences
+- **Collaboration Settings**: Granular privacy controls allowing users to configure what data is shared (journal summaries, emotional patterns, progress metrics) and sharing frequency
+- **AI Session Preparation**: Automated generation of therapeutic session prep using recent journal entries and mood data to help therapists prepare for appointments
+- **Professional Database Architecture**: New therapist tables (therapists, therapistSessions, therapistSharedInsights, collaborationSettings) supporting full hybrid therapy workflow
+- **Therapist Portal Navigation**: Added dedicated Therapist section to main navigation with overview dashboard, session management, and collaboration settings
+- **Hybrid Therapy Model**: Complete integration between AI-powered self-therapy tools and professional therapeutic care for comprehensive mental health support
+
 ### June 20, 2025 - Comprehensive Therapeutic Journaling System Implemented
 - **AI-Assisted Journaling**: Complete journaling system with OpenAI GPT-4o analysis for emotional patterns, sentiment tracking, and therapeutic insights
 - **Exportable Professional Reports**: Three export formats - therapist reports with clinical recommendations, personal insights summaries, and raw CSV data for backup
