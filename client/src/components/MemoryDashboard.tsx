@@ -32,6 +32,11 @@ interface MemoryProfile {
 export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
   const { data: memoryProfile, isLoading, error } = useQuery<MemoryProfile>({
     queryKey: ['/api/memory-profile', userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/memory-profile?userId=${userId}`);
+      if (!response.ok) throw new Error('Failed to fetch memory profile');
+      return response.json();
+    },
     staleTime: 30000, // Cache for 30 seconds
     retry: 2,
   });
