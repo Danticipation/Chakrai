@@ -282,7 +282,7 @@ export type InsertJournalExport = z.infer<typeof insertJournalExportSchema>;
 // Therapist Integration Tables
 export const therapists = pgTable("therapists", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   name: varchar("name").notNull(),
   email: varchar("email").notNull(),
   licenseNumber: varchar("license_number"),
@@ -295,7 +295,7 @@ export const therapists = pgTable("therapists", {
 
 export const therapistSessions = pgTable("therapist_sessions", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   therapistId: integer("therapist_id").notNull().references(() => therapists.id),
   scheduledAt: timestamp("scheduled_at").notNull(),
   duration: integer("duration").default(60), // minutes
@@ -312,7 +312,7 @@ export const therapistSessions = pgTable("therapist_sessions", {
 
 export const therapistSharedInsights = pgTable("therapist_shared_insights", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   therapistId: integer("therapist_id").notNull().references(() => therapists.id),
   insightType: varchar("insight_type", { enum: ["journal_summary", "mood_patterns", "crisis_alert", "progress_report"] }).notNull(),
   content: jsonb("content").notNull(),
@@ -325,7 +325,7 @@ export const therapistSharedInsights = pgTable("therapist_shared_insights", {
 
 export const collaborationSettings = pgTable("collaboration_settings", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   autoShareJournalSummaries: boolean("auto_share_journal_summaries").default(false),
   shareFrequency: varchar("share_frequency", { enum: ["daily", "weekly", "biweekly", "monthly"] }).default("weekly"),
   allowCrisisAlerts: boolean("allow_crisis_alerts").default(true),
