@@ -30,14 +30,15 @@ interface MemoryProfile {
 }
 
 export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
-  const { data: memoryProfile, isLoading } = useQuery<MemoryProfile>({
+  const { data: memoryProfile, isLoading, error } = useQuery<MemoryProfile>({
     queryKey: ['/api/memory-profile', userId],
-    refetchInterval: 10000,
+    staleTime: 30000, // Cache for 30 seconds
+    retry: 2,
   });
 
   if (isLoading) {
     return (
-      <div className="p-4 space-y-4">
+      <div className="space-y-4">
         <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Memory & Reflection</h2>
         <div className="animate-pulse space-y-4">
           <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
@@ -47,20 +48,38 @@ export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
               <div className="bg-white/60 rounded-xl p-3 h-16"></div>
             </div>
           </div>
-          <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
-            <div className="h-6 bg-white/60 rounded mb-4 w-2/3"></div>
-            <div className="space-y-2">
-              <div className="h-4 bg-white/60 rounded"></div>
-              <div className="h-4 bg-white/60 rounded w-5/6"></div>
-              <div className="h-4 bg-white/60 rounded w-4/6"></div>
-            </div>
-          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Memory & Reflection</h2>
+        <div className="rounded-2xl p-4 shadow-sm text-center" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+          <p style={{ color: 'var(--text-secondary)' }}>Unable to load memory data. Please try again.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!memoryProfile) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Memory & Reflection</h2>
+        <div className="rounded-2xl p-4 shadow-sm text-center" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+          <p style={{ color: 'var(--text-secondary)' }}>No memory data available.</p>
         </div>
       </div>
     );
   }
 
   const profile = memoryProfile?.personalityProfile;
+
+  // Debug logging
+  console.log('Memory Profile Data:', memoryProfile);
+  console.log('Profile:', profile);
 
   return (
     <div className="space-y-4">
