@@ -811,7 +811,7 @@ const AppLayout = () => {
         </div>
 
         {/* Mobile Chat Input - Always visible and floating */}
-        <div className="fixed bottom-16 left-0 right-0 bg-white shadow-lg z-50 border-t mobile-input-shift" style={{ borderColor: 'var(--gentle-lavender-dark)' }}>
+        <div className="fixed bottom-20 left-0 right-0 bg-white shadow-lg z-50 border-t mobile-input-shift" style={{ borderColor: 'var(--gentle-lavender-dark)' }}>
           {/* Voice Selector */}
           <div className="px-2 pt-2 pb-1 mobile-voice-shift">
             <select
