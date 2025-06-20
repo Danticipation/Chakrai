@@ -116,6 +116,59 @@ app.get('/api/daily-content', async (req, res) => {
   }
 });
 
+// Memory profile endpoint for dashboard
+app.get('/api/memory-profile', async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId as string) || 1;
+    
+    // Get user memories and facts
+    const memories = await storage.getUserMemories(userId);
+    const facts = await storage.getUserFacts(userId);
+    
+    // Build personality profile
+    let personalityProfile;
+    try {
+      const { buildPersonalityProfile } = await import('./personalityAnalysis.js');
+      personalityProfile = await buildPersonalityProfile(userId);
+    } catch (error) {
+      console.error('Error building personality profile:', error);
+      personalityProfile = {
+        communicationStyle: 'Learning about your style',
+        emotionalPatterns: [],
+        interests: [],
+        values: [],
+        coreTraits: [],
+        lifePhilosophy: 'Discovering your philosophy',
+        uniqueMannerisms: []
+      };
+    }
+    
+    res.json({
+      totalMemories: memories.length,
+      totalFacts: facts.length,
+      recentMemories: memories.slice(-10).map(m => ({
+        id: m.id,
+        memory: m.memory,
+        category: m.category,
+        importance: m.importance,
+        createdAt: m.createdAt.toISOString()
+      })),
+      keyFacts: facts.slice(-10).map(f => ({
+        id: f.id,
+        fact: f.fact,
+        category: f.category,
+        confidence: f.confidence,
+        createdAt: f.createdAt.toISOString()
+      })),
+      personalityProfile,
+      stage: memories.length > 20 ? 'Advanced' : memories.length > 10 ? 'Developing' : 'Learning'
+    });
+  } catch (error) {
+    console.error('Memory profile error:', error);
+    res.status(500).json({ error: 'Failed to get memory profile' });
+  }
+});
+
 // Basic stats endpoint
 app.get('/api/stats', async (req, res) => {
   try {
