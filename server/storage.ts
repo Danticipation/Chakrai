@@ -607,6 +607,118 @@ export class DatabaseStorage implements IStorage {
       .where(eq(dailyActivities.goalProgress, true));
     return result[0]?.count || 0;
   }
+
+  // Community and Peer Support methods implementation
+  async getSupportForums(): Promise<SupportForum[]> {
+    return await db.select().from(supportForums).orderBy(desc(supportForums.createdAt));
+  }
+
+  async getSupportForum(id: number): Promise<SupportForum | undefined> {
+    const [forum] = await db.select().from(supportForums).where(eq(supportForums.id, id));
+    return forum || undefined;
+  }
+
+  async createSupportForum(forum: InsertSupportForum): Promise<SupportForum> {
+    const [newForum] = await db.insert(supportForums).values(forum).returning();
+    return newForum;
+  }
+
+  async getForumPosts(forumId: number, limit = 20): Promise<ForumPost[]> {
+    return await db.select().from(forumPosts)
+      .where(eq(forumPosts.forumId, forumId))
+      .orderBy(desc(forumPosts.createdAt))
+      .limit(limit);
+  }
+
+  async getForumPost(id: number): Promise<ForumPost | undefined> {
+    const [post] = await db.select().from(forumPosts).where(eq(forumPosts.id, id));
+    return post || undefined;
+  }
+
+  async createForumPost(post: InsertForumPost): Promise<ForumPost> {
+    const [newPost] = await db.insert(forumPosts).values(post).returning();
+    return newPost;
+  }
+
+  async updateForumPost(id: number, updates: Partial<ForumPost>): Promise<ForumPost | undefined> {
+    const [updatedPost] = await db.update(forumPosts)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(forumPosts.id, id))
+      .returning();
+    return updatedPost || undefined;
+  }
+
+  async getForumReplies(postId: number): Promise<ForumReply[]> {
+    return await db.select().from(forumReplies)
+      .where(eq(forumReplies.postId, postId))
+      .orderBy(forumReplies.createdAt);
+  }
+
+  async createForumReply(reply: InsertForumReply): Promise<ForumReply> {
+    const [newReply] = await db.insert(forumReplies).values(reply).returning();
+    return newReply;
+  }
+
+  async updateForumReply(id: number, updates: Partial<ForumReply>): Promise<ForumReply | undefined> {
+    const [updatedReply] = await db.update(forumReplies)
+      .set(updates)
+      .where(eq(forumReplies.id, id))
+      .returning();
+    return updatedReply || undefined;
+  }
+
+  async getPeerCheckInRequests(status?: string): Promise<PeerCheckIn[]> {
+    const query = db.select().from(peerCheckIns);
+    if (status) {
+      return await query.where(eq(peerCheckIns.status, status)).orderBy(desc(peerCheckIns.createdAt));
+    }
+    return await query.orderBy(desc(peerCheckIns.createdAt));
+  }
+
+  async getUserPeerCheckIns(userId: number): Promise<PeerCheckIn[]> {
+    return await db.select().from(peerCheckIns)
+      .where(eq(peerCheckIns.requesterId, userId))
+      .orderBy(desc(peerCheckIns.createdAt));
+  }
+
+  async createPeerCheckIn(checkIn: InsertPeerCheckIn): Promise<PeerCheckIn> {
+    const [newCheckIn] = await db.insert(peerCheckIns).values(checkIn).returning();
+    return newCheckIn;
+  }
+
+  async updatePeerCheckIn(id: number, updates: Partial<PeerCheckIn>): Promise<PeerCheckIn | undefined> {
+    const [updatedCheckIn] = await db.update(peerCheckIns)
+      .set(updates)
+      .where(eq(peerCheckIns.id, id))
+      .returning();
+    return updatedCheckIn || undefined;
+  }
+
+  async getPeerSessions(userId: number): Promise<PeerSession[]> {
+    return await db.select().from(peerSessions)
+      .where(
+        sql`${peerSessions.participant1Id} = ${userId} OR ${peerSessions.participant2Id} = ${userId}`
+      )
+      .orderBy(desc(peerSessions.createdAt));
+  }
+
+  async createPeerSession(session: InsertPeerSession): Promise<PeerSession> {
+    const [newSession] = await db.insert(peerSessions).values(session).returning();
+    return newSession;
+  }
+
+  async updatePeerSession(id: number, updates: Partial<PeerSession>): Promise<PeerSession | undefined> {
+    const [updatedSession] = await db.update(peerSessions)
+      .set(updates)
+      .where(eq(peerSessions.id, id))
+      .returning();
+    return updatedSession || undefined;
+  }
+
+  async createCommunityModeration(moderation: InsertCommunityModeration): Promise<CommunityModeration> {
+    const [newModeration] = await db.insert(communityModerations).values(moderation).returning();
+    return newModeration;
+  }
 }
 
 export const storage = new DatabaseStorage();

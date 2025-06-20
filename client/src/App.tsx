@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -10,6 +10,7 @@ import CrisisAlert from './components/CrisisAlert';
 import JournalDashboard from './components/JournalDashboard';
 import TherapistPortal from './components/TherapistPortal';
 import AchievementDashboard from './components/AchievementDashboard';
+import CommunityPortal from './components/CommunityPortal';
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
@@ -89,6 +90,7 @@ const AppLayout = () => {
     { id: 'daily', icon: Sun, label: 'Daily' },
     { id: 'journal', icon: FileText, label: 'Journal' },
     { id: 'therapist', icon: UserCheck, label: 'Therapist' },
+    { id: 'community', icon: Users, label: 'Community' },
     { id: 'achievements', icon: Award, label: 'Achievements' },
     { id: 'reflect', icon: Brain, label: 'Reflect' },
     { id: 'memory', icon: BookOpen, label: 'Memory' },
@@ -681,6 +683,13 @@ const AppLayout = () => {
         return (
           <div className="h-full">
             <TherapistPortal userId="1" />
+          </div>
+        );
+
+      case 'community':
+        return (
+          <div className="h-full">
+            <CommunityPortal userId={1} />
           </div>
         );
 
