@@ -1651,6 +1651,108 @@ app.post('/api/sessions/:id/meeting-link', async (req, res) => {
   }
 });
 
+// Advanced Voice and Mindfulness API Routes
+
+// Generate emotionally responsive voice
+app.post('/api/voice/emotional-generate', async (req, res) => {
+  try {
+    const { text, voice, emotionalContext, intensity } = req.body;
+    
+    const { generateEmotionalVoice } = await import('./emotionalVoice');
+    
+    const audioBuffer = await generateEmotionalVoice({
+      text,
+      voiceProfile: voice || 'james',
+      emotionalContext: emotionalContext || 'neutral',
+      intensity: intensity || 1.0
+    });
+    
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': audioBuffer.length
+    });
+    res.send(audioBuffer);
+  } catch (error) {
+    console.error('Failed to generate emotional voice:', error);
+    res.status(500).json({ error: 'Failed to generate emotional voice' });
+  }
+});
+
+// Get available mindfulness exercises
+app.get('/api/mindfulness/exercises', async (req, res) => {
+  try {
+    const { mindfulnessExercises } = await import('./mindfulnessExercises');
+    res.json(mindfulnessExercises);
+  } catch (error) {
+    console.error('Failed to fetch mindfulness exercises:', error);
+    res.status(500).json({ error: 'Failed to fetch mindfulness exercises' });
+  }
+});
+
+// Get recommended mindfulness exercise based on emotional state
+app.post('/api/mindfulness/recommend', async (req, res) => {
+  try {
+    const { emotionalState, riskLevel, stressIndicators, preferredDuration } = req.body;
+    
+    const { selectMindfulnessExercise, generateMindfulnessInvitation } = await import('./mindfulnessExercises');
+    
+    const exercise = selectMindfulnessExercise(
+      emotionalState || 'neutral',
+      riskLevel || 'low',
+      stressIndicators || [],
+      preferredDuration
+    );
+    
+    if (!exercise) {
+      return res.json({ exercise: null, invitation: null });
+    }
+    
+    const invitation = generateMindfulnessInvitation(exercise, emotionalState || 'neutral');
+    
+    res.json({ exercise, invitation });
+  } catch (error) {
+    console.error('Failed to recommend mindfulness exercise:', error);
+    res.status(500).json({ error: 'Failed to recommend mindfulness exercise' });
+  }
+});
+
+// Check if mindfulness intervention should be triggered
+app.post('/api/mindfulness/should-trigger', async (req, res) => {
+  try {
+    const { emotionalState, riskLevel, stressIndicators, recentMessages } = req.body;
+    
+    const { shouldTriggerMindfulness } = await import('./mindfulnessExercises');
+    
+    const shouldTrigger = shouldTriggerMindfulness(
+      emotionalState || 'neutral',
+      riskLevel || 'low',
+      stressIndicators || [],
+      recentMessages || []
+    );
+    
+    res.json({ shouldTrigger });
+  } catch (error) {
+    console.error('Failed to check mindfulness trigger:', error);
+    res.status(500).json({ error: 'Failed to check mindfulness trigger' });
+  }
+});
+
+// Detect emotional context from message
+app.post('/api/voice/detect-context', async (req, res) => {
+  try {
+    const { message, userEmotion } = req.body;
+    
+    const { detectEmotionalContext } = await import('./emotionalVoice');
+    
+    const context = detectEmotionalContext(message, userEmotion);
+    
+    res.json({ context });
+  } catch (error) {
+    console.error('Failed to detect emotional context:', error);
+    res.status(500).json({ error: 'Failed to detect emotional context' });
+  }
+});
+
 // Helper functions
 async function generateSessionPreparation(journalEntries: any[], moodEntries: any[]): Promise<string> {
   try {
