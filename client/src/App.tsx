@@ -882,25 +882,29 @@ const AppLayout = () => {
 
         {/* Mobile Bottom Navigation - Fixed position */}
         <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg mobile-nav z-50 mobile-nav-shift" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
-          <div className="flex justify-around py-2">
-            {sections.map((section) => {
-              const IconComponent = section.icon;
-              const isActive = activeSection === section.id;
-              return (
-                <button
-                  key={section.id}
-                  onClick={() => setActiveSection(section.id)}
-                  className="flex flex-col items-center py-2 px-3 rounded-xl transition-all"
-                  style={{
-                    backgroundColor: isActive ? 'var(--soft-blue-light)' : 'transparent',
-                    color: isActive ? 'var(--soft-blue-dark)' : 'var(--text-secondary)'
-                  }}
-                >
-                  <IconComponent className="w-5 h-5 mb-1" />
-                  <span className="text-xs font-medium">{section.label}</span>
-                </button>
-              );
-            })}
+          <div className="flex justify-center py-2 px-2">
+            <div className="flex w-full max-w-2xl">
+              {sections.map((section) => {
+                const IconComponent = section.icon;
+                const isActive = activeSection === section.id;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => setActiveSection(section.id)}
+                    className="flex-1 flex flex-col items-center py-2 px-1 rounded-xl transition-all mx-1"
+                    style={{
+                      backgroundColor: isActive ? 'var(--soft-blue-light)' : 'transparent',
+                      color: isActive ? 'var(--soft-blue-dark)' : 'var(--text-secondary)',
+                      minWidth: '0',
+                      maxWidth: '80px'
+                    }}
+                  >
+                    <IconComponent className="w-5 h-5 mb-1 flex-shrink-0" />
+                    <span className="text-xs font-medium truncate w-full text-center">{section.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
