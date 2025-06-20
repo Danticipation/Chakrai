@@ -9,14 +9,14 @@
   --gentle-lavender: #1c2333; /* Accent for highlights */
   
   /* Derived therapeutic colors */
-  --soft-blue-dark: #ffffff;
+  --soft-blue-dark: #90feec;
   --soft-blue-light: #1c2333;
   --pale-green-dark: #1c2333;;
   --gentle-lavender-dark: #f609f6;
   
   /* Text colors for therapeutic design */
   --text-primary: #ffffff;    /* Calm dark blue-grey */
-  --text-secondary: #9f9999;  /* Medium blue-grey */
+  --text-secondary: #ffffff;  /* Medium blue-grey */
   --text-muted: #ec0404;      /* Light blue-grey */
   
   /* Surface colors */
@@ -51,7 +51,7 @@ html, body, #root {
 
 /* Mobile scrolling fixes */
 .mobile-scroll-container {
-  height: calc(100vh - 240px); /* Account for header + nav + input area */
+  height: calc(100vh - 299px); /* Account for header + nav + input area */
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -60,7 +60,7 @@ html, body, #root {
 /* Fix mobile viewport issues */
 @supports (-webkit-touch-callout: none) {
   .mobile-scroll-container {
-    height: calc(100vh - 240px - env(safe-area-inset-bottom));
+    height: calc(100vh - 299px - env(safe-area-inset-bottom));
   }
 }
 
@@ -85,34 +85,34 @@ div[class*="h-screen"], div[class*="min-h-screen"] {
 }
 
 /* Override all white backgrounds with therapeutic colors */
-div[style*="background-color: #FFFFFF"], 
-div[style*="backgroundColor: '#FFFFFF'"],
+div[style*="background-color: #000000"], 
+div[style*="backgroundColor: '#000000'"],
 div[style*="var(--surface-elevated)"] {
-  background-color: #0e1525 !important;
+  background-color: #ff0000 !important;
 }
 
 /* Force therapeutic colors on all panels and containers */
 .w-1\/4, .w-1\/2, .w-full {
-  background-color: #0e1525 !important;
+  background-color: #0e2662 !important;
 }
 
 /* Mobile input area left shift */
 @media (max-width: 768px) {
   .mobile-input-shift {
-    left: -6px !important;
-    right: 4px !important;
+    left:  0px !important;
+    right: 0px !important;
   }
   
   /* Shift welcome section left */
   .mobile-welcome-shift {
-    margin-left: -6px !important;
-    padding-left: 8px !important;
+    margin-left: -0px !important;
+    padding-left: 0px !important;
   }
   
   /* Shift voice selector left */  
   .mobile-voice-shift {
-    margin-left: -6px !important;
-    padding-left: 8px !important;
+    margin-left: -8px !important;
+    padding-left: 225px !important;
   }
   
   /* Shift bottom navigation left */
@@ -168,7 +168,7 @@ div[style*="backgroundColor: 'var(--surface-secondary')"] {
   body {
     margin: 0;
     padding: 0;
-    line-height: 1.5;
+    line-height: 4.0;
     overflow: hidden;
   }
   
@@ -185,14 +185,14 @@ div[style*="backgroundColor: 'var(--surface-secondary')"] {
     
     /* Mobile-first touch optimizations */
     button, input, select, textarea {
-      min-height: 44px;
+      min-height: 50px;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
     
     /* Prevent zoom on input focus */
     input, select, textarea {
-      font-size: 16px;
+      font-size: 14px;
     }
     
     /* Better scrolling */
@@ -203,11 +203,11 @@ div[style*="backgroundColor: 'var(--surface-secondary')"] {
     
     /* Mobile-optimized shadows */
     .shadow-sm {
-      box-shadow: 0 1px 3px rgb(157, 42, 42, 0.1);
+      box-shadow: 0 4px 3px rgb(0, 0, 0, 0.1);
     }
     
     .shadow-lg {
-      box-shadow: 0 4px 20px rgb(165, 49, 49, 0.15);
+      box-shadow: 0 4px 20px rgb(0, 0, 0, 0.15);
     }
   }
 }
@@ -256,11 +256,11 @@ div[style*="backgroundColor: 'var(--surface-secondary')"] {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 3px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #058df5;
+  background: #424242;
   border-radius: 3px;
 }
 
@@ -270,7 +270,7 @@ div[style*="backgroundColor: 'var(--surface-secondary')"] {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #058df5;
+  background: #5e5e5e;
 }
 
 /* Smooth animations */

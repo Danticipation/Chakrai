@@ -157,6 +157,53 @@ export type InsertMoodEntry = z.infer<typeof insertMoodEntrySchema>;
 export type EmotionalPattern = typeof emotionalPatterns.$inferSelect;
 export type InsertEmotionalPattern = z.infer<typeof insertEmotionalPatternSchema>;
 
+// Crisis detection and safety check-ins
+export const safetyCheckIns = pgTable("safety_check_ins", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  triggerMessage: text("trigger_message").notNull(),
+  riskLevel: varchar("risk_level", { length: 20 }).notNull(), // none, low, medium, high, critical
+  confidenceScore: real("confidence_score"), // 0.0 to 1.0
+  indicators: text("indicators").array(),
+  checkInRequired: boolean("check_in_required").default(false),
+  responseReceived: boolean("response_received").default(false),
+  userResponse: text("user_response"),
+  followUpScheduled: timestamp("follow_up_scheduled"),
+  interventionProvided: boolean("intervention_provided").default(false),
+  emergencyContactMade: boolean("emergency_contact_made").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const crisisInterventions = pgTable("crisis_interventions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  checkInId: integer("check_in_id").references(() => safetyCheckIns.id),
+  interventionType: varchar("intervention_type", { length: 50 }), // immediate_contact, scheduled_followup, emergency_services
+  contactMethod: varchar("contact_method", { length: 50 }), // crisis_hotline, emergency_services, mental_health_professional
+  outcome: varchar("outcome", { length: 100 }),
+  notes: text("notes"),
+  scheduledAt: timestamp("scheduled_at"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const insertSafetyCheckInSchema = createInsertSchema(safetyCheckIns).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCrisisInterventionSchema = createInsertSchema(crisisInterventions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SafetyCheckIn = typeof safetyCheckIns.$inferSelect;
+export type InsertSafetyCheckIn = z.infer<typeof insertSafetyCheckInSchema>;
+export type CrisisIntervention = typeof crisisInterventions.$inferSelect;
+export type InsertCrisisIntervention = z.infer<typeof insertCrisisInterventionSchema>;
+
 // WebSocket message types
 export interface ChatMessage {
   type: 'user_message' | 'bot_response' | 'learning_update' | 'milestone_achieved';

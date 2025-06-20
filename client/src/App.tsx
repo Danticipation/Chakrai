@@ -182,7 +182,7 @@ const AppLayout = () => {
       chunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
+        if (event.data.size > 1) {
           chunksRef.current.push(event.data);
         }
       };

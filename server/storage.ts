@@ -1,10 +1,13 @@
 import { 
   users, bots, messages, learnedWords, milestones, userMemories, userFacts, moodEntries, emotionalPatterns,
+  safetyCheckIns, crisisInterventions,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
   type UserFact, type InsertUserFact, type MoodEntry, type InsertMoodEntry,
-  type EmotionalPattern, type InsertEmotionalPattern
+  type EmotionalPattern, type InsertEmotionalPattern,
+  type SafetyCheckIn, type InsertSafetyCheckIn,
+  type CrisisIntervention, type InsertCrisisIntervention
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
@@ -46,6 +49,13 @@ export interface IStorage {
   createMoodEntry(mood: InsertMoodEntry): Promise<MoodEntry>;
   getEmotionalPattern(userId: number): Promise<EmotionalPattern | undefined>;
   updateEmotionalPattern(userId: number, pattern: InsertEmotionalPattern): Promise<EmotionalPattern>;
+
+  // Crisis detection methods
+  createSafetyCheckIn(checkIn: InsertSafetyCheckIn): Promise<SafetyCheckIn>;
+  getSafetyCheckIns(userId: number, limit?: number): Promise<SafetyCheckIn[]>;
+  updateSafetyCheckIn(id: number, updates: Partial<SafetyCheckIn>): Promise<SafetyCheckIn | undefined>;
+  createCrisisIntervention(intervention: InsertCrisisIntervention): Promise<CrisisIntervention>;
+  getPendingCheckIns(userId: number): Promise<SafetyCheckIn[]>;
 }
 
 export class DatabaseStorage implements IStorage {
