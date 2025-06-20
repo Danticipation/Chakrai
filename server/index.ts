@@ -360,6 +360,144 @@ app.get('/api/emotional-patterns', async (req, res) => {
   }
 });
 
+// Advanced NLP-driven crisis detection endpoint
+app.post('/api/crisis-analysis', async (req, res) => {
+  try {
+    const { message, userId, conversationHistory, sessionId } = req.body;
+    
+    const { analyzeCrisisRisk, scheduleFollowUpCheckIn } = await import('./crisisDetection.js');
+    
+    // Get user context for more accurate analysis
+    const recentMemories = await storage.getUserMemories(userId || 1);
+    const userFacts = await storage.getUserFacts(userId || 1);
+    
+    const userContext = {
+      recentMemories: recentMemories.slice(-5).map(m => m.memory),
+      userFacts: userFacts.slice(-10).map(f => f.fact)
+    };
+    
+    // Perform advanced crisis analysis
+    const crisisAnalysis = await analyzeCrisisRisk(
+      message,
+      conversationHistory || [],
+      userContext
+    );
+    
+    // If significant risk detected, create safety check-in
+    if (crisisAnalysis.riskLevel === 'high' || crisisAnalysis.riskLevel === 'critical') {
+      const checkIn = await storage.createSafetyCheckIn({
+        userId: userId || 1,
+        triggerMessage: message,
+        riskLevel: crisisAnalysis.riskLevel,
+        confidenceScore: crisisAnalysis.confidenceScore,
+        indicators: crisisAnalysis.indicators,
+        checkInRequired: crisisAnalysis.requiresCheckIn,
+        responseReceived: false,
+        followUpScheduled: crisisAnalysis.riskLevel === 'critical' ? 
+          new Date(Date.now() + 2 * 60 * 60 * 1000) : // 2 hours for critical
+          new Date(Date.now() + 6 * 60 * 60 * 1000)    // 6 hours for high
+      });
+      
+      // Create crisis intervention record
+      await storage.createCrisisIntervention({
+        userId: userId || 1,
+        checkInId: checkIn.id,
+        interventionType: crisisAnalysis.riskLevel === 'critical' ? 'immediate_contact' : 'scheduled_followup',
+        contactMethod: crisisAnalysis.riskLevel === 'critical' ? 'crisis_hotline' : 'mental_health_professional',
+        scheduledAt: new Date()
+      });
+      
+      // Store crisis memory
+      await storage.createUserMemory({
+        userId: userId || 1,
+        memory: `Crisis analysis detected ${crisisAnalysis.riskLevel} risk - immediate support provided`,
+        category: 'crisis_intervention',
+        importance: 'critical'
+      });
+    }
+    
+    res.json({
+      ...crisisAnalysis,
+      checkInScheduled: crisisAnalysis.requiresCheckIn,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Crisis analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze crisis risk' });
+  }
+});
+
+// Safety check-ins endpoint
+app.get('/api/safety-checkins', async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    
+    const checkIns = await storage.getSafetyCheckIns(userId, limit);
+    const pendingCheckIns = await storage.getPendingCheckIns(userId);
+    
+    res.json({
+      checkIns: checkIns.map(checkIn => ({
+        id: checkIn.id,
+        riskLevel: checkIn.riskLevel,
+        confidenceScore: checkIn.confidenceScore,
+        indicators: checkIn.indicators,
+        checkInRequired: checkIn.checkInRequired,
+        responseReceived: checkIn.responseReceived,
+        followUpScheduled: checkIn.followUpScheduled,
+        createdAt: checkIn.createdAt
+      })),
+      pendingCheckIns: pendingCheckIns.length,
+      requiresImmedateAttention: pendingCheckIns.some(c => c.riskLevel === 'critical')
+    });
+    
+  } catch (error) {
+    console.error('Safety check-ins error:', error);
+    res.status(500).json({ error: 'Failed to fetch safety check-ins' });
+  }
+});
+
+// Respond to safety check-in endpoint
+app.post('/api/safety-checkin-response', async (req, res) => {
+  try {
+    const { checkInId, userResponse, currentMood, needsHelp } = req.body;
+    
+    const { generateCheckInMessage } = await import('./crisisDetection.js');
+    
+    // Update check-in with user response
+    const updatedCheckIn = await storage.updateSafetyCheckIn(checkInId, {
+      responseReceived: true,
+      userResponse,
+      updatedAt: new Date()
+    });
+    
+    if (updatedCheckIn && needsHelp) {
+      // Create follow-up intervention if user still needs help
+      await storage.createCrisisIntervention({
+        userId: updatedCheckIn.userId,
+        checkInId: updatedCheckIn.id,
+        interventionType: 'scheduled_followup',
+        contactMethod: 'mental_health_professional',
+        notes: `User reported still needing help. Current mood: ${currentMood}`,
+        scheduledAt: new Date(Date.now() + 4 * 60 * 60 * 1000) // 4 hours
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: needsHelp ? 
+        "Thank you for responding. We're here to support you. Consider reaching out to a mental health professional." :
+        "Thank you for the update. I'm glad to hear you're doing better. Remember, support is always available.",
+      followUpScheduled: needsHelp
+    });
+    
+  } catch (error) {
+    console.error('Safety check-in response error:', error);
+    res.status(500).json({ error: 'Failed to process check-in response' });
+  }
+});
+
 // Crisis support endpoint for high-risk situations
 app.post('/api/crisis-support', async (req, res) => {
   try {
@@ -591,10 +729,10 @@ app.get('/api/onboarding-status', async (req, res) => {
   }
 });
 
-// Chat endpoint with persistent memory and personality mirroring
+// Chat endpoint with persistent memory, personality mirroring, and real-time crisis detection
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, userId = 1, personalityMode = 'friend' } = req.body;
+    const { message, userId = 1, personalityMode = 'friend', sessionId } = req.body;
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -610,6 +748,65 @@ app.post('/api/chat', async (req, res) => {
         wordsLearned: 0,
         personalityTraits: {}
       });
+    }
+
+    // Perform real-time crisis detection analysis
+    let crisisAnalysis = null;
+    let checkInScheduled = false;
+    
+    try {
+      const { analyzeCrisisRisk } = await import('./crisisDetection.js');
+      
+      // Get conversation context for better crisis analysis
+      const recentMemories = await storage.getUserMemories(userId);
+      const userFacts = await storage.getUserFacts(userId);
+      
+      const conversationHistory = recentMemories.slice(-3).map(m => m.memory);
+      const userContext = {
+        recentMemories: conversationHistory,
+        userFacts: userFacts.slice(-10).map(f => f.fact)
+      };
+      
+      // Analyze crisis risk in real-time
+      crisisAnalysis = await analyzeCrisisRisk(message, conversationHistory, userContext);
+      
+      // If significant risk detected, create safety check-in
+      if (crisisAnalysis.riskLevel === 'high' || crisisAnalysis.riskLevel === 'critical') {
+        const checkIn = await storage.createSafetyCheckIn({
+          userId,
+          triggerMessage: message,
+          riskLevel: crisisAnalysis.riskLevel,
+          confidenceScore: crisisAnalysis.confidenceScore,
+          indicators: crisisAnalysis.indicators,
+          checkInRequired: crisisAnalysis.requiresCheckIn,
+          responseReceived: false,
+          followUpScheduled: crisisAnalysis.riskLevel === 'critical' ? 
+            new Date(Date.now() + 2 * 60 * 60 * 1000) : // 2 hours for critical
+            new Date(Date.now() + 6 * 60 * 60 * 1000)    // 6 hours for high
+        });
+        
+        checkInScheduled = true;
+        
+        // Create crisis intervention record
+        await storage.createCrisisIntervention({
+          userId,
+          checkInId: checkIn.id,
+          interventionType: crisisAnalysis.riskLevel === 'critical' ? 'immediate_contact' : 'scheduled_followup',
+          contactMethod: crisisAnalysis.riskLevel === 'critical' ? 'crisis_hotline' : 'mental_health_professional',
+          scheduledAt: new Date()
+        });
+        
+        // Store crisis memory
+        await storage.createUserMemory({
+          userId,
+          memory: `Crisis detection: ${crisisAnalysis.riskLevel} risk identified - support resources provided`,
+          category: 'crisis_intervention',
+          importance: 'critical'
+        });
+      }
+    } catch (error) {
+      console.error('Crisis detection error:', error);
+      // Continue with chat even if crisis detection fails
     }
 
     // Store the user's message immediately

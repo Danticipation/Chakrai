@@ -10,7 +10,7 @@ import {
   type CrisisIntervention, type InsertCrisisIntervention
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -248,6 +248,48 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return created;
     }
+  }
+
+  // Crisis detection methods
+  async createSafetyCheckIn(insertCheckIn: InsertSafetyCheckIn): Promise<SafetyCheckIn> {
+    const [checkIn] = await db.insert(safetyCheckIns).values(insertCheckIn).returning();
+    return checkIn;
+  }
+
+  async getSafetyCheckIns(userId: number, limitCount?: number): Promise<SafetyCheckIn[]> {
+    const query = db.select().from(safetyCheckIns)
+      .where(eq(safetyCheckIns.userId, userId))
+      .orderBy(desc(safetyCheckIns.createdAt));
+    
+    if (limitCount) {
+      return await query.limit(limitCount);
+    }
+    return await query;
+  }
+
+  async updateSafetyCheckIn(id: number, updates: Partial<SafetyCheckIn>): Promise<SafetyCheckIn | undefined> {
+    const [updated] = await db.update(safetyCheckIns)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(safetyCheckIns.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async createCrisisIntervention(insertIntervention: InsertCrisisIntervention): Promise<CrisisIntervention> {
+    const [intervention] = await db.insert(crisisInterventions).values(insertIntervention).returning();
+    return intervention;
+  }
+
+  async getPendingCheckIns(userId: number): Promise<SafetyCheckIn[]> {
+    return await db.select().from(safetyCheckIns)
+      .where(
+        and(
+          eq(safetyCheckIns.userId, userId),
+          eq(safetyCheckIns.responseReceived, false),
+          eq(safetyCheckIns.checkInRequired, true)
+        )
+      )
+      .orderBy(desc(safetyCheckIns.createdAt));
   }
 }
 
