@@ -1,13 +1,16 @@
 import { 
   users, bots, messages, learnedWords, milestones, userMemories, userFacts, moodEntries, emotionalPatterns,
-  safetyCheckIns, crisisInterventions,
+  safetyCheckIns, crisisInterventions, journalEntries, journalAnalytics, journalExports,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
   type UserFact, type InsertUserFact, type MoodEntry, type InsertMoodEntry,
   type EmotionalPattern, type InsertEmotionalPattern,
   type SafetyCheckIn, type InsertSafetyCheckIn,
-  type CrisisIntervention, type InsertCrisisIntervention
+  type CrisisIntervention, type InsertCrisisIntervention,
+  type JournalEntry, type InsertJournalEntry,
+  type JournalAnalytics, type InsertJournalAnalytics,
+  type JournalExport, type InsertJournalExport
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -56,6 +59,19 @@ export interface IStorage {
   updateSafetyCheckIn(id: number, updates: Partial<SafetyCheckIn>): Promise<SafetyCheckIn | undefined>;
   createCrisisIntervention(intervention: InsertCrisisIntervention): Promise<CrisisIntervention>;
   getPendingCheckIns(userId: number): Promise<SafetyCheckIn[]>;
+
+  // Journaling methods
+  getJournalEntries(userId: number, limit?: number, offset?: number): Promise<JournalEntry[]>;
+  getJournalEntry(id: number): Promise<JournalEntry | undefined>;
+  createJournalEntry(entry: InsertJournalEntry): Promise<JournalEntry>;
+  updateJournalEntry(id: number, updates: Partial<JournalEntry>): Promise<JournalEntry | undefined>;
+  deleteJournalEntry(id: number): Promise<void>;
+  getJournalAnalytics(entryId: number): Promise<JournalAnalytics | undefined>;
+  createJournalAnalytics(analytics: InsertJournalAnalytics): Promise<JournalAnalytics>;
+  getJournalAnalyticsByUser(userId: number, limit?: number): Promise<JournalAnalytics[]>;
+  createJournalExport(exportData: InsertJournalExport): Promise<JournalExport>;
+  getJournalExports(userId: number): Promise<JournalExport[]>;
+  updateJournalExport(id: number, updates: Partial<JournalExport>): Promise<JournalExport | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -290,6 +306,74 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(desc(safetyCheckIns.createdAt));
+  }
+
+  // Journaling storage methods
+  async getJournalEntries(userId: number, limitCount?: number, offset?: number): Promise<JournalEntry[]> {
+    return await db.select().from(journalEntries)
+      .where(eq(journalEntries.userId, userId))
+      .orderBy(desc(journalEntries.createdAt))
+      .limit(limitCount || 50)
+      .offset(offset || 0);
+  }
+
+  async getJournalEntry(id: number): Promise<JournalEntry | undefined> {
+    const [entry] = await db.select().from(journalEntries).where(eq(journalEntries.id, id));
+    return entry || undefined;
+  }
+
+  async createJournalEntry(insertEntry: InsertJournalEntry): Promise<JournalEntry> {
+    const [entry] = await db.insert(journalEntries).values(insertEntry).returning();
+    return entry;
+  }
+
+  async updateJournalEntry(id: number, updates: Partial<JournalEntry>): Promise<JournalEntry | undefined> {
+    const [updated] = await db.update(journalEntries)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(journalEntries.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteJournalEntry(id: number): Promise<void> {
+    await db.delete(journalEntries).where(eq(journalEntries.id, id));
+  }
+
+  async getJournalAnalytics(entryId: number): Promise<JournalAnalytics | undefined> {
+    const [analytics] = await db.select().from(journalAnalytics)
+      .where(eq(journalAnalytics.entryId, entryId));
+    return analytics || undefined;
+  }
+
+  async createJournalAnalytics(insertAnalytics: InsertJournalAnalytics): Promise<JournalAnalytics> {
+    const [analytics] = await db.insert(journalAnalytics).values(insertAnalytics).returning();
+    return analytics;
+  }
+
+  async getJournalAnalyticsByUser(userId: number, limitCount?: number): Promise<JournalAnalytics[]> {
+    return await db.select().from(journalAnalytics)
+      .where(eq(journalAnalytics.userId, userId))
+      .orderBy(desc(journalAnalytics.createdAt))
+      .limit(limitCount || 50);
+  }
+
+  async createJournalExport(insertExport: InsertJournalExport): Promise<JournalExport> {
+    const [exportData] = await db.insert(journalExports).values(insertExport).returning();
+    return exportData;
+  }
+
+  async getJournalExports(userId: number): Promise<JournalExport[]> {
+    return await db.select().from(journalExports)
+      .where(eq(journalExports.userId, userId))
+      .orderBy(desc(journalExports.createdAt));
+  }
+
+  async updateJournalExport(id: number, updates: Partial<JournalExport>): Promise<JournalExport | undefined> {
+    const [updated] = await db.update(journalExports)
+      .set(updates)
+      .where(eq(journalExports.id, id))
+      .returning();
+    return updated || undefined;
   }
 }
 

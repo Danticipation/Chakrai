@@ -204,6 +204,81 @@ export type InsertSafetyCheckIn = z.infer<typeof insertSafetyCheckInSchema>;
 export type CrisisIntervention = typeof crisisInterventions.$inferSelect;
 export type InsertCrisisIntervention = z.infer<typeof insertCrisisInterventionSchema>;
 
+// Therapeutic journaling system
+export const journalEntries = pgTable("journal_entries", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  title: text("title"),
+  content: text("content").notNull(),
+  mood: text("mood"),
+  emotionalTags: text("emotional_tags").array(),
+  triggers: text("triggers").array(),
+  gratitude: text("gratitude").array(),
+  goals: text("goals").array(),
+  reflectionPrompts: text("reflection_prompts").array(),
+  aiAnalyzed: boolean("ai_analyzed").default(false),
+  wordCount: integer("word_count").default(0),
+  readingTime: integer("reading_time").default(0), // in minutes
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const journalAnalytics = pgTable("journal_analytics", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  entryId: integer("entry_id").notNull().references(() => journalEntries.id),
+  emotionalThemes: jsonb("emotional_themes"), // recurring emotional patterns
+  keyInsights: text("key_insights").array(),
+  sentimentScore: real("sentiment_score"), // -1.0 to 1.0
+  emotionalIntensity: integer("emotional_intensity"), // 0 to 100
+  copingStrategies: text("coping_strategies").array(),
+  growthIndicators: text("growth_indicators").array(),
+  concernAreas: text("concern_areas").array(),
+  recommendedActions: text("recommended_actions").array(),
+  therapistNotes: text("therapist_notes"), // AI-generated insights for therapists
+  patternConnections: jsonb("pattern_connections"), // connections to previous entries
+  confidenceScore: real("confidence_score"), // AI analysis confidence 0.0 to 1.0
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const journalExports = pgTable("journal_exports", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  exportType: varchar("export_type", { length: 50 }), // summary, full_entries, insights_only
+  dateRange: jsonb("date_range"), // start and end dates
+  includedEntries: integer("included_entries").array(),
+  format: varchar("format", { length: 20 }).default("pdf"), // pdf, json, csv
+  fileUrl: text("file_url"),
+  recipientType: varchar("recipient_type", { length: 50 }), // therapist, self, medical_professional
+  encryptionKey: text("encryption_key"),
+  expiresAt: timestamp("expires_at"),
+  downloadCount: integer("download_count").default(0),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const insertJournalEntrySchema = createInsertSchema(journalEntries).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertJournalAnalyticsSchema = createInsertSchema(journalAnalytics).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertJournalExportSchema = createInsertSchema(journalExports).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type JournalEntry = typeof journalEntries.$inferSelect;
+export type InsertJournalEntry = z.infer<typeof insertJournalEntrySchema>;
+export type JournalAnalytics = typeof journalAnalytics.$inferSelect;
+export type InsertJournalAnalytics = z.infer<typeof insertJournalAnalyticsSchema>;
+export type JournalExport = typeof journalExports.$inferSelect;
+export type InsertJournalExport = z.infer<typeof insertJournalExportSchema>;
+
 // WebSocket message types
 export interface ChatMessage {
   type: 'user_message' | 'bot_response' | 'learning_update' | 'milestone_achieved';

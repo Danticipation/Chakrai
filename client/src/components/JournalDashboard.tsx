@@ -1,0 +1,421 @@
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Plus, BookOpen, TrendingUp, Download, Calendar, Search, Filter } from 'lucide-react';
+import JournalEditor from './JournalEditor';
+import JournalExportModal from './JournalExportModal';
+import type { JournalEntry, JournalAnalytics } from '@shared/schema';
+import { format } from 'date-fns';
+
+interface JournalDashboardProps {
+  userId: number;
+}
+
+export default function JournalDashboard({ userId }: JournalDashboardProps) {
+  const [activeView, setActiveView] = useState<'list' | 'editor' | 'analytics' | 'export'>('list');
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [moodFilter, setMoodFilter] = useState('all');
+
+  const { data: entries = [], isLoading: entriesLoading } = useQuery({
+    queryKey: ['/api/journal', userId],
+    enabled: !!userId
+  });
+
+  const { data: analytics = [] } = useQuery({
+    queryKey: ['/api/journal/analytics', userId],
+    enabled: !!userId && activeView === 'analytics'
+  });
+
+  const filteredEntries = entries.filter((entry: JournalEntry) => {
+    const matchesSearch = !searchQuery || 
+      entry.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      entry.content.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesMood = moodFilter === 'all' || entry.mood === moodFilter;
+    
+    return matchesSearch && matchesMood;
+  });
+
+  const recentEntries = filteredEntries.slice(0, 10);
+
+  const handleNewEntry = () => {
+    setSelectedEntry(null);
+    setActiveView('editor');
+  };
+
+  const handleEditEntry = (entry: JournalEntry) => {
+    setSelectedEntry(entry);
+    setActiveView('editor');
+  };
+
+  const handleSaveEntry = () => {
+    setActiveView('list');
+    setSelectedEntry(null);
+  };
+
+  const handleCancelEdit = () => {
+    setActiveView('list');
+    setSelectedEntry(null);
+  };
+
+  const renderEntryCard = (entry: JournalEntry) => {
+    const entryAnalytics = analytics.find((a: JournalAnalytics) => a.entryId === entry.id);
+    const sentimentColor = !entryAnalytics?.sentimentScore ? '#6B7280' :
+      entryAnalytics.sentimentScore > 0.2 ? '#10B981' :
+      entryAnalytics.sentimentScore < -0.2 ? '#EF4444' : '#F59E0B';
+
+    return (
+      <div
+        key={entry.id}
+        onClick={() => handleEditEntry(entry)}
+        className="rounded-2xl p-4 shadow-sm cursor-pointer transition-all hover:shadow-md"
+        style={{ backgroundColor: 'var(--surface-secondary)' }}
+      >
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex-1">
+            <h3 className="font-semibold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>
+              {entry.title || 'Untitled'}
+            </h3>
+            <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
+              <span>{format(new Date(entry.createdAt!), 'MMM dd, yyyy')}</span>
+              <span>{entry.wordCount || 0} words</span>
+              {entry.mood && (
+                <span className="px-2 py-1 rounded-full text-xs" style={{ 
+                  backgroundColor: getMoodColor(entry.mood) + '20',
+                  color: getMoodColor(entry.mood)
+                }}>
+                  {getMoodLabel(entry.mood)}
+                </span>
+              )}
+            </div>
+          </div>
+          {entryAnalytics && (
+            <div className="flex items-center gap-2">
+              <div 
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: sentimentColor }}
+                title={`Sentiment: ${((entryAnalytics.sentimentScore || 0) * 100).toFixed(0)}%`}
+              />
+              <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                {entryAnalytics.emotionalIntensity || 0}%
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
+          {entry.content.substring(0, 120)}
+          {entry.content.length > 120 && '...'}
+        </p>
+
+        {entry.emotionalTags && entry.emotionalTags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {entry.emotionalTags.slice(0, 3).map(tag => (
+              <span
+                key={tag}
+                className="px-2 py-1 rounded-full text-xs"
+                style={{ 
+                  backgroundColor: 'var(--gentle-lavender)',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+            {entry.emotionalTags.length > 3 && (
+              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                +{entry.emotionalTags.length - 3} more
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderAnalyticsSummary = () => {
+    if (analytics.length === 0) {
+      return (
+        <div className="text-center py-8">
+          <BookOpen className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-secondary)' }} />
+          <p style={{ color: 'var(--text-secondary)' }}>No analytics available yet. Start journaling to see insights!</p>
+        </div>
+      );
+    }
+
+    const avgSentiment = analytics.reduce((sum: number, a: JournalAnalytics) => sum + (a.sentimentScore || 0), 0) / analytics.length;
+    const avgIntensity = analytics.reduce((sum: number, a: JournalAnalytics) => sum + (a.emotionalIntensity || 0), 0) / analytics.length;
+    
+    const allThemes = analytics.flatMap((a: JournalAnalytics) => Object.keys(a.emotionalThemes || {}));
+    const themeFrequency = allThemes.reduce((acc: Record<string, number>, theme) => {
+      acc[theme] = (acc[theme] || 0) + 1;
+      return acc;
+    }, {});
+    
+    const topThemes = Object.entries(themeFrequency)
+      .sort(([,a], [,b]) => (b as number) - (a as number))
+      .slice(0, 5);
+
+    return (
+      <div className="space-y-4">
+        {/* Overview Stats */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--pale-green)' }}>
+            <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
+              {((avgSentiment * 100)).toFixed(0)}%
+            </div>
+            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Average Sentiment</div>
+          </div>
+          <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+            <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
+              {avgIntensity.toFixed(0)}%
+            </div>
+            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Emotional Intensity</div>
+          </div>
+        </div>
+
+        {/* Top Themes */}
+        <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+          <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Top Emotional Themes</h3>
+          <div className="space-y-2">
+            {topThemes.map(([theme, count]) => (
+              <div key={theme} className="flex items-center justify-between">
+                <span className="text-sm capitalize" style={{ color: 'var(--text-primary)' }}>{theme.replace('_', ' ')}</span>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="h-2 rounded-full"
+                    style={{ 
+                      width: `${Math.max(20, (count as number) / analytics.length * 100)}px`,
+                      backgroundColor: 'var(--soft-blue-dark)'
+                    }}
+                  />
+                  <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{count}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Insights */}
+        <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+          <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Recent AI Insights</h3>
+          <div className="space-y-2">
+            {analytics.slice(0, 3).map((analytic: JournalAnalytics, index: number) => (
+              <div key={analytic.id} className="text-sm">
+                <div className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
+                  Entry {index + 1}
+                </div>
+                {analytic.keyInsights && analytic.keyInsights.length > 0 && (
+                  <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                    {analytic.keyInsights[0]}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (activeView === 'editor') {
+    return (
+      <JournalEditor
+        entry={selectedEntry || undefined}
+        onSave={handleSaveEntry}
+        onCancel={handleCancelEdit}
+        userId={userId}
+      />
+    );
+  }
+
+  if (activeView === 'export') {
+    return (
+      <JournalExportModal
+        userId={userId}
+        entries={entries}
+        onClose={() => setActiveView('list')}
+      />
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <div className="p-4 border-b" style={{ borderColor: 'var(--gentle-lavender-dark)' }}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+            {activeView === 'analytics' ? 'Journal Analytics' : 'Journal Entries'}
+          </h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveView('analytics')}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeView === 'analytics' ? 'shadow-sm' : ''
+              }`}
+              style={{ 
+                backgroundColor: activeView === 'analytics' ? 'var(--soft-blue-dark)' : 'var(--surface-secondary)',
+                color: activeView === 'analytics' ? 'white' : 'var(--text-primary)'
+              }}
+            >
+              <TrendingUp className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setActiveView('export')}
+              className="px-3 py-2 rounded-lg text-sm font-medium"
+              style={{ 
+                backgroundColor: 'var(--gentle-lavender)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              <Download className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleNewEntry}
+              className="px-3 py-2 rounded-lg text-sm font-medium shadow-sm"
+              style={{ 
+                backgroundColor: 'var(--soft-blue-dark)',
+                color: 'white'
+              }}
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveView('list')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeView === 'list' ? 'shadow-sm' : ''
+            }`}
+            style={{ 
+              backgroundColor: activeView === 'list' ? 'var(--surface-secondary)' : 'transparent',
+              color: 'var(--text-primary)'
+            }}
+          >
+            Entries ({entries.length})
+          </button>
+          <button
+            onClick={() => setActiveView('analytics')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeView === 'analytics' ? 'shadow-sm' : ''
+            }`}
+            style={{ 
+              backgroundColor: activeView === 'analytics' ? 'var(--surface-secondary)' : 'transparent',
+              color: 'var(--text-primary)'
+            }}
+          >
+            Analytics
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-4">
+        {activeView === 'list' && (
+          <div className="space-y-4">
+            {/* Search and Filters */}
+            <div className="rounded-2xl p-4 shadow-sm space-y-3" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
+                <input
+                  type="text"
+                  placeholder="Search your entries..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border text-sm"
+                  style={{ 
+                    borderColor: 'var(--gentle-lavender-dark)',
+                    backgroundColor: 'white',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+              </div>
+              
+              <select
+                value={moodFilter}
+                onChange={(e) => setMoodFilter(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border text-sm"
+                style={{ 
+                  borderColor: 'var(--gentle-lavender-dark)',
+                  backgroundColor: 'white',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                <option value="all">All Moods</option>
+                <option value="very_positive">Very Positive</option>
+                <option value="positive">Positive</option>
+                <option value="neutral">Neutral</option>
+                <option value="negative">Negative</option>
+                <option value="very_negative">Very Negative</option>
+              </select>
+            </div>
+
+            {/* Entries List */}
+            {entriesLoading ? (
+              <div className="text-center py-8">
+                <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                <p style={{ color: 'var(--text-secondary)' }}>Loading your entries...</p>
+              </div>
+            ) : filteredEntries.length === 0 ? (
+              <div className="text-center py-8">
+                <BookOpen className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-secondary)' }} />
+                <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>
+                  {searchQuery || moodFilter !== 'all' ? 'No entries match your filters' : 'Start your therapeutic journey by writing your first entry'}
+                </p>
+                <button
+                  onClick={handleNewEntry}
+                  className="px-6 py-3 rounded-2xl text-sm font-medium shadow-sm"
+                  style={{ 
+                    backgroundColor: 'var(--soft-blue-dark)',
+                    color: 'white'
+                  }}
+                >
+                  Write First Entry
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recentEntries.map(renderEntryCard)}
+                
+                {filteredEntries.length > 10 && (
+                  <div className="text-center py-4">
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      Showing 10 of {filteredEntries.length} entries
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeView === 'analytics' && renderAnalyticsSummary()}
+      </div>
+    </div>
+  );
+}
+
+function getMoodColor(mood: string): string {
+  const colors: Record<string, string> = {
+    very_positive: '#10B981',
+    positive: '#84CC16',
+    neutral: '#6B7280',
+    negative: '#F59E0B',
+    very_negative: '#EF4444'
+  };
+  return colors[mood] || '#6B7280';
+}
+
+function getMoodLabel(mood: string): string {
+  const labels: Record<string, string> = {
+    very_positive: '😊',
+    positive: '🙂',
+    neutral: '😐',
+    negative: '🙁',
+    very_negative: '😢'
+  };
+  return labels[mood] || '😐';
+}
