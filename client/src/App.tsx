@@ -6,6 +6,7 @@ import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import OnboardingQuiz from './components/OnboardingQuiz';
 import MoodTracker from './components/MoodTracker';
+import CrisisAlert from './components/CrisisAlert';
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
@@ -63,6 +64,10 @@ const AppLayout = () => {
   const [zodiacSign, setZodiacSign] = useState<string>('');
   const [selectedZodiacSign, setSelectedZodiacSign] = useState<string>('');
   const [dailyReflection, setDailyReflection] = useState<string>('Your reflection will appear here as you interact with your TrAI.');
+  
+  // Crisis detection state
+  const [crisisAlert, setCrisisAlert] = useState<any>(null);
+  const [showCrisisAlert, setShowCrisisAlert] = useState(false);
   
   // Goal tracking state
   const [goals, setGoals] = useState<Goal[]>([
@@ -283,7 +288,8 @@ const AppLayout = () => {
       const res = await axios.post('/api/chat', { 
         message: userMessageText,
         userId: 1,
-        personalityMode: personalityMode
+        personalityMode: personalityMode,
+        sessionId: `chat-${Date.now()}`
       });
       
       const botResponse = res.data.response;
@@ -293,6 +299,12 @@ const AppLayout = () => {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, botMessage]);
+      
+      // Handle crisis detection response
+      if (res.data.crisisAnalysis && res.data.crisisAnalysis.riskLevel !== 'none' && res.data.crisisAnalysis.riskLevel !== 'low') {
+        setCrisisAlert(res.data.crisisAnalysis);
+        setShowCrisisAlert(true);
+      }
       
       updateDailyReflection(userMessageText, botResponse);
       

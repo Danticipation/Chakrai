@@ -12,6 +12,17 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
 ## Recent Changes
+### June 20, 2025 - Advanced NLP-Driven Crisis Detection & Response System Completed
+- **Real-time crisis detection**: Implemented sophisticated NLP analysis using OpenAI GPT-4o to identify suicide risk, self-harm indicators, and severe depression during conversations
+- **Pattern-based risk assessment**: Advanced pattern matching for crisis indicators including suicidal ideation, self-harm language, isolation signs, and substance abuse coping
+- **Automated safety check-ins**: System automatically schedules follow-up check-ins based on risk level (2 hours for critical, 6 hours for high, 24 hours for medium risk)
+- **Crisis intervention tracking**: Complete database system for safety check-ins and crisis interventions with response tracking and outcome monitoring
+- **Multi-layered analysis**: Combined AI analysis with pattern matching for accurate crisis detection with confidence scoring (0.0-1.0)
+- **Immediate support resources**: Automatic provision of crisis hotlines, emergency contacts, and professional help based on detected risk level
+- **Chat integration**: Real-time crisis monitoring integrated directly into therapeutic conversations with immediate intervention capabilities
+- **Professional escalation**: Automated scheduling of mental health professional contact and emergency services when critical risk detected
+- **Risk level classification**: Five-tier system (none/low/medium/high/critical) with specific response protocols for each level
+
 ### June 20, 2025 - Enhanced Emotional Intelligence & Sentiment Analysis System Completed
 - **Real-time emotion detection**: Implemented comprehensive emotional analysis using OpenAI GPT-4o for immediate sentiment detection during conversations
 - **Advanced mood tracking**: Added visual mood tracking with 8 emotion types, intensity levels, and risk assessment for mental health monitoring

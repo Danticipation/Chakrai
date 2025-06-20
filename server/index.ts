@@ -867,11 +867,22 @@ app.post('/api/chat', async (req, res) => {
     else if (totalWords > 150) stage = "Child";
     else if (totalWords > 50) stage = "Toddler";
 
-    // Send response immediately
+    // Send response immediately with crisis analysis data
     res.json({
       response: botResponse,
       wordsLearned: totalWords,
-      stage: stage
+      stage: stage,
+      crisisAnalysis: crisisAnalysis ? {
+        riskLevel: crisisAnalysis.riskLevel,
+        indicators: crisisAnalysis.indicators,
+        supportMessage: crisisAnalysis.supportMessage,
+        immediateActions: crisisAnalysis.immediateActions,
+        emergencyContacts: crisisAnalysis.emergencyContacts,
+        confidenceScore: crisisAnalysis.confidenceScore,
+        checkInScheduled
+      } : null,
+      personalityMode,
+      timestamp: new Date().toISOString()
     });
 
     // Process personality analysis asynchronously (don't await)
