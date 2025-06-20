@@ -3,6 +3,7 @@ import {
   safetyCheckIns, crisisInterventions, journalEntries, journalAnalytics, journalExports,
   therapists, therapistSessions, therapistSharedInsights, collaborationSettings,
   userAchievements, wellnessStreaks, dailyActivities,
+  supportForums, forumPosts, forumReplies, peerCheckIns, peerSessions, communityModerations,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
@@ -19,7 +20,13 @@ import {
   type CollaborationSettings, type InsertCollaborationSettings,
   type UserAchievement, type InsertUserAchievement,
   type WellnessStreak, type InsertWellnessStreak,
-  type DailyActivity, type InsertDailyActivity
+  type DailyActivity, type InsertDailyActivity,
+  type SupportForum, type InsertSupportForum,
+  type ForumPost, type InsertForumPost,
+  type ForumReply, type InsertForumReply,
+  type PeerCheckIn, type InsertPeerCheckIn,
+  type PeerSession, type InsertPeerSession,
+  type CommunityModeration, type InsertCommunityModeration
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -107,6 +114,26 @@ export interface IStorage {
   getMoodEntryCount(userId: number): Promise<number>;
   getChatSessionCount(userId: number): Promise<number>;
   getGoalProgressCount(userId: number): Promise<number>;
+
+  // Community and Peer Support methods
+  getSupportForums(): Promise<SupportForum[]>;
+  getSupportForum(id: number): Promise<SupportForum | undefined>;
+  createSupportForum(forum: InsertSupportForum): Promise<SupportForum>;
+  getForumPosts(forumId: number, limit?: number): Promise<ForumPost[]>;
+  getForumPost(id: number): Promise<ForumPost | undefined>;
+  createForumPost(post: InsertForumPost): Promise<ForumPost>;
+  updateForumPost(id: number, updates: Partial<ForumPost>): Promise<ForumPost | undefined>;
+  getForumReplies(postId: number): Promise<ForumReply[]>;
+  createForumReply(reply: InsertForumReply): Promise<ForumReply>;
+  updateForumReply(id: number, updates: Partial<ForumReply>): Promise<ForumReply | undefined>;
+  getPeerCheckInRequests(status?: string): Promise<PeerCheckIn[]>;
+  getUserPeerCheckIns(userId: number): Promise<PeerCheckIn[]>;
+  createPeerCheckIn(checkIn: InsertPeerCheckIn): Promise<PeerCheckIn>;
+  updatePeerCheckIn(id: number, updates: Partial<PeerCheckIn>): Promise<PeerCheckIn | undefined>;
+  getPeerSessions(userId: number): Promise<PeerSession[]>;
+  createPeerSession(session: InsertPeerSession): Promise<PeerSession>;
+  updatePeerSession(id: number, updates: Partial<PeerSession>): Promise<PeerSession | undefined>;
+  createCommunityModeration(moderation: InsertCommunityModeration): Promise<CommunityModeration>;
 }
 
 export class DatabaseStorage implements IStorage {

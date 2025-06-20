@@ -413,6 +413,100 @@ export type InsertWellnessStreak = z.infer<typeof insertWellnessStreakSchema>;
 export type DailyActivity = typeof dailyActivities.$inferSelect;
 export type InsertDailyActivity = z.infer<typeof insertDailyActivitySchema>;
 
+// Community and Peer Support Tables
+export const supportForums = pgTable("support_forums", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }).notNull(), // 'anxiety', 'depression', 'general', 'crisis'
+  isModerated: boolean("is_moderated").default(true),
+  anonymousPostsAllowed: boolean("anonymous_posts_allowed").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const forumPosts = pgTable("forum_posts", {
+  id: serial("id").primaryKey(),
+  forumId: integer("forum_id").references(() => supportForums.id).notNull(),
+  authorId: integer("author_id").references(() => users.id), // null for anonymous posts
+  anonymousName: varchar("anonymous_name", { length: 100 }), // e.g., "Anonymous123"
+  title: varchar("title", { length: 500 }).notNull(),
+  content: text("content").notNull(),
+  isAnonymous: boolean("is_anonymous").default(false),
+  isFlagged: boolean("is_flagged").default(false),
+  isModerated: boolean("is_moderated").default(false),
+  supportCount: integer("support_count").default(0), // hearts/likes
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const forumReplies = pgTable("forum_replies", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").references(() => forumPosts.id).notNull(),
+  authorId: integer("author_id").references(() => users.id), // null for anonymous replies
+  anonymousName: varchar("anonymous_name", { length: 100 }),
+  content: text("content").notNull(),
+  isAnonymous: boolean("is_anonymous").default(false),
+  isFlagged: boolean("is_flagged").default(false),
+  supportCount: integer("support_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const peerCheckIns = pgTable("peer_check_ins", {
+  id: serial("id").primaryKey(),
+  requesterId: integer("requester_id").references(() => users.id).notNull(),
+  partnerId: integer("partner_id").references(() => users.id), // null until matched
+  status: varchar("status", { length: 50 }).default('pending'), // 'pending', 'matched', 'completed', 'cancelled'
+  checkInType: varchar("check_in_type", { length: 100 }).notNull(), // 'daily', 'crisis', 'motivation', 'accountability'
+  preferredTime: varchar("preferred_time", { length: 100 }), // 'morning', 'afternoon', 'evening', 'flexible'
+  duration: integer("duration").default(15), // minutes
+  isAnonymous: boolean("is_anonymous").default(true),
+  notes: text("notes"), // optional context from requester
+  scheduledAt: timestamp("scheduled_at"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const peerSessions = pgTable("peer_sessions", {
+  id: serial("id").primaryKey(),
+  checkInId: integer("check_in_id").references(() => peerCheckIns.id).notNull(),
+  participant1Id: integer("participant1_id").references(() => users.id).notNull(),
+  participant2Id: integer("participant2_id").references(() => users.id).notNull(),
+  sessionType: varchar("session_type", { length: 50 }).notNull(), // 'text', 'voice' (future)
+  startedAt: timestamp("started_at"),
+  endedAt: timestamp("ended_at"),
+  feedback1: text("feedback1"), // feedback from participant 1
+  feedback2: text("feedback2"), // feedback from participant 2
+  rating1: integer("rating1"), // 1-5 rating from participant 1
+  rating2: integer("rating2"), // 1-5 rating from participant 2
+  isSuccessful: boolean("is_successful").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const communityModerations = pgTable("community_moderations", {
+  id: serial("id").primaryKey(),
+  contentType: varchar("content_type", { length: 50 }).notNull(), // 'post', 'reply'
+  contentId: integer("content_id").notNull(),
+  moderatorId: integer("moderator_id").references(() => users.id),
+  action: varchar("action", { length: 100 }).notNull(), // 'approved', 'flagged', 'removed', 'warning'
+  reason: text("reason"),
+  isAutoModerated: boolean("is_auto_moderated").default(false),
+  aiConfidence: real("ai_confidence"), // 0.0-1.0 for AI moderation confidence
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type SupportForum = typeof supportForums.$inferSelect;
+export type InsertSupportForum = typeof supportForums.$inferInsert;
+export type ForumPost = typeof forumPosts.$inferSelect;
+export type InsertForumPost = typeof forumPosts.$inferInsert;
+export type ForumReply = typeof forumReplies.$inferSelect;
+export type InsertForumReply = typeof forumReplies.$inferInsert;
+export type PeerCheckIn = typeof peerCheckIns.$inferSelect;
+export type InsertPeerCheckIn = typeof peerCheckIns.$inferInsert;
+export type PeerSession = typeof peerSessions.$inferSelect;
+export type InsertPeerSession = typeof peerSessions.$inferInsert;
+export type CommunityModeration = typeof communityModerations.$inferSelect;
+export type InsertCommunityModeration = typeof communityModerations.$inferInsert;
+
 // WebSocket message types
 export interface ChatMessage {
   type: 'user_message' | 'bot_response' | 'learning_update' | 'milestone_achieved';
