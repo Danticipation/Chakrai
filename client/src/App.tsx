@@ -5,6 +5,7 @@ import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import OnboardingQuiz from './components/OnboardingQuiz';
+import MoodTracker from './components/MoodTracker';
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 

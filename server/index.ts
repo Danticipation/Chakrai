@@ -230,6 +230,197 @@ app.get('/api/memory-profile', async (req, res) => {
   }
 });
 
+// Emotional analysis endpoint for real-time sentiment detection
+app.post('/api/analyze-emotion', async (req, res) => {
+  try {
+    const { message, userId, conversationHistory, sessionId } = req.body;
+    
+    const { analyzeEmotionalState, generateSupportiveResponse } = await import('./emotionalAnalysis.js');
+    
+    // Analyze emotional state
+    const emotionalState = await analyzeEmotionalState(
+      message, 
+      conversationHistory || [], 
+      userId || 1
+    );
+    
+    // Store mood entry in database
+    const moodEntry = await storage.createMoodEntry({
+      userId: userId || 1,
+      emotion: emotionalState.primaryEmotion,
+      intensity: Math.round(emotionalState.intensity * 100),
+      valence: Math.round(emotionalState.valence * 100),
+      arousal: Math.round(emotionalState.arousal * 100),
+      context: message.substring(0, 500),
+      sessionId: sessionId,
+      riskLevel: emotionalState.riskLevel,
+      supportiveResponse: emotionalState.supportiveResponse,
+      recommendedActions: emotionalState.recommendedActions
+    });
+    
+    // Generate supportive response if needed
+    const supportiveResponse = await generateSupportiveResponse(emotionalState);
+    
+    res.json({
+      ...emotionalState,
+      supportiveResponse,
+      moodEntryId: moodEntry.id,
+      timestamp: moodEntry.createdAt
+    });
+  } catch (error) {
+    console.error('Emotional analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze emotional state' });
+  }
+});
+
+// Mood tracking endpoint for daily mood entries
+app.get('/api/mood-entries', async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 30;
+    
+    const entries = await storage.getMoodEntries(userId, limit);
+    
+    res.json({
+      entries: entries.map(entry => ({
+        id: entry.id,
+        emotion: entry.emotion,
+        intensity: entry.intensity,
+        valence: entry.valence,
+        arousal: entry.arousal,
+        context: entry.context,
+        riskLevel: entry.riskLevel,
+        timestamp: entry.createdAt
+      })),
+      totalEntries: entries.length
+    });
+  } catch (error) {
+    console.error('Mood entries error:', error);
+    res.status(500).json({ error: 'Failed to fetch mood entries' });
+  }
+});
+
+// Emotional patterns endpoint for analytics
+app.get('/api/emotional-patterns', async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId as string) || 1;
+    
+    // Get recent mood entries for pattern analysis
+    const recentEntries = await storage.getMoodEntries(userId, 50);
+    
+    if (recentEntries.length === 0) {
+      return res.json({
+        dominantEmotions: ['neutral'],
+        averageValence: 0,
+        averageArousal: 50,
+        emotionalVolatility: 0,
+        trendDirection: 'stable',
+        triggerPatterns: [],
+        copingStrategies: ['Regular self-reflection', 'Mindfulness practice'],
+        totalEntries: 0
+      });
+    }
+    
+    const { analyzeEmotionalPatterns } = await import('./emotionalAnalysis.js');
+    
+    // Convert database entries to analysis format
+    const moodData = recentEntries.map(entry => ({
+      id: entry.id,
+      userId: entry.userId,
+      emotion: entry.emotion,
+      intensity: entry.intensity / 100,
+      valence: entry.valence / 100,
+      arousal: entry.arousal / 100,
+      context: entry.context || '',
+      timestamp: entry.createdAt || new Date()
+    }));
+    
+    const patterns = analyzeEmotionalPatterns(moodData);
+    
+    // Store updated patterns
+    await storage.updateEmotionalPattern(userId, {
+      userId,
+      dominantEmotions: patterns.dominantEmotions,
+      averageValence: Math.round(patterns.averageValence * 100),
+      averageArousal: Math.round(patterns.averageArousal * 100),
+      emotionalVolatility: Math.round(patterns.emotionalVolatility * 100),
+      trendDirection: patterns.trendDirection,
+      triggerPatterns: patterns.triggerPatterns,
+      copingStrategies: patterns.copingStrategies
+    });
+    
+    res.json({
+      ...patterns,
+      totalEntries: recentEntries.length,
+      analysisDate: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Emotional patterns error:', error);
+    res.status(500).json({ error: 'Failed to analyze emotional patterns' });
+  }
+});
+
+// Crisis support endpoint for high-risk situations
+app.post('/api/crisis-support', async (req, res) => {
+  try {
+    const { userId, riskLevel, message } = req.body;
+    
+    const supportResources = {
+      critical: {
+        message: "I'm very concerned about what you're going through. Your safety is the most important thing right now.",
+        resources: [
+          "National Suicide Prevention Lifeline: 988",
+          "Crisis Text Line: Text HOME to 741741",
+          "Emergency Services: 911"
+        ],
+        immediateActions: [
+          "Reach out to emergency services if you're in immediate danger",
+          "Contact a trusted friend or family member",
+          "Go to your nearest emergency room",
+          "Call the National Suicide Prevention Lifeline"
+        ]
+      },
+      high: {
+        message: "I can sense you're going through a really difficult time. You don't have to face this alone.",
+        resources: [
+          "Mental Health America: mhanational.org",
+          "NAMI Helpline: 1-800-950-NAMI (6264)",
+          "Psychology Today therapist finder"
+        ],
+        immediateActions: [
+          "Consider reaching out to a mental health professional",
+          "Talk to someone you trust about how you're feeling",
+          "Practice grounding techniques",
+          "Ensure you're in a safe environment"
+        ]
+      }
+    };
+    
+    const support = supportResources[riskLevel as keyof typeof supportResources];
+    
+    if (support) {
+      // Log crisis intervention
+      await storage.createUserMemory({
+        userId: userId || 1,
+        memory: `Crisis support provided - Risk level: ${riskLevel}`,
+        category: 'crisis_support',
+        importance: 'critical'
+      });
+      
+      res.json(support);
+    } else {
+      res.json({
+        message: "Thank you for sharing your feelings. Remember that support is available when you need it.",
+        resources: [],
+        immediateActions: ["Practice self-care", "Stay connected with supportive people"]
+      });
+    }
+  } catch (error) {
+    console.error('Crisis support error:', error);
+    res.status(500).json({ error: 'Failed to provide crisis support' });
+  }
+});
+
 // Basic stats endpoint
 app.get('/api/stats', async (req, res) => {
   try {

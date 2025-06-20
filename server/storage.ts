@@ -1,12 +1,13 @@
 import { 
-  users, bots, messages, learnedWords, milestones, userMemories, userFacts,
+  users, bots, messages, learnedWords, milestones, userMemories, userFacts, moodEntries, emotionalPatterns,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
-  type UserFact, type InsertUserFact
+  type UserFact, type InsertUserFact, type MoodEntry, type InsertMoodEntry,
+  type EmotionalPattern, type InsertEmotionalPattern
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -199,6 +200,44 @@ export class DatabaseStorage implements IStorage {
 
   async clearUserFacts(userId: number): Promise<void> {
     await db.delete(userFacts).where(eq(userFacts.userId, userId));
+  }
+
+  // Mood tracking methods
+  async getMoodEntries(userId: number, limitCount?: number): Promise<MoodEntry[]> {
+    const query = db.select().from(moodEntries).where(eq(moodEntries.userId, userId)).orderBy(desc(moodEntries.createdAt));
+    if (limitCount) {
+      return await query.limit(limitCount);
+    }
+    return await query;
+  }
+
+  async createMoodEntry(insertMood: InsertMoodEntry): Promise<MoodEntry> {
+    const [mood] = await db.insert(moodEntries).values(insertMood).returning();
+    return mood;
+  }
+
+  async getEmotionalPattern(userId: number): Promise<EmotionalPattern | undefined> {
+    const [pattern] = await db.select().from(emotionalPatterns)
+      .where(eq(emotionalPatterns.userId, userId))
+      .orderBy(desc(emotionalPatterns.updatedAt));
+    return pattern || undefined;
+  }
+
+  async updateEmotionalPattern(userId: number, patternData: InsertEmotionalPattern): Promise<EmotionalPattern> {
+    const existingPattern = await this.getEmotionalPattern(userId);
+    
+    if (existingPattern) {
+      const [updated] = await db.update(emotionalPatterns)
+        .set({ ...patternData, updatedAt: new Date() })
+        .where(eq(emotionalPatterns.userId, userId))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db.insert(emotionalPatterns)
+        .values({ ...patternData, userId })
+        .returning();
+      return created;
+    }
   }
 }
 
