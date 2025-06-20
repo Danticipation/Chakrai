@@ -903,6 +903,19 @@ const AppLayout = () => {
             })}
           </div>
         </div>
+
+        {/* Crisis Alert Modal */}
+        {showCrisisAlert && crisisAlert && (
+          <CrisisAlert
+            crisisAnalysis={crisisAlert}
+            onClose={() => setShowCrisisAlert(false)}
+            onGetHelp={() => {
+              // Open mental health resources or crisis support
+              window.open('https://www.mentalhealth.gov/get-help/immediate-help', '_blank');
+              setShowCrisisAlert(false);
+            }}
+          />
+        )}
       </div>
     </QueryClientProvider>
   );
