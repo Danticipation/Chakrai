@@ -76,50 +76,36 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
   const deleteMutation = useMutation({
     mutationFn: async () => {
       if (!entry?.id) return;
-      await apiRequest(`/api/journal/${entry.id}`, { method: 'DELETE' });
+      await axios.delete(`/api/journal/${entry.id}`);
     },
     onSuccess: () => {
-      toast({
-        title: "Entry Deleted",
-        description: "Your journal entry has been removed.",
-      });
+      console.log("Journal entry deleted successfully");
       queryClient.invalidateQueries({ queryKey: ['/api/journal'] });
       onCancel?.();
     },
     onError: (error) => {
-      toast({
-        title: "Delete Failed",
-        description: "Unable to delete entry. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Failed to delete journal entry:", error);
     },
   });
 
   const analyzeEntryMutation = useMutation({
     mutationFn: async () => {
       if (!entry?.id) return null;
-      return await apiRequest(`/api/journal/${entry.id}/analyze`);
+      const response = await axios.get(`/api/journal/${entry.id}/analyze`);
+      return response.data;
     },
     onSuccess: (analysisData) => {
       setAnalytics(analysisData);
       setShowAnalysis(true);
     },
     onError: (error) => {
-      toast({
-        title: "Analysis Failed",
-        description: "Unable to analyze entry. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Failed to analyze journal entry:", error);
     },
   });
 
   const handleSave = () => {
     if (!content.trim()) {
-      toast({
-        title: "Content Required",
-        description: "Please write something before saving.",
-        variant: "destructive",
-      });
+      console.warn("Content required before saving");
       return;
     }
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Plus, BookOpen, TrendingUp, Download, Calendar, Search, Filter } from 'lucide-react';
 import JournalEditor from './JournalEditor';
-import JournalExportModal from './JournalExportModal';
+// import JournalExportModal from './JournalExportModal';
 import type { JournalEntry, JournalAnalytics } from '@shared/schema';
 import { format } from 'date-fns';
 
@@ -231,11 +231,24 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
 
   if (activeView === 'export') {
     return (
-      <JournalExportModal
-        userId={userId}
-        entries={entries}
-        onClose={() => setActiveView('list')}
-      />
+      <div className="p-4">
+        <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Export Journal</h2>
+        <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+          <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+            Export functionality will be available in the next update. You can access your journal entries through the main interface.
+          </p>
+          <button
+            onClick={() => setActiveView('list')}
+            className="px-4 py-2 rounded-lg text-sm font-medium"
+            style={{ 
+              backgroundColor: 'var(--soft-blue-dark)',
+              color: 'white'
+            }}
+          >
+            Back to Journal
+          </button>
+        </div>
+      </div>
     );
   }
 
