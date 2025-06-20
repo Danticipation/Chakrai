@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+import axios from 'axios';
 import { Save, Trash2, Eye, EyeOff, Brain, TrendingUp, FileText } from 'lucide-react';
 import type { JournalEntry, JournalAnalytics } from '@shared/schema';
 
@@ -52,37 +51,25 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
   const [analytics, setAnalytics] = useState<JournalAnalytics | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const saveMutation = useMutation({
     mutationFn: async (journalData: any) => {
       if (entry?.id) {
-        return await apiRequest(`/api/journal/${entry.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify(journalData)
-        });
+        const response = await axios.patch(`/api/journal/${entry.id}`, journalData);
+        return response.data;
       } else {
-        return await apiRequest('/api/journal', {
-          method: 'POST',
-          body: JSON.stringify(journalData)
-        });
+        const response = await axios.post('/api/journal', journalData);
+        return response.data;
       }
     },
     onSuccess: (savedEntry) => {
-      toast({
-        title: "Journal Entry Saved",
-        description: "Your thoughts have been safely recorded.",
-      });
+      console.log("Journal entry saved successfully");
       queryClient.invalidateQueries({ queryKey: ['/api/journal'] });
       onSave?.(savedEntry);
     },
     onError: (error) => {
-      toast({
-        title: "Save Failed",
-        description: "Unable to save your entry. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Failed to save journal entry:", error);
     },
   });
 

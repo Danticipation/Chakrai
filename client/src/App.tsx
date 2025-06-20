@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import OnboardingQuiz from './components/OnboardingQuiz';
 import MoodTracker from './components/MoodTracker';
 import CrisisAlert from './components/CrisisAlert';
+import JournalDashboard from './components/JournalDashboard';
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
@@ -84,6 +85,7 @@ const AppLayout = () => {
   const sections = [
     { id: 'chat', icon: MessageCircle, label: 'Chat' },
     { id: 'daily', icon: Sun, label: 'Daily' },
+    { id: 'journal', icon: FileText, label: 'Journal' },
     { id: 'reflect', icon: Brain, label: 'Reflect' },
     { id: 'memory', icon: BookOpen, label: 'Memory' },
     { id: 'mood', icon: Heart, label: 'Mood' },
@@ -661,6 +663,13 @@ const AppLayout = () => {
                 </button>
               </div>
             </div>
+          </div>
+        );
+
+      case 'journal':
+        return (
+          <div className="h-full">
+            <JournalDashboard userId={1} />
           </div>
         );
 

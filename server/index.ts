@@ -1253,6 +1253,231 @@ app.post('/api/voice/set', (req, res) => {
   }
 });
 
+// Therapeutic Journaling API Routes
+app.get('/api/journal', async (req, res) => {
+  try {
+    const userId = req.query.userId ? parseInt(req.query.userId as string) : 1;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+    const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+    
+    const entries = await storage.getJournalEntries(userId, limit, offset);
+    res.json(entries);
+  } catch (error) {
+    console.error('Failed to fetch journal entries:', error);
+    res.status(500).json({ error: 'Failed to fetch journal entries' });
+  }
+});
+
+app.get('/api/journal/:id', async (req, res) => {
+  try {
+    const entryId = parseInt(req.params.id);
+    const entry = await storage.getJournalEntry(entryId);
+    
+    if (!entry) {
+      return res.status(404).json({ error: 'Journal entry not found' });
+    }
+    
+    res.json(entry);
+  } catch (error) {
+    console.error('Failed to fetch journal entry:', error);
+    res.status(500).json({ error: 'Failed to fetch journal entry' });
+  }
+});
+
+app.post('/api/journal', async (req, res) => {
+  try {
+    const { analyzeJournalEntry, calculateJournalMetrics } = await import('./journalAnalysis');
+    
+    const entryData = req.body;
+    const metrics = calculateJournalMetrics({ content: entryData.content } as any);
+    
+    const entry = await storage.createJournalEntry({
+      ...entryData,
+      wordCount: metrics.wordCount,
+      readingTime: metrics.readingTime
+    });
+
+    // Perform AI analysis in background
+    try {
+      const previousEntries = await storage.getJournalEntries(entryData.userId, 10);
+      const analysis = await analyzeJournalEntry(entry, previousEntries);
+      
+      await storage.createJournalAnalytics({
+        userId: entryData.userId,
+        entryId: entry.id!,
+        emotionalThemes: analysis.emotionalThemes,
+        keyInsights: analysis.keyInsights,
+        sentimentScore: analysis.sentimentScore,
+        emotionalIntensity: analysis.emotionalIntensity,
+        copingStrategies: analysis.copingStrategies,
+        growthIndicators: analysis.growthIndicators,
+        concernAreas: analysis.concernAreas,
+        recommendedActions: analysis.recommendedActions,
+        therapistNotes: analysis.therapistNotes,
+        patternConnections: analysis.patternConnections,
+        confidenceScore: analysis.confidenceScore
+      });
+
+      await storage.updateJournalEntry(entry.id!, { aiAnalyzed: true });
+    } catch (analysisError) {
+      console.error('Journal analysis failed:', analysisError);
+    }
+
+    res.json(entry);
+  } catch (error) {
+    console.error('Failed to create journal entry:', error);
+    res.status(500).json({ error: 'Failed to create journal entry' });
+  }
+});
+
+app.patch('/api/journal/:id', async (req, res) => {
+  try {
+    const entryId = parseInt(req.params.id);
+    const updates = req.body;
+    
+    if (updates.content) {
+      const { calculateJournalMetrics } = await import('./journalAnalysis');
+      const metrics = calculateJournalMetrics({ content: updates.content } as any);
+      updates.wordCount = metrics.wordCount;
+      updates.readingTime = metrics.readingTime;
+    }
+    
+    const updatedEntry = await storage.updateJournalEntry(entryId, updates);
+    
+    if (!updatedEntry) {
+      return res.status(404).json({ error: 'Journal entry not found' });
+    }
+    
+    res.json(updatedEntry);
+  } catch (error) {
+    console.error('Failed to update journal entry:', error);
+    res.status(500).json({ error: 'Failed to update journal entry' });
+  }
+});
+
+app.delete('/api/journal/:id', async (req, res) => {
+  try {
+    const entryId = parseInt(req.params.id);
+    await storage.deleteJournalEntry(entryId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Failed to delete journal entry:', error);
+    res.status(500).json({ error: 'Failed to delete journal entry' });
+  }
+});
+
+app.get('/api/journal/:id/analyze', async (req, res) => {
+  try {
+    const entryId = parseInt(req.params.id);
+    const analytics = await storage.getJournalAnalytics(entryId);
+    
+    if (!analytics) {
+      return res.status(404).json({ error: 'Analysis not found' });
+    }
+    
+    res.json(analytics);
+  } catch (error) {
+    console.error('Failed to fetch journal analysis:', error);
+    res.status(500).json({ error: 'Failed to fetch journal analysis' });
+  }
+});
+
+app.get('/api/journal/analytics/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+    
+    const analytics = await storage.getJournalAnalyticsByUser(userId, limit);
+    res.json(analytics);
+  } catch (error) {
+    console.error('Failed to fetch journal analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch journal analytics' });
+  }
+});
+
+app.post('/api/journal/export', async (req, res) => {
+  try {
+    const { generateTherapistReport, generatePersonalInsightsSummary, exportToJSON, exportToCSV } = await import('./journalExport');
+    
+    const { userId, format, dateRange, includeAnalytics, recipientType } = req.body;
+    
+    // Get entries and analytics
+    const entries = await storage.getJournalEntries(userId, 1000);
+    const analytics = includeAnalytics ? await storage.getJournalAnalyticsByUser(userId, 1000) : [];
+    
+    let exportData: any;
+    let summary: string;
+    
+    switch (format) {
+      case 'therapist_report':
+        exportData = generateTherapistReport(entries, analytics);
+        summary = `Professional therapeutic report covering ${entries.length} journal entries with AI insights and clinical recommendations.`;
+        break;
+      case 'personal_insights':
+        exportData = generatePersonalInsightsSummary(entries, analytics);
+        summary = `Personal insights summary highlighting emotional journey and growth patterns across ${entries.length} entries.`;
+        break;
+      case 'csv_data':
+        exportData = exportToCSV(entries, analytics);
+        summary = `Structured data export containing ${entries.length} entries in CSV format for analysis or backup.`;
+        break;
+      default:
+        return res.status(400).json({ error: 'Invalid export format' });
+    }
+    
+    // Create export record
+    const exportRecord = await storage.createJournalExport({
+      userId,
+      exportType: format,
+      dateRange: { start: new Date(), end: new Date() },
+      includedEntries: entries.map(e => e.id!),
+      format: format === 'csv_data' ? 'csv' : 'json',
+      recipientType
+    });
+    
+    res.json({
+      id: exportRecord.id,
+      format: format.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      entryCount: entries.length,
+      dateRange: `${entries.length > 0 ? new Date(entries[entries.length - 1].createdAt!).toLocaleDateString() : 'N/A'} - ${entries.length > 0 ? new Date(entries[0].createdAt!).toLocaleDateString() : 'N/A'}`,
+      fileSize: `${Math.round(JSON.stringify(exportData).length / 1024)}KB`,
+      summary,
+      data: exportData
+    });
+  } catch (error) {
+    console.error('Failed to generate export:', error);
+    res.status(500).json({ error: 'Failed to generate export' });
+  }
+});
+
+app.get('/api/journal/export/:id/download', async (req, res) => {
+  try {
+    const exportId = parseInt(req.params.id);
+    const exportRecord = await storage.updateJournalExport(exportId, { 
+      downloadCount: 1 
+    });
+    
+    if (!exportRecord) {
+      return res.status(404).json({ error: 'Export not found' });
+    }
+    
+    // In a real implementation, you would retrieve the actual file
+    // For now, we'll return placeholder content
+    const content = "Export content would be here";
+    const mimeType = exportRecord.format === 'csv' ? 'text/csv' : 'application/json';
+    const filename = `journal_export_${exportId}.${exportRecord.format}`;
+    
+    res.json({
+      content,
+      mimeType,
+      filename
+    });
+  } catch (error) {
+    console.error('Failed to download export:', error);
+    res.status(500).json({ error: 'Failed to download export' });
+  }
+});
+
 // Setup Vite for frontend serving
 const server = createServer(app);
 
