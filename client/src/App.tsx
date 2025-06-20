@@ -9,6 +9,7 @@ import MoodTracker from './components/MoodTracker';
 import CrisisAlert from './components/CrisisAlert';
 import JournalDashboard from './components/JournalDashboard';
 import TherapistPortal from './components/TherapistPortal';
+import AchievementDashboard from './components/AchievementDashboard';
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
