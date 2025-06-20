@@ -1478,6 +1478,248 @@ app.get('/api/journal/export/:id/download', async (req, res) => {
   }
 });
 
+// Therapist Integration API Routes
+app.get('/api/therapists', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const therapists = await storage.getTherapistsByUser(userId as string);
+    res.json(therapists);
+  } catch (error) {
+    console.error('Failed to fetch therapists:', error);
+    res.status(500).json({ error: 'Failed to fetch therapists' });
+  }
+});
+
+app.post('/api/therapists', async (req, res) => {
+  try {
+    const therapistData = req.body;
+    const therapist = await storage.createTherapist(therapistData);
+    res.json(therapist);
+  } catch (error) {
+    console.error('Failed to create therapist:', error);
+    res.status(500).json({ error: 'Failed to create therapist' });
+  }
+});
+
+app.get('/api/therapist-sessions', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const sessions = await storage.getTherapistSessionsByUser(userId as string);
+    res.json(sessions);
+  } catch (error) {
+    console.error('Failed to fetch sessions:', error);
+    res.status(500).json({ error: 'Failed to fetch sessions' });
+  }
+});
+
+app.post('/api/therapist-sessions', async (req, res) => {
+  try {
+    const sessionData = req.body;
+    
+    // Generate AI session preparation
+    const userJournalEntries = await storage.getJournalEntries(sessionData.userId, 5);
+    const userMoodEntries = await storage.getMoodEntries(sessionData.userId, 10);
+    
+    // AI-generated session preparation
+    const sessionPrep = await generateSessionPreparation(userJournalEntries, userMoodEntries);
+    
+    const session = await storage.createTherapistSession({
+      ...sessionData,
+      userPreparation: sessionPrep
+    });
+    
+    res.json(session);
+  } catch (error) {
+    console.error('Failed to create session:', error);
+    res.status(500).json({ error: 'Failed to create session' });
+  }
+});
+
+app.get('/api/therapist-insights', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const insights = await storage.getTherapistSharedInsightsByUser(userId as string);
+    res.json(insights);
+  } catch (error) {
+    console.error('Failed to fetch insights:', error);
+    res.status(500).json({ error: 'Failed to fetch insights' });
+  }
+});
+
+app.post('/api/therapist-insights', async (req, res) => {
+  try {
+    const insightData = req.body;
+    const insight = await storage.createTherapistSharedInsight(insightData);
+    res.json(insight);
+  } catch (error) {
+    console.error('Failed to share insight:', error);
+    res.status(500).json({ error: 'Failed to share insight' });
+  }
+});
+
+app.get('/api/collaboration-settings', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    let settings = await storage.getCollaborationSettings(userId as string);
+    
+    // Create default settings if none exist
+    if (!settings) {
+      settings = await storage.createCollaborationSettings({
+        userId: userId as string,
+        autoShareJournalSummaries: false,
+        shareFrequency: 'weekly',
+        allowCrisisAlerts: true,
+        shareEmotionalPatterns: true,
+        shareProgressMetrics: true,
+        privacyLevel: 'standard'
+      });
+    }
+    
+    res.json(settings);
+  } catch (error) {
+    console.error('Failed to fetch collaboration settings:', error);
+    res.status(500).json({ error: 'Failed to fetch collaboration settings' });
+  }
+});
+
+app.patch('/api/collaboration-settings', async (req, res) => {
+  try {
+    const { userId, ...updateData } = req.body;
+    const settings = await storage.updateCollaborationSettings(userId, updateData);
+    res.json(settings);
+  } catch (error) {
+    console.error('Failed to update collaboration settings:', error);
+    res.status(500).json({ error: 'Failed to update collaboration settings' });
+  }
+});
+
+// Auto-share insights based on user settings
+app.post('/api/auto-share-insight', async (req, res) => {
+  try {
+    const { userId, insightType, content } = req.body;
+    
+    const settings = await storage.getCollaborationSettings(userId);
+    if (!settings || !shouldAutoShare(settings, insightType)) {
+      return res.json({ shared: false, reason: 'Auto-sharing disabled' });
+    }
+    
+    const therapists = await storage.getTherapistsByUser(userId);
+    const sharedInsights = [];
+    
+    for (const therapist of therapists) {
+      if (therapist.collaborationLevel !== 'view_only') {
+        const insight = await storage.createTherapistSharedInsight({
+          userId,
+          therapistId: therapist.id!,
+          insightType,
+          content,
+          priority: determinePriority(insightType, content)
+        });
+        sharedInsights.push(insight);
+      }
+    }
+    
+    res.json({ 
+      shared: true, 
+      count: sharedInsights.length,
+      insights: sharedInsights 
+    });
+  } catch (error) {
+    console.error('Failed to auto-share insight:', error);
+    res.status(500).json({ error: 'Failed to auto-share insight' });
+  }
+});
+
+// Generate meeting links for video sessions
+app.post('/api/sessions/:id/meeting-link', async (req, res) => {
+  try {
+    const sessionId = parseInt(req.params.id);
+    
+    // In a real implementation, you would integrate with video conferencing APIs
+    // For now, we'll generate a placeholder meeting link
+    const meetingLink = `https://meet.example.com/session-${sessionId}-${Date.now()}`;
+    
+    const session = await storage.updateTherapistSession(sessionId, { 
+      meetingLink,
+      status: 'scheduled'
+    });
+    
+    res.json({ meetingLink, session });
+  } catch (error) {
+    console.error('Failed to generate meeting link:', error);
+    res.status(500).json({ error: 'Failed to generate meeting link' });
+  }
+});
+
+// Helper functions
+async function generateSessionPreparation(journalEntries: any[], moodEntries: any[]): Promise<string> {
+  try {
+    const openai = (await import('openai')).default;
+    const client = new openai({ apiKey: process.env.OPENAI_API_KEY });
+
+    const recentEntries = journalEntries.slice(0, 3);
+    const recentMoods = moodEntries.slice(0, 5);
+    
+    const prompt = `Based on the following recent journal entries and mood data, generate a concise session preparation summary for a therapy session:
+
+Recent Journal Entries:
+${recentEntries.map(entry => `- ${entry.content?.substring(0, 200)}...`).join('\n')}
+
+Recent Mood Patterns:
+${recentMoods.map(mood => `- ${mood.emotion} (intensity: ${mood.intensity}/10)`).join('\n')}
+
+Please provide:
+1. Key themes to discuss (2-3 points)
+2. Emotional patterns observed
+3. Suggested discussion topics
+4. Any areas of concern
+
+Keep the summary concise and professional for therapist review.`;
+
+    const response = await client.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 500,
+    });
+
+    return response.choices[0]?.message?.content || 'Session preparation could not be generated at this time.';
+  } catch (error) {
+    console.error('Failed to generate session preparation:', error);
+    return 'Recent activity includes journaling and mood tracking. Recommend discussing current emotional patterns and coping strategies.';
+  }
+}
+
+function shouldAutoShare(settings: any, insightType: string): boolean {
+  switch (insightType) {
+    case 'journal_summary':
+      return settings.autoShareJournalSummaries;
+    case 'mood_patterns':
+      return settings.shareEmotionalPatterns;
+    case 'crisis_alert':
+      return settings.allowCrisisAlerts;
+    case 'progress_report':
+      return settings.shareProgressMetrics;
+    default:
+      return false;
+  }
+}
+
+function determinePriority(insightType: string, content: any): 'low' | 'medium' | 'high' | 'urgent' {
+  if (insightType === 'crisis_alert') {
+    return 'urgent';
+  }
+  
+  if (content?.riskLevel === 'high' || content?.riskLevel === 'critical') {
+    return 'high';
+  }
+  
+  if (insightType === 'mood_patterns' && content?.volatility > 0.7) {
+    return 'high';
+  }
+  
+  return 'medium';
+}
+
 // Setup Vite for frontend serving
 const server = createServer(app);
 

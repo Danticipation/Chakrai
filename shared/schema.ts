@@ -279,6 +279,95 @@ export type InsertJournalAnalytics = z.infer<typeof insertJournalAnalyticsSchema
 export type JournalExport = typeof journalExports.$inferSelect;
 export type InsertJournalExport = z.infer<typeof insertJournalExportSchema>;
 
+// Therapist Integration Tables
+export const therapists = pgTable("therapists", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  name: varchar("name").notNull(),
+  email: varchar("email").notNull(),
+  licenseNumber: varchar("license_number"),
+  specialization: text("specialization").array(),
+  isVerified: boolean("is_verified").default(false),
+  collaborationLevel: varchar("collaboration_level", { enum: ["view_only", "interactive", "full_access"] }).default("view_only"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const therapistSessions = pgTable("therapist_sessions", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  therapistId: integer("therapist_id").notNull().references(() => therapists.id),
+  scheduledAt: timestamp("scheduled_at").notNull(),
+  duration: integer("duration").default(60), // minutes
+  sessionType: varchar("session_type", { enum: ["video", "phone", "in_person"] }).default("video"),
+  status: varchar("status", { enum: ["scheduled", "in_progress", "completed", "cancelled", "no_show"] }).default("scheduled"),
+  meetingLink: varchar("meeting_link"),
+  notes: text("notes"),
+  userPreparation: text("user_preparation"), // AI-generated session prep
+  therapistNotes: text("therapist_notes"),
+  followUpActions: text("follow_up_actions").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const therapistSharedInsights = pgTable("therapist_shared_insights", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  therapistId: integer("therapist_id").notNull().references(() => therapists.id),
+  insightType: varchar("insight_type", { enum: ["journal_summary", "mood_patterns", "crisis_alert", "progress_report"] }).notNull(),
+  content: jsonb("content").notNull(),
+  sharedAt: timestamp("shared_at").defaultNow(),
+  therapistViewed: boolean("therapist_viewed").default(false),
+  therapistResponse: text("therapist_response"),
+  priority: varchar("priority", { enum: ["low", "medium", "high", "urgent"] }).default("medium"),
+  isActive: boolean("is_active").default(true),
+});
+
+export const collaborationSettings = pgTable("collaboration_settings", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  autoShareJournalSummaries: boolean("auto_share_journal_summaries").default(false),
+  shareFrequency: varchar("share_frequency", { enum: ["daily", "weekly", "biweekly", "monthly"] }).default("weekly"),
+  allowCrisisAlerts: boolean("allow_crisis_alerts").default(true),
+  shareEmotionalPatterns: boolean("share_emotional_patterns").default(true),
+  shareProgressMetrics: boolean("share_progress_metrics").default(true),
+  privacyLevel: varchar("privacy_level", { enum: ["minimal", "standard", "detailed"] }).default("standard"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTherapistSchema = createInsertSchema(therapists).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertTherapistSessionSchema = createInsertSchema(therapistSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertTherapistSharedInsightSchema = createInsertSchema(therapistSharedInsights).omit({
+  id: true,
+  sharedAt: true,
+});
+
+export const insertCollaborationSettingsSchema = createInsertSchema(collaborationSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type Therapist = typeof therapists.$inferSelect;
+export type InsertTherapist = z.infer<typeof insertTherapistSchema>;
+export type TherapistSession = typeof therapistSessions.$inferSelect;
+export type InsertTherapistSession = z.infer<typeof insertTherapistSessionSchema>;
+export type TherapistSharedInsight = typeof therapistSharedInsights.$inferSelect;
+export type InsertTherapistSharedInsight = z.infer<typeof insertTherapistSharedInsightSchema>;
+export type CollaborationSettings = typeof collaborationSettings.$inferSelect;
+export type InsertCollaborationSettings = z.infer<typeof insertCollaborationSettingsSchema>;
+
 // WebSocket message types
 export interface ChatMessage {
   type: 'user_message' | 'bot_response' | 'learning_update' | 'milestone_achieved';

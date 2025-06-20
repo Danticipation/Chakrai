@@ -1,6 +1,7 @@
 import { 
   users, bots, messages, learnedWords, milestones, userMemories, userFacts, moodEntries, emotionalPatterns,
   safetyCheckIns, crisisInterventions, journalEntries, journalAnalytics, journalExports,
+  therapists, therapistSessions, therapistSharedInsights, collaborationSettings,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
@@ -10,7 +11,11 @@ import {
   type CrisisIntervention, type InsertCrisisIntervention,
   type JournalEntry, type InsertJournalEntry,
   type JournalAnalytics, type InsertJournalAnalytics,
-  type JournalExport, type InsertJournalExport
+  type JournalExport, type InsertJournalExport,
+  type Therapist, type InsertTherapist,
+  type TherapistSession, type InsertTherapistSession,
+  type TherapistSharedInsight, type InsertTherapistSharedInsight,
+  type CollaborationSettings, type InsertCollaborationSettings
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -72,6 +77,18 @@ export interface IStorage {
   createJournalExport(exportData: InsertJournalExport): Promise<JournalExport>;
   getJournalExports(userId: number): Promise<JournalExport[]>;
   updateJournalExport(id: number, updates: Partial<JournalExport>): Promise<JournalExport | undefined>;
+
+  // Therapist integration methods
+  getTherapistsByUser(userId: string): Promise<Therapist[]>;
+  createTherapist(therapist: InsertTherapist): Promise<Therapist>;
+  getTherapistSessionsByUser(userId: string): Promise<TherapistSession[]>;
+  createTherapistSession(session: InsertTherapistSession): Promise<TherapistSession>;
+  updateTherapistSession(id: number, updates: Partial<TherapistSession>): Promise<TherapistSession | undefined>;
+  getTherapistSharedInsightsByUser(userId: string): Promise<TherapistSharedInsight[]>;
+  createTherapistSharedInsight(insight: InsertTherapistSharedInsight): Promise<TherapistSharedInsight>;
+  getCollaborationSettings(userId: string): Promise<CollaborationSettings | undefined>;
+  createCollaborationSettings(settings: InsertCollaborationSettings): Promise<CollaborationSettings>;
+  updateCollaborationSettings(userId: string, updates: Partial<CollaborationSettings>): Promise<CollaborationSettings | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -372,6 +389,67 @@ export class DatabaseStorage implements IStorage {
     const [updated] = await db.update(journalExports)
       .set(updates)
       .where(eq(journalExports.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  // Therapist integration methods
+  async getTherapistsByUser(userId: string): Promise<Therapist[]> {
+    return await db.select().from(therapists)
+      .where(eq(therapists.userId, userId))
+      .orderBy(desc(therapists.createdAt));
+  }
+
+  async createTherapist(insertTherapist: InsertTherapist): Promise<Therapist> {
+    const [therapist] = await db.insert(therapists).values(insertTherapist).returning();
+    return therapist;
+  }
+
+  async getTherapistSessionsByUser(userId: string): Promise<TherapistSession[]> {
+    return await db.select().from(therapistSessions)
+      .where(eq(therapistSessions.userId, userId))
+      .orderBy(desc(therapistSessions.scheduledAt));
+  }
+
+  async createTherapistSession(insertSession: InsertTherapistSession): Promise<TherapistSession> {
+    const [session] = await db.insert(therapistSessions).values(insertSession).returning();
+    return session;
+  }
+
+  async updateTherapistSession(id: number, updates: Partial<TherapistSession>): Promise<TherapistSession | undefined> {
+    const [updated] = await db.update(therapistSessions)
+      .set(updates)
+      .where(eq(therapistSessions.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async getTherapistSharedInsightsByUser(userId: string): Promise<TherapistSharedInsight[]> {
+    return await db.select().from(therapistSharedInsights)
+      .where(eq(therapistSharedInsights.userId, userId))
+      .orderBy(desc(therapistSharedInsights.sharedAt));
+  }
+
+  async createTherapistSharedInsight(insertInsight: InsertTherapistSharedInsight): Promise<TherapistSharedInsight> {
+    const [insight] = await db.insert(therapistSharedInsights).values(insertInsight).returning();
+    return insight;
+  }
+
+  async getCollaborationSettings(userId: string): Promise<CollaborationSettings | undefined> {
+    const [settings] = await db.select().from(collaborationSettings)
+      .where(eq(collaborationSettings.userId, userId));
+    return settings || undefined;
+  }
+
+  async createCollaborationSettings(insertSettings: InsertCollaborationSettings): Promise<CollaborationSettings> {
+    const [settings] = await db.insert(collaborationSettings).values(insertSettings).returning();
+    return settings;
+  }
+
+  async updateCollaborationSettings(userId: string, updates: Partial<CollaborationSettings>): Promise<CollaborationSettings | undefined> {
+    const [updated] = await db.update(collaborationSettings)
+      .set(updates)
+      .where(eq(collaborationSettings.userId, userId))
       .returning();
     return updated || undefined;
   }
