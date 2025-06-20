@@ -2,19 +2,19 @@
 
 /* Main background - soft blue */
 body, html, #root {
-  background-color: #030782 !important;
-  background: linear-gradient(180deg, #030782 0%, #d4f7e1 100%) !important;
+  background-color: #1c2333 !important;
+  background: linear-gradient(180deg, #1c2333 0%, #d4f7e1 100%) !important;
 }
 
 /* Panel backgrounds with subtle gradients */
 .w-1\/4, .w-1\/2 {
-  background: linear-gradient(180deg, #030782 0%, #f2f2f2 100%) !important;
+  background: linear-gradient(180deg, #1c2333 0%, #f2f2f2 100%) !important;
   border: 1px solid rgb(0, 0, 0, 0.3) !important;
 }
 
 /* Cards and content areas - layered depth */
 div[class*="rounded-2xl"] {
-  background: linear-gradient(180deg, #000000 0%, #030782 100%) !important;
+  background: linear-gradient(180deg, #000000 0%, #1c2333 100%) !important;
   border: 8px solid rgb(0, 0, 0, 0.4) !important;
   box-shadow: 0 24px 12px rgb(0, 0, 0, 0.15) !important;
 }

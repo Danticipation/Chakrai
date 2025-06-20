@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, jsonb, timestamp, varchar, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -110,6 +110,52 @@ export type UserMemory = typeof userMemories.$inferSelect;
 export type InsertUserMemory = z.infer<typeof insertUserMemorySchema>;
 export type UserFact = typeof userFacts.$inferSelect;
 export type InsertUserFact = z.infer<typeof insertUserFactSchema>;
+
+// Mood tracking tables for emotional intelligence
+export const moodEntries = pgTable("mood_entries", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  emotion: text("emotion").notNull(),
+  intensity: integer("intensity").notNull().default(50), // 0 to 100
+  valence: integer("valence").notNull().default(0), // -100 to 100
+  arousal: integer("arousal").notNull().default(50), // 0 to 100
+  context: text("context").default(""),
+  sessionId: text("session_id"),
+  riskLevel: text("risk_level").default("low"),
+  supportiveResponse: text("supportive_response"),
+  recommendedActions: jsonb("recommended_actions"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const emotionalPatterns = pgTable("emotional_patterns", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  dominantEmotions: jsonb("dominant_emotions"),
+  averageValence: integer("average_valence").default(0),
+  averageArousal: integer("average_arousal").default(50),
+  emotionalVolatility: integer("emotional_volatility").default(0),
+  trendDirection: text("trend_direction").default("stable"),
+  triggerPatterns: jsonb("trigger_patterns"),
+  copingStrategies: jsonb("coping_strategies"),
+  analysisDate: timestamp("analysis_date").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertMoodEntrySchema = createInsertSchema(moodEntries).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertEmotionalPatternSchema = createInsertSchema(emotionalPatterns).omit({
+  id: true,
+  analysisDate: true,
+  updatedAt: true,
+});
+
+export type MoodEntry = typeof moodEntries.$inferSelect;
+export type InsertMoodEntry = z.infer<typeof insertMoodEntrySchema>;
+export type EmotionalPattern = typeof emotionalPatterns.$inferSelect;
+export type InsertEmotionalPattern = z.infer<typeof insertEmotionalPatternSchema>;
 
 // WebSocket message types
 export interface ChatMessage {

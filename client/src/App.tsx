@@ -56,7 +56,7 @@ const AppLayout = () => {
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
-  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('EkK5I93UQWFDigLMpZcX'); // James - default voice
+  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('G0yjIg3xY8gEJZkHpjVm'); // Brian - default voice
   const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
   const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
   const [zodiacSign, setZodiacSign] = useState<string>('');
@@ -86,10 +86,11 @@ const AppLayout = () => {
   ];
 
   const voiceOptions = [
-    { id: 'EkK5I93UQWFDigLMpZcX', name: 'James', description: 'Professional male voice', gender: 'Male', default: true },
-    { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian', description: 'Deep, resonant male voice', gender: 'Male' },
+    { id: 'G0yjIg3xY8gEJZkHpjVm', name: 'Brian', description: 'Professional male voice', gender: 'Male', default: true },
+    { id: '1SM7GgM6IMuvQlz2BwM3', name: 'Mark', description: 'Deep, resonant male voice', gender: 'Male' },
     { id: 'kdmDKE6EkgrWrrykO9Qt', name: 'Alexandra', description: 'Clear female voice', gender: 'Female' },
-    { id: 'l32B8XDoylOsZKiSdfhE', name: 'Carla', description: 'Warm female voice', gender: 'Female' }
+    { id: 'l32B8XDoylOsZKiSdfhE', name: 'Carla', description: 'Warm female voice', gender: 'Female' },
+    { id: 'Z3R5wn05IrDiVCyEkUrK', name: 'Lili', description: 'Soft, Sweet female voice', gender: 'Female' }
   ];
 
   const personalityModes = [
@@ -461,9 +462,9 @@ const AppLayout = () => {
               <div className="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
                 <img src={traiLogo} alt="TrAI Logo" className="w-8 h-8" />
               </div>
-              <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Welcome to TraI</h2>
+              <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>TrAI</h2>
               <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                Your therapeutic companion for mental wellness
+                "Reflect. Refine. Rise."
               </p>
             </div>
 

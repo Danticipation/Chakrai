@@ -39,6 +39,12 @@ export interface IStorage {
   getUserFacts(userId: number): Promise<UserFact[]>;
   createUserFact(fact: InsertUserFact): Promise<UserFact>;
   clearUserFacts(userId: number): Promise<void>;
+
+  // Mood tracking methods
+  getMoodEntries(userId: number, limit?: number): Promise<MoodEntry[]>;
+  createMoodEntry(mood: InsertMoodEntry): Promise<MoodEntry>;
+  getEmotionalPattern(userId: number): Promise<EmotionalPattern | undefined>;
+  updateEmotionalPattern(userId: number, pattern: InsertEmotionalPattern): Promise<EmotionalPattern>;
 }
 
 export class DatabaseStorage implements IStorage {

@@ -129,7 +129,7 @@ export default function MemoryDashboard({ userId = 1 }: { userId?: number }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Your Personality Mirror
+              'Reflection'
             </h3>
           </div>
           <div className="space-y-3">

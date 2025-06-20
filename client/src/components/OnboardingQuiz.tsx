@@ -173,10 +173,10 @@ export default function OnboardingQuiz({ userId = 1, onComplete }: OnboardingQui
       {/* Header */}
       <div className="flex-shrink-0 text-center p-4">
         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
-          Welcome to TraI
+          Welcome to TrAI
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-          Let's build your personality mirror together
+          Let's build your Reflection together
         </p>
         
         {/* Progress Bar */}
