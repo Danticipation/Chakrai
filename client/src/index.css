@@ -4,25 +4,25 @@
 
 :root {
   /* Therapeutic Color Palette */
-  --soft-blue: #ADD8E6;      /* Main calming background */
-  --pale-green: #98FB98;     /* Accent for success/wellness */
-  --gentle-lavender: #E6E6FA; /* Accent for highlights */
+  --soft-blue: #006eff;      /* Main calming background */
+  --pale-green: #000000;     /* Accent for success/wellness */
+  --gentle-lavender: #000000; /* Accent for highlights */
   
   /* Derived therapeutic colors */
-  --soft-blue-dark: #87CEEB;
-  --soft-blue-darker: #6495ED;
-  --pale-green-dark: #90EE90;
-  --gentle-lavender-dark: #DDA0DD;
+  --soft-blue-dark: #000000;
+  --soft-blue-darker: #000000;
+  --pale-green-dark: #050505;
+  --gentle-lavender-dark: #0d0d0d;
   
   /* Text colors for therapeutic design */
-  --text-primary: #2F4F4F;    /* Calm dark blue-grey */
-  --text-secondary: #708090;  /* Medium blue-grey */
-  --text-muted: #B0C4DE;      /* Light blue-grey */
+  --text-primary: #000000;    /* Calm dark blue-grey */
+  --text-secondary: #050505;  /* Medium blue-grey */
+  --text-muted: #000000;      /* Light blue-grey */
   
   /* Surface colors */
-  --surface-primary: #F0F8FF;   /* Very light blue-white */
-  --surface-secondary: #F5F5F5; /* Light blue-grey */
-  --surface-elevated: #FFFFFF;  /* Pure white for cards */
+  --surface-primary: #000000;   /* Very light blue-white */
+  --surface-secondary: #000000; /* Light blue-grey */
+  --surface-elevated: #000000;  /* Pure white for cards */
 }
 
 body {
@@ -99,25 +99,25 @@ div[style*="var(--surface-elevated)"] {
 /* Mobile input area left shift */
 @media (max-width: 768px) {
   .mobile-input-shift {
-    left: -4px !important;
+    left: -6px !important;
     right: 4px !important;
   }
   
   /* Shift welcome section left */
   .mobile-welcome-shift {
-    margin-left: -4px !important;
+    margin-left: -6px !important;
     padding-left: 8px !important;
   }
   
   /* Shift voice selector left */  
   .mobile-voice-shift {
-    margin-left: -4px !important;
+    margin-left: -6px !important;
     padding-left: 8px !important;
   }
   
   /* Shift bottom navigation left */
   .mobile-nav-shift {
-    left: -4px !important;
+    left: -5px !important;
     right: 4px !important;
   }
 }

@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { createServer } from "http";
 import multer from "multer";
+import OpenAI from "openai";
 import { setupVite } from "./vite.js";
 import { baseVoices, getVoiceById, getDefaultVoice } from "./voiceConfig.js";
 import { storage } from "./storage.js";
@@ -51,69 +52,6 @@ app.get('/api/daily-content', async (req, res) => {
       "I am exactly where I need to be, learning and growing every day."
     ];
 
-    const horoscopes = {
-      aries: [
-        "Your leadership qualities shine today. Take initiative on projects that matter to you.",
-        "Mars energizes your ambition. A bold move could lead to unexpected opportunities.",
-        "Your competitive spirit serves you well. Channel that energy into productive pursuits."
-      ],
-      taurus: [
-        "Venus brings harmony to your relationships. Focus on building stronger connections.",
-        "Your practical nature helps you solve a financial matter. Trust your instincts.",
-        "Slow and steady progress in your goals brings lasting satisfaction today."
-      ],
-      gemini: [
-        "Mercury enhances your communication skills. Important conversations flow easily.",
-        "Your curiosity leads to valuable discoveries. Stay open to learning something new.",
-        "Networking and social connections bring unexpected benefits your way."
-      ],
-      cancer: [
-        "The Moon illuminates your intuitive powers. Trust your emotional guidance today.",
-        "Family and home matters receive positive attention. Nurturing brings rewards.",
-        "Your empathetic nature helps someone in need, creating good karma."
-      ],
-      leo: [
-        "The Sun spotlights your creative talents. Express yourself boldly and authentically.",
-        "Your natural charisma attracts positive attention from others today.",
-        "Leadership opportunities present themselves. Step into your power confidently."
-      ],
-      virgo: [
-        "Your attention to detail pays off in a significant way. Perfectionism serves you well.",
-        "Health and wellness routines bring noticeable improvements to your energy.",
-        "Practical solutions to complex problems come naturally to you today."
-      ],
-      libra: [
-        "Balance and harmony guide your decisions. Diplomatic approaches yield success.",
-        "Venus enhances your charm and social appeal. Relationships flourish today.",
-        "Artistic or aesthetic projects receive inspiration and positive feedback."
-      ],
-      scorpio: [
-        "Your intensity and focus help you uncover hidden truths or opportunities.",
-        "Transformation energy is strong. Embrace changes that serve your highest good.",
-        "Your investigative nature leads to valuable insights about a situation."
-      ],
-      sagittarius: [
-        "Jupiter expands your horizons. Travel, learning, or philosophy captures your interest.",
-        "Your optimistic outlook inspires others and opens new doors for you.",
-        "Adventure calls to you. Take calculated risks that align with your goals."
-      ],
-      capricorn: [
-        "Saturn rewards your hard work and dedication with tangible progress.",
-        "Your disciplined approach to goals shows impressive results today.",
-        "Authority figures or mentors provide valuable guidance for your career path."
-      ],
-      aquarius: [
-        "Uranus brings innovative ideas and fresh perspectives to your projects.",
-        "Your humanitarian nature guides you toward meaningful social connections.",
-        "Technology or unconventional approaches solve problems others cannot."
-      ],
-      pisces: [
-        "Neptune enhances your intuition and creative inspiration flows freely.",
-        "Your compassionate nature attracts kindred spirits and meaningful relationships.",
-        "Dreams and subconscious insights provide guidance for important decisions."
-      ]
-    };
-
     const zodiacSigns = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'] as const;
     
     // Use user's zodiac sign if provided, otherwise random
@@ -124,14 +62,51 @@ app.get('/api/daily-content', async (req, res) => {
       selectedSign = zodiacSigns[Math.floor(Math.random() * zodiacSigns.length)];
     }
     
-    const signHoroscopes = horoscopes[selectedSign as keyof typeof horoscopes];
+    // Fetch real horoscope from external API
+    let horoscope = '';
+    try {
+      const horoscopeResponse = await fetch(`https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${selectedSign}&day=TODAY`);
+      if (horoscopeResponse.ok) {
+        const horoscopeData = await horoscopeResponse.json();
+        horoscope = horoscopeData.data.horoscope_data || '';
+      }
+    } catch (error) {
+      console.error('Horoscope API error:', error);
+    }
+
+    // Fallback to OpenAI-generated horoscope if external API fails
+    if (!horoscope) {
+      try {
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+          messages: [
+            {
+              role: "system",
+              content: "You are an expert astrologer. Generate a personalized, insightful daily horoscope that feels authentic and meaningful. Focus on practical guidance, emotional insights, and positive energy. Keep it between 30-50 words."
+            },
+            {
+              role: "user",
+              content: `Generate today's horoscope for ${selectedSign}. Make it unique, thoughtful, and actionable.`
+            }
+          ],
+          max_tokens: 120,
+          temperature: 0.8
+        });
+        
+        horoscope = response.choices[0].message.content || '';
+      } catch (openaiError) {
+        console.error('OpenAI horoscope generation error:', openaiError);
+        // Ultimate fallback - should rarely be used
+        horoscope = `Today brings new opportunities for growth and self-discovery. Trust your intuition and embrace the positive energy around you.`;
+      }
+    }
     
     const randomAffirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
-    const randomHoroscope = signHoroscopes[Math.floor(Math.random() * signHoroscopes.length)];
 
     res.json({
       affirmation: randomAffirmation,
-      horoscope: randomHoroscope,
+      horoscope: horoscope,
       zodiacSign: selectedSign.charAt(0).toUpperCase() + selectedSign.slice(1)
     });
 
