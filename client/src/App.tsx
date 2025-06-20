@@ -766,9 +766,27 @@ const AppLayout = () => {
 
       default:
         return (
-          <div className="p-4">
-            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Coming Soon</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>This section is under development.</p>
+          <div className="flex flex-col h-full">
+            {/* Compact Welcome Section for Mobile */}
+            <div className="p-3 text-center mobile-welcome-shift" style={{ backgroundColor: 'var(--soft-blue)' }}>
+              <div className="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                <img src={traiLogo} alt="TrAI Logo" className="w-8 h-8" />
+              </div>
+              <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>TrAI</h2>
+              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                "Reflect. Refine. Rise."
+              </p>
+            </div>
+
+            {/* Default Content */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="text-center py-8">
+                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Welcome to TrAI</h3>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  Select a section from the navigation below to get started with your mental wellness journey.
+                </p>
+              </div>
+            </div>
           </div>
         );
     }
