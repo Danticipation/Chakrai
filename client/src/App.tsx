@@ -88,7 +88,6 @@ const AppLayout = () => {
     { id: 'memory', icon: BookOpen, label: 'Memory' },
     { id: 'mood', icon: Heart, label: 'Mood' },
     { id: 'progress', icon: Target, label: 'Progress' },
-    { id: 'voice', icon: Mic, label: 'Voice' },
     { id: 'settings', icon: User, label: 'Settings' }
   ];
 
