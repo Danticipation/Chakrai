@@ -336,6 +336,39 @@ export const collaborationSettings = pgTable("collaboration_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Gamification Tables
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  badgeId: varchar("badge_id").notNull(),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  progress: integer("progress").default(0),
+  isActive: boolean("is_active").default(true),
+});
+
+export const wellnessStreaks = pgTable("wellness_streaks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  streakType: varchar("streak_type", { enum: ["daily_checkin", "journal_entry", "mood_tracking", "chat_session", "goal_progress"] }).notNull(),
+  currentStreak: integer("current_streak").default(0),
+  longestStreak: integer("longest_streak").default(0),
+  lastActivity: timestamp("last_activity"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const dailyActivities = pgTable("daily_activities", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  activityDate: timestamp("activity_date").notNull(),
+  checkedIn: boolean("checked_in").default(false),
+  journalEntry: boolean("journal_entry").default(false),
+  moodTracked: boolean("mood_tracked").default(false),
+  chatSession: boolean("chat_session").default(false),
+  goalProgress: boolean("goal_progress").default(false),
+  totalActivities: integer("total_activities").default(0),
+});
+
 export const insertTherapistSchema = createInsertSchema(therapists).omit({
   id: true,
   createdAt: true,
@@ -367,6 +400,18 @@ export type TherapistSharedInsight = typeof therapistSharedInsights.$inferSelect
 export type InsertTherapistSharedInsight = z.infer<typeof insertTherapistSharedInsightSchema>;
 export type CollaborationSettings = typeof collaborationSettings.$inferSelect;
 export type InsertCollaborationSettings = z.infer<typeof insertCollaborationSettingsSchema>;
+
+// Gamification Schema Types
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({ id: true, unlockedAt: true });
+export const insertWellnessStreakSchema = createInsertSchema(wellnessStreaks).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertDailyActivitySchema = createInsertSchema(dailyActivities).omit({ id: true });
+
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+export type WellnessStreak = typeof wellnessStreaks.$inferSelect;
+export type InsertWellnessStreak = z.infer<typeof insertWellnessStreakSchema>;
+export type DailyActivity = typeof dailyActivities.$inferSelect;
+export type InsertDailyActivity = z.infer<typeof insertDailyActivitySchema>;
 
 // WebSocket message types
 export interface ChatMessage {

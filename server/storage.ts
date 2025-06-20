@@ -2,6 +2,7 @@ import {
   users, bots, messages, learnedWords, milestones, userMemories, userFacts, moodEntries, emotionalPatterns,
   safetyCheckIns, crisisInterventions, journalEntries, journalAnalytics, journalExports,
   therapists, therapistSessions, therapistSharedInsights, collaborationSettings,
+  userAchievements, wellnessStreaks, dailyActivities,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
@@ -15,7 +16,10 @@ import {
   type Therapist, type InsertTherapist,
   type TherapistSession, type InsertTherapistSession,
   type TherapistSharedInsight, type InsertTherapistSharedInsight,
-  type CollaborationSettings, type InsertCollaborationSettings
+  type CollaborationSettings, type InsertCollaborationSettings,
+  type UserAchievement, type InsertUserAchievement,
+  type WellnessStreak, type InsertWellnessStreak,
+  type DailyActivity, type InsertDailyActivity
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -89,6 +93,20 @@ export interface IStorage {
   getCollaborationSettings(userId: number): Promise<CollaborationSettings | undefined>;
   createCollaborationSettings(settings: InsertCollaborationSettings): Promise<CollaborationSettings>;
   updateCollaborationSettings(userId: number, updates: Partial<CollaborationSettings>): Promise<CollaborationSettings | undefined>;
+
+  // Gamification methods
+  getUserAchievements(userId: number): Promise<UserAchievement[]>;
+  createUserAchievement(achievement: InsertUserAchievement): Promise<UserAchievement>;
+  getWellnessStreak(userId: number, streakType: string): Promise<WellnessStreak | undefined>;
+  createWellnessStreak(streak: InsertWellnessStreak): Promise<WellnessStreak>;
+  updateWellnessStreak(id: number, updates: Partial<WellnessStreak>): Promise<WellnessStreak | undefined>;
+  updateDailyActivity(userId: number, date: Date, activityType: string): Promise<void>;
+  getDailyActivitiesHistory(userId: number, limit?: number): Promise<DailyActivity[]>;
+  getDailyCheckinCount(userId: number): Promise<number>;
+  getJournalEntryCount(userId: number): Promise<number>;
+  getMoodEntryCount(userId: number): Promise<number>;
+  getChatSessionCount(userId: number): Promise<number>;
+  getGoalProgressCount(userId: number): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -452,6 +470,115 @@ export class DatabaseStorage implements IStorage {
       .where(eq(collaborationSettings.userId, userId))
       .returning();
     return updated || undefined;
+  }
+
+  // Gamification methods
+  async getUserAchievements(userId: number): Promise<UserAchievement[]> {
+    return await db.select().from(userAchievements)
+      .where(eq(userAchievements.userId, userId))
+      .orderBy(desc(userAchievements.unlockedAt));
+  }
+
+  async createUserAchievement(insertAchievement: InsertUserAchievement): Promise<UserAchievement> {
+    const [achievement] = await db.insert(userAchievements).values(insertAchievement).returning();
+    return achievement;
+  }
+
+  async getWellnessStreak(userId: number, streakType: string): Promise<WellnessStreak | undefined> {
+    const [streak] = await db.select().from(wellnessStreaks)
+      .where(eq(wellnessStreaks.userId, userId))
+      .where(eq(wellnessStreaks.streakType, streakType as any));
+    return streak || undefined;
+  }
+
+  async createWellnessStreak(insertStreak: InsertWellnessStreak): Promise<WellnessStreak> {
+    const [streak] = await db.insert(wellnessStreaks).values(insertStreak).returning();
+    return streak;
+  }
+
+  async updateWellnessStreak(id: number, updates: Partial<WellnessStreak>): Promise<WellnessStreak | undefined> {
+    const [updated] = await db.update(wellnessStreaks)
+      .set(updates)
+      .where(eq(wellnessStreaks.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async updateDailyActivity(userId: number, date: Date, activityType: string): Promise<void> {
+    const dateString = date.toISOString().split('T')[0];
+    const existingActivity = await db.select().from(dailyActivities)
+      .where(eq(dailyActivities.userId, userId))
+      .where(sql`DATE(activity_date) = ${dateString}`)
+      .limit(1);
+
+    const updates: any = { [activityType]: true };
+    
+    if (existingActivity.length > 0) {
+      const activity = existingActivity[0];
+      const totalActivities = [
+        updates.checkedIn || activity.checkedIn,
+        updates.journalEntry || activity.journalEntry,
+        updates.moodTracked || activity.moodTracked,
+        updates.chatSession || activity.chatSession,
+        updates.goalProgress || activity.goalProgress
+      ].filter(Boolean).length;
+
+      await db.update(dailyActivities)
+        .set({ ...updates, totalActivities })
+        .where(eq(dailyActivities.id, activity.id));
+    } else {
+      await db.insert(dailyActivities).values({
+        userId,
+        activityDate: date,
+        ...updates,
+        totalActivities: 1
+      });
+    }
+  }
+
+  async getDailyActivitiesHistory(userId: number, limit = 30): Promise<DailyActivity[]> {
+    return await db.select().from(dailyActivities)
+      .where(eq(dailyActivities.userId, userId))
+      .orderBy(desc(dailyActivities.activityDate))
+      .limit(limit);
+  }
+
+  async getDailyCheckinCount(userId: number): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` })
+      .from(dailyActivities)
+      .where(eq(dailyActivities.userId, userId))
+      .where(eq(dailyActivities.checkedIn, true));
+    return result[0]?.count || 0;
+  }
+
+  async getJournalEntryCount(userId: number): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` })
+      .from(journalEntries)
+      .where(eq(journalEntries.userId, userId));
+    return result[0]?.count || 0;
+  }
+
+  async getMoodEntryCount(userId: number): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` })
+      .from(moodEntries)
+      .where(eq(moodEntries.userId, userId));
+    return result[0]?.count || 0;
+  }
+
+  async getChatSessionCount(userId: number): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` })
+      .from(dailyActivities)
+      .where(eq(dailyActivities.userId, userId))
+      .where(eq(dailyActivities.chatSession, true));
+    return result[0]?.count || 0;
+  }
+
+  async getGoalProgressCount(userId: number): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` })
+      .from(dailyActivities)
+      .where(eq(dailyActivities.userId, userId))
+      .where(eq(dailyActivities.goalProgress, true));
+    return result[0]?.count || 0;
   }
 }
 
