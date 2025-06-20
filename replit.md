@@ -12,6 +12,16 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
 ## Recent Changes
+### June 20, 2025 - Community & Peer Support Features Completed
+- **Anonymous Support Forums**: Safe, moderated spaces for anonymous discussions with 4 default forums (General, Anxiety, Depression, Crisis Support)
+- **Privacy-Conscious Design**: Anonymous posting with auto-generated supportive usernames like "KindHeart123" to maintain privacy while fostering connection
+- **Peer-to-Peer Check-Ins**: Voluntary peer support system with privacy-conscious pairing for daily check-ins, crisis support, motivation, and accountability
+- **Community Moderation**: Comprehensive moderation system with AI-assisted content monitoring and human oversight for safety
+- **Forum Interaction**: Support system for posts with heart reactions and threaded discussions to encourage positive community engagement
+- **Database Architecture**: New community tables (supportForums, forumPosts, forumReplies, peerCheckIns, peerSessions, communityModerations) supporting full community features
+- **Navigation Integration**: Added dedicated Community section to main navigation with access to forums and peer check-ins
+- **Mobile-Optimized Interface**: Community portal designed for mobile-first therapeutic interactions with calming design elements
+
 ### June 20, 2025 - Gamification & Positive Reinforcement System Completed
 - **Achievement Badge System**: Comprehensive 20+ achievement badges across 5 categories (engagement, milestone, wellness, achievement) with rarity levels (common, rare, epic, legendary)
 - **Wellness Streak Tracking**: Real-time streak monitoring for daily check-ins, journaling, mood tracking, chat sessions, and goal progress with automatic streak maintenance
