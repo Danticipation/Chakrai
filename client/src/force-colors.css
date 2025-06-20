@@ -2,68 +2,68 @@
 
 /* Main background - soft blue */
 body, html, #root {
-  background-color: #000000 !important;
-  background: linear-gradient(180deg, #94c8ff 0%, #d4f7e1 100%) !important;
+  background-color: #030782 !important;
+  background: linear-gradient(180deg, #030782 0%, #d4f7e1 100%) !important;
 }
 
 /* Panel backgrounds with subtle gradients */
 .w-1\/4, .w-1\/2 {
-  background: linear-gradient(180deg, #007bff 0%, #d4f7e1 100%) !important;
+  background: linear-gradient(180deg, #030782 0%, #f2f2f2 100%) !important;
   border: 1px solid rgb(0, 0, 0, 0.3) !important;
 }
 
 /* Cards and content areas - layered depth */
 div[class*="rounded-2xl"] {
-  background: linear-gradient(180deg, #002fff 0%, #adb0ff 100%) !important;
-  border: 1px solid rgb(0, 0, 0, 0.4) !important;
-  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.15) !important;
+  background: linear-gradient(180deg, #000000 0%, #030782 100%) !important;
+  border: 8px solid rgb(0, 0, 0, 0.4) !important;
+  box-shadow: 0 24px 12px rgb(0, 0, 0, 0.15) !important;
 }
 
 /* Buttons with personality */
 button {
-  background: linear-gradient(180deg, #454545 0%, #67a4e4 100%) !important;
-  border: 1px solid rgb(3, 3, 3, 0.6) !important;
+  background: linear-gradient(180deg, #000000 0%, #70a7ff 100%) !important;
+  border: 8px solid rgb(0, 0, 0, 0.6) !important;
   transition: all 0.3s ease !important;
-  box-shadow: 0 2px 8px rgb(8, 8, 8, 0.2) !important;
+  box-shadow: 0 24px 12px rgb(0, 0, 0, 0.2) !important;
 }
 
 button:hover {
-  background: linear-gradient(145deg, #94c8ff 0%, #d4f7e1 100%) !important;
+  background: linear-gradient(145deg, #70a7ff 0%, #000000 100%) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgb(8, 8, 8, 0.3) !important;
+  box-shadow: 0 24px 12 rgb(0, 0, 0, 0.3) !important;
 }
 
 /* Input fields */
 input, select, textarea {
-  background: linear-gradient(145deg, #636363 0%, #dedede 100%) !important;
-  border: 2px solid rgb(0, 0, 0, 0.3) !important;
+  background: linear-gradient(180, #70a7ff 0%, #000000 100%) !important;
+  border: 2px solid rgb(243, 247, 8, 0.3) !important;
   transition: all 0.3s ease !important;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: #000000 !important;
-  box-shadow: 0 0 0 3px rgb(0, 0, 0, 0.2) !important;
+  border-color: #ede607 !important;
+  box-shadow: 0 0 0 3px rgb(3, 3, 3, 0.2) !important;
 }
 
 /* Progress bars with gradient */
 div[class*="rounded-full"] {
-  background: linear-gradient(180deg, #83329a 0%, #000 100%) !important;
+  background: linear-gradient(180deg, #fdfbfe 0%, #000 100%) !important;
 }
 
 /* Icons and accent elements */
 div[style*="backgroundColor: 'var(--pale-green')"] {
-  background: linear-gradient(360deg, #0d0d0d 0%, #000000 100%) !important;
+  background: linear-gradient(360deg, #ff0000 0%, #000000 100%) !important;
   box-shadow: 0 3px 8px rgb(0, 0, 0, 0.25) !important;
 }
 
 div[style*="backgroundColor: 'var(--gentle-lavender')"] {
-  background: linear-gradient(145deg, #050505 0%, #030303 100%) !important;
+  background: linear-gradient(145deg, #971717 0%, #030303 100%) !important;
   box-shadow: 0 3px 8px rgb(0, 0, 0, 0.25) !important;
 }
 
 /* Add personality to goal progress bars */
 div[style*="width:"] {
-  background: linear-gradient(90deg, #000000 0%, #000000 50%, #000000 100%) !important;
+  background: linear-gradient(90deg, #870d0d 0%, #000000 50%, #000000 100%) !important;
   border-radius: 25px !important;
   position: relative !important;
   overflow: hidden !important;
@@ -76,7 +76,7 @@ div[style*="width:"]:before {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgb(0, 0, 0,0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgb(117, 15, 15,0.3), transparent);
   animation: shimmer 2s infinite;
 }
 
@@ -90,7 +90,7 @@ div[class*="space-y-4"] > div {
   border-radius: 20px !important;
   padding: 16px !important;
   margin: 8px 0 !important;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 3px 12px rgb(160, 34, 34,0.1) !important;
   transition: transform 0.2s ease !important;
 }
 
@@ -111,16 +111,16 @@ div[class*="w-12 h-12"] {
 /* Gradient borders for panels */
 .w-1\/4:first-child {
   border-right: 3px solid transparent !important;
-  background-image: linear-gradient(180deg, #000000 0%, #000000 100%), 
-                    linear-gradient(180deg, #000000, #000000) !important;
+  background-image: linear-gradient(180deg, #9f2323 0%, #000000 100%), 
+                    linear-gradient(180deg, #942424, #000000) !important;
   background-origin: border-box !important;
   background-clip: content-box, border-box !important;
 }
 
 .w-1\/4:last-child {
   border-left: 3px solid transparent !important;
-  background-image: linear-gradient(180deg, #050505 0%, #000000 100%), 
-                    linear-gradient(180deg, #0a0a0a, #000000) !important;
+  background-image: linear-gradient(180deg, #8f0a0a 0%, #000000 100%), 
+                    linear-gradient(180deg, #6c1313, #000000) !important;
   background-origin: border-box !important;
   background-clip: content-box, border-box !important;
 }

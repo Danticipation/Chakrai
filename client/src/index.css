@@ -4,25 +4,25 @@
 
 :root {
   /* Therapeutic Color Palette */
-  --soft-blue: #006eff;      /* Main calming background */
-  --pale-green: #000000;     /* Accent for success/wellness */
-  --gentle-lavender: #000000; /* Accent for highlights */
+  --soft-blue: #ADD8E6;      /* Main calming background */
+  --pale-green: #98FB98;     /* Accent for success/wellness */
+  --gentle-lavender: #E6E6FA; /* Accent for highlights */
   
   /* Derived therapeutic colors */
-  --soft-blue-dark: #000000;
-  --soft-blue-darker: #000000;
-  --pale-green-dark: #050505;
-  --gentle-lavender-dark: #0d0d0d;
+  --soft-blue-dark: #87CEEB;
+  --soft-blue-light: #E0F6FF;
+  --pale-green-dark: #90EE90;
+  --gentle-lavender-dark: #DDA0DD;
   
   /* Text colors for therapeutic design */
-  --text-primary: #000000;    /* Calm dark blue-grey */
-  --text-secondary: #050505;  /* Medium blue-grey */
-  --text-muted: #000000;      /* Light blue-grey */
+  --text-primary: #dddddd;    /* Calm dark blue-grey */
+  --text-secondary: #ffffff;  /* Medium blue-grey */
+  --text-muted: #ffffff;      /* Light blue-grey */
   
   /* Surface colors */
-  --surface-primary: #000000;   /* Very light blue-white */
-  --surface-secondary: #000000; /* Light blue-grey */
-  --surface-elevated: #000000;  /* Pure white for cards */
+  --surface-primary: #ffffff;   /* Very light blue-white */
+  --surface-secondary: #6c7f99; /* Light blue-grey */
+  --surface-elevated: #ffffff;  /* Pure white for cards */
 }
 
 body {
@@ -38,13 +38,13 @@ body {
 
 /* Global therapeutic background enforcement */
 html, body, #root {
-  background-color: #94c8ff !important;
+  background-color: #030782 !important;
   min-height: 100vh !important;
 }
 
 /* Override any white backgrounds in the app */
 .min-h-screen, .h-screen, .h-full {
-  background-color: #94c8ff !important;
+  background-color: #030782 !important;
 }
 
 /* Ensure all main containers use therapeutic colors */
@@ -81,19 +81,19 @@ body {
   height: 100%;
 }
 div[class*="h-screen"], div[class*="min-h-screen"] {
-  background-color: #94c8ff !important;
+  background-color: #030782 !important;
 }
 
 /* Override all white backgrounds with therapeutic colors */
 div[style*="background-color: #FFFFFF"], 
 div[style*="backgroundColor: '#FFFFFF'"],
 div[style*="var(--surface-elevated)"] {
-  background-color: #94c8ff !important;
+  background-color: #030782 !important;
 }
 
 /* Force therapeutic colors on all panels and containers */
 .w-1\/4, .w-1\/2, .w-full {
-  background-color: #94c8ff !important;
+  background-color: #030782 !important;
 }
 
 /* Mobile input area left shift */
@@ -124,20 +124,20 @@ div[style*="var(--surface-elevated)"] {
 
 /* Force therapeutic colors on main containers only */
 .w-1\/4, .w-1\/2, .flex-1, .h-full, .min-h-screen {
-  background-color: #94c8ff !important;
+  background-color: #123456 !important;
 }
 
 /* Override white card backgrounds */
 div[style*="backgroundColor: 'var(--surface-elevated')"],
 div[style*="backgroundColor: 'var(--surface-secondary')"] {
-  background-color: #94c8ff !important;
+  background-color: #058df5 !important;
 }
 
 /* Override CSS variables that might be causing white backgrounds */
 :root {
-  --surface-elevated: #94c8ff !important;
-  --surface-primary: #94c8ff !important;
-  --surface-secondary: #94c8ff !important;
+  --surface-elevated: #058df5 !important;
+  --surface-primary: #058df5 !important;
+  --surface-secondary: #058df5 !important;
 }
 
 /* Mobile safe area support */
@@ -203,11 +203,11 @@ div[style*="backgroundColor: 'var(--surface-secondary')"] {
     
     /* Mobile-optimized shadows */
     .shadow-sm {
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 3px rgb(157, 42, 42, 0.1);
     }
     
     .shadow-lg {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px rgb(165, 49, 49, 0.15);
     }
   }
 }
@@ -260,17 +260,17 @@ div[style*="backgroundColor: 'var(--surface-secondary')"] {
 }
 
 ::-webkit-scrollbar-track {
-  background: #94c8ff;
+  background: #058df5;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #94c8ff;
+  background: #058df5;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94c8ff;
+  background: #058df5;
 }
 
 /* Smooth animations */
@@ -282,7 +282,7 @@ div[style*="backgroundColor: 'var(--surface-secondary')"] {
 input:focus,
 button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgb(3, 3, 3, 0.5);
+  box-shadow: 0 0 0 2px rgb(133, 35, 35, 0.5);
 }
 
 /* Loading animation */
