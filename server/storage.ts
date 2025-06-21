@@ -5,6 +5,7 @@ import {
   userAchievements, wellnessStreaks, dailyActivities,
   supportForums, forumPosts, forumReplies, peerCheckIns, peerSessions, communityModerations,
   userPreferences, conversationPatterns, wellnessRecommendations, adaptationInsights, userFeedback, monthlyReports,
+  wearableDevices, healthMetrics, healthCorrelations, syncLogs,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
@@ -33,7 +34,11 @@ import {
   type WellnessRecommendation, type InsertWellnessRecommendation,
   type AdaptationInsight, type InsertAdaptationInsight,
   type UserFeedback, type InsertUserFeedback,
-  type MonthlyReport, type InsertMonthlyReport
+  type MonthlyReport, type InsertMonthlyReport,
+  type WearableDevice, type InsertWearableDevice,
+  type HealthMetric, type InsertHealthMetric,
+  type HealthCorrelation, type InsertHealthCorrelation,
+  type SyncLog, type InsertSyncLog
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -158,6 +163,18 @@ export interface IStorage {
   getMonthlyReport(userId: number, reportMonth: string): Promise<MonthlyReport | undefined>;
   saveMonthlyReport(report: InsertMonthlyReport): Promise<MonthlyReport>;
   getMonthlyReportById(reportId: number): Promise<MonthlyReport | undefined>;
+
+  // Wearable Device Integration methods
+  getWearableDevices(userId: number): Promise<WearableDevice[]>;
+  createWearableDevice(device: InsertWearableDevice): Promise<WearableDevice>;
+  updateWearableDevice(deviceId: number, updates: Partial<WearableDevice>): Promise<WearableDevice | undefined>;
+  deleteWearableDevice(deviceId: number): Promise<void>;
+  getHealthMetrics(userId: number, metricType?: string, limit?: number): Promise<HealthMetric[]>;
+  createHealthMetric(metric: InsertHealthMetric): Promise<HealthMetric>;
+  getHealthCorrelations(userId: number): Promise<HealthCorrelation[]>;
+  createHealthCorrelation(correlation: InsertHealthCorrelation): Promise<HealthCorrelation>;
+  createSyncLog(log: InsertSyncLog): Promise<SyncLog>;
+  getRecentSyncLogs(deviceId: number, limit?: number): Promise<SyncLog[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -830,6 +847,67 @@ export class DatabaseStorage implements IStorage {
   async getMonthlyReportById(reportId: number): Promise<MonthlyReport | undefined> {
     const [report] = await db.select().from(monthlyReports).where(eq(monthlyReports.id, reportId));
     return report || undefined;
+  }
+
+  // Wearable Device Integration methods
+  async getWearableDevices(userId: number): Promise<WearableDevice[]> {
+    return await db.select().from(wearableDevices).where(eq(wearableDevices.userId, userId));
+  }
+
+  async createWearableDevice(device: InsertWearableDevice): Promise<WearableDevice> {
+    const [newDevice] = await db.insert(wearableDevices).values(device).returning();
+    return newDevice;
+  }
+
+  async updateWearableDevice(deviceId: number, updates: Partial<WearableDevice>): Promise<WearableDevice | undefined> {
+    const [updatedDevice] = await db
+      .update(wearableDevices)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(wearableDevices.id, deviceId))
+      .returning();
+    return updatedDevice || undefined;
+  }
+
+  async deleteWearableDevice(deviceId: number): Promise<void> {
+    await db.delete(wearableDevices).where(eq(wearableDevices.id, deviceId));
+  }
+
+  async getHealthMetrics(userId: number, metricType?: string, limit: number = 100): Promise<HealthMetric[]> {
+    let query = db.select().from(healthMetrics).where(eq(healthMetrics.userId, userId));
+    
+    if (metricType) {
+      query = query.where(eq(healthMetrics.metricType, metricType));
+    }
+    
+    return await query.orderBy(desc(healthMetrics.timestamp)).limit(limit);
+  }
+
+  async createHealthMetric(metric: InsertHealthMetric): Promise<HealthMetric> {
+    const [newMetric] = await db.insert(healthMetrics).values(metric).returning();
+    return newMetric;
+  }
+
+  async getHealthCorrelations(userId: number): Promise<HealthCorrelation[]> {
+    return await db.select().from(healthCorrelations)
+      .where(eq(healthCorrelations.userId, userId))
+      .orderBy(desc(healthCorrelations.analysisDate));
+  }
+
+  async createHealthCorrelation(correlation: InsertHealthCorrelation): Promise<HealthCorrelation> {
+    const [newCorrelation] = await db.insert(healthCorrelations).values(correlation).returning();
+    return newCorrelation;
+  }
+
+  async createSyncLog(log: InsertSyncLog): Promise<SyncLog> {
+    const [newLog] = await db.insert(syncLogs).values(log).returning();
+    return newLog;
+  }
+
+  async getRecentSyncLogs(deviceId: number, limit: number = 10): Promise<SyncLog[]> {
+    return await db.select().from(syncLogs)
+      .where(eq(syncLogs.deviceId, deviceId))
+      .orderBy(desc(syncLogs.createdAt))
+      .limit(limit);
   }
 }
 
