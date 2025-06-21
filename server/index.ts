@@ -3020,6 +3020,307 @@ app.get('/api/wearable-devices/:deviceId/sync-logs', async (req, res) => {
   }
 });
 
+// ===============================
+// VR/AR THERAPEUTIC EXPERIENCES API
+// ===============================
+
+// Get available VR environments
+app.get('/api/vr/environments', async (req, res) => {
+  try {
+    const { category } = req.query;
+    const environments = await storage.getVrEnvironments(category as string);
+    res.json({ environments });
+  } catch (error) {
+    console.error('Failed to fetch VR environments:', error);
+    res.status(500).json({ error: 'Failed to fetch VR environments' });
+  }
+});
+
+// Get specific VR environment
+app.get('/api/vr/environments/:id', async (req, res) => {
+  try {
+    const environmentId = parseInt(req.params.id);
+    const environment = await storage.getVrEnvironment(environmentId);
+    if (!environment) {
+      return res.status(404).json({ error: 'Environment not found' });
+    }
+    res.json({ environment });
+  } catch (error) {
+    console.error('Failed to fetch VR environment:', error);
+    res.status(500).json({ error: 'Failed to fetch VR environment' });
+  }
+});
+
+// Create custom VR environment
+app.post('/api/vr/environments', async (req, res) => {
+  try {
+    const { therapeuticGoal, targetCondition, difficulty } = req.body;
+    const { generateCustomVrEnvironment } = await import('./vrTherapyEngine');
+    
+    const environmentData = await generateCustomVrEnvironment(therapeuticGoal, targetCondition, difficulty);
+    const environment = await storage.createVrEnvironment({
+      ...environmentData,
+      isActive: true
+    });
+    
+    res.json({ environment });
+  } catch (error) {
+    console.error('Failed to create VR environment:', error);
+    res.status(500).json({ error: 'Failed to create VR environment' });
+  }
+});
+
+// Get VR recommendations for user
+app.get('/api/vr/recommendations/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { mood, goals } = req.query;
+    const { generateVrRecommendations } = await import('./vrTherapyEngine');
+    
+    const sessions = await storage.getUserVrSessions(userId, 10);
+    const therapeuticGoals = goals ? (goals as string).split(',') : undefined;
+    
+    const recommendations = await generateVrRecommendations(
+      userId, 
+      mood as string, 
+      therapeuticGoals, 
+      sessions
+    );
+    
+    res.json({ recommendations });
+  } catch (error) {
+    console.error('Failed to generate VR recommendations:', error);
+    res.status(500).json({ error: 'Failed to generate VR recommendations' });
+  }
+});
+
+// Personalize VR environment for user
+app.post('/api/vr/personalize/:environmentId/:userId', async (req, res) => {
+  try {
+    const environmentId = parseInt(req.params.environmentId);
+    const userId = parseInt(req.params.userId);
+    const { sessionGoals } = req.body;
+    const { personalizeVrEnvironment } = await import('./vrTherapyEngine');
+    
+    const personalizedEnv = await personalizeVrEnvironment(environmentId, userId, sessionGoals);
+    res.json({ personalizedEnvironment: personalizedEnv });
+  } catch (error) {
+    console.error('Failed to personalize VR environment:', error);
+    res.status(500).json({ error: 'Failed to personalize VR environment' });
+  }
+});
+
+// Start VR session
+app.post('/api/vr/sessions', async (req, res) => {
+  try {
+    const { userId, environmentId, sessionGoals, personalizedSettings } = req.body;
+    
+    const session = await storage.createVrSession({
+      userId,
+      environmentId,
+      startTime: new Date(),
+      sessionGoals: sessionGoals || [],
+      personalizedSettings: personalizedSettings || {},
+      completionStatus: 'in_progress'
+    });
+    
+    res.json({ session });
+  } catch (error) {
+    console.error('Failed to start VR session:', error);
+    res.status(500).json({ error: 'Failed to start VR session' });
+  }
+});
+
+// Update VR session progress
+app.patch('/api/vr/sessions/:sessionId', async (req, res) => {
+  try {
+    const sessionId = parseInt(req.params.sessionId);
+    const updates = req.body;
+    
+    const session = await storage.updateVrSession(sessionId, updates);
+    res.json({ session });
+  } catch (error) {
+    console.error('Failed to update VR session:', error);
+    res.status(500).json({ error: 'Failed to update VR session' });
+  }
+});
+
+// Complete VR session and analyze
+app.post('/api/vr/sessions/:sessionId/complete', async (req, res) => {
+  try {
+    const sessionId = parseInt(req.params.sessionId);
+    const { effectiveness, stressLevel, heartRate, interactions, sideEffects, notes } = req.body;
+    const { analyzeVrSession } = await import('./vrTherapyEngine');
+    
+    // Update session with completion data
+    const session = await storage.updateVrSession(sessionId, {
+      endTime: new Date(),
+      completionStatus: 'completed',
+      effectiveness,
+      stressLevel,
+      heartRate,
+      interactions,
+      sideEffects,
+      notes
+    });
+    
+    // Analyze session effectiveness
+    const analysis = await analyzeVrSession(sessionId);
+    
+    // Update user progress
+    const existingProgress = await storage.getVrProgress(session.userId, session.environmentId);
+    if (existingProgress) {
+      await storage.updateVrProgress(session.userId, session.environmentId, {
+        sessionCount: existingProgress.sessionCount + 1,
+        totalDuration: existingProgress.totalDuration + (session.duration || 0),
+        averageEffectiveness: ((existingProgress.averageEffectiveness * existingProgress.sessionCount) + effectiveness) / (existingProgress.sessionCount + 1),
+        bestScore: Math.max(existingProgress.bestScore, effectiveness),
+        achievements: [...(existingProgress.achievements || []), ...(analysis.achievements || [])],
+        lastSession: new Date()
+      });
+    } else {
+      await storage.createVrProgress({
+        userId: session.userId,
+        environmentId: session.environmentId,
+        sessionCount: 1,
+        totalDuration: session.duration || 0,
+        averageEffectiveness: effectiveness,
+        bestScore: effectiveness,
+        achievements: analysis.achievements || [],
+        lastSession: new Date()
+      });
+    }
+    
+    res.json({ session, analysis });
+  } catch (error) {
+    console.error('Failed to complete VR session:', error);
+    res.status(500).json({ error: 'Failed to complete VR session' });
+  }
+});
+
+// Monitor VR session in real-time
+app.post('/api/vr/sessions/:sessionId/monitor', async (req, res) => {
+  try {
+    const sessionId = parseInt(req.params.sessionId);
+    const { heartRate, stressLevel, userInteractions } = req.body;
+    const { monitorVrSession } = await import('./vrTherapyEngine');
+    
+    const monitoring = await monitorVrSession(sessionId, heartRate, stressLevel, userInteractions);
+    res.json({ monitoring });
+  } catch (error) {
+    console.error('Failed to monitor VR session:', error);
+    res.status(500).json({ error: 'Failed to monitor VR session' });
+  }
+});
+
+// Get user's VR sessions
+app.get('/api/vr/sessions/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { limit } = req.query;
+    
+    const sessions = await storage.getUserVrSessions(userId, limit ? parseInt(limit as string) : 50);
+    res.json({ sessions });
+  } catch (error) {
+    console.error('Failed to fetch VR sessions:', error);
+    res.status(500).json({ error: 'Failed to fetch VR sessions' });
+  }
+});
+
+// Get user's VR progress
+app.get('/api/vr/progress/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { environmentId } = req.query;
+    
+    const progress = environmentId 
+      ? await storage.getUserVrProgress(userId, parseInt(environmentId as string))
+      : await storage.getUserVrProgress(userId);
+    
+    res.json({ progress });
+  } catch (error) {
+    console.error('Failed to fetch VR progress:', error);
+    res.status(500).json({ error: 'Failed to fetch VR progress' });
+  }
+});
+
+// Create VR therapeutic plan
+app.post('/api/vr/therapeutic-plans', async (req, res) => {
+  try {
+    const { userId, therapeuticGoal, targetConditions, planDuration } = req.body;
+    const { createPersonalizedVrPlan } = await import('./vrTherapyEngine');
+    
+    const plan = await createPersonalizedVrPlan(userId, therapeuticGoal, targetConditions, planDuration);
+    res.json({ plan });
+  } catch (error) {
+    console.error('Failed to create VR therapeutic plan:', error);
+    res.status(500).json({ error: 'Failed to create VR therapeutic plan' });
+  }
+});
+
+// Get user's VR therapeutic plans
+app.get('/api/vr/therapeutic-plans/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const plans = await storage.getUserVrTherapeuticPlans(userId);
+    res.json({ plans });
+  } catch (error) {
+    console.error('Failed to fetch VR therapeutic plans:', error);
+    res.status(500).json({ error: 'Failed to fetch VR therapeutic plans' });
+  }
+});
+
+// Update VR therapeutic plan
+app.patch('/api/vr/therapeutic-plans/:planId', async (req, res) => {
+  try {
+    const planId = parseInt(req.params.planId);
+    const updates = req.body;
+    
+    const plan = await storage.updateVrTherapeuticPlan(planId, updates);
+    res.json({ plan });
+  } catch (error) {
+    console.error('Failed to update VR therapeutic plan:', error);
+    res.status(500).json({ error: 'Failed to update VR therapeutic plan' });
+  }
+});
+
+// Get user's VR accessibility profile
+app.get('/api/vr/accessibility-profile/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const profile = await storage.getUserVrAccessibilityProfile(userId);
+    res.json({ profile });
+  } catch (error) {
+    console.error('Failed to fetch VR accessibility profile:', error);
+    res.status(500).json({ error: 'Failed to fetch VR accessibility profile' });
+  }
+});
+
+// Create or update VR accessibility profile
+app.post('/api/vr/accessibility-profile/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const profileData = req.body;
+    
+    const existingProfile = await storage.getUserVrAccessibilityProfile(userId);
+    
+    let profile;
+    if (existingProfile) {
+      profile = await storage.updateVrAccessibilityProfile(userId, profileData);
+    } else {
+      profile = await storage.createVrAccessibilityProfile({
+        userId,
+        ...profileData
+      });
+    }
+    
+    res.json({ profile });
+  } catch (error) {
+    console.error('Failed to save VR accessibility profile:', error);
+    res.status(500).json({ error: 'Failed to save VR accessibility profile' });
+  }
+});
+
 // Setup Vite for frontend serving
 const server = createServer(app);
 

@@ -12,6 +12,7 @@ import TherapistPortal from './components/TherapistPortal';
 import AchievementDashboard from './components/AchievementDashboard';
 import CommunityPortal from './components/CommunityPortal';
 import HealthDashboard from './components/HealthDashboard';
+import VRTherapyDashboard from './components/VRTherapyDashboard';
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
