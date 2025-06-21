@@ -507,6 +507,8 @@ export type InsertPeerSession = typeof peerSessions.$inferInsert;
 export type CommunityModeration = typeof communityModerations.$inferSelect;
 export type InsertCommunityModeration = typeof communityModerations.$inferInsert;
 
+
+
 // WebSocket message types
 export interface ChatMessage {
   type: 'user_message' | 'bot_response' | 'learning_update' | 'milestone_achieved';
@@ -593,6 +595,21 @@ export const userFeedback = pgTable("user_feedback", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const monthlyReports = pgTable("monthly_reports", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  reportMonth: varchar("report_month", { length: 7 }).notNull(), // YYYY-MM format
+  reportData: jsonb("report_data").notNull(), // Complete report content
+  wellnessScore: real("wellness_score"),
+  emotionalVolatility: real("emotional_volatility"),
+  progressSummary: text("progress_summary"),
+  keyInsights: text("key_insights").array(),
+  recommendations: text("recommendations").array(),
+  riskLevel: varchar("risk_level", { length: 20 }).default('low'),
+  generatedAt: timestamp("generated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type InsertUserPreferences = typeof userPreferences.$inferInsert;
 export type ConversationPattern = typeof conversationPatterns.$inferSelect;
@@ -603,3 +620,5 @@ export type WellnessRecommendation = typeof wellnessRecommendations.$inferSelect
 export type InsertWellnessRecommendation = typeof wellnessRecommendations.$inferInsert;
 export type UserFeedback = typeof userFeedback.$inferSelect;
 export type InsertUserFeedback = typeof userFeedback.$inferInsert;
+export type MonthlyReport = typeof monthlyReports.$inferSelect;
+export type InsertMonthlyReport = typeof monthlyReports.$inferInsert;

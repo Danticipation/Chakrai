@@ -4,6 +4,7 @@ import {
   therapists, therapistSessions, therapistSharedInsights, collaborationSettings,
   userAchievements, wellnessStreaks, dailyActivities,
   supportForums, forumPosts, forumReplies, peerCheckIns, peerSessions, communityModerations,
+  userPreferences, conversationPatterns, wellnessRecommendations, adaptationInsights, userFeedback, monthlyReports,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
@@ -26,7 +27,13 @@ import {
   type ForumReply, type InsertForumReply,
   type PeerCheckIn, type InsertPeerCheckIn,
   type PeerSession, type InsertPeerSession,
-  type CommunityModeration, type InsertCommunityModeration
+  type CommunityModeration, type InsertCommunityModeration,
+  type UserPreferences, type InsertUserPreferences,
+  type ConversationPattern, type InsertConversationPattern,
+  type WellnessRecommendation, type InsertWellnessRecommendation,
+  type AdaptationInsight, type InsertAdaptationInsight,
+  type UserFeedback, type InsertUserFeedback,
+  type MonthlyReport, type InsertMonthlyReport
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -134,6 +141,23 @@ export interface IStorage {
   createPeerSession(session: InsertPeerSession): Promise<PeerSession>;
   updatePeerSession(id: number, updates: Partial<PeerSession>): Promise<PeerSession | undefined>;
   createCommunityModeration(moderation: InsertCommunityModeration): Promise<CommunityModeration>;
+
+  // Adaptive Learning and Personalization methods
+  getUserPreferences(userId: number): Promise<UserPreferences | undefined>;
+  createUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences>;
+  updateUserPreferences(userId: number, updates: Partial<UserPreferences>): Promise<UserPreferences | undefined>;
+  getLatestAdaptationInsights(userId: number): Promise<AdaptationInsight | undefined>;
+  createAdaptationInsight(insight: InsertAdaptationInsight): Promise<AdaptationInsight>;
+  getWellnessRecommendations(userId: number, limit?: number): Promise<WellnessRecommendation[]>;
+  createWellnessRecommendation(recommendation: InsertWellnessRecommendation): Promise<WellnessRecommendation>;
+  markRecommendationUsed(recommendationId: number): Promise<void>;
+  rateRecommendation(recommendationId: number, rating: number): Promise<void>;
+  createUserFeedback(feedback: InsertUserFeedback): Promise<UserFeedback>;
+  getConversationPatterns(userId: number): Promise<ConversationPattern[]>;
+  createConversationPattern(pattern: InsertConversationPattern): Promise<ConversationPattern>;
+  getMonthlyReport(userId: number, reportMonth: string): Promise<MonthlyReport | undefined>;
+  saveMonthlyReport(report: InsertMonthlyReport): Promise<MonthlyReport>;
+  getMonthlyReportById(reportId: number): Promise<MonthlyReport | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -718,6 +742,94 @@ export class DatabaseStorage implements IStorage {
   async createCommunityModeration(moderation: InsertCommunityModeration): Promise<CommunityModeration> {
     const [newModeration] = await db.insert(communityModerations).values(moderation).returning();
     return newModeration;
+  }
+
+  // Adaptive Learning and Personalization implementations
+  async getUserPreferences(userId: number): Promise<UserPreferences | undefined> {
+    const [preferences] = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId.toString()));
+    return preferences || undefined;
+  }
+
+  async createUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences> {
+    const [newPreferences] = await db.insert(userPreferences).values(preferences).returning();
+    return newPreferences;
+  }
+
+  async updateUserPreferences(userId: number, updates: Partial<UserPreferences>): Promise<UserPreferences | undefined> {
+    const [updatedPreferences] = await db.update(userPreferences)
+      .set(updates)
+      .where(eq(userPreferences.userId, userId.toString()))
+      .returning();
+    return updatedPreferences || undefined;
+  }
+
+  async getLatestAdaptationInsights(userId: number): Promise<AdaptationInsight | undefined> {
+    const [insight] = await db.select().from(adaptationInsights)
+      .where(eq(adaptationInsights.userId, userId.toString()))
+      .orderBy(desc(adaptationInsights.createdAt))
+      .limit(1);
+    return insight || undefined;
+  }
+
+  async createAdaptationInsight(insight: InsertAdaptationInsight): Promise<AdaptationInsight> {
+    const [newInsight] = await db.insert(adaptationInsights).values(insight).returning();
+    return newInsight;
+  }
+
+  async getWellnessRecommendations(userId: number, limit: number = 10): Promise<WellnessRecommendation[]> {
+    return await db.select().from(wellnessRecommendations)
+      .where(eq(wellnessRecommendations.userId, userId.toString()))
+      .orderBy(desc(wellnessRecommendations.createdAt))
+      .limit(limit);
+  }
+
+  async createWellnessRecommendation(recommendation: InsertWellnessRecommendation): Promise<WellnessRecommendation> {
+    const [newRecommendation] = await db.insert(wellnessRecommendations).values(recommendation).returning();
+    return newRecommendation;
+  }
+
+  async markRecommendationUsed(recommendationId: number): Promise<void> {
+    await db.update(wellnessRecommendations)
+      .set({ wasUsed: true })
+      .where(eq(wellnessRecommendations.id, recommendationId));
+  }
+
+  async rateRecommendation(recommendationId: number, rating: number): Promise<void> {
+    await db.update(wellnessRecommendations)
+      .set({ userRating: rating })
+      .where(eq(wellnessRecommendations.id, recommendationId));
+  }
+
+  async createUserFeedback(feedback: InsertUserFeedback): Promise<UserFeedback> {
+    const [newFeedback] = await db.insert(userFeedback).values(feedback).returning();
+    return newFeedback;
+  }
+
+  async getConversationPatterns(userId: number): Promise<ConversationPattern[]> {
+    return await db.select().from(conversationPatterns)
+      .where(eq(conversationPatterns.userId, userId.toString()))
+      .orderBy(desc(conversationPatterns.lastUsed));
+  }
+
+  async createConversationPattern(pattern: InsertConversationPattern): Promise<ConversationPattern> {
+    const [newPattern] = await db.insert(conversationPatterns).values(pattern).returning();
+    return newPattern;
+  }
+
+  async getMonthlyReport(userId: number, reportMonth: string): Promise<MonthlyReport | undefined> {
+    const [report] = await db.select().from(monthlyReports)
+      .where(and(eq(monthlyReports.userId, userId), eq(monthlyReports.reportMonth, reportMonth)));
+    return report || undefined;
+  }
+
+  async saveMonthlyReport(report: InsertMonthlyReport): Promise<MonthlyReport> {
+    const [newReport] = await db.insert(monthlyReports).values(report).returning();
+    return newReport;
+  }
+
+  async getMonthlyReportById(reportId: number): Promise<MonthlyReport | undefined> {
+    const [report] = await db.select().from(monthlyReports).where(eq(monthlyReports.id, reportId));
+    return report || undefined;
   }
 }
 
