@@ -468,17 +468,16 @@ Return as JSON with VR environment fields: name, description, category, scenePat
       name: environmentData.name || `${therapeuticGoal} Environment`,
       description: environmentData.description || '',
       environmentType: environmentData.category || 'mindfulness',
-      difficulty,
-      duration: difficulty === 'beginner' ? 10 : difficulty === 'intermediate' ? 20 : 30,
-      environmentType: 'vr',
-      scenePath: environmentData.scenePath || `/scenes/${environmentData.name?.toLowerCase().replace(/\s+/g, '_')}`,
-      audioPath: environmentData.audioPath || null,
-      instructions: environmentData.instructions || [],
-      therapeuticGoals: environmentData.therapeuticGoals || [],
-      contraindications: environmentData.contraindications || [],
-      vrSettings: environmentData.vrSettings || {},
-      accessibility: environmentData.accessibility || {},
-      tags: environmentData.tags || [therapeuticGoal, targetCondition, difficulty]
+      difficultyLevel: difficulty,
+      durationMinutes: difficulty === 'beginner' ? 10 : difficulty === 'intermediate' ? 20 : 30,
+      therapeuticFocus: environmentData.therapeuticFocus || 'general',
+      immersionLevel: environmentData.immersionLevel || 'medium',
+      visualAssets: environmentData.scenePath || `/scenes/${environmentData.name?.toLowerCase().replace(/\s+/g, '_')}`,
+      audioAssets: environmentData.audioPath || null,
+      interactionOptions: environmentData.instructions || [],
+      accessibilityFeatures: environmentData.accessibility || [],
+      contentWarnings: environmentData.contraindications || [],
+      isActive: true
     };
 
   } catch (error) {
