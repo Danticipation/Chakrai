@@ -746,7 +746,7 @@ export class DatabaseStorage implements IStorage {
 
   // Adaptive Learning and Personalization implementations
   async getUserPreferences(userId: number): Promise<UserPreferences | undefined> {
-    const [preferences] = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId.toString()));
+    const [preferences] = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId));
     return preferences || undefined;
   }
 
@@ -758,14 +758,14 @@ export class DatabaseStorage implements IStorage {
   async updateUserPreferences(userId: number, updates: Partial<UserPreferences>): Promise<UserPreferences | undefined> {
     const [updatedPreferences] = await db.update(userPreferences)
       .set(updates)
-      .where(eq(userPreferences.userId, userId.toString()))
+      .where(eq(userPreferences.userId, userId))
       .returning();
     return updatedPreferences || undefined;
   }
 
   async getLatestAdaptationInsights(userId: number): Promise<AdaptationInsight | undefined> {
     const [insight] = await db.select().from(adaptationInsights)
-      .where(eq(adaptationInsights.userId, userId.toString()))
+      .where(eq(adaptationInsights.userId, userId))
       .orderBy(desc(adaptationInsights.createdAt))
       .limit(1);
     return insight || undefined;

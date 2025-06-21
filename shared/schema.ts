@@ -526,7 +526,7 @@ export interface LearningUpdate {
 // Personalization and Adaptive Learning Tables
 export const userPreferences = pgTable("user_preferences", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   communicationStyle: varchar("communication_style").notNull().default('supportive'),
   preferredTopics: text("preferred_topics").array().default([]),
   avoidedTopics: text("avoided_topics").array().default([]),
@@ -542,7 +542,7 @@ export const userPreferences = pgTable("user_preferences", {
 
 export const conversationPatterns = pgTable("conversation_patterns", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   pattern: text("pattern").notNull(),
   frequency: integer("frequency").notNull().default(1),
   effectiveness: real("effectiveness").notNull().default(0.5),
@@ -554,7 +554,7 @@ export const conversationPatterns = pgTable("conversation_patterns", {
 
 export const adaptationInsights = pgTable("adaptation_insights", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   conversationThemes: text("conversation_themes").array().default([]),
   emotionalPatterns: text("emotional_patterns").array().default([]),
   effectiveApproaches: text("effective_approaches").array().default([]),
@@ -568,7 +568,7 @@ export const adaptationInsights = pgTable("adaptation_insights", {
 
 export const wellnessRecommendations = pgTable("wellness_recommendations", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   recommendationId: varchar("recommendation_id").notNull(),
   type: varchar("type").notNull(),
   name: varchar("name").notNull(),
@@ -585,7 +585,7 @@ export const wellnessRecommendations = pgTable("wellness_recommendations", {
 
 export const userFeedback = pgTable("user_feedback", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   sessionId: varchar("session_id"),
   responseQuality: integer("response_quality").notNull(), // 1-5
   helpfulness: integer("helpfulness").notNull(), // 1-5
