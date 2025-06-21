@@ -74,7 +74,7 @@ Available VR environments: ${environments.map(env =>
 ).join('\n')}
 
 Previous VR sessions: ${sessionHistory?.slice(0, 5).map(session => 
-  `Environment: ${session.environmentId}, Duration: ${session.duration}s, Effectiveness: ${session.effectiveness}/10`
+  `Environment: ${session.environmentId}, Duration: ${session.durationMinutes}min, Effectiveness: ${session.effectivenessRating}/10`
 ).join('\n') || 'None'}
 
 Generate 3-5 personalized VR therapy recommendations. For each recommendation, provide:
@@ -470,10 +470,12 @@ Return as JSON with VR environment fields: name, description, category, scenePat
       durationMinutes: difficulty === 'beginner' ? 10 : difficulty === 'intermediate' ? 20 : 30,
       therapeuticFocus: environmentData.therapeuticFocus || 'general',
       immersionLevel: environmentData.immersionLevel || 'medium',
-      visualAssets: environmentData.scenePath || `/scenes/${environmentData.name?.toLowerCase().replace(/\s+/g, '_')}`,
-      audioAssets: environmentData.audioPath || null,
-      interactionOptions: environmentData.instructions || [],
-      accessibilityFeatures: environmentData.accessibility || [],
+      settings: {
+        scenePath: environmentData.scenePath || `/scenes/${environmentData.name?.toLowerCase().replace(/\s+/g, '_')}`,
+        audioPath: environmentData.audioPath || null,
+        instructions: environmentData.instructions || []
+      },
+      accessibilityFeatures: environmentData.accessibility || {},
       contentWarnings: environmentData.contraindications || [],
       isActive: true
     };
