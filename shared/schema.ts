@@ -697,3 +697,109 @@ export type InsertWearableDevice = z.infer<typeof insertWearableDeviceSchema>;
 export type InsertHealthMetric = z.infer<typeof insertHealthMetricSchema>;
 export type InsertHealthCorrelation = z.infer<typeof insertHealthCorrelationSchema>;
 export type InsertSyncLog = z.infer<typeof insertSyncLogSchema>;
+
+// VR/AR Therapeutic Experiences Tables
+export const vrEnvironments = pgTable("vr_environments", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { length: 30 }).notNull(), // 'mindfulness', 'exposure', 'relaxation', 'cbr'
+  difficulty: varchar("difficulty", { length: 20 }).notNull().default('beginner'), // 'beginner', 'intermediate', 'advanced'
+  duration: integer("duration").notNull(), // minutes
+  environmentType: varchar("environment_type", { length: 20 }).notNull(), // 'vr', 'ar', 'mixed'
+  scenePath: text("scene_path").notNull(), // Path to 3D scene/environment
+  audioPath: text("audio_path"), // Guided audio file
+  instructions: text("instructions").array(),
+  therapeuticGoals: text("therapeutic_goals").array(),
+  contraindications: text("contraindications").array(), // Conditions where this shouldn't be used
+  vrSettings: jsonb("vr_settings").notNull().default({}), // Movement, comfort settings
+  accessibility: jsonb("accessibility").notNull().default({}), // Accessibility options
+  tags: text("tags").array(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const vrSessions = pgTable("vr_sessions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  environmentId: integer("environment_id").notNull().references(() => vrEnvironments.id),
+  sessionType: varchar("session_type", { length: 30 }).notNull(), // 'guided', 'free_form', 'exposure'
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time"),
+  duration: integer("duration"), // actual duration in seconds
+  completionStatus: varchar("completion_status", { length: 20 }).notNull().default('in_progress'), // 'completed', 'interrupted', 'abandoned'
+  stressLevel: jsonb("stress_level"), // Before/after stress measurements
+  heartRate: jsonb("heart_rate"), // HR data during session if available
+  interactions: jsonb("interactions").notNull().default([]), // User interactions within VR
+  achievements: text("achievements").array(), // Goals achieved during session
+  notes: text("notes"), // User or therapist notes
+  effectiveness: integer("effectiveness"), // 1-10 user rating
+  sideEffects: text("side_effects").array(), // Any motion sickness, discomfort
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const vrProgressTracking = pgTable("vr_progress_tracking", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  environmentId: integer("environment_id").notNull().references(() => vrEnvironments.id),
+  sessionCount: integer("session_count").notNull().default(0),
+  totalDuration: integer("total_duration").notNull().default(0), // Total seconds spent
+  averageEffectiveness: real("average_effectiveness"),
+  bestScore: real("best_score"), // Best performance/comfort score
+  lastSessionDate: timestamp("last_session_date"),
+  progressMilestones: jsonb("progress_milestones").notNull().default([]),
+  adaptations: jsonb("adaptations").notNull().default({}), // Environment adaptations based on user progress
+  recommendedNext: text("recommended_next").array(), // Next recommended environments
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const vrTherapeuticPlans = pgTable("vr_therapeutic_plans", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  planName: text("plan_name").notNull(),
+  therapeuticGoal: varchar("therapeutic_goal", { length: 50 }).notNull(), // 'anxiety_reduction', 'phobia_treatment', 'stress_management'
+  environments: jsonb("environments").notNull(), // Ordered list of environment IDs and session counts
+  currentStage: integer("current_stage").notNull().default(0),
+  totalStages: integer("total_stages").notNull(),
+  estimatedDuration: integer("estimated_duration"), // Total plan duration in days
+  progressPercent: real("progress_percent").notNull().default(0),
+  adaptiveSettings: jsonb("adaptive_settings").notNull().default({}),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const vrAccessibilityProfiles = pgTable("vr_accessibility_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  motionSensitivity: varchar("motion_sensitivity", { length: 20 }).notNull().default('medium'), // 'low', 'medium', 'high'
+  comfortSettings: jsonb("comfort_settings").notNull().default({}), // Snap turning, comfort zones
+  visualAdjustments: jsonb("visual_adjustments").notNull().default({}), // Color contrast, text size
+  audioPreferences: jsonb("audio_preferences").notNull().default({}), // Volume, spatial audio
+  inputAdaptations: jsonb("input_adaptations").notNull().default({}), // Alternative input methods
+  safetyProtocols: jsonb("safety_protocols").notNull().default({}), // Emergency exit, break reminders
+  medicalConsiderations: text("medical_considerations").array(), // Conditions to consider
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// VR/AR Types
+export type VrEnvironment = typeof vrEnvironments.$inferSelect;
+export type InsertVrEnvironment = typeof vrEnvironments.$inferInsert;
+export type VrSession = typeof vrSessions.$inferSelect;
+export type InsertVrSession = typeof vrSessions.$inferInsert;
+export type VrProgressTracking = typeof vrProgressTracking.$inferSelect;
+export type InsertVrProgressTracking = typeof vrProgressTracking.$inferInsert;
+export type VrTherapeuticPlan = typeof vrTherapeuticPlans.$inferSelect;
+export type InsertVrTherapeuticPlan = typeof vrTherapeuticPlans.$inferInsert;
+export type VrAccessibilityProfile = typeof vrAccessibilityProfiles.$inferSelect;
+export type InsertVrAccessibilityProfile = typeof vrAccessibilityProfiles.$inferInsert;
+
+// VR/AR Insert Schemas
+export const insertVrEnvironmentSchema = createInsertSchema(vrEnvironments).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertVrSessionSchema = createInsertSchema(vrSessions).omit({ id: true, createdAt: true });
+export const insertVrProgressTrackingSchema = createInsertSchema(vrProgressTracking).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertVrTherapeuticPlanSchema = createInsertSchema(vrTherapeuticPlans).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertVrAccessibilityProfileSchema = createInsertSchema(vrAccessibilityProfiles).omit({ id: true, createdAt: true, updatedAt: true });
