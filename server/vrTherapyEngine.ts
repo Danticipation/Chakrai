@@ -70,7 +70,7 @@ User Context:
 - Motion sensitivity: ${accessibilityProfile?.motionSensitivity || 'medium'}
 
 Available VR environments: ${environments.map(env => 
-  `${env.name} (${env.category}, ${env.difficulty}, ${env.duration}min) - ${env.description}`
+  `${env.name} (${env.environmentType}, ${env.difficultyLevel}, ${env.durationMinutes}min) - ${env.description}`
 ).join('\n')}
 
 Previous VR sessions: ${sessionHistory?.slice(0, 5).map(session => 
@@ -258,11 +258,10 @@ Focus on evidence-based VR therapy approaches for the specified conditions.
     const plan = await storage.createVrTherapeuticPlan({
       userId,
       planName: planData.planName || `${therapeuticGoal} Plan`,
-      therapeuticGoal,
-      environments: planData.environments || [],
-      totalStages: planData.totalStages || 4,
-      estimatedDuration: planData.estimatedDuration || planDuration,
-      adaptiveSettings: planData.adaptiveSettings || {}
+      therapeuticGoals: [therapeuticGoal],
+      recommendedEnvironments: planData.environments || [],
+      durationWeeks: Math.ceil((planData.estimatedDuration || planDuration) / 7),
+      progressMetrics: planData.adaptiveSettings || {}
     });
 
     return plan;
@@ -296,18 +295,19 @@ export async function personalizeVrEnvironment(
 Personalize this VR environment for the user's needs:
 
 Environment: ${environment.name}
-Category: ${environment.category}
-Base difficulty: ${environment.difficulty}
-Duration: ${environment.duration} minutes
+Type: ${environment.environmentType}
+Therapeutic Focus: ${environment.therapeuticFocus}
+Difficulty: ${environment.difficultyLevel}
+Duration: ${environment.durationMinutes} minutes
 Description: ${environment.description}
 
 User Profile:
 - Motion sensitivity: ${accessibilityProfile?.motionSensitivity || 'medium'}
-- Comfort settings: ${JSON.stringify(accessibilityProfile?.comfortSettings || {})}
-- Visual adjustments: ${JSON.stringify(accessibilityProfile?.visualAdjustments || {})}
-- Audio preferences: ${JSON.stringify(accessibilityProfile?.audioPreferences || {})}
-- Previous sessions: ${progress?.sessionCount || 0}
-- Best performance: ${progress?.bestScore || 'N/A'}
+- Audio descriptions: ${accessibilityProfile?.audioDescriptions || false}
+- High contrast: ${accessibilityProfile?.highContrast || false}
+- Simplified controls: ${accessibilityProfile?.simplifiedControls || false}
+- Previous sessions: ${progress?.totalSessions || 0}
+- Average effectiveness: ${progress?.averageEffectiveness || 'N/A'}
 
 Session Goals: ${sessionGoals?.join(', ') || 'General therapeutic benefit'}
 
@@ -338,7 +338,7 @@ Return as JSON with fields: visualSettings, audioSettings, interactionSettings, 
         comfortSettings: adaptations.comfortSettings || {}
       },
       therapeuticGoals: adaptations.therapeuticGoals || sessionGoals || [],
-      estimatedDuration: adaptations.estimatedDuration || environment.duration,
+      estimatedDuration: adaptations.estimatedDuration || environment.durationMinutes,
       difficultyLevel: adaptations.difficultyLevel || 0.5
     };
 
@@ -353,7 +353,7 @@ Return as JSON with fields: visualSettings, audioSettings, interactionSettings, 
         comfortSettings: {}
       },
       therapeuticGoals: sessionGoals || [],
-      estimatedDuration: environment!.duration,
+      estimatedDuration: environment!.durationMinutes,
       difficultyLevel: 0.5
     };
   }

@@ -3181,12 +3181,11 @@ app.post('/api/vr/sessions/:sessionId/complete', async (req, res) => {
       await storage.createVrProgress({
         userId: session.userId,
         environmentId: session.environmentId,
-        sessionCount: 1,
-        totalDuration: session.duration || 0,
+        totalSessions: 1,
+        totalDurationMinutes: session.duration || 0,
         averageEffectiveness: effectiveness,
-        bestScore: effectiveness,
-        achievements: analysis.achievements || [],
-        lastSession: new Date()
+        milestonesAchieved: analysis.achievements || [],
+        lastSessionDate: new Date()
       });
     }
     
