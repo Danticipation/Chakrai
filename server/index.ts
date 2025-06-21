@@ -1753,6 +1753,123 @@ app.post('/api/voice/detect-context', async (req, res) => {
   }
 });
 
+// Adaptive Learning API Routes
+
+// Get user preferences
+app.get('/api/adaptive/user-preferences/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const preferences = await storage.getUserPreferences(userId);
+    
+    if (!preferences) {
+      return res.status(404).json({ error: 'User preferences not found' });
+    }
+    
+    res.json(preferences);
+  } catch (error) {
+    console.error('Failed to fetch user preferences:', error);
+    res.status(500).json({ error: 'Failed to fetch user preferences' });
+  }
+});
+
+// Create or update user preferences
+app.post('/api/adaptive/user-preferences', async (req, res) => {
+  try {
+    const preferencesData = req.body;
+    
+    const existingPreferences = await storage.getUserPreferences(preferencesData.userId);
+    
+    let preferences;
+    if (existingPreferences) {
+      preferences = await storage.updateUserPreferences(preferencesData.userId, preferencesData);
+    } else {
+      preferences = await storage.createUserPreferences(preferencesData);
+    }
+    
+    res.json(preferences);
+  } catch (error) {
+    console.error('Failed to save user preferences:', error);
+    res.status(500).json({ error: 'Failed to save user preferences' });
+  }
+});
+
+// Get conversation patterns for a user
+app.get('/api/adaptive/conversation-patterns/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const patterns = await storage.getConversationPatterns(userId);
+    res.json(patterns);
+  } catch (error) {
+    console.error('Failed to fetch conversation patterns:', error);
+    res.status(500).json({ error: 'Failed to fetch conversation patterns' });
+  }
+});
+
+// Create conversation pattern
+app.post('/api/adaptive/conversation-patterns', async (req, res) => {
+  try {
+    const patternData = req.body;
+    const pattern = await storage.createConversationPattern(patternData);
+    res.json(pattern);
+  } catch (error) {
+    console.error('Failed to create conversation pattern:', error);
+    res.status(500).json({ error: 'Failed to create conversation pattern' });
+  }
+});
+
+// Get adaptation insights
+app.get('/api/adaptive/insights/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const insights = await storage.getLatestAdaptationInsights(userId);
+    
+    if (!insights) {
+      return res.status(404).json({ error: 'No adaptation insights found' });
+    }
+    
+    res.json(insights);
+  } catch (error) {
+    console.error('Failed to fetch adaptation insights:', error);
+    res.status(500).json({ error: 'Failed to fetch adaptation insights' });
+  }
+});
+
+// Create adaptation insights
+app.post('/api/adaptive/insights', async (req, res) => {
+  try {
+    const insightsData = req.body;
+    const insights = await storage.createAdaptationInsights(insightsData);
+    res.json(insights);
+  } catch (error) {
+    console.error('Failed to create adaptation insights:', error);
+    res.status(500).json({ error: 'Failed to create adaptation insights' });
+  }
+});
+
+// Get wellness recommendations
+app.get('/api/adaptive/recommendations/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const recommendations = await storage.getWellnessRecommendations(userId);
+    res.json(recommendations);
+  } catch (error) {
+    console.error('Failed to fetch wellness recommendations:', error);
+    res.status(500).json({ error: 'Failed to fetch wellness recommendations' });
+  }
+});
+
+// Create wellness recommendation
+app.post('/api/adaptive/recommendations', async (req, res) => {
+  try {
+    const recommendationData = req.body;
+    const recommendation = await storage.createWellnessRecommendation(recommendationData);
+    res.json(recommendation);
+  } catch (error) {
+    console.error('Failed to create wellness recommendation:', error);
+    res.status(500).json({ error: 'Failed to create wellness recommendation' });
+  }
+});
+
 // Personalization and Adaptive Learning API Routes
 
 // Get personalized recommendations
