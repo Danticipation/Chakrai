@@ -3171,12 +3171,11 @@ app.post('/api/vr/sessions/:sessionId/complete', async (req, res) => {
     const existingProgress = await storage.getVrProgress(session.userId, session.environmentId);
     if (existingProgress) {
       await storage.updateVrProgress(session.userId, session.environmentId, {
-        sessionCount: existingProgress.sessionCount + 1,
-        totalDuration: existingProgress.totalDuration + (session.duration || 0),
-        averageEffectiveness: ((existingProgress.averageEffectiveness * existingProgress.sessionCount) + effectiveness) / (existingProgress.sessionCount + 1),
-        bestScore: Math.max(existingProgress.bestScore, effectiveness),
-        achievements: [...(existingProgress.achievements || []), ...(analysis.achievements || [])],
-        lastSession: new Date()
+        totalSessions: existingProgress.totalSessions + 1,
+        totalDurationMinutes: existingProgress.totalDurationMinutes + (session.duration || 0),
+        averageEffectiveness: ((parseFloat(existingProgress.averageEffectiveness || '0') * existingProgress.totalSessions) + effectiveness) / (existingProgress.totalSessions + 1),
+        milestonesAchieved: [...(existingProgress.milestonesAchieved || []), ...(analysis.achievements || [])],
+        lastSessionDate: new Date()
       });
     } else {
       await storage.createVrProgress({

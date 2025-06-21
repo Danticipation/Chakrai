@@ -701,20 +701,16 @@ export type InsertSyncLog = z.infer<typeof insertSyncLogSchema>;
 // VR/AR Therapeutic Experiences Tables
 export const vrEnvironments = pgTable("vr_environments", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  category: varchar("category", { length: 30 }).notNull(), // 'mindfulness', 'exposure', 'relaxation', 'cbr'
-  difficulty: varchar("difficulty", { length: 20 }).notNull().default('beginner'), // 'beginner', 'intermediate', 'advanced'
-  duration: integer("duration").notNull(), // minutes
-  environmentType: varchar("environment_type", { length: 20 }).notNull(), // 'vr', 'ar', 'mixed'
-  scenePath: text("scene_path").notNull(), // Path to 3D scene/environment
-  audioPath: text("audio_path"), // Guided audio file
-  instructions: text("instructions").array(),
-  therapeuticGoals: text("therapeutic_goals").array(),
-  contraindications: text("contraindications").array(), // Conditions where this shouldn't be used
-  vrSettings: jsonb("vr_settings").notNull().default({}), // Movement, comfort settings
-  accessibility: jsonb("accessibility").notNull().default({}), // Accessibility options
-  tags: text("tags").array(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  environmentType: varchar("environment_type", { length: 100 }),
+  therapeuticFocus: varchar("therapeutic_focus", { length: 100 }),
+  immersionLevel: varchar("immersion_level", { length: 50 }),
+  difficultyLevel: varchar("difficulty_level", { length: 50 }),
+  durationMinutes: integer("duration_minutes"),
+  settings: jsonb("settings"),
+  accessibilityFeatures: jsonb("accessibility_features"),
+  contentWarnings: text("content_warnings").array(),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
