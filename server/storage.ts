@@ -778,7 +778,7 @@ export class DatabaseStorage implements IStorage {
 
   async getWellnessRecommendations(userId: number, limit: number = 10): Promise<WellnessRecommendation[]> {
     return await db.select().from(wellnessRecommendations)
-      .where(eq(wellnessRecommendations.userId, userId.toString()))
+      .where(eq(wellnessRecommendations.userId, userId))
       .orderBy(desc(wellnessRecommendations.createdAt))
       .limit(limit);
   }
@@ -807,7 +807,7 @@ export class DatabaseStorage implements IStorage {
 
   async getConversationPatterns(userId: number): Promise<ConversationPattern[]> {
     return await db.select().from(conversationPatterns)
-      .where(eq(conversationPatterns.userId, userId.toString()))
+      .where(eq(conversationPatterns.userId, userId))
       .orderBy(desc(conversationPatterns.lastUsed));
   }
 
