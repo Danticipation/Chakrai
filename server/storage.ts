@@ -946,7 +946,7 @@ export class DatabaseStorage implements IStorage {
     let query = db.select().from(vrEnvironments).where(eq(vrEnvironments.isActive, true));
     
     if (category) {
-      query = query.where(eq(vrEnvironments.category, category));
+      query = query.where(eq(vrEnvironments.environmentType, category));
     }
     
     return await query.orderBy(vrEnvironments.name);

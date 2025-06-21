@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, jsonb, timestamp, varchar, real } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, jsonb, timestamp, varchar, real, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -741,46 +741,48 @@ export const vrSessions = pgTable("vr_sessions", {
 
 export const vrProgressTracking = pgTable("vr_progress_tracking", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  environmentId: integer("environment_id").notNull().references(() => vrEnvironments.id),
-  sessionCount: integer("session_count").notNull().default(0),
-  totalDuration: integer("total_duration").notNull().default(0), // Total seconds spent
-  averageEffectiveness: real("average_effectiveness"),
-  bestScore: real("best_score"), // Best performance/comfort score
+  userId: integer("user_id").notNull(),
+  environmentId: integer("environment_id").notNull(),
+  totalSessions: integer("total_sessions").notNull().default(0),
+  totalDurationMinutes: integer("total_duration_minutes").notNull().default(0),
+  averageEffectiveness: decimal("average_effectiveness", { precision: 3, scale: 2 }),
+  stressReductionAverage: decimal("stress_reduction_average", { precision: 3, scale: 2 }),
+  skillDevelopmentLevel: integer("skill_development_level").notNull().default(1),
+  personalRecords: jsonb("personal_records"),
+  milestonesAchieved: text("milestones_achieved").array(),
   lastSessionDate: timestamp("last_session_date"),
-  progressMilestones: jsonb("progress_milestones").notNull().default([]),
-  adaptations: jsonb("adaptations").notNull().default({}), // Environment adaptations based on user progress
-  recommendedNext: text("recommended_next").array(), // Next recommended environments
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
 export const vrTherapeuticPlans = pgTable("vr_therapeutic_plans", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  planName: text("plan_name").notNull(),
-  therapeuticGoal: varchar("therapeutic_goal", { length: 50 }).notNull(), // 'anxiety_reduction', 'phobia_treatment', 'stress_management'
-  environments: jsonb("environments").notNull(), // Ordered list of environment IDs and session counts
-  currentStage: integer("current_stage").notNull().default(0),
-  totalStages: integer("total_stages").notNull(),
-  estimatedDuration: integer("estimated_duration"), // Total plan duration in days
-  progressPercent: real("progress_percent").notNull().default(0),
-  adaptiveSettings: jsonb("adaptive_settings").notNull().default({}),
-  isActive: boolean("is_active").notNull().default(true),
+  userId: integer("user_id").notNull(),
+  planName: varchar("plan_name", { length: 255 }).notNull(),
+  therapeuticGoals: text("therapeutic_goals").array(),
+  recommendedEnvironments: integer("recommended_environments").array(),
+  sessionFrequency: varchar("session_frequency", { length: 50 }),
+  durationWeeks: integer("duration_weeks"),
+  progressMetrics: jsonb("progress_metrics"),
+  createdBy: varchar("created_by", { length: 100 }).default('AI'),
+  status: varchar("status", { length: 50 }).default('active'),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
 export const vrAccessibilityProfiles = pgTable("vr_accessibility_profiles", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  motionSensitivity: varchar("motion_sensitivity", { length: 20 }).notNull().default('medium'), // 'low', 'medium', 'high'
-  comfortSettings: jsonb("comfort_settings").notNull().default({}), // Snap turning, comfort zones
-  visualAdjustments: jsonb("visual_adjustments").notNull().default({}), // Color contrast, text size
-  audioPreferences: jsonb("audio_preferences").notNull().default({}), // Volume, spatial audio
-  inputAdaptations: jsonb("input_adaptations").notNull().default({}), // Alternative input methods
-  safetyProtocols: jsonb("safety_protocols").notNull().default({}), // Emergency exit, break reminders
-  medicalConsiderations: text("medical_considerations").array(), // Conditions to consider
+  userId: integer("user_id").notNull(),
+  motionSensitivity: varchar("motion_sensitivity", { length: 50 }).default('medium'),
+  audioDescriptions: boolean("audio_descriptions").default(false),
+  simplifiedControls: boolean("simplified_controls").default(false),
+  highContrast: boolean("high_contrast").default(false),
+  largeText: boolean("large_text").default(false),
+  reducedMotion: boolean("reduced_motion").default(false),
+  voiceCommands: boolean("voice_commands").default(false),
+  hapticFeedback: boolean("haptic_feedback").default(true),
+  triggerWarnings: boolean("trigger_warnings").default(true),
+  emergencyExit: boolean("emergency_exit").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
