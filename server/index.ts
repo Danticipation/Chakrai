@@ -1838,7 +1838,7 @@ app.get('/api/adaptive/insights/:userId', async (req, res) => {
 app.post('/api/adaptive/insights', async (req, res) => {
   try {
     const insightsData = req.body;
-    const insights = await storage.createAdaptationInsights(insightsData);
+    const insights = await storage.createAdaptationInsight(insightsData);
     res.json(insights);
   } catch (error) {
     console.error('Failed to create adaptation insights:', error);
