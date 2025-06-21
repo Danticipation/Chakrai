@@ -520,3 +520,86 @@ export interface LearningUpdate {
   levelUp?: boolean;
   personalityUpdate?: Record<string, number>;
 }
+
+// Personalization and Adaptive Learning Tables
+export const userPreferences = pgTable("user_preferences", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  communicationStyle: varchar("communication_style").notNull().default('supportive'),
+  preferredTopics: text("preferred_topics").array().default([]),
+  avoidedTopics: text("avoided_topics").array().default([]),
+  responseLength: varchar("response_length").notNull().default('moderate'),
+  emotionalSupport: varchar("emotional_support").notNull().default('gentle'),
+  sessionTiming: varchar("session_timing").notNull().default('flexible'),
+  exercisePreferences: text("exercise_preferences").array().default([]),
+  voicePreference: varchar("voice_preference").notNull().default('james'),
+  adaptationLevel: real("adaptation_level").notNull().default(0.5),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const conversationPatterns = pgTable("conversation_patterns", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  pattern: text("pattern").notNull(),
+  frequency: integer("frequency").notNull().default(1),
+  effectiveness: real("effectiveness").notNull().default(0.5),
+  category: varchar("category").notNull(),
+  context: text("context"),
+  lastUsed: timestamp("last_used").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const adaptationInsights = pgTable("adaptation_insights", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  conversationThemes: text("conversation_themes").array().default([]),
+  emotionalPatterns: text("emotional_patterns").array().default([]),
+  effectiveApproaches: text("effective_approaches").array().default([]),
+  preferredTimes: text("preferred_times").array().default([]),
+  wellnessNeeds: text("wellness_needs").array().default([]),
+  learningProgress: real("learning_progress").notNull().default(0.1),
+  confidenceScore: real("confidence_score").notNull().default(0.1),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const wellnessRecommendations = pgTable("wellness_recommendations", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  recommendationId: varchar("recommendation_id").notNull(),
+  type: varchar("type").notNull(),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  duration: integer("duration").notNull(),
+  difficulty: varchar("difficulty").notNull(),
+  tags: text("tags").array().default([]),
+  personalizedReason: text("personalized_reason"),
+  confidence: real("confidence").notNull().default(0.5),
+  wasUsed: boolean("was_used").notNull().default(false),
+  userRating: integer("user_rating"), // 1-5 stars
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userFeedback = pgTable("user_feedback", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  sessionId: varchar("session_id"),
+  responseQuality: integer("response_quality").notNull(), // 1-5
+  helpfulness: integer("helpfulness").notNull(), // 1-5
+  personalRelevance: integer("personal_relevance").notNull(), // 1-5
+  communicationMatch: integer("communication_match").notNull(), // 1-5
+  specificFeedback: text("specific_feedback"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type InsertUserPreferences = typeof userPreferences.$inferInsert;
+export type ConversationPattern = typeof conversationPatterns.$inferSelect;
+export type InsertConversationPattern = typeof conversationPatterns.$inferInsert;
+export type AdaptationInsight = typeof adaptationInsights.$inferSelect;
+export type InsertAdaptationInsight = typeof adaptationInsights.$inferInsert;
+export type WellnessRecommendation = typeof wellnessRecommendations.$inferSelect;
+export type InsertWellnessRecommendation = typeof wellnessRecommendations.$inferInsert;
+export type UserFeedback = typeof userFeedback.$inferSelect;
+export type InsertUserFeedback = typeof userFeedback.$inferInsert;

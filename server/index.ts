@@ -1753,6 +1753,215 @@ app.post('/api/voice/detect-context', async (req, res) => {
   }
 });
 
+// Personalization and Adaptive Learning API Routes
+
+// Get personalized recommendations
+app.post('/api/personalization/recommendations', async (req, res) => {
+  try {
+    const { userId, emotionalState, recentMessages } = req.body;
+    
+    const { analyzeConversationPatterns, generatePersonalizedRecommendations } = await import('./adaptiveLearning');
+    
+    // Get recent conversation messages
+    const messages = recentMessages || [];
+    const messageObjects = messages.map((msg: string, index: number) => ({
+      sender: index % 2 === 0 ? 'user' : 'bot',
+      text: msg,
+      timestamp: new Date()
+    }));
+    
+    // Analyze patterns and generate insights
+    const insights = await analyzeConversationPatterns(userId, messageObjects);
+    
+    // Get user preferences if they exist
+    const preferences = await storage.getUserPreferences(userId);
+    
+    // Generate personalized recommendations
+    const recommendations = await generatePersonalizedRecommendations(
+      insights,
+      preferences,
+      [] // recent activities - could be enhanced with activity tracking
+    );
+    
+    res.json({ recommendations, insights });
+  } catch (error) {
+    console.error('Failed to generate personalized recommendations:', error);
+    res.status(500).json({ error: 'Failed to generate recommendations' });
+  }
+});
+
+// Get adaptation insights for a user
+app.get('/api/personalization/insights/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    const insights = await storage.getLatestAdaptationInsights(userId);
+    const preferences = await storage.getUserPreferences(userId);
+    
+    res.json({ insights, preferences });
+  } catch (error) {
+    console.error('Failed to fetch adaptation insights:', error);
+    res.status(500).json({ error: 'Failed to fetch insights' });
+  }
+});
+
+// Track recommendation usage
+app.post('/api/personalization/use-recommendation', async (req, res) => {
+  try {
+    const { userId, recommendationId, timestamp } = req.body;
+    
+    // Mark recommendation as used
+    await storage.markRecommendationUsed(userId, recommendationId, timestamp);
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Failed to track recommendation usage:', error);
+    res.status(500).json({ error: 'Failed to track usage' });
+  }
+});
+
+// Rate a recommendation
+app.post('/api/personalization/rate-recommendation', async (req, res) => {
+  try {
+    const { userId, recommendationId, rating } = req.body;
+    
+    await storage.rateRecommendation(userId, recommendationId, rating);
+    
+    // Update user preferences based on rating
+    const preferences = await storage.getUserPreferences(userId);
+    if (preferences) {
+      const { updatePersonalizationFromFeedback } = await import('./adaptiveLearning');
+      
+      const feedbackData = {
+        responseQuality: rating,
+        helpfulness: rating,
+        personalRelevance: rating,
+        communicationMatch: rating
+      };
+      
+      const updatedPreferences = updatePersonalizationFromFeedback(preferences, feedbackData);
+      await storage.updateUserPreferences(userId, updatedPreferences);
+    }
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Failed to rate recommendation:', error);
+    res.status(500).json({ error: 'Failed to rate recommendation' });
+  }
+});
+
+// Submit user feedback for adaptation
+app.post('/api/personalization/feedback', async (req, res) => {
+  try {
+    const { userId, sessionId, responseQuality, helpfulness, personalRelevance, communicationMatch, specificFeedback } = req.body;
+    
+    const feedback = await storage.createUserFeedback({
+      userId,
+      sessionId,
+      responseQuality,
+      helpfulness,
+      personalRelevance,
+      communicationMatch,
+      specificFeedback
+    });
+    
+    // Update user preferences based on feedback
+    const preferences = await storage.getUserPreferences(userId);
+    if (preferences) {
+      const { updatePersonalizationFromFeedback } = await import('./adaptiveLearning');
+      
+      const updatedPreferences = updatePersonalizationFromFeedback(preferences, {
+        responseQuality,
+        helpfulness,
+        personalRelevance,
+        communicationMatch
+      });
+      
+      await storage.updateUserPreferences(userId, updatedPreferences);
+    }
+    
+    res.json({ feedback, success: true });
+  } catch (error) {
+    console.error('Failed to submit feedback:', error);
+    res.status(500).json({ error: 'Failed to submit feedback' });
+  }
+});
+
+// Adapt conversation response
+app.post('/api/personalization/adapt-response', async (req, res) => {
+  try {
+    const { userId, originalResponse, userMessage, context } = req.body;
+    
+    const preferences = await storage.getUserPreferences(userId);
+    
+    if (!preferences || preferences.adaptationLevel < 0.3) {
+      return res.json({ adaptedResponse: originalResponse });
+    }
+    
+    const { adaptConversationResponse } = await import('./adaptiveLearning');
+    
+    const adaptedResponse = await adaptConversationResponse(
+      originalResponse,
+      userMessage,
+      preferences,
+      context || []
+    );
+    
+    res.json({ adaptedResponse });
+  } catch (error) {
+    console.error('Failed to adapt response:', error);
+    res.json({ adaptedResponse: req.body.originalResponse });
+  }
+});
+
+// Get wellness insights based on user patterns
+app.get('/api/personalization/wellness-insights/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    const insights = await storage.getLatestAdaptationInsights(userId);
+    const preferences = await storage.getUserPreferences(userId);
+    
+    if (!insights) {
+      return res.json({ insights: [] });
+    }
+    
+    const { generateWellnessInsights } = await import('./adaptiveLearning');
+    
+    const wellnessInsights = generateWellnessInsights(insights, preferences);
+    
+    res.json({ insights: wellnessInsights });
+  } catch (error) {
+    console.error('Failed to generate wellness insights:', error);
+    res.status(500).json({ error: 'Failed to generate insights' });
+  }
+});
+
+// Initialize user preferences
+app.post('/api/personalization/initialize', async (req, res) => {
+  try {
+    const { userId, initialPreferences } = req.body;
+    
+    const preferences = await storage.createUserPreferences({
+      userId,
+      communicationStyle: initialPreferences?.communicationStyle || 'supportive',
+      responseLength: initialPreferences?.responseLength || 'moderate',
+      emotionalSupport: initialPreferences?.emotionalSupport || 'gentle',
+      sessionTiming: initialPreferences?.sessionTiming || 'flexible',
+      voicePreference: initialPreferences?.voicePreference || 'james',
+      adaptationLevel: 0.5,
+      preferredTopics: [],
+      avoidedTopics: [],
+      exercisePreferences: []
+    });
+    
+    res.json({ preferences });
+  } catch (error) {
+    console.error('Failed to initialize preferences:', error);
+    res.status(500).json({ error: 'Failed to initialize preferences' });
+  }
+});
+
 // Helper functions
 async function generateSessionPreparation(journalEntries: any[], moodEntries: any[]): Promise<string> {
   try {
