@@ -136,8 +136,8 @@ export async function analyzeVrSession(sessionId: number): Promise<VrSessionAnal
 Analyze this VR therapy session for therapeutic effectiveness:
 
 Session Details:
-- Environment: ${environment?.name} (${environment?.category})
-- Duration: ${session.duration} seconds (planned: ${environment?.duration} minutes)
+- Environment: ${environment?.name} (${environment?.environmentType})
+- Duration: ${session.duration} seconds (planned: ${environment?.durationMinutes} minutes)
 - Completion: ${session.completionStatus}
 - User effectiveness rating: ${session.effectiveness}/10
 - Stress levels: ${JSON.stringify(session.stressLevel)}
@@ -147,9 +147,9 @@ Session Details:
 - User notes: ${session.notes || 'None'}
 
 User Progress:
-- Total sessions in this environment: ${userProgress?.sessionCount || 0}
+- Total sessions in this environment: ${userProgress?.totalSessions || 0}
 - Average effectiveness: ${userProgress?.averageEffectiveness || 'N/A'}
-- Best score: ${userProgress?.bestScore || 'N/A'}
+- Skill development level: ${userProgress?.skillDevelopmentLevel || 'N/A'}
 
 Provide detailed analysis including:
 1. Effectiveness score (0.0-1.0)
@@ -224,7 +224,7 @@ Accessibility Needs: Motion sensitivity ${accessibilityProfile?.motionSensitivit
 
 Available VR Environments:
 ${environments.map(env => 
-  `ID: ${env.id}, Name: ${env.name}, Category: ${env.category}, Difficulty: ${env.difficulty}, Duration: ${env.duration}min`
+  `ID: ${env.id}, Name: ${env.name}, Type: ${env.environmentType}, Focus: ${env.therapeuticFocus}, Duration: ${env.durationMinutes}min`
 ).join('\n')}
 
 Recent emotional patterns: ${recentMoods.map(m => `${m.emotion} (intensity: ${m.intensity})`).slice(0, 10).join(', ')}
@@ -280,13 +280,15 @@ export async function personalizeVrEnvironment(
   userId: number,
   sessionGoals?: string[]
 ): Promise<PersonalizedVrEnvironment> {
+  let environment: any;
   try {
-    const [environment, accessibilityProfile, progress] = await Promise.all([
+    const [envResult, accessibilityProfile, progress] = await Promise.all([
       storage.getVrEnvironment(environmentId),
       storage.getUserVrAccessibilityProfile(userId),
       storage.getVrProgress(userId, environmentId)
     ]);
 
+    environment = envResult;
     if (!environment) {
       throw new Error('Environment not found');
     }
@@ -344,18 +346,22 @@ Return as JSON with fields: visualSettings, audioSettings, interactionSettings, 
 
   } catch (error) {
     console.error('Error personalizing VR environment:', error);
-    return {
-      baseEnvironment: environment!,
-      adaptations: {
-        visualSettings: {},
-        audioSettings: {},
-        interactionSettings: {},
-        comfortSettings: {}
-      },
-      therapeuticGoals: sessionGoals || [],
-      estimatedDuration: environment!.durationMinutes,
-      difficultyLevel: 0.5
-    };
+    // Return a basic fallback environment if available
+    if (environment) {
+      return {
+        baseEnvironment: environment,
+        adaptations: {
+          visualSettings: {},
+          audioSettings: {},
+          interactionSettings: {},
+          comfortSettings: {}
+        },
+        therapeuticGoals: sessionGoals || [],
+        estimatedDuration: environment.durationMinutes || 30,
+        difficultyLevel: 0.5
+      };
+    }
+    throw error;
   }
 }
 
@@ -461,7 +467,7 @@ Return as JSON with VR environment fields: name, description, category, scenePat
     return {
       name: environmentData.name || `${therapeuticGoal} Environment`,
       description: environmentData.description || '',
-      category: environmentData.category || 'mindfulness',
+      environmentType: environmentData.category || 'mindfulness',
       difficulty,
       duration: difficulty === 'beginner' ? 10 : difficulty === 'intermediate' ? 20 : 30,
       environmentType: 'vr',
