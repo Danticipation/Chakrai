@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users, Activity } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users, Activity, Headphones } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -95,6 +95,7 @@ const AppLayout = () => {
     { id: 'community', icon: Users, label: 'Community' },
     { id: 'achievements', icon: Award, label: 'Achievements' },
     { id: 'health', icon: Activity, label: 'Health' },
+    { id: 'vr-therapy', icon: Headphones, label: 'VR Therapy' },
     { id: 'reflect', icon: Brain, label: 'Reflect' },
     { id: 'memory', icon: BookOpen, label: 'Memory' },
     { id: 'mood', icon: Heart, label: 'Mood' },
@@ -706,6 +707,13 @@ const AppLayout = () => {
         return (
           <div className="h-full">
             <HealthDashboard />
+          </div>
+        );
+
+      case 'vr-therapy':
+        return (
+          <div className="h-full">
+            <VRTherapyDashboard userId={1} />
           </div>
         );
 
