@@ -721,17 +721,13 @@ export const vrSessions = pgTable("vr_sessions", {
   userId: integer("user_id").notNull().references(() => users.id),
   environmentId: integer("environment_id").notNull().references(() => vrEnvironments.id),
   sessionType: varchar("session_type", { length: 30 }).notNull(), // 'guided', 'free_form', 'exposure'
-  startTime: timestamp("start_time").notNull(),
-  endTime: timestamp("end_time"),
-  duration: integer("duration"), // actual duration in seconds
+  durationMinutes: integer("duration_minutes"), // actual duration in minutes
   completionStatus: varchar("completion_status", { length: 20 }).notNull().default('in_progress'), // 'completed', 'interrupted', 'abandoned'
-  stressLevel: jsonb("stress_level"), // Before/after stress measurements
-  heartRate: jsonb("heart_rate"), // HR data during session if available
-  interactions: jsonb("interactions").notNull().default([]), // User interactions within VR
-  achievements: text("achievements").array(), // Goals achieved during session
-  notes: text("notes"), // User or therapist notes
-  effectiveness: integer("effectiveness"), // 1-10 user rating
-  sideEffects: text("side_effects").array(), // Any motion sickness, discomfort
+  therapeuticNotes: text("therapeutic_notes"), // User or therapist notes
+  effectivenessRating: integer("effectiveness_rating"), // 1-10 user rating
+  stressLevelBefore: integer("stress_level_before"), // 1-10 stress before session
+  stressLevelAfter: integer("stress_level_after"), // 1-10 stress after session
+  insights: jsonb("insights").notNull().default([]), // Session insights and achievements
   createdAt: timestamp("created_at").defaultNow()
 });
 

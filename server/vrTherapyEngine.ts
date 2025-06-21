@@ -137,14 +137,12 @@ Analyze this VR therapy session for therapeutic effectiveness:
 
 Session Details:
 - Environment: ${environment?.name} (${environment?.environmentType})
-- Duration: ${session.duration} seconds (planned: ${environment?.durationMinutes} minutes)
+- Duration: ${session.durationMinutes} minutes (planned: ${environment?.durationMinutes} minutes)
 - Completion: ${session.completionStatus}
-- User effectiveness rating: ${session.effectiveness}/10
-- Stress levels: ${JSON.stringify(session.stressLevel)}
-- Heart rate data: ${JSON.stringify(session.heartRate)}
-- Interactions: ${JSON.stringify(session.interactions)}
-- Side effects: ${session.sideEffects?.join(', ') || 'None reported'}
-- User notes: ${session.notes || 'None'}
+- User effectiveness rating: ${session.effectivenessRating}/10
+- Stress levels: Before ${session.stressLevelBefore}/10, After ${session.stressLevelAfter}/10
+- Session insights: ${JSON.stringify(session.insights)}
+- Therapeutic notes: ${session.therapeuticNotes || 'None'}
 
 User Progress:
 - Total sessions in this environment: ${userProgress?.totalSessions || 0}
@@ -387,11 +385,11 @@ export async function monitorVrSession(
     const monitoringPrompt = `
 Monitor this ongoing VR therapy session for safety and effectiveness:
 
-Session Duration: ${Date.now() - new Date(session.startTime).getTime()}ms
+Session Duration: ${session.durationMinutes || 0} minutes
 Current Heart Rate: ${heartRate || 'Not available'}
 Current Stress Level: ${stressLevel || 'Not available'} (1-10 scale)
 User Interactions: ${JSON.stringify(userInteractions || [])}
-Side Effects Reported: ${session.sideEffects?.join(', ') || 'None'}
+Session Insights: ${JSON.stringify(session.insights) || 'None'}
 
 Provide real-time guidance:
 1. Safety warnings (motion sickness, fatigue, stress)

@@ -973,7 +973,7 @@ export class DatabaseStorage implements IStorage {
   async getUserVrSessions(userId: number, limit: number = 50): Promise<VrSession[]> {
     return await db.select().from(vrSessions)
       .where(eq(vrSessions.userId, userId))
-      .orderBy(desc(vrSessions.startTime))
+      .orderBy(desc(vrSessions.createdAt))
       .limit(limit);
   }
 
