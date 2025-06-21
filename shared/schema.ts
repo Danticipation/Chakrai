@@ -610,6 +610,60 @@ export const monthlyReports = pgTable("monthly_reports", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
+// Wearable Device Integration Tables
+export const wearableDevices = pgTable("wearable_devices", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  deviceType: varchar("device_type", { length: 50 }).notNull(), // 'apple_watch', 'fitbit', 'garmin', etc.
+  deviceName: text("device_name").notNull(),
+  deviceId: text("device_id").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  lastSyncAt: timestamp("last_sync_at"),
+  authToken: text("auth_token"), // Encrypted token for device API
+  refreshToken: text("refresh_token"), // For OAuth refresh
+  syncSettings: jsonb("sync_settings").notNull().default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const healthMetrics = pgTable("health_metrics", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  deviceId: integer("device_id").references(() => wearableDevices.id),
+  metricType: varchar("metric_type", { length: 50 }).notNull(), // 'heart_rate', 'sleep', 'steps', 'stress'
+  value: real("value").notNull(),
+  unit: varchar("unit", { length: 20 }).notNull(), // 'bpm', 'hours', 'steps', 'score'
+  timestamp: timestamp("timestamp").notNull(),
+  metadata: jsonb("metadata").default({}), // Additional data like sleep stages, activity type
+  confidence: real("confidence").default(1.0), // Data quality score
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const healthCorrelations = pgTable("health_correlations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  emotionalMetric: varchar("emotional_metric", { length: 50 }).notNull(), // 'mood', 'anxiety', 'stress'
+  physicalMetric: varchar("physical_metric", { length: 50 }).notNull(), // 'heart_rate', 'sleep_quality'
+  correlationScore: real("correlation_score").notNull(), // -1.0 to 1.0
+  confidence: real("confidence").notNull(), // Statistical confidence
+  timeframe: varchar("timeframe", { length: 20 }).notNull(), // 'daily', 'weekly', 'monthly'
+  analysisDate: timestamp("analysis_date").defaultNow(),
+  insights: text("insights").array(),
+  recommendations: text("recommendations").array(),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const syncLogs = pgTable("sync_logs", {
+  id: serial("id").primaryKey(),
+  deviceId: integer("device_id").notNull().references(() => wearableDevices.id),
+  syncStatus: varchar("sync_status", { length: 20 }).notNull(), // 'success', 'failed', 'partial'
+  recordsProcessed: integer("records_processed").default(0),
+  errorMessage: text("error_message"),
+  syncDuration: integer("sync_duration"), // milliseconds
+  dataTypes: text("data_types").array(), // ['heart_rate', 'sleep', 'steps']
+  createdAt: timestamp("created_at").defaultNow()
+});
+
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type InsertUserPreferences = typeof userPreferences.$inferInsert;
 export type ConversationPattern = typeof conversationPatterns.$inferSelect;
@@ -622,3 +676,24 @@ export type UserFeedback = typeof userFeedback.$inferSelect;
 export type InsertUserFeedback = typeof userFeedback.$inferInsert;
 export type MonthlyReport = typeof monthlyReports.$inferSelect;
 export type InsertMonthlyReport = typeof monthlyReports.$inferInsert;
+
+// Wearable Device Types
+export type WearableDevice = typeof wearableDevices.$inferSelect;
+export type InsertWearableDevice = typeof wearableDevices.$inferInsert;
+export type HealthMetric = typeof healthMetrics.$inferSelect;
+export type InsertHealthMetric = typeof healthMetrics.$inferInsert;
+export type HealthCorrelation = typeof healthCorrelations.$inferSelect;
+export type InsertHealthCorrelation = typeof healthCorrelations.$inferInsert;
+export type SyncLog = typeof syncLogs.$inferSelect;
+export type InsertSyncLog = typeof syncLogs.$inferInsert;
+
+// Wearable Device Insert Schemas
+export const insertWearableDeviceSchema = createInsertSchema(wearableDevices).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertHealthMetricSchema = createInsertSchema(healthMetrics).omit({ id: true, createdAt: true });
+export const insertHealthCorrelationSchema = createInsertSchema(healthCorrelations).omit({ id: true, createdAt: true });
+export const insertSyncLogSchema = createInsertSchema(syncLogs).omit({ id: true, createdAt: true });
+
+export type InsertWearableDevice = z.infer<typeof insertWearableDeviceSchema>;
+export type InsertHealthMetric = z.infer<typeof insertHealthMetricSchema>;
+export type InsertHealthCorrelation = z.infer<typeof insertHealthCorrelationSchema>;
+export type InsertSyncLog = z.infer<typeof insertSyncLogSchema>;
