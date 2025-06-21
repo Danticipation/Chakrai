@@ -848,6 +848,225 @@ export class DatabaseStorage implements IStorage {
       .where(eq(wellnessRecommendations.id, recommendationId));
   }
 
+  // Enhanced Gamification Storage Methods
+
+  // Wellness Points Management
+  async getUserWellnessPoints(userId: number): Promise<UserWellnessPoints | undefined> {
+    const [points] = await db.select().from(userWellnessPoints)
+      .where(eq(userWellnessPoints.userId, userId))
+      .limit(1);
+    return points || undefined;
+  }
+
+  async createUserWellnessPoints(pointsData: InsertUserWellnessPoints): Promise<UserWellnessPoints> {
+    const [newPoints] = await db.insert(userWellnessPoints).values(pointsData).returning();
+    return newPoints;
+  }
+
+  async updateUserWellnessPoints(userId: number, updates: Partial<UserWellnessPoints>): Promise<UserWellnessPoints | undefined> {
+    const [updatedPoints] = await db.update(userWellnessPoints)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(userWellnessPoints.userId, userId))
+      .returning();
+    return updatedPoints || undefined;
+  }
+
+  // Rewards Shop Management
+  async getRewardsShop(): Promise<RewardsShop[]> {
+    return await db.select().from(rewardsShop)
+      .where(eq(rewardsShop.isAvailable, true))
+      .orderBy(rewardsShop.category, rewardsShop.pointsCost);
+  }
+
+  async getRewardById(rewardId: number): Promise<RewardsShop | undefined> {
+    const [reward] = await db.select().from(rewardsShop)
+      .where(eq(rewardsShop.id, rewardId))
+      .limit(1);
+    return reward || undefined;
+  }
+
+  async createReward(rewardData: InsertRewardsShop): Promise<RewardsShop> {
+    const [newReward] = await db.insert(rewardsShop).values(rewardData).returning();
+    return newReward;
+  }
+
+  async createUserReward(userRewardData: InsertUserRewards): Promise<UserRewards> {
+    const [newUserReward] = await db.insert(userRewards).values(userRewardData).returning();
+    return newUserReward;
+  }
+
+  async getUserRewards(userId: number): Promise<UserRewards[]> {
+    return await db.select().from(userRewards)
+      .where(eq(userRewards.userId, userId))
+      .orderBy(desc(userRewards.purchasedAt));
+  }
+
+  async updateRewardPurchaseCount(rewardId: number): Promise<void> {
+    await db.update(rewardsShop)
+      .set({ 
+        purchaseCount: sql`${rewardsShop.purchaseCount} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(rewardsShop.id, rewardId));
+  }
+
+  // Community Challenges Management
+  async getActiveCommunityChallenge(currentDate: Date): Promise<CommunityChallenge[]> {
+    return await db.select().from(communityChallengess)
+      .where(
+        and(
+          eq(communityChallengess.isActive, true),
+          lte(communityChallengess.startDate, currentDate),
+          gte(communityChallengess.endDate, currentDate)
+        )
+      )
+      .orderBy(desc(communityChallengess.isFeatured), communityChallengess.startDate);
+  }
+
+  async getCommunityChallenge(challengeId: number): Promise<CommunityChallenge | undefined> {
+    const [challenge] = await db.select().from(communityChallengess)
+      .where(eq(communityChallengess.id, challengeId))
+      .limit(1);
+    return challenge || undefined;
+  }
+
+  async createCommunityChallenge(challengeData: InsertCommunityChallenge): Promise<CommunityChallenge> {
+    const [newChallenge] = await db.insert(communityChallengess).values(challengeData).returning();
+    return newChallenge;
+  }
+
+  async getChallengeParticipant(challengeId: number, userId: number): Promise<ChallengeParticipant | undefined> {
+    const [participant] = await db.select().from(challengeParticipants)
+      .where(
+        and(
+          eq(challengeParticipants.challengeId, challengeId),
+          eq(challengeParticipants.userId, userId)
+        )
+      )
+      .limit(1);
+    return participant || undefined;
+  }
+
+  async createChallengeParticipant(participantData: InsertChallengeParticipant): Promise<ChallengeParticipant> {
+    const [newParticipant] = await db.insert(challengeParticipants).values(participantData).returning();
+    return newParticipant;
+  }
+
+  async updateChallengeParticipantCount(challengeId: number, newCount: number): Promise<void> {
+    await db.update(communityChallengess)
+      .set({ 
+        participantCount: newCount,
+        updatedAt: new Date()
+      })
+      .where(eq(communityChallengess.id, challengeId));
+  }
+
+  async updateChallengeParticipantProgress(challengeId: number, userId: number, updates: Partial<ChallengeParticipant>): Promise<ChallengeParticipant | undefined> {
+    const [updatedParticipant] = await db.update(challengeParticipants)
+      .set(updates)
+      .where(
+        and(
+          eq(challengeParticipants.challengeId, challengeId),
+          eq(challengeParticipants.userId, userId)
+        )
+      )
+      .returning();
+    return updatedParticipant || undefined;
+  }
+
+  async createChallengeActivity(activityData: InsertChallengeActivity): Promise<ChallengeActivity> {
+    const [newActivity] = await db.insert(challengeActivities).values(activityData).returning();
+    return newActivity;
+  }
+
+  async getChallengeActivities(challengeId: number, userId: number): Promise<ChallengeActivity[]> {
+    return await db.select().from(challengeActivities)
+      .where(
+        and(
+          eq(challengeActivities.challengeId, challengeId),
+          eq(challengeActivities.userId, userId)
+        )
+      )
+      .orderBy(challengeActivities.activityDay);
+  }
+
+  // Emotional Achievements Management
+  async getEmotionalAchievements(): Promise<EmotionalAchievement[]> {
+    return await db.select().from(emotionalAchievements)
+      .orderBy(emotionalAchievements.category, emotionalAchievements.difficultyLevel);
+  }
+
+  async getEmotionalAchievement(achievementId: string): Promise<EmotionalAchievement | undefined> {
+    const [achievement] = await db.select().from(emotionalAchievements)
+      .where(eq(emotionalAchievements.achievementId, achievementId))
+      .limit(1);
+    return achievement || undefined;
+  }
+
+  async createEmotionalAchievement(achievementData: InsertEmotionalAchievement): Promise<EmotionalAchievement> {
+    const [newAchievement] = await db.insert(emotionalAchievements).values(achievementData).returning();
+    return newAchievement;
+  }
+
+  async getUserEmotionalAchievements(userId: number, daysBack?: number): Promise<UserEmotionalAchievement[]> {
+    let query = db.select().from(userEmotionalAchievements)
+      .where(eq(userEmotionalAchievements.userId, userId));
+
+    if (daysBack) {
+      const dateThreshold = new Date();
+      dateThreshold.setDate(dateThreshold.getDate() - daysBack);
+      query = query.where(
+        and(
+          eq(userEmotionalAchievements.userId, userId),
+          gte(userEmotionalAchievements.unlockedAt, dateThreshold)
+        )
+      );
+    }
+
+    return await query.orderBy(desc(userEmotionalAchievements.unlockedAt));
+  }
+
+  async getUserEmotionalAchievement(userId: number, achievementId: string): Promise<UserEmotionalAchievement | undefined> {
+    const [userAchievement] = await db.select().from(userEmotionalAchievements)
+      .where(
+        and(
+          eq(userEmotionalAchievements.userId, userId),
+          eq(userEmotionalAchievements.achievementId, achievementId)
+        )
+      )
+      .limit(1);
+    return userAchievement || undefined;
+  }
+
+  async createUserEmotionalAchievement(achievementData: InsertUserEmotionalAchievement): Promise<UserEmotionalAchievement> {
+    const [newUserAchievement] = await db.insert(userEmotionalAchievements).values(achievementData).returning();
+    return newUserAchievement;
+  }
+
+  async markEmotionalAchievementViewed(userId: number, achievementId: string): Promise<void> {
+    await db.update(userEmotionalAchievements)
+      .set({ isViewed: true })
+      .where(
+        and(
+          eq(userEmotionalAchievements.userId, userId),
+          eq(userEmotionalAchievements.achievementId, achievementId)
+        )
+      );
+  }
+
+  // Points History Management
+  async createPointsHistory(historyData: InsertPointsHistory): Promise<PointsHistory> {
+    const [newHistory] = await db.insert(pointsHistory).values(historyData).returning();
+    return newHistory;
+  }
+
+  async getPointsHistory(userId: number, limit: number = 50): Promise<PointsHistory[]> {
+    return await db.select().from(pointsHistory)
+      .where(eq(pointsHistory.userId, userId))
+      .orderBy(desc(pointsHistory.createdAt))
+      .limit(limit);
+  }
+
   async createUserFeedback(feedback: InsertUserFeedback): Promise<UserFeedback> {
     const [newFeedback] = await db.insert(userFeedback).values(feedback).returning();
     return newFeedback;

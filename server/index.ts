@@ -2446,6 +2446,272 @@ app.post('/api/accessibility/chart-description', async (req, res) => {
   }
 });
 
+// Enhanced Gamification API Endpoints
+
+// Wellness Points Management
+app.get('/api/wellness-points/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { getWellnessPointsBalance } = await import('./enhancedGamificationEngine');
+    
+    const balance = await getWellnessPointsBalance(userId, storage);
+    res.json(balance);
+  } catch (error) {
+    console.error('Error getting wellness points:', error);
+    res.status(500).json({ error: 'Failed to get wellness points' });
+  }
+});
+
+app.post('/api/wellness-points/:userId/award', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { points, source, sourceId, description } = req.body;
+    const { awardWellnessPoints } = await import('./enhancedGamificationEngine');
+    
+    const newBalance = await awardWellnessPoints(userId, points, source, sourceId, description, storage);
+    res.json({ success: true, balance: newBalance });
+  } catch (error) {
+    console.error('Error awarding wellness points:', error);
+    res.status(500).json({ error: 'Failed to award wellness points' });
+  }
+});
+
+app.get('/api/wellness-points/:userId/history', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const limit = parseInt(req.query.limit as string) || 50;
+    
+    const history = await storage.getPointsHistory(userId, limit);
+    res.json({ history });
+  } catch (error) {
+    console.error('Error getting points history:', error);
+    res.status(500).json({ error: 'Failed to get points history' });
+  }
+});
+
+// Therapeutic Rewards Shop
+app.get('/api/rewards-shop/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { getAvailableRewards } = await import('./enhancedGamificationEngine');
+    
+    const rewards = await getAvailableRewards(userId, storage);
+    res.json({ rewards });
+  } catch (error) {
+    console.error('Error getting rewards shop:', error);
+    res.status(500).json({ error: 'Failed to get rewards shop' });
+  }
+});
+
+app.post('/api/rewards-shop/:userId/purchase', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { rewardId } = req.body;
+    const { purchaseReward } = await import('./enhancedGamificationEngine');
+    
+    const result = await purchaseReward(userId, rewardId, storage);
+    res.json(result);
+  } catch (error) {
+    console.error('Error purchasing reward:', error);
+    res.status(500).json({ error: 'Failed to purchase reward' });
+  }
+});
+
+app.get('/api/user-rewards/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    const userRewards = await storage.getUserRewards(userId);
+    res.json({ rewards: userRewards });
+  } catch (error) {
+    console.error('Error getting user rewards:', error);
+    res.status(500).json({ error: 'Failed to get user rewards' });
+  }
+});
+
+// Community Challenges
+app.get('/api/community-challenges', async (req, res) => {
+  try {
+    const { getActiveChallenges } = await import('./enhancedGamificationEngine');
+    
+    const challenges = await getActiveChallenges(storage);
+    res.json({ challenges });
+  } catch (error) {
+    console.error('Error getting community challenges:', error);
+    res.status(500).json({ error: 'Failed to get community challenges' });
+  }
+});
+
+app.post('/api/community-challenges/:challengeId/join', async (req, res) => {
+  try {
+    const challengeId = parseInt(req.params.challengeId);
+    const { userId } = req.body;
+    const { joinChallenge } = await import('./enhancedGamificationEngine');
+    
+    const result = await joinChallenge(userId, challengeId, storage);
+    res.json(result);
+  } catch (error) {
+    console.error('Error joining challenge:', error);
+    res.status(500).json({ error: 'Failed to join challenge' });
+  }
+});
+
+app.get('/api/community-challenges/:challengeId/progress/:userId', async (req, res) => {
+  try {
+    const challengeId = parseInt(req.params.challengeId);
+    const userId = parseInt(req.params.userId);
+    
+    const participant = await storage.getChallengeParticipant(challengeId, userId);
+    const activities = await storage.getChallengeActivities(challengeId, userId);
+    
+    res.json({ 
+      participant,
+      activities,
+      totalActivities: activities.length
+    });
+  } catch (error) {
+    console.error('Error getting challenge progress:', error);
+    res.status(500).json({ error: 'Failed to get challenge progress' });
+  }
+});
+
+app.post('/api/community-challenges/:challengeId/update-progress', async (req, res) => {
+  try {
+    const challengeId = parseInt(req.params.challengeId);
+    const { userId, activityResponse, emotionalState } = req.body;
+    const { updateChallengeProgress } = await import('./enhancedGamificationEngine');
+    
+    const result = await updateChallengeProgress(userId, challengeId, activityResponse, emotionalState, storage);
+    res.json(result);
+  } catch (error) {
+    console.error('Error updating challenge progress:', error);
+    res.status(500).json({ error: 'Failed to update challenge progress' });
+  }
+});
+
+// Dynamic Emotional Achievements
+app.get('/api/emotional-achievements/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const daysBack = parseInt(req.query.daysBack as string) || undefined;
+    
+    const userAchievements = await storage.getUserEmotionalAchievements(userId, daysBack);
+    const allAchievements = await storage.getEmotionalAchievements();
+    
+    res.json({ 
+      userAchievements,
+      availableAchievements: allAchievements
+    });
+  } catch (error) {
+    console.error('Error getting emotional achievements:', error);
+    res.status(500).json({ error: 'Failed to get emotional achievements' });
+  }
+});
+
+app.post('/api/emotional-achievements/:userId/analyze', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { conversationData, emotionalData } = req.body;
+    const { analyzeEmotionalBreakthroughs } = await import('./enhancedGamificationEngine');
+    
+    const unlockedAchievements = await analyzeEmotionalBreakthroughs(userId, conversationData, emotionalData, storage);
+    res.json({ 
+      success: true,
+      unlockedAchievements,
+      count: unlockedAchievements.length
+    });
+  } catch (error) {
+    console.error('Error analyzing emotional breakthroughs:', error);
+    res.status(500).json({ error: 'Failed to analyze emotional breakthroughs' });
+  }
+});
+
+app.post('/api/emotional-achievements/:userId/mark-viewed', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { achievementId } = req.body;
+    
+    await storage.markEmotionalAchievementViewed(userId, achievementId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error marking achievement as viewed:', error);
+    res.status(500).json({ error: 'Failed to mark achievement as viewed' });
+  }
+});
+
+// Initialize gamification data
+app.post('/api/admin/initialize-gamification', async (req, res) => {
+  try {
+    const { initializeEmotionalAchievements, initializeRewardsShop, generateWeeklyChallenges } = await import('./enhancedGamificationEngine');
+    
+    await initializeEmotionalAchievements(storage);
+    await initializeRewardsShop(storage);
+    const challenges = await generateWeeklyChallenges(storage);
+    
+    res.json({ 
+      success: true,
+      message: 'Gamification system initialized',
+      challengesGenerated: challenges.length
+    });
+  } catch (error) {
+    console.error('Error initializing gamification:', error);
+    res.status(500).json({ error: 'Failed to initialize gamification system' });
+  }
+});
+
+// Gamification Dashboard Overview
+app.get('/api/gamification/dashboard/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { getWellnessPointsBalance, getActiveChallenges } = await import('./enhancedGamificationEngine');
+    
+    // Get comprehensive gamification overview
+    const [
+      wellnessPoints,
+      activeChallenges,
+      recentAchievements,
+      userRewards,
+      pointsHistory
+    ] = await Promise.all([
+      getWellnessPointsBalance(userId, storage),
+      getActiveChallenges(storage),
+      storage.getUserEmotionalAchievements(userId, 7),
+      storage.getUserRewards(userId),
+      storage.getPointsHistory(userId, 10)
+    ]);
+
+    // Get user's challenge participation
+    const userChallenges = await Promise.all(
+      activeChallenges.map(async (challenge: any) => {
+        const participant = await storage.getChallengeParticipant(challenge.id, userId);
+        return {
+          ...challenge,
+          isParticipating: !!participant,
+          progress: participant?.currentProgress || 0,
+          completedDays: participant?.completedDays || 0
+        };
+      })
+    );
+
+    res.json({
+      wellnessPoints,
+      activeChallenges: userChallenges,
+      recentAchievements,
+      userRewards: userRewards.slice(0, 5), // Latest 5 rewards
+      pointsHistory: pointsHistory.slice(0, 10), // Latest 10 transactions
+      stats: {
+        totalAchievements: recentAchievements.length,
+        totalRewards: userRewards.length,
+        activeChallengesCount: userChallenges.filter((c: any) => c.isParticipating).length,
+        lifetimePoints: wellnessPoints.lifetimePoints
+      }
+    });
+  } catch (error) {
+    console.error('Error getting gamification dashboard:', error);
+    res.status(500).json({ error: 'Failed to get gamification dashboard' });
+  }
+});
+
 // Simplify language for cognitive accessibility
 app.post('/api/accessibility/simplify-language', async (req, res) => {
   try {

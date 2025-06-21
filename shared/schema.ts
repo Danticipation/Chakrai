@@ -369,6 +369,146 @@ export const dailyActivities = pgTable("daily_activities", {
   totalActivities: integer("total_activities").default(0),
 });
 
+// Enhanced Gamification: Wellness Points & Rewards Shop
+export const userWellnessPoints = pgTable("user_wellness_points", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  totalPoints: integer("total_points").default(0),
+  lifetimePoints: integer("lifetime_points").default(0),
+  pointsSpent: integer("points_spent").default(0),
+  currentLevel: integer("current_level").default(1),
+  pointsToNextLevel: integer("points_to_next_level").default(100),
+  lastActivity: timestamp("last_activity").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const rewardsShop = pgTable("rewards_shop", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { enum: ["avatar", "theme", "premium_content", "virtual_item", "therapeutic_tool"] }).notNull(),
+  pointsCost: integer("points_cost").notNull(),
+  rarity: varchar("rarity", { enum: ["common", "rare", "epic", "legendary"] }).default("common"),
+  isAvailable: boolean("is_available").default(true),
+  isLimitedTime: boolean("is_limited_time").default(false),
+  availableUntil: timestamp("available_until"),
+  therapeuticValue: text("therapeutic_value"), // How this reward supports mental wellness
+  previewImage: varchar("preview_image"),
+  unlockRequirement: jsonb("unlock_requirement"), // Level, achievement, or special conditions
+  purchaseCount: integer("purchase_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const userRewards = pgTable("user_rewards", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  rewardId: integer("reward_id").notNull().references(() => rewardsShop.id),
+  purchasedAt: timestamp("purchased_at").defaultNow(),
+  pointsSpent: integer("points_spent").notNull(),
+  isActive: boolean("is_active").default(true),
+  isEquipped: boolean("is_equipped").default(false), // For avatars/themes
+});
+
+// Community Challenges System
+export const communityChallengess = pgTable("community_challenges", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  challengeType: varchar("challenge_type", { enum: ["gratitude", "mindfulness", "journaling", "mood_tracking", "social_connection", "self_care", "resilience"] }).notNull(),
+  duration: integer("duration").notNull(), // days
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  targetGoal: integer("target_goal").notNull(), // e.g., 30 days of gratitude
+  pointsReward: integer("points_reward").default(0),
+  badgeReward: varchar("badge_reward"), // Achievement badge for completion
+  participantCount: integer("participant_count").default(0),
+  completionRate: decimal("completion_rate", { precision: 5, scale: 2 }).default("0"),
+  isActive: boolean("is_active").default(true),
+  isFeatured: boolean("is_featured").default(false),
+  therapeuticFocus: text("therapeutic_focus"), // Mental health benefits
+  dailyPrompts: jsonb("daily_prompts"), // Array of daily prompts/activities
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const challengeParticipants = pgTable("challenge_participants", {
+  id: serial("id").primaryKey(),
+  challengeId: integer("challenge_id").notNull().references(() => communityChallengess.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  currentProgress: integer("current_progress").default(0),
+  completedDays: integer("completed_days").default(0),
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  pointsEarned: integer("points_earned").default(0),
+  motivationalMessage: text("motivational_message"),
+  isActive: boolean("is_active").default(true),
+});
+
+export const challengeActivities = pgTable("challenge_activities", {
+  id: serial("id").primaryKey(),
+  challengeId: integer("challenge_id").notNull().references(() => communityChallengess.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  activityDay: integer("activity_day").notNull(), // Day 1, 2, 3, etc.
+  activityDate: timestamp("activity_date").notNull(),
+  prompt: text("prompt").notNull(),
+  userResponse: text("user_response"),
+  emotionalState: varchar("emotional_state"), // Before/after emotional check-in
+  reflectionNotes: text("reflection_notes"),
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  pointsEarned: integer("points_earned").default(0),
+});
+
+// Dynamic Emotional Achievements System
+export const emotionalAchievements = pgTable("emotional_achievements", {
+  id: serial("id").primaryKey(),
+  achievementId: varchar("achievement_id").notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { enum: ["resilience", "emotional_breakthrough", "self_awareness", "mindfulness", "social_connection", "coping_skills", "progress_milestone"] }).notNull(),
+  triggerCondition: jsonb("trigger_condition").notNull(), // AI-detectable conditions
+  difficultyLevel: varchar("difficulty_level", { enum: ["beginner", "intermediate", "advanced", "expert"] }).default("beginner"),
+  rarity: varchar("rarity", { enum: ["common", "rare", "epic", "legendary"] }).default("common"),
+  pointsReward: integer("points_reward").default(0),
+  badgeIcon: varchar("badge_icon").notNull(),
+  badgeColor: varchar("badge_color").default("#ADD8E6"),
+  therapeuticSignificance: text("therapeutic_significance"), // Why this achievement matters for mental health
+  isHidden: boolean("is_hidden").default(false), // Hidden until unlocked
+  unlockMessage: text("unlock_message"),
+  celebrationMessage: text("celebration_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const userEmotionalAchievements = pgTable("user_emotional_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  achievementId: varchar("achievement_id").notNull().references(() => emotionalAchievements.achievementId),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  triggerContext: jsonb("trigger_context"), // What emotional pattern/conversation triggered this
+  emotionalState: jsonb("emotional_state"), // User's emotional state when achieved
+  progressSnapshot: jsonb("progress_snapshot"), // User's therapy progress at time of achievement
+  confidenceScore: decimal("confidence_score", { precision: 3, scale: 2 }), // AI confidence in achievement validity
+  pointsEarned: integer("points_earned").default(0),
+  isViewed: boolean("is_viewed").default(false),
+  userReflection: text("user_reflection"), // User's thoughts on achieving this
+});
+
+export const pointsHistory = pgTable("points_history", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  pointsChange: integer("points_change").notNull(), // Positive for earned, negative for spent
+  source: varchar("source", { enum: ["achievement", "daily_activity", "streak", "challenge", "purchase", "bonus", "manual_adjustment"] }).notNull(),
+  sourceId: integer("source_id"), // Reference to achievement, challenge, etc.
+  description: text("description").notNull(),
+  balanceBefore: integer("balance_before").notNull(),
+  balanceAfter: integer("balance_after").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertTherapistSchema = createInsertSchema(therapists).omit({
   id: true,
   createdAt: true,
@@ -412,6 +552,36 @@ export type WellnessStreak = typeof wellnessStreaks.$inferSelect;
 export type InsertWellnessStreak = z.infer<typeof insertWellnessStreakSchema>;
 export type DailyActivity = typeof dailyActivities.$inferSelect;
 export type InsertDailyActivity = z.infer<typeof insertDailyActivitySchema>;
+
+// Enhanced Gamification Schema Types
+export const insertUserWellnessPointsSchema = createInsertSchema(userWellnessPoints).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertRewardsShopSchema = createInsertSchema(rewardsShop).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertUserRewardsSchema = createInsertSchema(userRewards).omit({ id: true, purchasedAt: true });
+export const insertCommunityChallengeSchema = createInsertSchema(communityChallengess).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertChallengeParticipantSchema = createInsertSchema(challengeParticipants).omit({ id: true, joinedAt: true });
+export const insertChallengeActivitySchema = createInsertSchema(challengeActivities).omit({ id: true });
+export const insertEmotionalAchievementSchema = createInsertSchema(emotionalAchievements).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertUserEmotionalAchievementSchema = createInsertSchema(userEmotionalAchievements).omit({ id: true, unlockedAt: true });
+export const insertPointsHistorySchema = createInsertSchema(pointsHistory).omit({ id: true, createdAt: true });
+
+export type UserWellnessPoints = typeof userWellnessPoints.$inferSelect;
+export type InsertUserWellnessPoints = z.infer<typeof insertUserWellnessPointsSchema>;
+export type RewardsShop = typeof rewardsShop.$inferSelect;
+export type InsertRewardsShop = z.infer<typeof insertRewardsShopSchema>;
+export type UserRewards = typeof userRewards.$inferSelect;
+export type InsertUserRewards = z.infer<typeof insertUserRewardsSchema>;
+export type CommunityChallenge = typeof communityChallengess.$inferSelect;
+export type InsertCommunityChallenge = z.infer<typeof insertCommunityChallengeSchema>;
+export type ChallengeParticipant = typeof challengeParticipants.$inferSelect;
+export type InsertChallengeParticipant = z.infer<typeof insertChallengeParticipantSchema>;
+export type ChallengeActivity = typeof challengeActivities.$inferSelect;
+export type InsertChallengeActivity = z.infer<typeof insertChallengeActivitySchema>;
+export type EmotionalAchievement = typeof emotionalAchievements.$inferSelect;
+export type InsertEmotionalAchievement = z.infer<typeof insertEmotionalAchievementSchema>;
+export type UserEmotionalAchievement = typeof userEmotionalAchievements.$inferSelect;
+export type InsertUserEmotionalAchievement = z.infer<typeof insertUserEmotionalAchievementSchema>;
+export type PointsHistory = typeof pointsHistory.$inferSelect;
+export type InsertPointsHistory = z.infer<typeof insertPointsHistorySchema>;
 
 // Community and Peer Support Tables
 export const supportForums = pgTable("support_forums", {
