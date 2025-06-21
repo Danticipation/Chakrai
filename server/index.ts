@@ -1962,6 +1962,189 @@ app.post('/api/personalization/initialize', async (req, res) => {
   }
 });
 
+// Advanced Analytics and Reports API Routes
+
+// Generate dashboard data
+app.post('/api/analytics/dashboard', async (req, res) => {
+  try {
+    const { userId, dateRange } = req.body;
+    
+    const { generateDashboardData } = await import('./analyticsEngine');
+    
+    const dashboardData = await generateDashboardData(
+      parseInt(userId),
+      {
+        start: new Date(dateRange.start),
+        end: new Date(dateRange.end)
+      }
+    );
+    
+    res.json(dashboardData);
+  } catch (error) {
+    console.error('Failed to generate dashboard data:', error);
+    res.status(500).json({ error: 'Failed to generate dashboard data' });
+  }
+});
+
+// Get monthly report
+app.get('/api/analytics/monthly-report/:userId/:year/:month', async (req, res) => {
+  try {
+    const { userId, year, month } = req.params;
+    
+    // Try to get existing report from storage
+    const existingReport = await storage.getMonthlyReport(
+      parseInt(userId),
+      parseInt(year),
+      parseInt(month)
+    );
+    
+    if (existingReport) {
+      res.json({ report: existingReport });
+    } else {
+      res.status(404).json({ error: 'Report not found' });
+    }
+  } catch (error) {
+    console.error('Failed to fetch monthly report:', error);
+    res.status(500).json({ error: 'Failed to fetch monthly report' });
+  }
+});
+
+// Generate monthly report
+app.post('/api/analytics/generate-monthly-report', async (req, res) => {
+  try {
+    const { userId, month, year } = req.body;
+    
+    const { generateMonthlyReport } = await import('./analyticsEngine');
+    
+    const report = await generateMonthlyReport(
+      parseInt(userId),
+      parseInt(month),
+      parseInt(year)
+    );
+    
+    // Store the generated report
+    await storage.saveMonthlyReport(report);
+    
+    res.json({ report });
+  } catch (error) {
+    console.error('Failed to generate monthly report:', error);
+    res.status(500).json({ error: 'Failed to generate monthly report' });
+  }
+});
+
+// Export monthly report
+app.post('/api/analytics/export-monthly-report', async (req, res) => {
+  try {
+    const { reportId, format } = req.body;
+    
+    const report = await storage.getMonthlyReportById(reportId);
+    
+    if (!report) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    
+    if (format === 'pdf') {
+      // Generate PDF export (simplified implementation)
+      const pdfContent = `
+        Monthly Wellness Report - ${report.month}/${report.year}
+        
+        Overall Score: ${report.overallScore}/100
+        
+        Summary:
+        ${report.summary}
+        
+        Key Highlights:
+        ${report.keyHighlights.map(h => `• ${h}`).join('\n')}
+        
+        Emotional Journey:
+        ${report.emotionalJourney}
+        
+        Progress Achievements:
+        ${report.progressAchievements.map(a => `• ${a}`).join('\n')}
+        
+        Goals for Next Month:
+        ${report.goalsForNextMonth.map(g => `• ${g}`).join('\n')}
+      `;
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="wellness-report-${report.year}-${report.month}.txt"`);
+      res.send(pdfContent);
+    } else {
+      res.json({ report });
+    }
+  } catch (error) {
+    console.error('Failed to export monthly report:', error);
+    res.status(500).json({ error: 'Failed to export monthly report' });
+  }
+});
+
+// Get analytics insights
+app.get('/api/analytics/insights/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { period = 'monthly' } = req.query;
+    
+    const { generateDashboardData } = await import('./analyticsEngine');
+    
+    const endDate = new Date();
+    const startDate = period === 'weekly' 
+      ? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    
+    const data = await generateDashboardData(userId, { start: startDate, end: endDate });
+    
+    res.json({ 
+      insights: data.insights,
+      emotionalOverview: data.emotionalOverview,
+      activityOverview: data.activityOverview 
+    });
+  } catch (error) {
+    console.error('Failed to fetch analytics insights:', error);
+    res.status(500).json({ error: 'Failed to fetch analytics insights' });
+  }
+});
+
+// Get wellness trends
+app.get('/api/analytics/trends/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { period = '3m' } = req.query; // 3m, 6m, 1y
+    
+    let months = 3;
+    if (period === '6m') months = 6;
+    if (period === '1y') months = 12;
+    
+    const trends = [];
+    const currentDate = new Date();
+    
+    for (let i = months - 1; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      
+      try {
+        const report = await storage.getMonthlyReport(userId, year, month);
+        if (report) {
+          trends.push({
+            month: `${year}-${month.toString().padStart(2, '0')}`,
+            score: report.overallScore,
+            sessions: report.metrics.activityMetrics.totalSessions,
+            journalEntries: report.metrics.activityMetrics.journalEntries,
+            emotionalProgress: report.metrics.emotionalTrends.progressDirection
+          });
+        }
+      } catch (error) {
+        // Skip months without reports
+      }
+    }
+    
+    res.json({ trends });
+  } catch (error) {
+    console.error('Failed to fetch wellness trends:', error);
+    res.status(500).json({ error: 'Failed to fetch wellness trends' });
+  }
+});
+
 // Helper functions
 async function generateSessionPreparation(journalEntries: any[], moodEntries: any[]): Promise<string> {
   try {
