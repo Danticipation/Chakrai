@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Heart, 
@@ -8,9 +8,7 @@ import {
   TrendingUp, 
   BarChart3, 
   Plus, 
-  Settings, 
-  Sync,
-  AlertCircle,
+  RefreshCw,
   CheckCircle,
   Info,
   Trash2
@@ -49,23 +47,13 @@ interface HealthCorrelation {
   analysisDate: string;
 }
 
-interface SyncLog {
-  id: number;
-  syncStatus: string;
-  recordsProcessed: number;
-  errorMessage: string | null;
-  syncDuration: number;
-  dataTypes: string[];
-  createdAt: string;
-}
-
 export default function HealthDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showAddDevice, setShowAddDevice] = useState(false);
   const [correlationTimeframe, setCorrelationTimeframe] = useState('weekly');
   const queryClient = useQueryClient();
 
-  // Get current user ID (would come from context in real app)
+  // Get current user ID
   const userId = 1;
 
   // Fetch wearable devices
@@ -313,7 +301,7 @@ export default function HealthDashboard() {
                       </div>
                     </div>
                     <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                      <Sync className="w-4 h-4" />
+                      <RefreshCw className="w-4 h-4" />
                       Sync Now
                     </button>
                   </div>
@@ -476,224 +464,6 @@ export default function HealthDashboard() {
           )}
         </div>
       </div>
-
-      {/* Add Device Modal */}
-      {showAddDevice && <AddDeviceModal onClose={() => setShowAddDevice(false)} onConnect={connectDevice.mutate} />}
-    </div>
-  );
-}
-
-        {/* Devices Tab */}
-        <TabsContent value="devices" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {devices.map((device: WearableDevice) => (
-              <Card key={device.id}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                  <div className="flex items-center gap-3">
-                    <Watch className="w-8 h-8 text-gray-600" />
-                    <div>
-                      <CardTitle className="text-lg">{device.deviceName}</CardTitle>
-                      <CardDescription>{formatMetricName(device.deviceType)}</CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={device.isActive ? "default" : "secondary"}>
-                      {device.isActive ? "Active" : "Inactive"}
-                    </Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeDevice.mutate(device.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Last Sync:</span>
-                      <span>
-                        {device.lastSyncAt 
-                          ? new Date(device.lastSyncAt).toLocaleDateString()
-                          : 'Never'
-                        }
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Device ID:</span>
-                      <span className="font-mono text-xs">{device.deviceId}</span>
-                    </div>
-                  </div>
-                  <Button 
-                    className="w-full mt-4" 
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Sync className="w-4 h-4 mr-2" />
-                    Sync Now
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {devices.length === 0 && (
-            <Card>
-              <CardContent className="text-center py-8">
-                <Watch className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No devices connected</h3>
-                <p className="text-gray-600 mb-4">
-                  Connect your smartwatch or fitness tracker to start tracking health correlations
-                </p>
-                <Button onClick={() => setShowAddDevice(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Connect Your First Device
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        {/* Correlations Tab */}
-        <TabsContent value="correlations" className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-lg font-medium">Health-Emotion Correlations</h3>
-              <p className="text-gray-600 text-sm">Discover connections between physical and emotional patterns</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Select value={correlationTimeframe} onValueChange={setCorrelationTimeframe}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button 
-                onClick={() => analyzeCorrelations.mutate()}
-                disabled={analyzeCorrelations.isPending}
-              >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Analyze
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {correlations.map((correlation: HealthCorrelation) => (
-              <Card key={correlation.id}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">
-                        {formatMetricName(correlation.physicalMetric)} ↔ {formatMetricName(correlation.emotionalMetric)}
-                      </CardTitle>
-                      <CardDescription>{correlation.timeframe} analysis</CardDescription>
-                    </div>
-                    <Badge className={getCorrelationColor(correlation.correlationScore)}>
-                      {correlation.correlationScore > 0 ? '+' : ''}{correlation.correlationScore.toFixed(2)}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <Progress value={correlation.confidence * 100} className="h-2" />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Confidence: {Math.round(correlation.confidence * 100)}%
-                      </p>
-                    </div>
-                    
-                    {correlation.insights && correlation.insights.length > 0 && (
-                      <div>
-                        <h4 className="font-medium text-sm mb-2">Key Insights:</h4>
-                        <ul className="space-y-1">
-                          {correlation.insights.slice(0, 2).map((insight, index) => (
-                            <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
-                              <span className="w-1 h-1 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
-                              {insight}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {correlation.recommendations && correlation.recommendations.length > 0 && (
-                      <div>
-                        <h4 className="font-medium text-sm mb-2">Recommendations:</h4>
-                        <ul className="space-y-1">
-                          {correlation.recommendations.slice(0, 2).map((rec, index) => (
-                            <li key={index} className="text-sm text-green-700 flex items-start gap-2">
-                              <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
-                              {rec}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {correlations.length === 0 && (
-            <Card>
-              <CardContent className="text-center py-8">
-                <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No correlations found</h3>
-                <p className="text-gray-600 mb-4">
-                  Connect devices and track mood to discover health-emotion patterns
-                </p>
-                <Button 
-                  onClick={() => analyzeCorrelations.mutate()}
-                  disabled={analyzeCorrelations.isPending}
-                >
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  Run Analysis
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        {/* Insights Tab */}
-        <TabsContent value="insights" className="space-y-6">
-          {insightsData?.insights && insightsData.insights.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4">
-              {insightsData.insights.map((insight: string, index: number) => (
-                <Card key={index}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Info className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-900 mb-2">Health Insight #{index + 1}</h3>
-                        <p className="text-gray-700">{insight}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="text-center py-8">
-                <Info className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No insights available yet</h3>
-                <p className="text-gray-600 mb-4">
-                  Connect devices and track health data to receive personalized wellness insights
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
 
       {/* Add Device Modal */}
       {showAddDevice && <AddDeviceModal onClose={() => setShowAddDevice(false)} onConnect={connectDevice.mutate} />}

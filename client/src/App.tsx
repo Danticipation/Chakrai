@@ -93,6 +93,7 @@ const AppLayout = () => {
     { id: 'therapist', icon: UserCheck, label: 'Therapist' },
     { id: 'community', icon: Users, label: 'Community' },
     { id: 'achievements', icon: Award, label: 'Achievements' },
+    { id: 'health', icon: Activity, label: 'Health' },
     { id: 'reflect', icon: Brain, label: 'Reflect' },
     { id: 'memory', icon: BookOpen, label: 'Memory' },
     { id: 'mood', icon: Heart, label: 'Mood' },
