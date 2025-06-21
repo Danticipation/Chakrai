@@ -2145,6 +2145,267 @@ app.get('/api/analytics/trends/:userId', async (req, res) => {
   }
 });
 
+// Accessibility & Internationalization API Routes
+
+// Get supported languages
+app.get('/api/internationalization/languages', async (req, res) => {
+  try {
+    const { supportedLanguages } = await import('./internationalization');
+    res.json({ languages: supportedLanguages });
+  } catch (error) {
+    console.error('Failed to fetch supported languages:', error);
+    res.status(500).json({ error: 'Failed to fetch supported languages' });
+  }
+});
+
+// Test voice in specific language
+app.post('/api/internationalization/test-voice', async (req, res) => {
+  try {
+    const { text, language } = req.body;
+    const { generateMultilingualVoice } = await import('./internationalization');
+    
+    const audioBuffer = await generateMultilingualVoice(text, language, 'supportive');
+    
+    if (audioBuffer) {
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.send(audioBuffer);
+    } else {
+      res.status(404).json({ error: 'Voice not supported for this language' });
+    }
+  } catch (error) {
+    console.error('Failed to generate test voice:', error);
+    res.status(500).json({ error: 'Failed to generate test voice' });
+  }
+});
+
+// Set user language preference
+app.post('/api/internationalization/set-language', async (req, res) => {
+  try {
+    const { language } = req.body;
+    // This would save to user preferences in a real implementation
+    res.json({ success: true, language });
+  } catch (error) {
+    console.error('Failed to set language preference:', error);
+    res.status(500).json({ error: 'Failed to set language preference' });
+  }
+});
+
+// Translate therapeutic message
+app.post('/api/internationalization/translate', async (req, res) => {
+  try {
+    const { message, targetLanguage, context = 'therapeutic' } = req.body;
+    const { translateTherapeuticMessage } = await import('./internationalization');
+    
+    const translatedMessage = await translateTherapeuticMessage(message, targetLanguage, context);
+    res.json({ translation: translatedMessage });
+  } catch (error) {
+    console.error('Failed to translate message:', error);
+    res.status(500).json({ error: 'Failed to translate message' });
+  }
+});
+
+// Get emergency resources by language
+app.get('/api/internationalization/emergency-resources/:language', async (req, res) => {
+  try {
+    const { language } = req.params;
+    const { getEmergencyResources } = await import('./internationalization');
+    
+    const resources = getEmergencyResources(language);
+    res.json({ resources });
+  } catch (error) {
+    console.error('Failed to fetch emergency resources:', error);
+    res.status(500).json({ error: 'Failed to fetch emergency resources' });
+  }
+});
+
+// Get accessibility settings
+app.get('/api/accessibility/settings/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    // Default accessibility settings - would be fetched from database in real implementation
+    const defaultSettings = {
+      visualImpairment: {
+        enabled: false,
+        screenReaderSupport: false,
+        highContrast: false,
+        fontSize: 'medium',
+        colorBlindnessType: 'none',
+        voiceDescriptions: false,
+        hapticFeedback: false,
+      },
+      hearingImpairment: {
+        enabled: false,
+        closedCaptions: false,
+        visualAlerts: false,
+        signLanguageSupport: false,
+        transcriptionEnabled: false,
+        vibrationAlerts: false,
+      },
+      motorImpairment: {
+        enabled: false,
+        voiceNavigation: false,
+        eyeTracking: false,
+        switchControl: false,
+        dwellTime: 1000,
+        largerTouchTargets: false,
+        oneHandedMode: false,
+      },
+      cognitiveSupport: {
+        enabled: false,
+        simplifiedInterface: false,
+        reducedAnimations: false,
+        clearLanguage: false,
+        memoryAids: false,
+        focusAssistance: false,
+        timeoutExtensions: false,
+      },
+      language: 'en',
+      speechRate: 1.0,
+      preferredInteractionMode: 'mixed',
+    };
+    
+    res.json({ settings: defaultSettings });
+  } catch (error) {
+    console.error('Failed to fetch accessibility settings:', error);
+    res.status(500).json({ error: 'Failed to fetch accessibility settings' });
+  }
+});
+
+// Save accessibility settings
+app.post('/api/accessibility/settings', async (req, res) => {
+  try {
+    const { userId, settings } = req.body;
+    
+    // In a real implementation, save to database
+    // await storage.saveAccessibilitySettings(userId, settings);
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Failed to save accessibility settings:', error);
+    res.status(500).json({ error: 'Failed to save accessibility settings' });
+  }
+});
+
+// Generate voice description for visual elements
+app.post('/api/accessibility/voice-description', async (req, res) => {
+  try {
+    const { elementType, visualContent, context, userLanguage = 'en' } = req.body;
+    const { generateVoiceDescription } = await import('./accessibility');
+    
+    const description = await generateVoiceDescription(elementType, visualContent, context, userLanguage);
+    res.json({ description });
+  } catch (error) {
+    console.error('Failed to generate voice description:', error);
+    res.status(500).json({ error: 'Failed to generate voice description' });
+  }
+});
+
+// Generate closed captions for audio
+app.post('/api/accessibility/closed-captions', async (req, res) => {
+  try {
+    const { audioText, speaker, emotionalContext, language = 'en' } = req.body;
+    const { generateClosedCaptions } = await import('./accessibility');
+    
+    const captions = await generateClosedCaptions(audioText, speaker, emotionalContext, language);
+    res.json({ captions });
+  } catch (error) {
+    console.error('Failed to generate closed captions:', error);
+    res.status(500).json({ error: 'Failed to generate closed captions' });
+  }
+});
+
+// Generate chart accessibility description
+app.post('/api/accessibility/chart-description', async (req, res) => {
+  try {
+    const { chartType, data, timeframe, language = 'en' } = req.body;
+    const { generateChartAccessibilityDescription } = await import('./accessibility');
+    
+    const description = await generateChartAccessibilityDescription(chartType, data, timeframe, language);
+    res.json({ description });
+  } catch (error) {
+    console.error('Failed to generate chart description:', error);
+    res.status(500).json({ error: 'Failed to generate chart description' });
+  }
+});
+
+// Simplify language for cognitive accessibility
+app.post('/api/accessibility/simplify-language', async (req, res) => {
+  try {
+    const { text, complexityLevel, language = 'en' } = req.body;
+    const { simplifyTherapeuticLanguage } = await import('./accessibility');
+    
+    const simplifiedText = await simplifyTherapeuticLanguage(text, complexityLevel, language);
+    res.json({ simplifiedText });
+  } catch (error) {
+    console.error('Failed to simplify language:', error);
+    res.status(500).json({ error: 'Failed to simplify language' });
+  }
+});
+
+// Generate haptic feedback pattern
+app.post('/api/accessibility/haptic-feedback', async (req, res) => {
+  try {
+    const { emotionalState, intensity = 0.5 } = req.body;
+    const { generateHapticFeedback } = await import('./accessibility');
+    
+    const pattern = generateHapticFeedback(emotionalState, intensity);
+    res.json({ pattern });
+  } catch (error) {
+    console.error('Failed to generate haptic feedback:', error);
+    res.status(500).json({ error: 'Failed to generate haptic feedback' });
+  }
+});
+
+// Get navigation assistance
+app.get('/api/accessibility/navigation-assistance/:language', async (req, res) => {
+  try {
+    const { language } = req.params;
+    const { getNavigationAssistance } = await import('./accessibility');
+    
+    const assistance = getNavigationAssistance(language);
+    res.json({ assistance });
+  } catch (error) {
+    console.error('Failed to fetch navigation assistance:', error);
+    res.status(500).json({ error: 'Failed to fetch navigation assistance' });
+  }
+});
+
+// Get color accessibility scheme
+app.get('/api/accessibility/color-scheme/:type', async (req, res) => {
+  try {
+    const { type } = req.params;
+    const { highContrast = 'false' } = req.query;
+    const { getColorAccessibilityScheme } = await import('./accessibility');
+    
+    const scheme = getColorAccessibilityScheme(type, highContrast === 'true');
+    res.json({ scheme });
+  } catch (error) {
+    console.error('Failed to fetch color scheme:', error);
+    res.status(500).json({ error: 'Failed to fetch color scheme' });
+  }
+});
+
+// Test accessibility voice
+app.post('/api/accessibility/test-voice', async (req, res) => {
+  try {
+    const { text, language, speechRate } = req.body;
+    const { generateMultilingualVoice } = await import('./internationalization');
+    
+    const audioBuffer = await generateMultilingualVoice(text, language, 'supportive');
+    
+    if (audioBuffer) {
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.send(audioBuffer);
+    } else {
+      res.status(404).json({ error: 'Voice not supported' });
+    }
+  } catch (error) {
+    console.error('Failed to test accessibility voice:', error);
+    res.status(500).json({ error: 'Failed to test accessibility voice' });
+  }
+});
+
 // Helper functions
 async function generateSessionPreparation(journalEntries: any[], moodEntries: any[]): Promise<string> {
   try {
