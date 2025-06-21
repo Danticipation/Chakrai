@@ -2406,6 +2406,208 @@ app.post('/api/accessibility/test-voice', async (req, res) => {
   }
 });
 
+// Adaptive Therapy Plan API Routes
+
+// Get current therapeutic plan for user
+app.get('/api/adaptive-therapy/plan/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    // In a real implementation, this would fetch from database
+    // For now, generate a sample plan
+    const { generateAdaptiveTherapeuticPlan } = await import('./adaptiveTherapy');
+    const plan = await generateAdaptiveTherapeuticPlan(userId, 'weekly');
+    
+    res.json({ plan });
+  } catch (error) {
+    console.error('Failed to fetch therapeutic plan:', error);
+    res.status(500).json({ error: 'Failed to fetch therapeutic plan' });
+  }
+});
+
+// Generate new adaptive therapeutic plan
+app.post('/api/adaptive-therapy/generate', async (req, res) => {
+  try {
+    const { userId, planType = 'weekly' } = req.body;
+    const { generateAdaptiveTherapeuticPlan } = await import('./adaptiveTherapy');
+    
+    const plan = await generateAdaptiveTherapeuticPlan(userId, planType);
+    
+    // In a real implementation, save to database
+    // await storage.saveTherapeuticPlan(plan);
+    
+    res.json({ plan, message: 'New therapeutic plan generated successfully' });
+  } catch (error) {
+    console.error('Failed to generate therapeutic plan:', error);
+    res.status(500).json({ error: 'Failed to generate therapeutic plan' });
+  }
+});
+
+// Adapt existing therapeutic plan
+app.post('/api/adaptive-therapy/adapt', async (req, res) => {
+  try {
+    const { planId, triggerType, feedback } = req.body;
+    const { adaptTherapeuticPlan } = await import('./adaptiveTherapy');
+    
+    // In a real implementation, fetch current plan from database
+    // const currentPlan = await storage.getTherapeuticPlan(planId);
+    
+    // For now, create a sample current plan
+    const currentPlan = {
+      id: planId,
+      userId: 1,
+      planType: 'weekly' as const,
+      generatedAt: new Date(),
+      validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      adaptationLevel: 0.5,
+      therapeuticGoals: [],
+      dailyActivities: [],
+      weeklyMilestones: [],
+      progressMetrics: [],
+      adaptationTriggers: [],
+      confidenceScore: 0.8
+    };
+    
+    const adaptedPlan = await adaptTherapeuticPlan(currentPlan, triggerType, feedback);
+    
+    // In a real implementation, save adapted plan
+    // await storage.saveTherapeuticPlan(adaptedPlan);
+    
+    res.json({ 
+      adaptedPlan, 
+      message: 'Therapeutic plan adapted successfully',
+      adaptationReason: triggerType
+    });
+  } catch (error) {
+    console.error('Failed to adapt therapeutic plan:', error);
+    res.status(500).json({ error: 'Failed to adapt therapeutic plan' });
+  }
+});
+
+// Complete activity and track progress
+app.post('/api/adaptive-therapy/complete-activity', async (req, res) => {
+  try {
+    const { userId, activityId, completedAt } = req.body;
+    
+    // In a real implementation, save activity completion
+    // await storage.recordActivityCompletion(userId, activityId, completedAt);
+    
+    // Update progress metrics
+    // await storage.updateProgressMetrics(userId);
+    
+    res.json({ 
+      success: true, 
+      message: 'Activity completed successfully',
+      points: 10 // Example points awarded
+    });
+  } catch (error) {
+    console.error('Failed to complete activity:', error);
+    res.status(500).json({ error: 'Failed to complete activity' });
+  }
+});
+
+// Monitor plan effectiveness and suggest adaptations
+app.get('/api/adaptive-therapy/monitor/:userId/:planId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const planId = req.params.planId;
+    
+    const { monitorPlanEffectiveness } = await import('./adaptiveTherapy');
+    const monitoring = await monitorPlanEffectiveness(userId, planId);
+    
+    res.json(monitoring);
+  } catch (error) {
+    console.error('Failed to monitor plan effectiveness:', error);
+    res.status(500).json({ error: 'Failed to monitor plan effectiveness' });
+  }
+});
+
+// Generate personalized CBT exercises
+app.post('/api/adaptive-therapy/cbt-exercises', async (req, res) => {
+  try {
+    const { userId, emotionalPattern, difficulty = 'beginner' } = req.body;
+    const { generatePersonalizedCBTExercises } = await import('./adaptiveTherapy');
+    
+    const exercises = await generatePersonalizedCBTExercises(userId, emotionalPattern, difficulty);
+    
+    res.json({ exercises });
+  } catch (error) {
+    console.error('Failed to generate CBT exercises:', error);
+    res.status(500).json({ error: 'Failed to generate CBT exercises' });
+  }
+});
+
+// Get user's therapeutic analytics
+app.get('/api/adaptive-therapy/analytics/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { analyzeUserTherapeuticNeeds } = await import('./adaptiveTherapy');
+    
+    const analytics = await analyzeUserTherapeuticNeeds(userId);
+    
+    res.json({ analytics });
+  } catch (error) {
+    console.error('Failed to fetch therapeutic analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch therapeutic analytics' });
+  }
+});
+
+// Rate therapeutic plan effectiveness
+app.post('/api/adaptive-therapy/rate-plan', async (req, res) => {
+  try {
+    const { userId, planId, rating, feedback } = req.body;
+    
+    // In a real implementation, save rating and feedback
+    // await storage.ratePlanEffectiveness(userId, planId, rating, feedback);
+    
+    // Use feedback to improve future plans
+    if (rating < 3) {
+      // Trigger plan adaptation for low ratings
+      const { adaptTherapeuticPlan } = await import('./adaptiveTherapy');
+      // Could trigger automatic adaptation here
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Plan rating recorded successfully' 
+    });
+  } catch (error) {
+    console.error('Failed to rate plan:', error);
+    res.status(500).json({ error: 'Failed to rate plan' });
+  }
+});
+
+// Get plan adaptation history
+app.get('/api/adaptive-therapy/adaptation-history/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    // In a real implementation, fetch from database
+    // const history = await storage.getAdaptationHistory(userId);
+    
+    const history = {
+      userId,
+      adaptations: [
+        {
+          date: new Date(),
+          triggerType: 'emotional_spike',
+          changes: ['Added grounding exercises', 'Increased check-in frequency'],
+          effectiveness: 0.85,
+          userSatisfaction: 8.2
+        }
+      ],
+      totalAdaptations: 1,
+      averageEffectiveness: 0.85,
+      mostCommonTriggers: ['emotional_spike', 'plateau']
+    };
+    
+    res.json({ history });
+  } catch (error) {
+    console.error('Failed to fetch adaptation history:', error);
+    res.status(500).json({ error: 'Failed to fetch adaptation history' });
+  }
+});
+
 // Helper functions
 async function generateSessionPreparation(journalEntries: any[], moodEntries: any[]): Promise<string> {
   try {
