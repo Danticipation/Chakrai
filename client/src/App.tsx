@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users, Activity } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -11,6 +11,7 @@ import JournalDashboard from './components/JournalDashboard';
 import TherapistPortal from './components/TherapistPortal';
 import AchievementDashboard from './components/AchievementDashboard';
 import CommunityPortal from './components/CommunityPortal';
+import HealthDashboard from './components/HealthDashboard';
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
@@ -696,6 +697,13 @@ const AppLayout = () => {
         return (
           <div className="p-4">
             <AchievementDashboard userId={1} />
+          </div>
+        );
+
+      case 'health':
+        return (
+          <div className="h-full">
+            <HealthDashboard />
           </div>
         );
 

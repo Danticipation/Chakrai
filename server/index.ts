@@ -2794,6 +2794,232 @@ function determinePriority(insightType: string, content: any): 'low' | 'medium' 
   return 'medium';
 }
 
+// ===============================
+// WEARABLE DEVICE INTEGRATION API
+// ===============================
+
+// Get user's wearable devices
+app.get('/api/wearable-devices/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const devices = await storage.getWearableDevices(userId);
+    res.json(devices);
+  } catch (error) {
+    console.error('Failed to fetch wearable devices:', error);
+    res.status(500).json({ error: 'Failed to fetch wearable devices' });
+  }
+});
+
+// Connect a new wearable device
+app.post('/api/wearable-devices', async (req, res) => {
+  try {
+    const { insertWearableDeviceSchema } = await import('@shared/schema');
+    const deviceData = insertWearableDeviceSchema.parse(req.body);
+    
+    const device = await storage.createWearableDevice(deviceData);
+    
+    // Log successful connection
+    await storage.createSyncLog({
+      deviceId: device.id,
+      syncStatus: 'success',
+      recordsProcessed: 0,
+      syncDuration: 0,
+      dataTypes: []
+    });
+    
+    res.json(device);
+  } catch (error) {
+    console.error('Failed to connect wearable device:', error);
+    res.status(500).json({ error: 'Failed to connect wearable device' });
+  }
+});
+
+// Update wearable device settings
+app.put('/api/wearable-devices/:deviceId', async (req, res) => {
+  try {
+    const deviceId = parseInt(req.params.deviceId);
+    const updates = req.body;
+    
+    const device = await storage.updateWearableDevice(deviceId, updates);
+    if (!device) {
+      return res.status(404).json({ error: 'Device not found' });
+    }
+    
+    res.json(device);
+  } catch (error) {
+    console.error('Failed to update wearable device:', error);
+    res.status(500).json({ error: 'Failed to update wearable device' });
+  }
+});
+
+// Remove wearable device
+app.delete('/api/wearable-devices/:deviceId', async (req, res) => {
+  try {
+    const deviceId = parseInt(req.params.deviceId);
+    await storage.deleteWearableDevice(deviceId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Failed to remove wearable device:', error);
+    res.status(500).json({ error: 'Failed to remove wearable device' });
+  }
+});
+
+// Sync health data from wearable device
+app.post('/api/wearable-devices/:deviceId/sync', async (req, res) => {
+  try {
+    const deviceId = parseInt(req.params.deviceId);
+    const { healthData } = req.body;
+    
+    const { processHealthData } = await import('./healthCorrelationEngine');
+    
+    // Get device info for processing
+    const devices = await storage.getWearableDevices(0); // Get all devices to find this one
+    const device = devices.find(d => d.id === deviceId);
+    
+    if (!device) {
+      return res.status(404).json({ error: 'Device not found' });
+    }
+    
+    const startTime = Date.now();
+    let processedCount = 0;
+    
+    try {
+      // Process raw health data into standardized metrics
+      const processedMetrics = processHealthData(healthData, device.deviceType);
+      
+      // Store health metrics in database
+      for (const metric of processedMetrics) {
+        await storage.createHealthMetric({
+          userId: device.userId,
+          deviceId: device.id,
+          metricType: metric.metricType,
+          value: metric.value,
+          unit: metric.unit,
+          timestamp: metric.timestamp,
+          metadata: metric.metadata,
+          confidence: metric.confidence
+        });
+        processedCount++;
+      }
+      
+      // Update device sync timestamp
+      await storage.updateWearableDevice(deviceId, {
+        lastSyncAt: new Date()
+      });
+      
+      // Log successful sync
+      await storage.createSyncLog({
+        deviceId,
+        syncStatus: 'success',
+        recordsProcessed: processedCount,
+        syncDuration: Date.now() - startTime,
+        dataTypes: [...new Set(processedMetrics.map(m => m.metricType))]
+      });
+      
+      res.json({ 
+        success: true, 
+        recordsProcessed: processedCount,
+        syncDuration: Date.now() - startTime
+      });
+    } catch (processingError) {
+      // Log failed sync
+      await storage.createSyncLog({
+        deviceId,
+        syncStatus: 'failed',
+        recordsProcessed: processedCount,
+        errorMessage: processingError instanceof Error ? processingError.message : 'Processing failed',
+        syncDuration: Date.now() - startTime,
+        dataTypes: []
+      });
+      
+      throw processingError;
+    }
+  } catch (error) {
+    console.error('Failed to sync health data:', error);
+    res.status(500).json({ error: 'Failed to sync health data' });
+  }
+});
+
+// Get health metrics for a user
+app.get('/api/health-metrics/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { metricType, limit } = req.query;
+    
+    const metrics = await storage.getHealthMetrics(
+      userId, 
+      metricType as string, 
+      limit ? parseInt(limit as string) : undefined
+    );
+    
+    res.json(metrics);
+  } catch (error) {
+    console.error('Failed to fetch health metrics:', error);
+    res.status(500).json({ error: 'Failed to fetch health metrics' });
+  }
+});
+
+// Analyze health correlations
+app.post('/api/health-correlations/:userId/analyze', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { timeframe = 'weekly' } = req.body;
+    
+    const { analyzeHealthCorrelations } = await import('./healthCorrelationEngine');
+    
+    const correlations = await analyzeHealthCorrelations(userId, timeframe);
+    res.json({ correlations });
+  } catch (error) {
+    console.error('Failed to analyze health correlations:', error);
+    res.status(500).json({ error: 'Failed to analyze health correlations' });
+  }
+});
+
+// Get existing health correlations
+app.get('/api/health-correlations/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const correlations = await storage.getHealthCorrelations(userId);
+    res.json(correlations);
+  } catch (error) {
+    console.error('Failed to fetch health correlations:', error);
+    res.status(500).json({ error: 'Failed to fetch health correlations' });
+  }
+});
+
+// Get wellness insights based on health data
+app.get('/api/health-insights/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    const { generateWellnessInsights } = await import('./healthCorrelationEngine');
+    
+    const insights = await generateWellnessInsights(userId);
+    res.json({ insights });
+  } catch (error) {
+    console.error('Failed to generate wellness insights:', error);
+    res.status(500).json({ error: 'Failed to generate wellness insights' });
+  }
+});
+
+// Get sync logs for a device
+app.get('/api/wearable-devices/:deviceId/sync-logs', async (req, res) => {
+  try {
+    const deviceId = parseInt(req.params.deviceId);
+    const { limit } = req.query;
+    
+    const logs = await storage.getRecentSyncLogs(
+      deviceId, 
+      limit ? parseInt(limit as string) : undefined
+    );
+    
+    res.json(logs);
+  } catch (error) {
+    console.error('Failed to fetch sync logs:', error);
+    res.status(500).json({ error: 'Failed to fetch sync logs' });
+  }
+});
+
 // Setup Vite for frontend serving
 const server = createServer(app);
 
