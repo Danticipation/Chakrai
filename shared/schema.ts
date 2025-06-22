@@ -509,6 +509,103 @@ export const pointsHistory = pgTable("points_history", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Advanced Emotional Intelligence Tables
+
+export const moodForecasts = pgTable("mood_forecasts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  forecastDate: timestamp("forecast_date").notNull(),
+  predictedMood: varchar("predicted_mood", { length: 50 }).notNull(),
+  confidenceScore: decimal("confidence_score", { precision: 3, scale: 2 }).notNull(),
+  riskLevel: varchar("risk_level", { length: 20 }).notNull(),
+  triggerFactors: text("trigger_factors").array(),
+  preventiveRecommendations: text("preventive_recommendations").array(),
+  historicalPatterns: jsonb("historical_patterns"),
+  actualMood: varchar("actual_mood", { length: 50 }),
+  actualIntensity: integer("actual_intensity"),
+  forecastAccuracy: decimal("forecast_accuracy", { precision: 3, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const emotionalContexts = pgTable("emotional_contexts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  sessionId: varchar("session_id", { length: 255 }),
+  messageId: varchar("message_id", { length: 255 }),
+  currentMood: varchar("current_mood", { length: 50 }).notNull(),
+  intensity: integer("intensity").notNull(),
+  volatility: decimal("volatility", { precision: 3, scale: 2 }).notNull(),
+  urgency: varchar("urgency", { length: 20 }).notNull(),
+  recentTriggers: text("recent_triggers").array(),
+  supportNeeds: text("support_needs").array(),
+  responseContext: jsonb("response_context"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const predictiveInsights = pgTable("predictive_insights", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  insightType: varchar("insight_type", { length: 50 }).notNull(),
+  insight: text("insight").notNull(),
+  probability: decimal("probability", { precision: 3, scale: 2 }).notNull(),
+  timeframe: varchar("timeframe", { length: 50 }).notNull(),
+  preventiveActions: text("preventive_actions").array(),
+  riskMitigation: text("risk_mitigation").array(),
+  isActive: boolean("is_active").default(true),
+  wasAccurate: boolean("was_accurate"),
+  userFeedback: text("user_feedback"),
+  createdAt: timestamp("created_at").defaultNow(),
+  validUntil: timestamp("valid_until")
+});
+
+export const emotionalResponseAdaptations = pgTable("emotional_response_adaptations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  messageContext: text("message_context").notNull(),
+  detectedEmotionalState: jsonb("detected_emotional_state").notNull(),
+  responseStrategy: jsonb("response_strategy").notNull(),
+  tone: varchar("tone", { length: 30 }).notNull(),
+  intensity: varchar("intensity", { length: 20 }).notNull(),
+  responseLength: varchar("response_length", { length: 20 }).notNull(),
+  communicationStyle: text("communication_style").notNull(),
+  priorityFocus: text("priority_focus").array(),
+  effectiveness: decimal("effectiveness", { precision: 3, scale: 2 }),
+  userResponse: text("user_response"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Advanced Emotional Intelligence Schema Types
+export const insertMoodForecastSchema = createInsertSchema(moodForecasts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertEmotionalContextSchema = createInsertSchema(emotionalContexts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPredictiveInsightSchema = createInsertSchema(predictiveInsights).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertEmotionalResponseAdaptationSchema = createInsertSchema(emotionalResponseAdaptations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type MoodForecast = typeof moodForecasts.$inferSelect;
+export type InsertMoodForecast = z.infer<typeof insertMoodForecastSchema>;
+export type EmotionalContext = typeof emotionalContexts.$inferSelect;
+export type InsertEmotionalContext = z.infer<typeof insertEmotionalContextSchema>;
+export type PredictiveInsight = typeof predictiveInsights.$inferSelect;
+export type InsertPredictiveInsight = z.infer<typeof insertPredictiveInsightSchema>;
+export type EmotionalResponseAdaptation = typeof emotionalResponseAdaptations.$inferSelect;
+export type InsertEmotionalResponseAdaptation = z.infer<typeof insertEmotionalResponseAdaptationSchema>;
+
 export const insertTherapistSchema = createInsertSchema(therapists).omit({
   id: true,
   createdAt: true,
