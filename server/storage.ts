@@ -7,6 +7,7 @@ import {
   userPreferences, conversationPatterns, wellnessRecommendations, adaptationInsights, userFeedback, monthlyReports,
   wearableDevices, healthMetrics, healthCorrelations, syncLogs,
   vrEnvironments, vrSessions, vrProgressTracking, vrTherapeuticPlans, vrAccessibilityProfiles,
+  userWellnessPoints, rewardsShop, userRewards, communityChallengess, challengeParticipants, challengeActivities, emotionalAchievements, userEmotionalAchievements, pointsHistory,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
@@ -44,10 +45,19 @@ import {
   type VrSession, type InsertVrSession,
   type VrProgressTracking, type InsertVrProgressTracking,
   type VrTherapeuticPlan, type InsertVrTherapeuticPlan,
-  type VrAccessibilityProfile, type InsertVrAccessibilityProfile
+  type VrAccessibilityProfile, type InsertVrAccessibilityProfile,
+  type UserWellnessPoints, type InsertUserWellnessPoints,
+  type RewardsShop, type InsertRewardsShop,
+  type UserRewards, type InsertUserRewards,
+  type CommunityChallenge, type InsertCommunityChallenge,
+  type ChallengeParticipant, type InsertChallengeParticipant,
+  type ChallengeActivity, type InsertChallengeActivity,
+  type EmotionalAchievement, type InsertEmotionalAchievement,
+  type UserEmotionalAchievement, type InsertUserEmotionalAchievement,
+  type PointsHistory, type InsertPointsHistory
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
