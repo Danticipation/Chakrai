@@ -661,24 +661,7 @@ export const insertEmotionalAchievementSchema = createInsertSchema(emotionalAchi
 export const insertUserEmotionalAchievementSchema = createInsertSchema(userEmotionalAchievements).omit({ id: true, unlockedAt: true });
 export const insertPointsHistorySchema = createInsertSchema(pointsHistory).omit({ id: true, createdAt: true });
 
-export type UserWellnessPoints = typeof userWellnessPoints.$inferSelect;
-export type InsertUserWellnessPoints = z.infer<typeof insertUserWellnessPointsSchema>;
-export type RewardsShop = typeof rewardsShop.$inferSelect;
-export type InsertRewardsShop = z.infer<typeof insertRewardsShopSchema>;
-export type UserRewards = typeof userRewards.$inferSelect;
-export type InsertUserRewards = z.infer<typeof insertUserRewardsSchema>;
-export type CommunityChallenge = typeof communityChallengess.$inferSelect;
-export type InsertCommunityChallenge = z.infer<typeof insertCommunityChallengeSchema>;
-export type ChallengeParticipant = typeof challengeParticipants.$inferSelect;
-export type InsertChallengeParticipant = z.infer<typeof insertChallengeParticipantSchema>;
-export type ChallengeActivity = typeof challengeActivities.$inferSelect;
-export type InsertChallengeActivity = z.infer<typeof insertChallengeActivitySchema>;
-export type EmotionalAchievement = typeof emotionalAchievements.$inferSelect;
-export type InsertEmotionalAchievement = z.infer<typeof insertEmotionalAchievementSchema>;
-export type UserEmotionalAchievement = typeof userEmotionalAchievements.$inferSelect;
-export type InsertUserEmotionalAchievement = z.infer<typeof insertUserEmotionalAchievementSchema>;
-export type PointsHistory = typeof pointsHistory.$inferSelect;
-export type InsertPointsHistory = z.infer<typeof insertPointsHistorySchema>;
+// Enhanced Gamification Types (moved to line 1064)
 
 // Community and Peer Support Tables
 export const supportForums = pgTable("support_forums", {
