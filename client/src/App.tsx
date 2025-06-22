@@ -16,6 +16,7 @@ import VRTherapyDashboard from './components/VRTherapyDashboard';
 import EnhancedGamificationDashboard from './components/EnhancedGamificationDashboard';
 import EmotionalIntelligenceDashboard from './components/EmotionalIntelligenceDashboard';
 import AiPerformanceMonitoringDashboard from './components/AiPerformanceMonitoringDashboard';
+import PrivacyComplianceDashboard from './components/PrivacyComplianceDashboard';
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
@@ -741,6 +742,13 @@ const AppLayout = () => {
         return (
           <div className="h-full">
             <AiPerformanceMonitoringDashboard />
+          </div>
+        );
+
+      case 'privacy':
+        return (
+          <div className="h-full">
+            <PrivacyComplianceDashboard />
           </div>
         );
 
