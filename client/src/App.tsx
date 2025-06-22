@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users, Activity, Headphones, Gift, Zap } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users, Activity, Headphones, Gift, Zap, Shield } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -15,6 +15,7 @@ import HealthDashboard from './components/HealthDashboard';
 import VRTherapyDashboard from './components/VRTherapyDashboard';
 import EnhancedGamificationDashboard from './components/EnhancedGamificationDashboard';
 import EmotionalIntelligenceDashboard from './components/EmotionalIntelligenceDashboard';
+import AiPerformanceMonitoringDashboard from './components/AiPerformanceMonitoringDashboard';
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
@@ -100,6 +101,7 @@ const AppLayout = () => {
     { id: 'health', icon: Activity, label: 'Health' },
     { id: 'vr-therapy', icon: Headphones, label: 'VR Therapy' },
     { id: 'emotional-intelligence', icon: Zap, label: 'AI Intelligence' },
+    { id: 'ai-monitoring', icon: Shield, label: 'AI Monitor' },
     { id: 'reflect', icon: Brain, label: 'Reflect' },
     { id: 'memory', icon: BookOpen, label: 'Memory' },
     { id: 'mood', icon: Heart, label: 'Mood' },
