@@ -949,6 +949,8 @@ export const vrAccessibilityProfiles = pgTable("vr_accessibility_profiles", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
+
+
 // VR/AR Types
 export type VrEnvironment = typeof vrEnvironments.$inferSelect;
 export type InsertVrEnvironment = typeof vrEnvironments.$inferInsert;
@@ -961,9 +963,31 @@ export type InsertVrTherapeuticPlan = typeof vrTherapeuticPlans.$inferInsert;
 export type VrAccessibilityProfile = typeof vrAccessibilityProfiles.$inferSelect;
 export type InsertVrAccessibilityProfile = typeof vrAccessibilityProfiles.$inferInsert;
 
+// Enhanced Gamification Types
+export type UserWellnessPoints = typeof userWellnessPoints.$inferSelect;
+export type InsertUserWellnessPoints = typeof userWellnessPoints.$inferInsert;
+export type RewardsShop = typeof rewardsShop.$inferSelect;
+export type InsertRewardsShop = typeof rewardsShop.$inferInsert;
+export type UserRewards = typeof userRewards.$inferSelect;
+export type InsertUserRewards = typeof userRewards.$inferInsert;
+export type CommunityChallenge = typeof communityChallengess.$inferSelect;
+export type InsertCommunityChallenge = typeof communityChallengess.$inferInsert;
+export type ChallengeParticipant = typeof challengeParticipants.$inferSelect;
+export type InsertChallengeParticipant = typeof challengeParticipants.$inferInsert;
+export type ChallengeActivity = typeof challengeActivities.$inferSelect;
+export type InsertChallengeActivity = typeof challengeActivities.$inferInsert;
+export type EmotionalAchievement = typeof emotionalAchievements.$inferSelect;
+export type InsertEmotionalAchievement = typeof emotionalAchievements.$inferInsert;
+export type UserEmotionalAchievement = typeof userEmotionalAchievements.$inferSelect;
+export type InsertUserEmotionalAchievement = typeof userEmotionalAchievements.$inferInsert;
+export type PointsHistory = typeof pointsHistory.$inferSelect;
+export type InsertPointsHistory = typeof pointsHistory.$inferInsert;
+
 // VR/AR Insert Schemas
 export const insertVrEnvironmentSchema = createInsertSchema(vrEnvironments).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertVrSessionSchema = createInsertSchema(vrSessions).omit({ id: true, createdAt: true });
 export const insertVrProgressTrackingSchema = createInsertSchema(vrProgressTracking).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertVrTherapeuticPlanSchema = createInsertSchema(vrTherapeuticPlans).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertVrAccessibilityProfileSchema = createInsertSchema(vrAccessibilityProfiles).omit({ id: true, createdAt: true, updatedAt: true });
+
+
