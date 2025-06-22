@@ -151,8 +151,8 @@ export function calculateMoodVolatility(moodEntries: any[]): number {
 }
 
 export function identifyTemporalPatterns(moodEntries: any[]) {
-  const dayOfWeekPatterns = {};
-  const timeOfDayPatterns = {};
+  const dayOfWeekPatterns: Record<number, { total: number; count: number; average?: number }> = {};
+  const timeOfDayPatterns: Record<string, { total: number; count: number; average?: number }> = {};
   
   moodEntries.forEach(entry => {
     const date = new Date(entry.createdAt);
@@ -177,7 +177,8 @@ export function identifyTemporalPatterns(moodEntries: any[]) {
   
   // Calculate averages
   Object.keys(dayOfWeekPatterns).forEach(day => {
-    dayOfWeekPatterns[day].average = dayOfWeekPatterns[day].total / dayOfWeekPatterns[day].count;
+    const dayKey = parseInt(day);
+    dayOfWeekPatterns[dayKey].average = dayOfWeekPatterns[dayKey].total / dayOfWeekPatterns[dayKey].count;
   });
   
   Object.keys(timeOfDayPatterns).forEach(time => {
@@ -188,7 +189,7 @@ export function identifyTemporalPatterns(moodEntries: any[]) {
 }
 
 export async function extractTriggerPatterns(journalEntries: any[]): Promise<string[]> {
-  const triggers = [];
+  const triggers: string[] = [];
   
   for (const entry of journalEntries) {
     if (entry.triggers && Array.isArray(entry.triggers)) {
@@ -203,13 +204,13 @@ export async function extractTriggerPatterns(journalEntries: any[]): Promise<str
   }
   
   // Count frequency and return most common triggers
-  const triggerFreq = {};
+  const triggerFreq: Record<string, number> = {};
   triggers.forEach(trigger => {
     triggerFreq[trigger] = (triggerFreq[trigger] || 0) + 1;
   });
   
   return Object.entries(triggerFreq)
-    .sort(([,a], [,b]) => b - a)
+    .sort(([,a], [,b]) => (b as number) - (a as number))
     .slice(0, 5)
     .map(([trigger]) => trigger);
 }
@@ -243,7 +244,7 @@ export async function analyzeTextForTriggers(text: string): Promise<string[]> {
 export function analyzeCopingEffectiveness(moodEntries: any[], journalEntries: any[]) {
   // Analyze patterns between coping strategies mentioned in journals and subsequent mood improvements
   const copingStrategies = ['meditation', 'exercise', 'journaling', 'social support', 'breathing', 'mindfulness'];
-  const effectiveness = {};
+  const effectiveness: Record<string, { usage: number; avgImprovement: number; effectiveness: string }> = {};
   
   copingStrategies.forEach(strategy => {
     const strategyMentions = journalEntries.filter(entry => 
@@ -264,7 +265,7 @@ export function analyzeCopingEffectiveness(moodEntries: any[], journalEntries: a
           return avgAfter;
         }
         return null;
-      }).filter(val => val !== null);
+      }).filter((val): val is number => val !== null);
       
       if (improvements.length > 0) {
         effectiveness[strategy] = {

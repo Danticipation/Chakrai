@@ -3585,6 +3585,212 @@ app.post('/api/vr/accessibility-profile/:userId', async (req, res) => {
   }
 });
 
+// Advanced Emotional Intelligence API Endpoints
+
+// Generate mood forecast
+app.post('/api/emotional-intelligence/mood-forecast', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const { generateMoodForecast } = await import('./emotionalIntelligenceEngine');
+    const forecast = await generateMoodForecast(userId, storage);
+    
+    res.json({
+      forecast,
+      generatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Mood forecast generation error:', error);
+    res.status(500).json({ error: 'Failed to generate mood forecast' });
+  }
+});
+
+// Get mood forecasts for user
+app.get('/api/emotional-intelligence/mood-forecasts/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const limit = parseInt(req.query.limit as string) || 10;
+    
+    const forecasts = await storage.getMoodForecasts(userId, limit);
+    
+    res.json({
+      forecasts,
+      totalCount: forecasts.length
+    });
+  } catch (error) {
+    console.error('Failed to fetch mood forecasts:', error);
+    res.status(500).json({ error: 'Failed to fetch mood forecasts' });
+  }
+});
+
+// Generate emotionally intelligent response
+app.post('/api/emotional-intelligence/contextual-response', async (req, res) => {
+  try {
+    const { userMessage, userId } = req.body;
+    
+    if (!userMessage || !userId) {
+      return res.status(400).json({ error: 'User message and ID are required' });
+    }
+
+    const { generateEmotionallyIntelligentResponse } = await import('./emotionalIntelligenceEngine');
+    const response = await generateEmotionallyIntelligentResponse(userMessage, userId, storage);
+    
+    res.json({
+      response,
+      generatedAt: new Date().toISOString(),
+      emotionallyAdapted: true
+    });
+  } catch (error) {
+    console.error('Contextual response generation error:', error);
+    res.status(500).json({ error: 'Failed to generate contextual response' });
+  }
+});
+
+// Get emotional contexts for user
+app.get('/api/emotional-intelligence/contexts/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const sessionId = req.query.sessionId as string;
+    const limit = parseInt(req.query.limit as string) || 20;
+    
+    const contexts = await storage.getEmotionalContexts(userId, sessionId, limit);
+    
+    res.json({
+      contexts,
+      totalCount: contexts.length
+    });
+  } catch (error) {
+    console.error('Failed to fetch emotional contexts:', error);
+    res.status(500).json({ error: 'Failed to fetch emotional contexts' });
+  }
+});
+
+// Get predictive insights for user
+app.get('/api/emotional-intelligence/insights/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const isActive = req.query.active !== 'false';
+    
+    const insights = await storage.getPredictiveInsights(userId, isActive);
+    
+    res.json({
+      insights,
+      totalCount: insights.length
+    });
+  } catch (error) {
+    console.error('Failed to fetch predictive insights:', error);
+    res.status(500).json({ error: 'Failed to fetch predictive insights' });
+  }
+});
+
+// Update predictive insight accuracy
+app.patch('/api/emotional-intelligence/insights/:insightId', async (req, res) => {
+  try {
+    const insightId = parseInt(req.params.insightId);
+    const { wasAccurate, userFeedback } = req.body;
+    
+    const updatedInsight = await storage.updatePredictiveInsight(insightId, {
+      wasAccurate,
+      userFeedback
+    });
+    
+    if (!updatedInsight) {
+      return res.status(404).json({ error: 'Insight not found' });
+    }
+    
+    res.json(updatedInsight);
+  } catch (error) {
+    console.error('Failed to update predictive insight:', error);
+    res.status(500).json({ error: 'Failed to update predictive insight' });
+  }
+});
+
+// Get emotional response adaptations for user
+app.get('/api/emotional-intelligence/adaptations/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const limit = parseInt(req.query.limit as string) || 50;
+    
+    const adaptations = await storage.getEmotionalResponseAdaptations(userId, limit);
+    
+    res.json({
+      adaptations,
+      totalCount: adaptations.length
+    });
+  } catch (error) {
+    console.error('Failed to fetch emotional response adaptations:', error);
+    res.status(500).json({ error: 'Failed to fetch emotional response adaptations' });
+  }
+});
+
+// Rate emotional response adaptation effectiveness
+app.patch('/api/emotional-intelligence/adaptations/:adaptationId', async (req, res) => {
+  try {
+    const adaptationId = parseInt(req.params.adaptationId);
+    const { effectiveness, userResponse } = req.body;
+    
+    const updatedAdaptation = await storage.updateEmotionalResponseAdaptation(adaptationId, {
+      effectiveness,
+      userResponse
+    });
+    
+    if (!updatedAdaptation) {
+      return res.status(404).json({ error: 'Adaptation not found' });
+    }
+    
+    res.json(updatedAdaptation);
+  } catch (error) {
+    console.error('Failed to update emotional response adaptation:', error);
+    res.status(500).json({ error: 'Failed to update emotional response adaptation' });
+  }
+});
+
+// Generate dashboard overview for emotional intelligence
+app.get('/api/emotional-intelligence/dashboard/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    // Get recent forecasts, insights, and adaptations
+    const [forecasts, insights, adaptations, emotionalPattern] = await Promise.all([
+      storage.getMoodForecasts(userId, 5),
+      storage.getPredictiveInsights(userId, true),
+      storage.getEmotionalResponseAdaptations(userId, 10),
+      storage.getEmotionalPattern(userId)
+    ]);
+    
+    // Calculate accuracy metrics
+    const completedForecasts = forecasts.filter(f => f.actualMood && f.forecastAccuracy);
+    const avgAccuracy = completedForecasts.length > 0 
+      ? completedForecasts.reduce((sum, f) => sum + parseFloat(f.forecastAccuracy || '0'), 0) / completedForecasts.length
+      : 0;
+    
+    const effectiveAdaptations = adaptations.filter(a => a.effectiveness && parseFloat(a.effectiveness) >= 0.7);
+    const adaptationEffectiveness = adaptations.length > 0 
+      ? effectiveAdaptations.length / adaptations.length 
+      : 0;
+    
+    res.json({
+      overview: {
+        totalForecasts: forecasts.length,
+        averageAccuracy: Math.round(avgAccuracy * 100),
+        activeInsights: insights.length,
+        adaptationEffectiveness: Math.round(adaptationEffectiveness * 100),
+        emotionalStability: emotionalPattern?.volatility ? Math.round((1 - emotionalPattern.volatility) * 100) : 75
+      },
+      recentForecasts: forecasts.slice(0, 3),
+      activeInsights: insights.slice(0, 5),
+      recentAdaptations: adaptations.slice(0, 5)
+    });
+  } catch (error) {
+    console.error('Failed to generate emotional intelligence dashboard:', error);
+    res.status(500).json({ error: 'Failed to generate dashboard' });
+  }
+});
+
 // Setup Vite for frontend serving
 const server = createServer(app);
 
