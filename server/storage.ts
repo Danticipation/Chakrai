@@ -8,6 +8,7 @@ import {
   wearableDevices, healthMetrics, healthCorrelations, syncLogs,
   vrEnvironments, vrSessions, vrProgressTracking, vrTherapeuticPlans, vrAccessibilityProfiles,
   userWellnessPoints, rewardsShop, userRewards, communityChallengess, challengeParticipants, challengeActivities, emotionalAchievements, userEmotionalAchievements, pointsHistory,
+  moodForecasts, emotionalContexts, predictiveInsights, emotionalResponseAdaptations,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
@@ -54,7 +55,11 @@ import {
   type ChallengeActivity, type InsertChallengeActivity,
   type EmotionalAchievement, type InsertEmotionalAchievement,
   type UserEmotionalAchievement, type InsertUserEmotionalAchievement,
-  type PointsHistory, type InsertPointsHistory
+  type PointsHistory, type InsertPointsHistory,
+  type MoodForecast, type InsertMoodForecast,
+  type EmotionalContext, type InsertEmotionalContext,
+  type PredictiveInsight, type InsertPredictiveInsight,
+  type EmotionalResponseAdaptation, type InsertEmotionalResponseAdaptation
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
@@ -216,6 +221,19 @@ export interface IStorage {
   getUserVrAccessibilityProfile(userId: number): Promise<VrAccessibilityProfile | undefined>;
   createVrAccessibilityProfile(profile: InsertVrAccessibilityProfile): Promise<VrAccessibilityProfile>;
   updateVrAccessibilityProfile(userId: number, updates: Partial<InsertVrAccessibilityProfile>): Promise<VrAccessibilityProfile>;
+
+  // Advanced Emotional Intelligence methods
+  getMoodForecasts(userId: number, limit?: number): Promise<MoodForecast[]>;
+  createMoodForecast(forecast: InsertMoodForecast): Promise<MoodForecast>;
+  updateMoodForecast(id: number, updates: Partial<MoodForecast>): Promise<MoodForecast | undefined>;
+  getEmotionalContexts(userId: number, sessionId?: string, limit?: number): Promise<EmotionalContext[]>;
+  createEmotionalContext(context: InsertEmotionalContext): Promise<EmotionalContext>;
+  getPredictiveInsights(userId: number, isActive?: boolean): Promise<PredictiveInsight[]>;
+  createPredictiveInsight(insight: InsertPredictiveInsight): Promise<PredictiveInsight>;
+  updatePredictiveInsight(id: number, updates: Partial<PredictiveInsight>): Promise<PredictiveInsight | undefined>;
+  getEmotionalResponseAdaptations(userId: number, limit?: number): Promise<EmotionalResponseAdaptation[]>;
+  createEmotionalResponseAdaptation(adaptation: InsertEmotionalResponseAdaptation): Promise<EmotionalResponseAdaptation>;
+  updateEmotionalResponseAdaptation(id: number, updates: Partial<EmotionalResponseAdaptation>): Promise<EmotionalResponseAdaptation | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1300,6 +1318,90 @@ export class DatabaseStorage implements IStorage {
       .where(eq(vrAccessibilityProfiles.userId, userId))
       .returning();
     return updatedProfile;
+  }
+
+  // Advanced Emotional Intelligence implementation methods
+  async getMoodForecasts(userId: number, limit: number = 10): Promise<MoodForecast[]> {
+    return await db.select().from(moodForecasts)
+      .where(eq(moodForecasts.userId, userId))
+      .orderBy(desc(moodForecasts.createdAt))
+      .limit(limit);
+  }
+
+  async createMoodForecast(forecast: InsertMoodForecast): Promise<MoodForecast> {
+    const [newForecast] = await db.insert(moodForecasts).values(forecast).returning();
+    return newForecast;
+  }
+
+  async updateMoodForecast(id: number, updates: Partial<MoodForecast>): Promise<MoodForecast | undefined> {
+    const [updatedForecast] = await db.update(moodForecasts)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(moodForecasts.id, id))
+      .returning();
+    return updatedForecast || undefined;
+  }
+
+  async getEmotionalContexts(userId: number, sessionId?: string, limit: number = 20): Promise<EmotionalContext[]> {
+    let query = db.select().from(emotionalContexts)
+      .where(eq(emotionalContexts.userId, userId))
+      .orderBy(desc(emotionalContexts.createdAt))
+      .limit(limit);
+    
+    if (sessionId) {
+      query = db.select().from(emotionalContexts)
+        .where(and(eq(emotionalContexts.userId, userId), eq(emotionalContexts.sessionId, sessionId)))
+        .orderBy(desc(emotionalContexts.createdAt))
+        .limit(limit);
+    }
+    
+    return await query;
+  }
+
+  async createEmotionalContext(context: InsertEmotionalContext): Promise<EmotionalContext> {
+    const [newContext] = await db.insert(emotionalContexts).values(context).returning();
+    return newContext;
+  }
+
+  async getPredictiveInsights(userId: number, isActive: boolean = true): Promise<PredictiveInsight[]> {
+    return await db.select().from(predictiveInsights)
+      .where(and(
+        eq(predictiveInsights.userId, userId),
+        eq(predictiveInsights.isActive, isActive)
+      ))
+      .orderBy(desc(predictiveInsights.createdAt));
+  }
+
+  async createPredictiveInsight(insight: InsertPredictiveInsight): Promise<PredictiveInsight> {
+    const [newInsight] = await db.insert(predictiveInsights).values(insight).returning();
+    return newInsight;
+  }
+
+  async updatePredictiveInsight(id: number, updates: Partial<PredictiveInsight>): Promise<PredictiveInsight | undefined> {
+    const [updatedInsight] = await db.update(predictiveInsights)
+      .set(updates)
+      .where(eq(predictiveInsights.id, id))
+      .returning();
+    return updatedInsight || undefined;
+  }
+
+  async getEmotionalResponseAdaptations(userId: number, limit: number = 50): Promise<EmotionalResponseAdaptation[]> {
+    return await db.select().from(emotionalResponseAdaptations)
+      .where(eq(emotionalResponseAdaptations.userId, userId))
+      .orderBy(desc(emotionalResponseAdaptations.createdAt))
+      .limit(limit);
+  }
+
+  async createEmotionalResponseAdaptation(adaptation: InsertEmotionalResponseAdaptation): Promise<EmotionalResponseAdaptation> {
+    const [newAdaptation] = await db.insert(emotionalResponseAdaptations).values(adaptation).returning();
+    return newAdaptation;
+  }
+
+  async updateEmotionalResponseAdaptation(id: number, updates: Partial<EmotionalResponseAdaptation>): Promise<EmotionalResponseAdaptation | undefined> {
+    const [updatedAdaptation] = await db.update(emotionalResponseAdaptations)
+      .set(updates)
+      .where(eq(emotionalResponseAdaptations.id, id))
+      .returning();
+    return updatedAdaptation || undefined;
   }
 }
 
