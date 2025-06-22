@@ -737,6 +737,13 @@ const AppLayout = () => {
           </div>
         );
 
+      case 'ai-monitoring':
+        return (
+          <div className="h-full">
+            <AiPerformanceMonitoringDashboard />
+          </div>
+        );
+
       case 'memory':
         return (
           <div className="p-4">
