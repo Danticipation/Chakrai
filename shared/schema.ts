@@ -1087,4 +1087,108 @@ export const insertVrProgressTrackingSchema = createInsertSchema(vrProgressTrack
 export const insertVrTherapeuticPlanSchema = createInsertSchema(vrTherapeuticPlans).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertVrAccessibilityProfileSchema = createInsertSchema(vrAccessibilityProfiles).omit({ id: true, createdAt: true, updatedAt: true });
 
+// AI Performance Monitoring Tables
+export const aiPerformanceMetrics = pgTable('ai_performance_metrics', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id),
+  metricType: text('metric_type').notNull(), // 'response_quality', 'therapeutic_effectiveness', 'crisis_detection'
+  metricValue: real('metric_value').notNull(), // 0.0-1.0 score
+  context: text('context'), // Additional context about the metric
+  aiModel: text('ai_model').default('gpt-4o'), // Which AI model was used
+  promptTokens: integer('prompt_tokens'),
+  completionTokens: integer('completion_tokens'),
+  responseTime: integer('response_time'), // milliseconds
+  timestamp: timestamp('timestamp').defaultNow(),
+  sessionId: text('session_id'),
+  conversationId: text('conversation_id')
+});
+
+export const aiResponseAnalysis = pgTable('ai_response_analysis', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id),
+  originalPrompt: text('original_prompt').notNull(),
+  aiResponse: text('ai_response').notNull(),
+  therapeuticScore: real('therapeutic_score'), // 0.0-1.0 therapeutic value
+  empathyScore: real('empathy_score'), // 0.0-1.0 empathy level
+  clarityScore: real('clarity_score'), // 0.0-1.0 clarity rating
+  appropriatenessScore: real('appropriateness_score'), // 0.0-1.0 appropriateness
+  userFeedback: text('user_feedback'), // Optional user feedback
+  userRating: integer('user_rating'), // 1-5 star rating
+  flaggedForReview: boolean('flagged_for_review').default(false),
+  reviewNotes: text('review_notes'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow()
+});
+
+export const crisisDetectionLogs = pgTable('crisis_detection_logs', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id),
+  messageContent: text('message_content').notNull(),
+  detectedRiskLevel: text('detected_risk_level').notNull(), // 'none', 'low', 'medium', 'high', 'critical'
+  confidenceScore: real('confidence_score'), // 0.0-1.0 AI confidence
+  triggerKeywords: text('trigger_keywords').array(),
+  aiAnalysis: text('ai_analysis'), // AI's reasoning for detection
+  interventionTriggered: boolean('intervention_triggered').default(false),
+  interventionType: text('intervention_type'), // 'immediate', 'scheduled', 'resources'
+  falsePositive: boolean('false_positive'), // Marked by review
+  truePositive: boolean('true_positive'), // Confirmed crisis
+  reviewedBy: text('reviewed_by'), // Internal reviewer
+  reviewNotes: text('review_notes'),
+  detectedAt: timestamp('detected_at').defaultNow(),
+  reviewedAt: timestamp('reviewed_at')
+});
+
+export const therapeuticEffectivenessTracking = pgTable('therapeutic_effectiveness_tracking', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id),
+  interventionType: text('intervention_type').notNull(), // 'mindfulness', 'cbt', 'crisis_support', 'mood_tracking'
+  interventionId: integer('intervention_id'), // Reference to specific intervention
+  userEngagement: real('user_engagement'), // 0.0-1.0 engagement level
+  completionRate: real('completion_rate'), // 0.0-1.0 completion percentage
+  userSatisfaction: real('user_satisfaction'), // 0.0-1.0 satisfaction score
+  therapeuticProgress: real('therapeutic_progress'), // 0.0-1.0 progress indicator
+  longTermImpact: real('long_term_impact'), // 0.0-1.0 measured after time
+  followUpData: jsonb('follow_up_data'), // Additional tracking data
+  measuredAt: timestamp('measured_at').defaultNow(),
+  followUpAt: timestamp('follow_up_at')
+});
+
+export const systemPerformanceDashboard = pgTable('system_performance_dashboard', {
+  id: serial('id').primaryKey(),
+  metricPeriod: text('metric_period').notNull(), // 'hourly', 'daily', 'weekly', 'monthly'
+  periodStart: timestamp('period_start').notNull(),
+  periodEnd: timestamp('period_end').notNull(),
+  totalResponses: integer('total_responses').default(0),
+  averageResponseQuality: real('average_response_quality'),
+  averageTherapeuticEffectiveness: real('average_therapeutic_effectiveness'),
+  crisisDetectionAccuracy: real('crisis_detection_accuracy'),
+  falsePositiveRate: real('false_positive_rate'),
+  userSatisfactionAverage: real('user_satisfaction_average'),
+  systemUptime: real('system_uptime'), // Percentage
+  averageResponseTime: real('average_response_time'), // milliseconds
+  totalTokensUsed: integer('total_tokens_used'),
+  costAnalysis: jsonb('cost_analysis'),
+  performanceAlerts: text('performance_alerts').array(),
+  createdAt: timestamp('created_at').defaultNow()
+});
+
+// AI Performance Monitoring Types
+export type AiPerformanceMetric = typeof aiPerformanceMetrics.$inferSelect;
+export type InsertAiPerformanceMetric = typeof aiPerformanceMetrics.$inferInsert;
+export type AiResponseAnalysis = typeof aiResponseAnalysis.$inferSelect;
+export type InsertAiResponseAnalysis = typeof aiResponseAnalysis.$inferInsert;
+export type CrisisDetectionLog = typeof crisisDetectionLogs.$inferSelect;
+export type InsertCrisisDetectionLog = typeof crisisDetectionLogs.$inferInsert;
+export type TherapeuticEffectivenessTracking = typeof therapeuticEffectivenessTracking.$inferSelect;
+export type InsertTherapeuticEffectivenessTracking = typeof therapeuticEffectivenessTracking.$inferInsert;
+export type SystemPerformanceDashboard = typeof systemPerformanceDashboard.$inferSelect;
+export type InsertSystemPerformanceDashboard = typeof systemPerformanceDashboard.$inferInsert;
+
+// AI Performance Insert Schemas
+export const insertAiPerformanceMetricSchema = createInsertSchema(aiPerformanceMetrics).omit({ id: true, timestamp: true });
+export const insertAiResponseAnalysisSchema = createInsertSchema(aiResponseAnalysis).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertCrisisDetectionLogSchema = createInsertSchema(crisisDetectionLogs).omit({ id: true, detectedAt: true, reviewedAt: true });
+export const insertTherapeuticEffectivenessTrackingSchema = createInsertSchema(therapeuticEffectivenessTracking).omit({ id: true, measuredAt: true, followUpAt: true });
+export const insertSystemPerformanceDashboardSchema = createInsertSchema(systemPerformanceDashboard).omit({ id: true, createdAt: true });
+
 

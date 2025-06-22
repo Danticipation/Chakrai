@@ -9,6 +9,7 @@ import {
   vrEnvironments, vrSessions, vrProgressTracking, vrTherapeuticPlans, vrAccessibilityProfiles,
   userWellnessPoints, rewardsShop, userRewards, communityChallengess, challengeParticipants, challengeActivities, emotionalAchievements, userEmotionalAchievements, pointsHistory,
   moodForecasts, emotionalContexts, predictiveInsights, emotionalResponseAdaptations,
+  aiPerformanceMetrics, aiResponseAnalysis, crisisDetectionLogs, therapeuticEffectivenessTracking, systemPerformanceDashboard,
   type User, type InsertUser, type Bot, type InsertBot,
   type Message, type InsertMessage, type LearnedWord, type InsertLearnedWord,
   type Milestone, type InsertMilestone, type UserMemory, type InsertUserMemory,
@@ -1402,6 +1403,208 @@ export class DatabaseStorage implements IStorage {
       .where(eq(emotionalResponseAdaptations.id, id))
       .returning();
     return updatedAdaptation || undefined;
+  }
+
+  // AI Performance Monitoring Methods
+  async createAiPerformanceMetric(metric: InsertAiPerformanceMetric): Promise<AiPerformanceMetric> {
+    const [newMetric] = await db.insert(aiPerformanceMetrics).values(metric).returning();
+    return newMetric;
+  }
+
+  async getAiPerformanceMetrics(userId?: number, metricType?: string, timeframe?: { start: Date; end: Date }, limit: number = 100): Promise<AiPerformanceMetric[]> {
+    let query = db.select().from(aiPerformanceMetrics)
+      .orderBy(desc(aiPerformanceMetrics.timestamp))
+      .limit(limit);
+
+    if (userId) {
+      query = query.where(eq(aiPerformanceMetrics.userId, userId));
+    }
+    if (metricType) {
+      query = query.where(eq(aiPerformanceMetrics.metricType, metricType));
+    }
+    if (timeframe) {
+      query = query.where(
+        and(
+          gte(aiPerformanceMetrics.timestamp, timeframe.start),
+          lte(aiPerformanceMetrics.timestamp, timeframe.end)
+        )
+      );
+    }
+
+    return await query;
+  }
+
+  async createAiResponseAnalysis(analysis: InsertAiResponseAnalysis): Promise<AiResponseAnalysis> {
+    const [newAnalysis] = await db.insert(aiResponseAnalysis).values(analysis).returning();
+    return newAnalysis;
+  }
+
+  async getAiResponseAnalyses(userId?: number, flaggedOnly?: boolean, limit: number = 50): Promise<AiResponseAnalysis[]> {
+    let query = db.select().from(aiResponseAnalysis)
+      .orderBy(desc(aiResponseAnalysis.createdAt))
+      .limit(limit);
+
+    if (userId) {
+      query = query.where(eq(aiResponseAnalysis.userId, userId));
+    }
+    if (flaggedOnly) {
+      query = query.where(eq(aiResponseAnalysis.flaggedForReview, true));
+    }
+
+    return await query;
+  }
+
+  async updateAiResponseAnalysis(id: number, updates: Partial<AiResponseAnalysis>): Promise<AiResponseAnalysis | undefined> {
+    const [updatedAnalysis] = await db.update(aiResponseAnalysis)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(aiResponseAnalysis.id, id))
+      .returning();
+    return updatedAnalysis || undefined;
+  }
+
+  async createCrisisDetectionLog(log: InsertCrisisDetectionLog): Promise<CrisisDetectionLog> {
+    const [newLog] = await db.insert(crisisDetectionLogs).values(log).returning();
+    return newLog;
+  }
+
+  async getCrisisDetectionLogs(userId?: number, riskLevel?: string, reviewed?: boolean, limit: number = 100): Promise<CrisisDetectionLog[]> {
+    let query = db.select().from(crisisDetectionLogs)
+      .orderBy(desc(crisisDetectionLogs.detectedAt))
+      .limit(limit);
+
+    if (userId) {
+      query = query.where(eq(crisisDetectionLogs.userId, userId));
+    }
+    if (riskLevel) {
+      query = query.where(eq(crisisDetectionLogs.detectedRiskLevel, riskLevel));
+    }
+    if (reviewed !== undefined) {
+      if (reviewed) {
+        query = query.where(isNotNull(crisisDetectionLogs.reviewedAt));
+      } else {
+        query = query.where(isNull(crisisDetectionLogs.reviewedAt));
+      }
+    }
+
+    return await query;
+  }
+
+  async updateCrisisDetectionLog(id: number, updates: Partial<CrisisDetectionLog>): Promise<CrisisDetectionLog | undefined> {
+    const [updatedLog] = await db.update(crisisDetectionLogs)
+      .set({ ...updates, reviewedAt: updates.reviewedBy ? new Date() : undefined })
+      .where(eq(crisisDetectionLogs.id, id))
+      .returning();
+    return updatedLog || undefined;
+  }
+
+  async createTherapeuticEffectivenessTracking(tracking: InsertTherapeuticEffectivenessTracking): Promise<TherapeuticEffectivenessTracking> {
+    const [newTracking] = await db.insert(therapeuticEffectivenessTracking).values(tracking).returning();
+    return newTracking;
+  }
+
+  async getTherapeuticEffectivenessTracking(userId?: number, interventionType?: string, limit: number = 50): Promise<TherapeuticEffectivenessTracking[]> {
+    let query = db.select().from(therapeuticEffectivenessTracking)
+      .orderBy(desc(therapeuticEffectivenessTracking.measuredAt))
+      .limit(limit);
+
+    if (userId) {
+      query = query.where(eq(therapeuticEffectivenessTracking.userId, userId));
+    }
+    if (interventionType) {
+      query = query.where(eq(therapeuticEffectivenessTracking.interventionType, interventionType));
+    }
+
+    return await query;
+  }
+
+  async updateTherapeuticEffectivenessTracking(id: number, updates: Partial<TherapeuticEffectivenessTracking>): Promise<TherapeuticEffectivenessTracking | undefined> {
+    const [updatedTracking] = await db.update(therapeuticEffectivenessTracking)
+      .set(updates)
+      .where(eq(therapeuticEffectivenessTracking.id, id))
+      .returning();
+    return updatedTracking || undefined;
+  }
+
+  async createSystemPerformanceDashboard(dashboard: InsertSystemPerformanceDashboard): Promise<SystemPerformanceDashboard> {
+    const [newDashboard] = await db.insert(systemPerformanceDashboard).values(dashboard).returning();
+    return newDashboard;
+  }
+
+  async getSystemPerformanceDashboard(metricPeriod?: string, limit: number = 30): Promise<SystemPerformanceDashboard[]> {
+    let query = db.select().from(systemPerformanceDashboard)
+      .orderBy(desc(systemPerformanceDashboard.periodStart))
+      .limit(limit);
+
+    if (metricPeriod) {
+      query = query.where(eq(systemPerformanceDashboard.metricPeriod, metricPeriod));
+    }
+
+    return await query;
+  }
+
+  async getLatestSystemPerformance(metricPeriod: string = 'daily'): Promise<SystemPerformanceDashboard | undefined> {
+    const [latest] = await db.select().from(systemPerformanceDashboard)
+      .where(eq(systemPerformanceDashboard.metricPeriod, metricPeriod))
+      .orderBy(desc(systemPerformanceDashboard.periodStart))
+      .limit(1);
+    return latest || undefined;
+  }
+
+  // AI Performance Analytics Methods
+  async getAiPerformanceOverview(): Promise<{
+    totalResponses: number;
+    averageResponseQuality: number;
+    averageTherapeuticEffectiveness: number;
+    crisisDetectionAccuracy: number;
+    falsePositiveRate: number;
+    userSatisfactionAverage: number;
+    averageResponseTime: number;
+  }> {
+    const responseQualityMetrics = await db.select({
+      avg: avg(aiPerformanceMetrics.metricValue),
+      count: count()
+    }).from(aiPerformanceMetrics)
+      .where(eq(aiPerformanceMetrics.metricType, 'response_quality'));
+
+    const therapeuticEffectivenessMetrics = await db.select({
+      avg: avg(aiPerformanceMetrics.metricValue)
+    }).from(aiPerformanceMetrics)
+      .where(eq(aiPerformanceMetrics.metricType, 'therapeutic_effectiveness'));
+
+    const crisisDetectionMetrics = await db.select({
+      avg: avg(aiPerformanceMetrics.metricValue)
+    }).from(aiPerformanceMetrics)
+      .where(eq(aiPerformanceMetrics.metricType, 'crisis_detection'));
+
+    const userSatisfactionMetrics = await db.select({
+      avg: avg(aiResponseAnalysis.userRating)
+    }).from(aiResponseAnalysis)
+      .where(isNotNull(aiResponseAnalysis.userRating));
+
+    const responseTimeMetrics = await db.select({
+      avg: avg(aiPerformanceMetrics.responseTime)
+    }).from(aiPerformanceMetrics)
+      .where(isNotNull(aiPerformanceMetrics.responseTime));
+
+    const falsePositiveCount = await db.select({
+      count: count()
+    }).from(crisisDetectionLogs)
+      .where(eq(crisisDetectionLogs.falsePositive, true));
+
+    const totalCrisisDetections = await db.select({
+      count: count()
+    }).from(crisisDetectionLogs);
+
+    return {
+      totalResponses: responseQualityMetrics[0]?.count || 0,
+      averageResponseQuality: Number(responseQualityMetrics[0]?.avg || 0),
+      averageTherapeuticEffectiveness: Number(therapeuticEffectivenessMetrics[0]?.avg || 0),
+      crisisDetectionAccuracy: Number(crisisDetectionMetrics[0]?.avg || 0),
+      falsePositiveRate: totalCrisisDetections[0]?.count ? 
+        (falsePositiveCount[0]?.count || 0) / totalCrisisDetections[0].count : 0,
+      userSatisfactionAverage: Number(userSatisfactionMetrics[0]?.avg || 0),
+      averageResponseTime: Number(responseTimeMetrics[0]?.avg || 0)
+    };
   }
 }
 
