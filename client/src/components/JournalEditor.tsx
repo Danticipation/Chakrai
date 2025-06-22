@@ -109,17 +109,31 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
       }
     } catch (error) {
       console.error('Error transcribing audio:', error);
+      console.log('Error object:', JSON.stringify(error, null, 2));
+      console.log('Error response:', error?.response);
+      console.log('Error status:', error?.response?.status);
+      console.log('Error data:', error?.response?.data);
       
       // Show user-friendly error message based on error type
       let errorMessage = 'Voice transcription failed. Please try again or use text input.';
       
-      if (error.response?.data?.errorType === 'quota_exceeded') {
+      // Check if it's an axios error with response
+      if (error?.response?.data) {
+        console.log('Has response data:', error.response.data);
+        if (error.response.data.errorType === 'quota_exceeded') {
+          errorMessage = 'Voice transcription temporarily unavailable due to high demand. Please try again later or type your entry manually.';
+        } else if (error.response.data.errorType === 'auth_error') {
+          errorMessage = 'Voice transcription service configuration error. Please use text input for now.';
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        }
+      } else if (error?.response?.status === 503) {
+        errorMessage = 'Voice transcription service is temporarily unavailable. Please try again later or type your entry manually.';
+      } else if (error?.response?.status === 429) {
         errorMessage = 'Voice transcription temporarily unavailable due to high demand. Please try again later or type your entry manually.';
-      } else if (error.response?.data?.errorType === 'auth_error') {
-        errorMessage = 'Voice transcription service configuration error. Please use text input for now.';
-      } else if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
       }
+      
+      console.log('Setting error message:', errorMessage);
       
       // Show user-friendly error notification
       setErrorMessage(errorMessage);

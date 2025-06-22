@@ -943,10 +943,7 @@ export const insertHealthMetricSchema = createInsertSchema(healthMetrics).omit({
 export const insertHealthCorrelationSchema = createInsertSchema(healthCorrelations).omit({ id: true, createdAt: true });
 export const insertSyncLogSchema = createInsertSchema(syncLogs).omit({ id: true, createdAt: true });
 
-export type InsertWearableDevice = z.infer<typeof insertWearableDeviceSchema>;
-export type InsertHealthMetric = z.infer<typeof insertHealthMetricSchema>;
-export type InsertHealthCorrelation = z.infer<typeof insertHealthCorrelationSchema>;
-export type InsertSyncLog = z.infer<typeof insertSyncLogSchema>;
+// Wearable device types defined later in file
 
 // VR/AR Therapeutic Experiences Tables
 export const vrEnvironments = pgTable("vr_environments", {
