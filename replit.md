@@ -12,14 +12,15 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
 ## Recent Changes
-### June 22, 2025 - Voice Input for Journal Entries Completed
+### June 22, 2025 - Voice Input for Journal Entries Completed with Enhanced Error Handling
 - **Voice Recording Integration**: Successfully implemented voice input functionality for journal entries allowing users to speak their thoughts as well as type them
 - **Real-Time Voice Transcription**: Added microphone button to journal editor with real-time audio recording and OpenAI Whisper transcription
 - **Visual Recording Indicators**: Implemented recording status indicators with red pulsing animation during recording and loading spinner during transcription
 - **Seamless Text Integration**: Voice transcriptions automatically append to existing journal content with proper spacing for natural flow
 - **Mobile-Optimized Interface**: Positioned voice input button within textarea for easy thumb access on mobile devices
-- **Comprehensive Error Handling**: Built robust error handling for microphone permissions and transcription failures
-- **Production Ready**: Complete voice input system integrated into existing journal editor with proper state management and user feedback
+- **Enhanced Error Handling System**: Replaced basic alert() notifications with polished toast notification system featuring visual error display with AlertCircle icon, manual dismiss button, and 5-second auto-timeout
+- **User-Friendly API Error Messages**: Comprehensive error handling for OpenAI API quota limits with clear, therapeutic messaging when transcription service is temporarily unavailable
+- **Production Ready**: Complete voice input system integrated into existing journal editor with proper state management, professional error notifications, and seamless user experience
 
 ### June 22, 2025 - Enhanced Privacy & Compliance System Completed
 - **Complete Differential Privacy Implementation**: Successfully implemented comprehensive differential privacy system using Laplace and Gaussian noise mechanisms with configurable epsilon (1.0) and delta (0.00001) parameters for anonymous analytics reporting

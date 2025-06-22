@@ -285,6 +285,23 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
           )}
         </div>
 
+        {/* Error Notification */}
+        {errorMessage && (
+          <div className="rounded-lg p-4 bg-red-50 border border-red-200 flex items-start space-x-3">
+            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-red-800 text-sm font-medium">Voice Transcription Error</p>
+              <p className="text-red-700 text-sm mt-1">{errorMessage}</p>
+            </div>
+            <button
+              onClick={() => setErrorMessage(null)}
+              className="text-red-500 hover:text-red-700 transition-colors text-xl leading-none"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Title Input */}
         <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
           <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
