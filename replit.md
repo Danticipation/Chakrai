@@ -12,6 +12,15 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
 ## Recent Changes
+### June 22, 2025 - Voice Input for Journal Entries Completed
+- **Voice Recording Integration**: Successfully implemented voice input functionality for journal entries allowing users to speak their thoughts as well as type them
+- **Real-Time Voice Transcription**: Added microphone button to journal editor with real-time audio recording and OpenAI Whisper transcription
+- **Visual Recording Indicators**: Implemented recording status indicators with red pulsing animation during recording and loading spinner during transcription
+- **Seamless Text Integration**: Voice transcriptions automatically append to existing journal content with proper spacing for natural flow
+- **Mobile-Optimized Interface**: Positioned voice input button within textarea for easy thumb access on mobile devices
+- **Comprehensive Error Handling**: Built robust error handling for microphone permissions and transcription failures
+- **Production Ready**: Complete voice input system integrated into existing journal editor with proper state management and user feedback
+
 ### June 22, 2025 - Enhanced Privacy & Compliance System Completed
 - **Complete Differential Privacy Implementation**: Successfully implemented comprehensive differential privacy system using Laplace and Gaussian noise mechanisms with configurable epsilon (1.0) and delta (0.00001) parameters for anonymous analytics reporting
 - **User-Controlled Data Encryption**: Built client-side encryption system using AES-256-GCM with PBKDF2 key derivation (100,000 rounds) where users control their encryption keys and only they can decrypt their therapeutic data

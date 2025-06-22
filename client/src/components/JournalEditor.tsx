@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { Save, Trash2, Eye, EyeOff, Brain, TrendingUp, FileText } from 'lucide-react';
+import { Save, Trash2, Eye, EyeOff, Brain, TrendingUp, FileText, Mic, Square } from 'lucide-react';
 import type { JournalEntry, JournalAnalytics } from '@shared/schema';
 
 interface JournalEditorProps {
@@ -50,8 +50,76 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analytics, setAnalytics] = useState<JournalAnalytics | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
 
   const queryClient = useQueryClient();
+
+  // Voice recording functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        await sendAudioToWhisper(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error starting recording:', error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const sendAudioToWhisper = async (audioBlob: Blob) => {
+    setIsTranscribing(true);
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+
+      const response = await axios.post('/api/transcribe', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (response.data.transcription) {
+        // Append transcription to existing content with a space if content exists
+        const newContent = content ? content + ' ' + response.data.transcription : response.data.transcription;
+        setContent(newContent);
+      }
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
 
   const saveMutation = useMutation({
     mutationFn: async (journalData: any) => {
@@ -250,20 +318,45 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
           <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
             Your Thoughts
           </label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Share what's on your mind... Express your thoughts, feelings, experiences, or reflections freely."
-            className="w-full h-32 px-3 py-2 rounded-lg border text-sm resize-none"
-            style={{ 
-              borderColor: 'var(--gentle-lavender-dark)',
-              backgroundColor: 'white',
-              color: 'var(--text-primary)'
-            }}
-          />
+          <div className="relative">
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Share what's on your mind... Express your thoughts, feelings, experiences, or reflections freely."
+              className="w-full h-32 px-3 py-2 pr-12 rounded-lg border text-sm resize-none"
+              style={{ 
+                borderColor: 'var(--gentle-lavender-dark)',
+                backgroundColor: 'white',
+                color: 'var(--text-primary)'
+              }}
+            />
+            {/* Voice Input Button */}
+            <button
+              onClick={toggleRecording}
+              disabled={isTranscribing}
+              className={`absolute right-2 top-2 p-2 rounded-full transition-all ${
+                isRecording 
+                  ? 'bg-red-500 text-white animate-pulse' 
+                  : 'bg-blue-500 text-white hover:bg-blue-600'
+              } ${isTranscribing ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title={isRecording ? 'Stop recording' : isTranscribing ? 'Transcribing...' : 'Start voice recording'}
+            >
+              {isTranscribing ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : isRecording ? (
+                <Square className="w-4 h-4" />
+              ) : (
+                <Mic className="w-4 h-4" />
+              )}
+            </button>
+          </div>
           <div className="flex justify-between items-center mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
             <span>{content.split(/\s+/).filter(word => word.length > 0).length} words</span>
-            <span>~{Math.ceil(content.split(/\s+/).filter(word => word.length > 0).length / 200)} min read</span>
+            <div className="flex items-center gap-2">
+              {isTranscribing && <span className="text-blue-500">Transcribing...</span>}
+              {isRecording && <span className="text-red-500">Recording...</span>}
+              <span>~{Math.ceil(content.split(/\s+/).filter(word => word.length > 0).length / 200)} min read</span>
+            </div>
           </div>
         </div>
 
