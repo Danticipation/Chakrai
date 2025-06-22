@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { Save, Trash2, Eye, EyeOff, Brain, TrendingUp, FileText, Mic, Square } from 'lucide-react';
+import { Save, Trash2, Eye, EyeOff, Brain, TrendingUp, FileText, Mic, Square, AlertCircle } from 'lucide-react';
 import type { JournalEntry, JournalAnalytics } from '@shared/schema';
 
 interface JournalEditorProps {
@@ -52,6 +52,7 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -101,13 +102,28 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (response.data.transcription) {
+      if (response.data.text) {
         // Append transcription to existing content with a space if content exists
-        const newContent = content ? content + ' ' + response.data.transcription : response.data.transcription;
+        const newContent = content ? content + ' ' + response.data.text : response.data.text;
         setContent(newContent);
       }
     } catch (error) {
       console.error('Error transcribing audio:', error);
+      
+      // Show user-friendly error message based on error type
+      let errorMessage = 'Voice transcription failed. Please try again or use text input.';
+      
+      if (error.response?.data?.errorType === 'quota_exceeded') {
+        errorMessage = 'Voice transcription temporarily unavailable due to high demand. Please try again later or type your entry manually.';
+      } else if (error.response?.data?.errorType === 'auth_error') {
+        errorMessage = 'Voice transcription service configuration error. Please use text input for now.';
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      // Show user-friendly error notification
+      setErrorMessage(errorMessage);
+      setTimeout(() => setErrorMessage(null), 5000); // Auto-dismiss after 5 seconds
     } finally {
       setIsTranscribing(false);
     }

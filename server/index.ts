@@ -1171,7 +1171,24 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
 
   } catch (error) {
     console.error('Transcription error:', error);
-    res.status(500).json({ error: 'Transcription failed' });
+    
+    // Provide specific error messages based on the error type
+    if (error.message && error.message.includes('429')) {
+      res.status(503).json({ 
+        error: 'Voice transcription temporarily unavailable due to high demand. Please try again later or type your entry manually.',
+        errorType: 'quota_exceeded'
+      });
+    } else if (error.message && error.message.includes('401')) {
+      res.status(503).json({ 
+        error: 'Voice transcription service configuration error. Please use text input for now.',
+        errorType: 'auth_error'
+      });
+    } else {
+      res.status(500).json({ 
+        error: 'Voice transcription failed. Please try again or use text input.',
+        errorType: 'transcription_error'
+      });
+    }
   }
 });
 
