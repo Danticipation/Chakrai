@@ -1,336 +1,257 @@
-# TraI - Advanced Mental Wellness & Therapy Application
+# TraI - Mental Wellness & Therapy Application
 
-TraI is a comprehensive AI-powered mental health companion designed to provide personalized therapeutic support through cutting-edge technology and evidence-based therapeutic approaches. The application combines artificial intelligence, voice synthesis, emotional analytics, and accessibility features to create an inclusive and effective mental wellness platform.
+## Overview
+TraI is a comprehensive AI-powered mental wellness and therapy application designed to provide therapeutic support through advanced voice interaction, emotional intelligence, and adaptive learning. The application features a calming, professional interface with therapeutic pastel colors and mobile-first design for optimal accessibility.
 
-## 🌟 Core Features
+## Core Features
 
-### 🤖 AI-Powered Therapeutic Conversations
-- **Intelligent Chat System**: GPT-4o powered conversations with personality mirroring for authentic self-reflection
-- **Persistent Memory**: Bot remembers users across sessions and builds detailed personality profiles
-- **Adaptive Learning**: AI analyzes conversation patterns to learn communication preferences and effective therapeutic approaches
-- **Crisis Detection**: Real-time NLP analysis identifies suicide risk, self-harm indicators, and mental health crises
-- **Emotional Intelligence**: Advanced sentiment analysis with immediate supportive responses based on detected emotional states
+### 🎯 **Intelligent Chat System**
+- **OpenAI GPT-4o Integration**: Dynamic, personality-mirrored therapeutic conversations
+- **Real-time Voice Input**: Browser-based speech recognition with microphone button
+- **Voice Output**: ElevenLabs TTS with 4 therapeutic voices (James, Brian, Alexandra, Carla)
+- **Personality Modes**: 7 different therapeutic conversation styles
+  - Friend Mode: Casual conversation and friendly banter
+  - Counsel Mode: Advice and guidance for decisions
+  - Study Mode: Research and learning assistance
+  - Diary Mode: Listening and emotional support
+  - Goal-Setting Mode: Track progress and achieve milestones
+  - Wellness Mode: Mental health and mindfulness support
+  - Creative Mode: Brainstorming and creative inspiration
 
-### 🎙️ Advanced Voice & Audio Features
-- **Multi-Language Voice Synthesis**: ElevenLabs integration supporting 12 languages with emotionally responsive tones
-- **Dynamic Voice Modulation**: Automatic emotional context detection for appropriate voice tone and intensity
-- **Speech-to-Text**: Whisper-powered voice input for natural therapeutic conversations
-- **Closed Captioning**: AI-generated captions for all audio content with emotional tone indicators
-- **Interactive Mindfulness**: Guided audio exercises (Box Breathing, Progressive Relaxation, Grounding techniques)
+### 🧠 **Advanced Emotional Intelligence**
+- **Real-time Emotion Detection**: Comprehensive emotional analysis using OpenAI GPT-4o
+- **Mood Forecasting**: AI-powered predictive mood analysis with confidence scoring
+- **Contextual Response Adaptation**: Dynamic communication tone adjustment based on emotional state
+- **Crisis Detection & Response**: NLP-driven safety monitoring with automatic intervention
+- **Emotional Pattern Analysis**: Long-term emotional trend tracking and insights
 
-### 🌍 Internationalization & Accessibility
-- **12 Language Support**: English, Spanish, French, German, Portuguese, Italian, Chinese, Japanese, Korean, Arabic, Hindi, Russian
-- **Cultural Adaptation**: Therapeutic approaches adapted for cultural sensitivity and regional mental health practices
-- **Visual Accessibility**: Screen reader support, high contrast modes, adjustable font sizes, color blindness accommodations
-- **Hearing Accessibility**: Closed captions, visual alerts, vibration feedback, speech transcription
-- **Motor Accessibility**: Voice navigation, larger touch targets, one-handed mode, adjustable dwell times
-- **Cognitive Support**: Simplified interfaces, reduced animations, clear language processing, memory aids
+### 📊 **Comprehensive Analytics & Reporting**
+- **Monthly Wellness Reports**: AI-generated therapeutic summaries with progress analysis
+- **Interactive Analytics Dashboard**: Visual emotional journey tracking with charts
+- **Progress Metrics**: Wellness scores, emotional volatility, and therapeutic development
+- **Risk Assessment**: Automated emotional risk level monitoring with recommendations
+- **Longitudinal Trend Analysis**: Multi-month wellness tracking and milestone recognition
 
-### 📊 Analytics & Progress Tracking
-- **Monthly Wellness Reports**: AI-generated comprehensive summaries with therapeutic insights and personalized goals
-- **Interactive Dashboards**: Multi-tab visual analytics with emotional trends, progress metrics, and activity tracking
-- **Mood Analytics**: Visual emotional journey tracking with pattern recognition and volatility analysis
-- **Risk Assessment**: Automated emotional risk monitoring with intervention recommendations
-- **Longitudinal Analysis**: Multi-month wellness tracking showing progress patterns and achievement milestones
+### 📝 **Therapeutic Journaling System**
+- **AI-Assisted Analysis**: OpenAI-powered emotional pattern recognition and sentiment tracking
+- **Voice Input for Entries**: Speak your thoughts with automatic transcription
+- **Professional Export Reports**: Therapist-ready clinical insights and recommendations
+- **Advanced Analytics**: Emotional journey visualization and recurring theme analysis
+- **Crisis Integration**: Journal analysis connects with crisis detection system
 
-### 📝 Therapeutic Journaling System
-- **AI-Assisted Analysis**: GPT-4o powered emotional pattern analysis and sentiment tracking
-- **Professional Exports**: Therapist-ready reports with clinical recommendations and risk assessments
-- **Emotional Tagging**: Mood selection, trigger identification, gratitude tracking, and goal setting
-- **Pattern Recognition**: Recurring theme analysis with confidence scoring and therapeutic insights
-- **Crisis Integration**: Journal analysis connects with crisis detection for comprehensive monitoring
+### 🎮 **Enhanced Gamification & Rewards**
+- **Wellness Points System**: Earn points for therapeutic activities and achievements
+- **Achievement Badges**: 20+ badges across 5 categories with rarity levels
+- **Rewards Shop**: Virtual rewards, avatars, and premium therapeutic content
+- **Community Challenges**: Group wellness challenges with progress tracking
+- **Streak Tracking**: Daily check-ins, journaling, and mood tracking streaks
 
-### 🏥 Professional Therapist Integration
-- **Collaboration Portal**: Licensed therapist connection with secure insight sharing capabilities
-- **Session Management**: Video/phone/in-person scheduling with AI-generated session preparation
-- **Automated Reporting**: Intelligent sharing of journal summaries, mood patterns, and progress reports
-- **Privacy Controls**: Granular settings for data sharing frequency and content types
-- **Hybrid Therapy Model**: Integration between AI self-therapy tools and professional therapeutic care
+### 👥 **Community & Professional Integration**
+- **Anonymous Support Forums**: Safe, moderated spaces for peer discussions
+- **Peer Check-ins**: Voluntary support system with privacy-conscious pairing
+- **Professional Therapist Portal**: Licensed therapist integration and collaboration
+- **Hybrid Therapy Model**: AI-powered self-therapy tools with professional care
+- **Session Management**: Video/phone/in-person scheduling with meeting links
 
-### 🎮 Gamification & Motivation
-- **Achievement System**: 20+ badges across engagement, milestone, wellness, and achievement categories
-- **Wellness Streaks**: Real-time tracking for daily check-ins, journaling, mood tracking, and chat sessions
-- **Progressive Leveling**: Dynamic point system with achievement-based rewards and motivational feedback
-- **Activity Tracking**: Automated logging throughout the application with progress monitoring
-- **Positive Reinforcement**: Celebratory feedback and visual progress indicators
+### 🌟 **Adaptive Learning & Personalization**
+- **Dynamic Therapy Pathways**: AI-curated care plans adapted weekly based on progress
+- **Personalized CBT Exercises**: AI-generated cognitive behavioral therapy targeting specific patterns
+- **Conversation Pattern Learning**: System learns communication preferences and therapeutic approaches
+- **Wellness Recommendations**: Smart suggestions for mindfulness, breathing, and activities
+- **Real-time Plan Adaptation**: Intelligent triggers for emotional spikes and breakthroughs
 
-### 👥 Community & Peer Support
-- **Anonymous Forums**: Safe, moderated spaces for discussions across 4 support categories (General, Anxiety, Depression, Crisis)
-- **Privacy-Conscious Design**: Anonymous posting with auto-generated supportive usernames
-- **Peer Check-Ins**: Voluntary peer support system with privacy-conscious pairing for daily support
-- **Community Moderation**: AI-assisted content monitoring with human oversight for safety
-- **Supportive Interactions**: Heart reactions and threaded discussions for positive community engagement
+### 🥽 **Immersive VR/AR Therapeutic Experiences**
+- **8 Therapeutic Environments**: Peaceful beach, mountain forest, safe therapy room, and more
+- **Guided Sessions**: Mindfulness, relaxation, and exposure therapy exercises
+- **Progress Tracking**: Effectiveness ratings, stress monitoring, and therapeutic notes
+- **AI Recommendations**: Optimal environment selection based on emotional state
+- **Accessibility Features**: Audio descriptions, simplified controls, motion sensitivity
 
-### 🎯 Personalization & Adaptive Learning
-- **Communication Style Learning**: AI adapts to user preferences for formal/casual/warm/direct/supportive communication
-- **Dynamic Recommendations**: Personalized mindfulness exercises, breathing techniques, and wellness activities
-- **Conversation Analysis**: Advanced pattern recognition for effective approaches and preferred topics
-- **Feedback Integration**: Rating system continuously improves personalization accuracy through user feedback
-- **Contextual Adaptation**: Real-time response adjustment while maintaining therapeutic value
+### 🔒 **Privacy & Compliance System**
+- **Differential Privacy**: Anonymous analytics with configurable epsilon/delta parameters
+- **Client-side Encryption**: AES-256-GCM encryption with user-controlled keys
+- **Zero-Knowledge Architecture**: Therapeutic data remains private even from administrators
+- **Encrypted Backups**: Client-side encrypted data backup with 90-day retention
+- **Compliance Dashboard**: Real-time privacy status monitoring and audit logging
 
-### 🆘 Crisis Support & Safety
-- **Multi-Layered Detection**: Combined AI analysis with pattern matching for accurate crisis identification
-- **Automated Check-Ins**: Scheduled follow-up based on risk level (2-24 hour intervals)
-- **Immediate Resources**: Crisis hotlines, emergency contacts, and professional help based on detected risk
-- **Safety Protocols**: Five-tier risk classification with specific response protocols for each level
-- **Professional Escalation**: Automated mental health professional contact for critical situations
+### 📱 **Health Integration & Wearables**
+- **Device Support**: Apple Watch, Fitbit, Garmin, Samsung Health, Polar
+- **Health Correlation Analytics**: Physical health indicators vs emotional states
+- **Real-time Sync**: Automated device synchronization with status tracking
+- **AI Health Insights**: Personalized wellness recommendations based on health patterns
+- **Privacy-conscious Data**: Secure health data handling with user consent controls
 
-### 📱 Mobile-Optimized Design
-- **Therapeutic Interface**: Calming pastel color scheme (#ADD8E6 soft blue, #98FB98 pale green, #E6E6FA gentle lavender)
-- **Touch-Friendly**: 44px minimum touch targets optimized for thumb navigation
-- **Responsive Layout**: Mobile-first design with proper safe area handling for notched devices
-- **Performance Optimized**: Smooth scrolling, reduced shadows, and touch responsiveness
+### 🎧 **Advanced Voice & Interaction**
+- **Emotionally Responsive Voices**: Dynamic voice modulation based on emotional context
+- **Interactive Mindfulness Exercises**: 5 guided exercises with breathing patterns
+- **Contextual Voice Selection**: Automatic tone adjustment for genuine empathy
+- **Multi-language Support**: 12 languages with therapeutic translation accuracy
+- **Accessibility Suite**: Screen reader compatibility, high contrast, voice navigation
 
-## 🏗️ Technical Architecture
+### 🔍 **AI Performance Monitoring**
+- **Response Quality Tracking**: Therapeutic score, empathy score, clarity metrics
+- **Crisis Detection Accuracy**: Confidence scoring and intervention effectiveness
+- **System Performance Analytics**: Response times, token usage, cost monitoring
+- **Quality Assurance**: Automated flagging and review workflows for improvement
+- **Scalability Metrics**: Edge computing readiness and health indicators
 
-### Frontend Stack
-- **React 18** with TypeScript for type-safe development
-- **Vite** for fast development and optimized builds
-- **Tailwind CSS** with therapeutic design system
-- **shadcn/ui** component library for consistent UI
-- **TanStack Query** for efficient data fetching and caching
-- **Wouter** for lightweight routing
+## Technical Architecture
 
-### Backend Stack
-- **Express.js** with TypeScript for robust API development
-- **PostgreSQL** with Drizzle ORM for data persistence
-- **OpenAI GPT-4o** for intelligent conversations and analysis
-- **ElevenLabs** for advanced voice synthesis
-- **WebSocket** for real-time communication
+### Frontend
+- **React with TypeScript**: Type-safe, responsive user interface
+- **Tailwind CSS**: Mobile-first therapeutic design system
+- **Vite**: Fast development and build tooling
+- **PWA Support**: Progressive web app with offline capabilities
 
-### Key Integrations
-- **OpenAI Whisper** for speech-to-text conversion
-- **OpenAI GPT-4o** for therapeutic conversations, translations, and analysis
-- **ElevenLabs** for multi-language voice synthesis with emotional responsiveness
-- **External APIs** for horoscope data and wellness content
+### Backend
+- **Express.js**: RESTful API server with WebSocket support
+- **PostgreSQL**: Robust data persistence with Drizzle ORM
+- **OpenAI GPT-4o**: Advanced AI conversation and analysis
+- **ElevenLabs**: High-quality voice synthesis
 
 ### Database Schema
-```
-Core Tables:
-- users: User profiles and authentication
-- userFacts: Personality insights and self-reflection data
-- userMemories: Conversation history and learned patterns
-- messages: Chat conversations with emotional context
+- **User Management**: Profiles, preferences, onboarding status
+- **Conversations**: Messages, personality analysis, crisis detection
+- **Wellness Tracking**: Mood entries, goals, achievements, streaks
+- **Therapeutic Data**: Journal entries, CBT exercises, VR sessions
+- **Privacy & Security**: Encryption keys, audit logs, compliance tracking
 
-Therapeutic Features:
-- moodEntries: Daily mood tracking with analytics
-- journalEntries: Therapeutic journaling with AI analysis
-- crisisDetections: Safety monitoring and intervention tracking
-- mindfulnessExercises: Guided wellness activities
+## Mobile Optimization
 
-Analytics & Progress:
-- monthlyReports: AI-generated wellness summaries
-- userAchievements: Gamification and progress tracking
-- wellnessStreaks: Consistency monitoring
-- adaptationInsights: Personalization learning data
+### Design Features
+- **Therapeutic Color Palette**: Calming pastels (#ADD8E6, #98FB98, #E6E6FA)
+- **Touch-friendly Interface**: 44px minimum touch targets, thumb navigation
+- **Responsive Layout**: Grouped navigation categories for better UX
+- **Safe Area Support**: iOS/Android compatibility with notched devices
+- **Performance Optimized**: Smooth scrolling and reduced visual effects
 
-Professional Integration:
-- therapists: Licensed professional profiles
-- therapistSessions: Appointment management
-- collaborationSettings: Privacy and sharing preferences
+### Navigation System
+- **Dashboard Home**: Integrated gamification metrics and grouped categories
+- **Category-based Navigation**: Therapy, Wellness, Progress, Tools, More
+- **Quick Access**: Chat and microphone always easily accessible
+- **Settings Integration**: Voice selection, privacy controls, profile management
 
-Community Features:
-- supportForums: Anonymous discussion spaces
-- forumPosts: Community interactions
-- peerCheckIns: Peer support system
+## Voice System Features
 
-Accessibility & Internationalization:
-- accessibilitySettings: User accommodation preferences
-- languagePreferences: Multi-language support configuration
-```
+### Speech Recognition
+- **Browser-based Recognition**: Immediate transcription without API dependencies
+- **Microphone Permission Handling**: Clear permission requests and error messaging
+- **Real-time Feedback**: Visual pulse animation and "🎤 Speak now..." indicators
+- **Auto-stop Safety**: 8-second timeout with manual stop capability
+- **Error Recovery**: Graceful handling of no-speech and permission errors
 
-## 🚀 Getting Started
+### Voice Output
+- **4 Approved Voices**: James (default), Brian, Alexandra, Carla
+- **Emotional Context**: Dynamic voice modulation for therapeutic conversations
+- **Fallback System**: HTML Audio → Web Audio API → Browser TTS
+- **Audio Settings**: Voice selection, testing, and download options
+
+## Security & Privacy
+
+### Data Protection
+- **End-to-end Encryption**: AES-256-GCM with PBKDF2 key derivation
+- **Anonymous Analytics**: Differential privacy with minimum 10-user cohorts
+- **Zero-knowledge Storage**: User-controlled encryption keys never leave device
+- **Audit Logging**: Complete privacy operation tracking for compliance
+- **GDPR Compliance**: Right to export, delete, and data portability
+
+### Crisis Safety
+- **Multi-layered Detection**: AI analysis combined with pattern matching
+- **Immediate Intervention**: Automatic safety check-ins based on risk level
+- **Professional Escalation**: Mental health professional contact automation
+- **Resource Provision**: Crisis hotlines and emergency contacts
+- **Follow-up Monitoring**: Scheduled check-ins for continued safety
+
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 18+ with npm
 - PostgreSQL database
-- API keys for OpenAI and ElevenLabs
-
-### Environment Setup
-```bash
-# Required environment variables
-DATABASE_URL=postgresql://username:password@host:port/database
-OPENAI_API_KEY=your_openai_api_key
-ELEVENLABS_API_KEY=your_elevenlabs_api_key
-SESSION_SECRET=your_session_secret
-```
+- OpenAI API key
+- ElevenLabs API key (optional for voice)
 
 ### Installation
 ```bash
+# Clone the repository
+git clone [repository-url]
+cd trai-app
+
 # Install dependencies
 npm install
 
-# Set up database
+# Set up environment variables
+cp .env.example .env
+# Add your API keys to .env
+
+# Initialize database
 npm run db:push
 
 # Start development server
 npm run dev
 ```
 
-### Database Migration
-```bash
-# Push schema changes to database
-npm run db:push
-
-# Generate new migration (if needed)
-npm run db:generate
+### Environment Variables
+```
+DATABASE_URL=postgresql://[credentials]
+OPENAI_API_KEY=sk-[your-key]
+ELEVENLABS_API_KEY=[your-key] # Optional
+NODE_ENV=development
 ```
 
-## 🎯 Usage Examples
+## API Endpoints
 
-### Therapeutic Conversation
-```javascript
-// AI responds with personality mirroring
-const response = await fetch('/api/chat', {
-  method: 'POST',
-  body: JSON.stringify({
-    message: "I'm feeling anxious about work",
-    userId: 1
-  })
-});
-```
+### Core Functionality
+- `GET /api/stats` - User statistics and bot growth data
+- `POST /api/chat` - Send message and get AI response
+- `POST /api/text-to-speech` - Convert text to speech
+- `GET /api/daily-content` - Daily affirmations and horoscopes
 
-### Multi-Language Voice Synthesis
-```javascript
-// Generate voice in user's preferred language
-const audioResponse = await fetch('/api/voice/generate', {
-  method: 'POST',
-  body: JSON.stringify({
-    text: "This is a calming therapeutic message",
-    language: "es",
-    emotionalContext: "calming"
-  })
-});
-```
+### Wellness & Analytics
+- `GET /api/mood-entries` - Retrieve mood tracking data
+- `POST /api/mood-entries` - Log new mood entry
+- `GET /api/monthly-report` - Generate wellness report
+- `GET /api/journal-analytics` - Journal pattern analysis
 
-### Accessibility Features
-```javascript
-// Generate voice description for visual elements
-const description = await fetch('/api/accessibility/voice-description', {
-  method: 'POST',
-  body: JSON.stringify({
-    elementType: "chart",
-    visualContent: "mood trend graph",
-    context: "emotional analytics",
-    userLanguage: "fr"
-  })
-});
-```
+### Therapeutic Features
+- `POST /api/crisis-detection` - Crisis risk assessment
+- `GET /api/therapy-plans` - Adaptive therapeutic plans
+- `POST /api/mindfulness-sessions` - Log mindfulness exercises
+- `GET /api/cbt-exercises` - Get personalized CBT exercises
 
-### Crisis Detection
-```javascript
-// Real-time crisis analysis
-const analysis = await fetch('/api/crisis/analyze', {
-  method: 'POST',
-  body: JSON.stringify({
-    message: "User message for analysis",
-    userId: 1,
-    conversationHistory: []
-  })
-});
-```
-
-## 🔒 Privacy & Security
-
-### Data Protection
-- End-to-end encryption for sensitive therapeutic data
-- HIPAA-compliant data handling practices
-- Granular privacy controls for professional data sharing
-- Anonymous community interactions with privacy-first design
-
-### User Control
-- Complete data export capabilities
-- Selective data sharing with therapists
-- Right to data deletion and account termination
-- Transparent data usage policies
-
-## 🌐 Supported Languages
-
-1. **English** - 100% complete with full voice support
-2. **Spanish** - 95% complete with cultural adaptation
-3. **French** - 90% complete with therapeutic terminology
-4. **German** - 85% complete with professional tone
-5. **Portuguese** - 80% complete with regional variants
-6. **Italian** - 75% complete with expressive adaptation
-7. **Chinese** - 70% complete with cultural sensitivity
-8. **Japanese** - 65% complete with respectful communication
-9. **Korean** - 60% complete with hierarchy awareness
-10. **Arabic** - 55% complete with RTL support
-11. **Hindi** - 50% complete with spiritual elements
-12. **Russian** - 45% complete with cultural adaptation
-
-## ♿ Accessibility Compliance
-
-### WCAG 2.1 AA Compliance
-- Screen reader compatibility with ARIA labels
-- Keyboard navigation for all interactive elements
-- Color contrast ratios meeting accessibility standards
-- Alternative text for all visual content
-- Closed captioning for audio content
-
-### Disability Support
-- **Visual**: Screen readers, high contrast, voice descriptions, haptic feedback
-- **Hearing**: Closed captions, visual alerts, vibration feedback, transcription
-- **Motor**: Voice navigation, larger touch targets, one-handed mode, switch control
-- **Cognitive**: Simplified interfaces, clear language, memory aids, focus assistance
-
-## 📈 Performance & Scalability
-
-### Optimization Features
-- Server-side rendering for improved load times
-- Lazy loading for non-critical components
-- Efficient database queries with proper indexing
-- CDN integration for static assets
-- Progressive Web App capabilities
-
-### Monitoring
-- Real-time error tracking and reporting
-- Performance metrics and user analytics
-- Therapeutic effectiveness measurement
-- Crisis intervention response times
-
-## 🤝 Contributing
+## Contributing
 
 ### Development Guidelines
-- Follow TypeScript best practices
-- Maintain therapeutic design principles
-- Ensure accessibility compliance
-- Test multi-language functionality
-- Respect user privacy and data protection
+- Follow mobile-first design principles
+- Maintain therapeutic color scheme and calming interface
+- Ensure all features work with voice input/output
+- Test accessibility features thoroughly
+- Document privacy and security implications
 
-### Code Quality
-- ESLint and Prettier for code formatting
+### Code Standards
 - TypeScript for type safety
-- Jest for unit testing
-- Cypress for end-to-end testing
+- ESLint and Prettier for code formatting
+- Component-based architecture
+- Responsive design patterns
+- Comprehensive error handling
 
-## 📞 Support & Resources
+## Support & Documentation
 
-### Emergency Resources
-- Crisis hotlines available in all supported languages
-- Region-specific mental health services
-- 24/7 crisis intervention protocols
-- Professional therapist network integration
+### User Support
+- In-app help system with guided tutorials
+- Crisis support resources and emergency contacts
+- Professional therapist integration and referrals
+- Community forums for peer support
 
 ### Technical Support
-- Comprehensive API documentation
-- Accessibility testing tools
-- Multi-language validation
-- Performance monitoring dashboard
+- Comprehensive error logging and monitoring
+- Performance analytics and optimization
+- Regular security audits and updates
+- Scalability planning for growing user base
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Mental health professionals for therapeutic guidance
-- Accessibility consultants for inclusive design
-- International translators for cultural adaptation
-- Open source community for technical foundations
+This project is proprietary software designed for mental health support. Please ensure compliance with healthcare regulations (HIPAA, GDPR) when deploying in production environments.
 
 ---
 
-**TraI - Transforming mental wellness through accessible, intelligent, and culturally-aware therapeutic technology.**
-
-For more information, visit our documentation or contact our support team.
+**Note**: TraI is designed to supplement, not replace, professional mental health care. Users experiencing crisis situations should contact emergency services or mental health professionals immediately.
