@@ -17,6 +17,7 @@ import EnhancedGamificationDashboard from './components/EnhancedGamificationDash
 import EmotionalIntelligenceDashboard from './components/EmotionalIntelligenceDashboard';
 import AiPerformanceMonitoringDashboard from './components/AiPerformanceMonitoringDashboard';
 import PrivacyComplianceDashboard from './components/PrivacyComplianceDashboard';
+
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
@@ -27,166 +28,6 @@ interface DashboardHomeProps {
   dailyReflection: string;
   onNavigate: (section: string) => void;
 }
-
-// Navigation Categories and Sections
-
-const DashboardHome: React.FC<DashboardHomeProps> = ({ botStats, goals, dailyReflection, onNavigate }) => {
-  return (
-    <div className="p-4 space-y-4 pb-32">
-      {/* Welcome Header */}
-      <div className="text-center mb-6">
-        <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-          <img src={traiLogo} alt="TrAI Logo" className="w-12 h-12" />
-        </div>
-        <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Welcome to TrAI</h1>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          "Reflect. Refine. Rise."
-        </p>
-      </div>
-
-      {/* Progress Overview Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--pale-green)' }}>
-          <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
-            {botStats?.level || 1}
-          </div>
-          <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Current Level</div>
-          <div className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-            {botStats?.stage || 'Infant'}
-          </div>
-        </div>
-        
-        <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
-          <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
-            {botStats?.wordsLearned || 0}
-          </div>
-          <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Words Learned</div>
-          <div className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-            Growing vocabulary
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Goals Overview */}
-      <div className="rounded-2xl p-4 mb-6" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-        <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Today's Goals</h3>
-        <div className="space-y-3">
-          {goals.slice(0, 3).map((goal) => {
-            const percentage = Math.round((goal.current / goal.target) * 100);
-            return (
-              <div key={goal.id} className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                      {goal.name}
-                    </span>
-                    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                      {goal.current}/{goal.target}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${Math.min(percentage, 100)}%`,
-                        backgroundColor: goal.color === 'blue' ? 'var(--soft-blue-dark)' : 
-                                       goal.color === 'green' ? 'var(--pale-green-dark)' : 
-                                       'var(--gentle-lavender-dark)'
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <button
-          onClick={() => onNavigate('progress')}
-          className="w-full mt-3 px-4 py-2 rounded-xl text-sm font-medium"
-          style={{ 
-            backgroundColor: 'var(--soft-blue-dark)',
-            color: 'white'
-          }}
-        >
-          View All Goals
-        </button>
-      </div>
-
-      {/* Quick Actions Grid */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <button
-          onClick={() => onNavigate('chat')}
-          className="rounded-2xl p-4 text-left transition-all"
-          style={{ backgroundColor: 'var(--soft-blue-light)' }}
-        >
-          <MessageCircle className="w-8 h-8 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
-          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Start Chat</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Begin conversation</div>
-        </button>
-
-        <button
-          onClick={() => onNavigate('mood')}
-          className="rounded-2xl p-4 text-left transition-all"
-          style={{ backgroundColor: 'var(--pale-green-light)' }}
-        >
-          <Heart className="w-8 h-8 mb-2" style={{ color: 'var(--pale-green-dark)' }} />
-          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Track Mood</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>How are you feeling?</div>
-        </button>
-
-        <button
-          onClick={() => onNavigate('journal')}
-          className="rounded-2xl p-4 text-left transition-all"
-          style={{ backgroundColor: 'var(--gentle-lavender-light)' }}
-        >
-          <FileText className="w-8 h-8 mb-2" style={{ color: 'var(--gentle-lavender-dark)' }} />
-          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Journal</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Write your thoughts</div>
-        </button>
-
-        <button
-          onClick={() => onNavigate('daily')}
-          className="rounded-2xl p-4 text-left transition-all"
-          style={{ backgroundColor: 'var(--soft-blue-light)' }}
-        >
-          <Sun className="w-8 h-8 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
-          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Daily</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Inspiration & horoscope</div>
-        </button>
-      </div>
-
-      {/* Daily Reflection */}
-      <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-        <div className="flex items-center mb-3">
-          <Brain className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
-          <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Reflection</h3>
-        </div>
-        <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
-          {dailyReflection}
-        </p>
-        <button
-          onClick={() => onNavigate('reflect')}
-          className="w-full px-4 py-2 rounded-xl text-sm font-medium"
-          style={{ 
-            backgroundColor: 'var(--gentle-lavender-dark)',
-            color: 'white'
-          }}
-        >
-          View Full Reflection
-        </button>
-      </div>
-    </div>
-  );
-};
-
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  },
-});
 
 interface BotStats {
   level: number;
@@ -208,278 +49,260 @@ interface Goal {
   color: string;
 }
 
-const AppLayout = () => {
+const DashboardHome: React.FC<DashboardHomeProps> = ({ botStats, goals, dailyReflection, onNavigate }) => {
+  return (
+    <div className="p-4 space-y-4 pb-32">
+      {/* Welcome Header */}
+      <div className="text-center mb-6">
+        <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+          <img src={traiLogo} alt="TrAI Logo" className="w-12 h-12" />
+        </div>
+        <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Welcome to TrAI</h1>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          "Reflect. Refine. Rise."
+        </p>
+      </div>
+
+      {/* Progress Overview Cards */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--pale-green)' }}>
+          <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
+            {botStats?.level || 3}
+          </div>
+          <div className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Current Level</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+            {botStats?.stage || 'Therapist'}
+          </div>
+        </div>
+        <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--soft-blue)' }}>
+          <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
+            {botStats?.wordsLearned || 1000}
+          </div>
+          <div className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Words Learned</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+            Growing vocabulary
+          </div>
+        </div>
+      </div>
+
+      {/* Today's Goals Section */}
+      <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+        <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Today's Goals</h3>
+        <div className="space-y-3">
+          {goals.slice(0, 3).map((goal) => (
+            <div key={goal.id} className="space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{goal.name}</span>
+                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{goal.current}/{goal.target}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="h-2 rounded-full transition-all duration-300" 
+                  style={{ 
+                    width: `${(goal.current / goal.target) * 100}%`,
+                    backgroundColor: goal.color
+                  }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick Actions Grid */}
+      <div className="grid grid-cols-2 gap-3">
+        <button 
+          onClick={() => onNavigate('chat')}
+          className="p-4 rounded-2xl text-left transition-all"
+          style={{ backgroundColor: 'var(--soft-blue)' }}
+        >
+          <MessageCircle className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
+          <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Chat Therapy</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Start conversation</div>
+        </button>
+
+        <button 
+          onClick={() => onNavigate('mood')}
+          className="p-4 rounded-2xl text-left transition-all"
+          style={{ backgroundColor: 'var(--pale-green)' }}
+        >
+          <Heart className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
+          <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Mood Check</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Track emotions</div>
+        </button>
+
+        <button 
+          onClick={() => onNavigate('journal')}
+          className="p-4 rounded-2xl text-left transition-all"
+          style={{ backgroundColor: 'var(--gentle-lavender)' }}
+        >
+          <FileText className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
+          <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Journal</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Reflect & write</div>
+        </button>
+
+        <button 
+          onClick={() => onNavigate('reflect')}
+          className="p-4 rounded-2xl text-left transition-all"
+          style={{ backgroundColor: 'var(--soft-blue)' }}
+        >
+          <Brain className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
+          <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Insights</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>View progress</div>
+        </button>
+      </div>
+
+      {/* Daily Reflection Card */}
+      {dailyReflection && (
+        <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Today's Reflection</h3>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            {dailyReflection}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Main App Component
+function AppLayout() {
+  // State management
   const [activeSection, setActiveSection] = useState('home');
-  const [selectedCategory, setSelectedCategory] = useState('home');
-  const [isRecording, setIsRecording] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  const [input, setInput] = useState('');
-  const [botStats, setBotStats] = useState<BotStats | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [weeklySummary, setWeeklySummary] = useState<string>('');
-  const [personalityInsights, setPersonalityInsights] = useState<any>(null);
-  const [showReflection, setShowReflection] = useState(false);
-  const [showMemory, setShowMemory] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [newUserName, setNewUserName] = useState('');
-  const [personalityMode, setPersonalityMode] = useState<string>('friend');
-
-  const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
-  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('EkK5I93UQWFDigLMpZcX'); // James - default voice
-  const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
-  const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
-  const [zodiacSign, setZodiacSign] = useState<string>('');
-  const [selectedZodiacSign, setSelectedZodiacSign] = useState<string>('');
-  const [dailyReflection, setDailyReflection] = useState<string>('Your reflection will appear here as you interact with your TrAI.');
-  
-  // Crisis detection state
+  const [personalityMode, setPersonalityMode] = useState('Friend');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [dailyAffirmation, setDailyAffirmation] = useState('');
+  const [dailyHoroscope, setDailyHoroscope] = useState('');
+  const [zodiacSign, setZodiacSign] = useState('');
+  const [selectedZodiacSign, setSelectedZodiacSign] = useState('');
+  const [botStats, setBotStats] = useState<BotStats | null>(null);
+  const [goals, setGoals] = useState<Goal[]>([
+    { id: 1, name: 'Daily Chat Goal', current: 7, target: 10, color: '#4A90E2' },
+    { id: 2, name: 'Weekly Reflection', current: 4, target: 7, color: '#7ED321' },
+    { id: 3, name: 'Voice Practice', current: 12, target: 15, color: '#F5A623' }
+  ]);
+  const [dailyReflection, setDailyReflection] = useState('');
+  const [weeklySummary, setWeeklySummary] = useState('');
+  const [personalityInsights, setPersonalityInsights] = useState<any>(null);
   const [crisisAlert, setCrisisAlert] = useState<any>(null);
   const [showCrisisAlert, setShowCrisisAlert] = useState(false);
-  
-  // Goal tracking state
-  const [goals, setGoals] = useState<Goal[]>([
-    { id: 1, name: 'Daily Chat Goal', current: 7, target: 10, color: 'blue' },
-    { id: 2, name: 'Weekly Reflection', current: 4, target: 7, color: 'green' },
-    { id: 3, name: 'Voice Practice', current: 12, target: 15, color: 'purple' }
-  ]);
-  const [showGoalEditor, setShowGoalEditor] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState('James');
 
+  // Refs for audio recording
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const speechRecognitionRef = useRef<any>(null);
 
-  // Grouped navigation categories for better mobile UX
-  const navigationCategories = [
-    {
-      id: 'therapy',
-      label: 'Therapy',
-      icon: MessageCircle,
-      color: 'var(--soft-blue-dark)',
-      sections: [
-        { id: 'chat', icon: MessageCircle, label: 'Chat' },
-        { id: 'mood', icon: Heart, label: 'Mood' },
-        { id: 'journal', icon: FileText, label: 'Journal' },
-        { id: 'therapist', icon: UserCheck, label: 'Therapist' }
-      ]
-    },
-    {
-      id: 'wellness',
-      label: 'Wellness',
-      icon: Sun,
-      color: 'var(--pale-green-dark)',
-      sections: [
-        { id: 'daily', icon: Sun, label: 'Daily' },
-        { id: 'vr-therapy', icon: Headphones, label: 'VR Therapy' },
-        { id: 'health', icon: Activity, label: 'Health' },
-        { id: 'reflect', icon: Brain, label: 'Reflect' }
-      ]
-    },
-    {
-      id: 'community',
-      label: 'Community',
-      icon: Users,
-      color: 'var(--gentle-lavender-dark)',
-      sections: [
-        { id: 'community', icon: Users, label: 'Community' },
-        { id: 'achievements', icon: Award, label: 'Achievements' },
-        { id: 'wellness-rewards', icon: Gift, label: 'Rewards' },
-        { id: 'progress', icon: Target, label: 'Progress' }
-      ]
-    },
-    {
-      id: 'advanced',
-      label: 'Advanced',
-      icon: Zap,
-      color: 'var(--soft-blue-dark)',
-      sections: [
-        { id: 'emotional-intelligence', icon: Zap, label: 'AI Intelligence' },
-        { id: 'ai-monitoring', icon: Shield, label: 'AI Monitor' },
-        { id: 'privacy', icon: Lock, label: 'Privacy' },
-        { id: 'memory', icon: BookOpen, label: 'Memory' },
-        { id: 'settings', icon: User, label: 'Settings' }
-      ]
-    }
-  ];
+  // Voice mode cycling
+  const personalityModes = ['Friend', 'Counsel', 'Study', 'Diary', 'Goal-Setting', 'Wellness', 'Creative'];
 
-  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
-
-  // Get current sections from selected category
-  const getCurrentSections = () => {
-    const category = navigationCategories.find(cat => cat.id === selectedCategory);
-    return category ? category.sections : navigationCategories[0].sections;
-  };
-
-  // Update category when section changes
-  const handleSectionChange = (section: string) => {
-    console.log('BUTTON CLICKED - Navigating to section:', section);
-    setActiveSection(section);
-    
-    // Auto-update category based on section
-    for (const category of navigationCategories) {
-      if (category.sections.some(s => s.id === section)) {
-        setSelectedCategory(category.id);
-        break;
-      }
-    }
-  };
-
-  // Simple direct navigation handler
-  const handleDirectNavigation = (section: string) => {
-    console.log('DIRECT NAVIGATION to:', section);
-    setActiveSection(section);
-  };
-
-  const voiceOptions = [
-    { id: 'EkK5I93UQWFDigLMpZcX', name: 'James', description: 'Professional male voice', gender: 'Male', default: true },
-    { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian', description: 'Deep, resonant male voice', gender: 'Male' },
-    { id: 'kdmDKE6EkgrWrrykO9Qt', name: 'Alexandra', description: 'Clear female voice', gender: 'Female' },
-    { id: 'l32B8XDoylOsZKiSdfhE', name: 'Carla', description: 'Warm female voice', gender: 'Female' }
-  ];
-
-  const personalityModes = [
-    { id: 'friend', name: 'Friend Mode', emoji: '😊', description: 'Casual conversation and friendly banter' },
-    { id: 'counsel', name: 'Counsel Mode', emoji: '🧭', description: 'Advice and guidance for decisions' },
-    { id: 'study', name: 'Study Mode', emoji: '📚', description: 'Research and learning assistance' },
-    { id: 'diary', name: 'Diary Mode', emoji: '💭', description: 'Listening and emotional support' },
-    { id: 'goal', name: 'Goal-Setting Mode', emoji: '🎯', description: 'Track progress and achieve milestones' },
-    { id: 'wellness', name: 'Wellness Mode', emoji: '🌱', description: 'Mental health and mindfulness support' },
-    { id: 'creative', name: 'Creative Mode', emoji: '🎨', description: 'Brainstorming and creative inspiration' }
-  ];
-
+  // Check for onboarding completion
   useEffect(() => {
-    axios.get('/api/stats?userId=1')
-      .then(res => {
-        setBotStats({
-          level: res.data.stage === 'Infant' ? 1 : 
-                 res.data.stage === 'Toddler' ? 2 : 
-                 res.data.stage === 'Child' ? 3 : 
-                 res.data.stage === 'Adolescent' ? 4 : 
-                 res.data.stage === 'Therapist' ? 3 : 5,
-          stage: res.data.stage,
-          wordsLearned: res.data.wordCount
-        });
-      })
-      .catch(() => setBotStats({ level: 1, stage: 'Infant', wordsLearned: 0 }));
+    const checkOnboardingStatus = async () => {
+      try {
+        const response = await axios.get('/api/user-profile');
+        if (!response.data || response.data.length === 0) {
+          setShowOnboarding(true);
+        }
+      } catch (error) {
+        console.log('No existing profile found, showing onboarding');
+        setShowOnboarding(true);
+      }
+    };
 
-    axios.get('/api/weekly-summary?userId=1')
-      .then(res => setWeeklySummary(res.data.summary))
-      .catch(() => setWeeklySummary('No reflection available yet. Start chatting to build your weekly summary!'));
-
-    // Load personality insights for reflection tab
-    axios.get('/api/personality-insights?userId=1')
-      .then(res => setPersonalityInsights(res.data))
-      .catch(() => setPersonalityInsights({
-        insights: ["I'm still learning about you through our conversations.", "Share more about yourself so I can provide better insights."],
-        traits: [],
-        communicationStyle: "Getting to know you",
-        interests: []
-      }));
-
-    // Load saved zodiac preference
-    const savedZodiacSign = localStorage.getItem('userZodiacSign') || '';
-    setSelectedZodiacSign(savedZodiacSign);
-
-    // Load daily content
-    const zodiacParam = savedZodiacSign ? `?zodiacSign=${savedZodiacSign}` : '';
-    axios.get(`/api/daily-content${zodiacParam}`)
-      .then(res => {
-        setDailyAffirmation(res.data.affirmation);
-        setDailyHoroscope(res.data.horoscope);
-        setZodiacSign(res.data.zodiacSign || '');
-      })
-      .catch(() => {
-        setDailyAffirmation('Today is a new beginning. Embrace the possibilities that await you.');
-        setDailyHoroscope('The universe is aligning to bring positive energy into your life today.');
-        setZodiacSign('');
-      });
+    checkOnboardingStatus();
   }, []);
 
-  // Check onboarding status on load - only show if explicitly incomplete
+  // Load initial data
   useEffect(() => {
-    const hasCompletedOnboarding = localStorage.getItem('onboardingCompleted');
-    
-    if (!hasCompletedOnboarding) {
-      axios.get('/api/onboarding-status?userId=1')
-        .then(res => {
-          if (!res.data.completed) {
-            setShowOnboarding(true);
+    const loadInitialData = async () => {
+      try {
+        // Load bot stats
+        const statsRes = await axios.get('/api/stats');
+        setBotStats(statsRes.data);
+
+        // Load daily content
+        const savedZodiac = localStorage.getItem('userZodiacSign') || '';
+        const zodiacParam = savedZodiac ? `?zodiacSign=${savedZodiac}` : '';
+        const contentRes = await axios.get(`/api/daily-content${zodiacParam}`);
+        
+        setDailyAffirmation(contentRes.data.affirmation);
+        setDailyHoroscope(contentRes.data.horoscope);
+        setZodiacSign(contentRes.data.zodiacSign || '');
+        setSelectedZodiacSign(savedZodiac);
+
+        // Load weekly summary for reflection
+        const summaryRes = await axios.get('/api/weekly-summary');
+        setWeeklySummary(summaryRes.data.summary);
+        setDailyReflection(summaryRes.data.dailyReflection || 'Take a moment to reflect on your thoughts and feelings today.');
+
+        // Load personality insights
+        const insightsRes = await axios.get('/api/personality-insights');
+        setPersonalityInsights(insightsRes.data);
+      } catch (error) {
+        console.error('Failed to load initial data:', error);
+      }
+    };
+
+    if (!showOnboarding) {
+      loadInitialData();
+    }
+  }, [showOnboarding]);
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'r' || e.key === 'R') {
+        if (activeSection === 'chat') {
+          e.preventDefault();
+          if (isRecording) {
+            stopRecording();
           } else {
-            localStorage.setItem('onboardingCompleted', 'true');
+            startRecording();
           }
-        })
-        .catch(() => {
-          // Don't force onboarding if API fails
-          localStorage.setItem('onboardingCompleted', 'true');
-        });
-    }
-  }, []);
-
-  const handleGlobalKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'r' && activeSection === 'chat') {
-      if (!isRecording) {
-        startRecording();
-      } else {
-        stopRecording();
+        }
       }
-    }
-  };
+    };
 
-  useEffect(() => {
     document.addEventListener('keydown', handleGlobalKeyDown);
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
   }, [isRecording, activeSection]);
 
+  // Enhanced mobile microphone functionality
   const startRecording = async () => {
     try {
-      console.log('MOBILE MIC - Starting voice recording for mobile...');
+      console.log('MOBILE MIC - Starting voice recording...');
       
       // Detect mobile device
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       console.log('MOBILE MIC - Mobile device detected:', isMobile);
       
-      // First ensure microphone permission with mobile-specific handling
-      try {
-        const testStream = await navigator.mediaDevices.getUserMedia({ 
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-            sampleRate: isMobile ? 22050 : 44100,
-            channelCount: 1
-          } 
-        });
-        
-        // Test the stream briefly then stop
-        testStream.getTracks().forEach(track => {
-          console.log('MOBILE MIC - Audio track settings:', track.getSettings());
-          track.stop();
-        });
-      } catch (err) {
-        console.error('MOBILE MIC - Permission error:', err);
-        setInput('🎤 Microphone permission needed. Please allow access and tap the mic button again.');
-        setTimeout(() => setInput(''), 4000);
-        return;
-      }
-      
-      console.log('MOBILE MIC - Starting audio recording...');
-      setInput('🎤 Recording...');
-      setIsRecording(true);
-      
-      // Get fresh audio stream for recording
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      // Mobile-optimized audio settings
+      const audioConstraints = {
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
           sampleRate: isMobile ? 22050 : 44100,
           channelCount: 1
-        } 
-      });
+        }
+      };
+
+      console.log('MOBILE MIC - Requesting microphone permission...');
+      setInput('🎤 Requesting microphone access...');
+      
+      const stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+      console.log('MOBILE MIC - Microphone access granted');
+      
+      setInput('🎤 Recording...');
+      setIsRecording(true);
       
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const source = audioContext.createMediaStreamSource(stream);
@@ -489,6 +312,8 @@ const AppLayout = () => {
         options.mimeType = 'audio/webm';
       } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
         options.mimeType = 'audio/mp4';
+      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+        options.mimeType = 'audio/wav';
       }
       
       const mediaRecorder = new MediaRecorder(stream, options);
@@ -512,20 +337,20 @@ const AppLayout = () => {
           
           console.log('MOBILE MIC - Audio blob created:', {
             size: audioBlob.size,
-            type: audioBlob.type,
-            durationEstimate: Math.round(audioBlob.size / 16000) + 's'
+            type: audioBlob.type
           });
           
           if (audioBlob.size > 500) {
+            setInput('🎤 Processing speech...');
             sendAudioToWhisper(audioBlob);
           } else {
-            console.log('MOBILE MIC - Audio blob too small, likely no speech');
-            setInput('No speech detected. Please speak clearly into your microphone.');
+            console.log('MOBILE MIC - Audio blob too small');
+            setInput('🎤 No speech detected. Please speak clearly and try again.');
             setTimeout(() => setInput(''), 3000);
           }
         } else {
           console.log('MOBILE MIC - No audio data captured');
-          setInput('Recording failed. Please check microphone permissions and try again.');
+          setInput('🎤 Recording failed. Please check microphone permissions.');
           setTimeout(() => setInput(''), 3000);
         }
         
@@ -534,7 +359,7 @@ const AppLayout = () => {
         audioContext.close();
       };
 
-      mediaRecorder.start(250); // Smaller chunks for better mobile responsiveness
+      mediaRecorder.start(250);
       console.log('MOBILE MIC - Recording started successfully');
       
       // Auto-stop after 30 seconds
@@ -545,212 +370,136 @@ const AppLayout = () => {
       }, 30000);
       
     } catch (error) {
-      console.error('❌ Recording failed:', error);
+      console.error('MOBILE MIC - Recording failed:', error);
+      setIsRecording(false);
       
       if ((error as any).name === 'NotAllowedError') {
-        setInput('Microphone permission denied. Please allow microphone access and try again.');
+        setInput('🎤 Microphone permission denied. Please allow access and try again.');
       } else if ((error as any).name === 'NotFoundError') {
-        setInput('No microphone found. Please check your device settings.');
+        setInput('🎤 No microphone found. Please check your device settings.');
       } else {
-        setInput('Recording failed. Please refresh the page and try again.');
+        setInput('🎤 Recording failed. Please refresh and try again.');
       }
       setTimeout(() => setInput(''), 4000);
     }
   };
 
   const stopRecording = () => {
+    console.log('MOBILE MIC - Stopping recording...');
+    setIsRecording(false);
+    
     if (speechRecognitionRef.current) {
       speechRecognitionRef.current.stop();
-      setIsRecording(false);
+      speechRecognitionRef.current = null;
     }
+    
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
-      setIsRecording(false);
     }
   };
 
   const sendAudioToWhisper = async (audioBlob: Blob) => {
     try {
-      console.log('Audio captured:', audioBlob.size, 'bytes');
+      setLoading(true);
+      console.log('MOBILE MIC - Sending audio to Whisper API...');
       
-      // Use browser's built-in speech recognition for immediate results
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        console.log('Using browser speech recognition...');
-        
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-        
-        setInput('Listening...');
-        
-        recognition.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript;
-          console.log('Transcribed:', transcript);
-          setInput(transcript);
-        };
-        
-        recognition.onerror = (event: any) => {
-          console.log('Speech recognition error:', event.error);
-          setInput('');
-        };
-        
-        recognition.onend = () => {
-          setLoading(false);
-        };
-        
-        recognition.start();
-        setLoading(true);
-        
-        // Auto-stop after 5 seconds
-        setTimeout(() => {
-          recognition.stop();
-        }, 5000);
-        
-      } else {
-        // Fallback for browsers without speech recognition
-        setInput('Voice input detected - please type your message.');
-        setTimeout(() => setInput(''), 2000);
-      }
-      
-    } catch (error) {
-      console.error('Voice processing error:', error);
-      setInput('');
-    }
-  };
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
 
-  const updateDailyReflection = (userMessage: string, botResponse: string) => {
-    const currentTime = new Date();
-    const timeOfDay = currentTime.getHours() < 12 ? 'morning' : currentTime.getHours() < 17 ? 'afternoon' : 'evening';
-    
-    // Analyze conversation themes
-    const userLower = userMessage.toLowerCase();
-    const themes = [];
-    
-    if (userLower.includes('stress') || userLower.includes('anxious') || userLower.includes('worry')) {
-      themes.push('stress management');
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('MOBILE MIC - Transcription received:', data.text);
+        setInput(data.text || '');
+      } else {
+        console.error('MOBILE MIC - Transcription failed');
+        setInput('🎤 Transcription failed. Please try typing your message.');
+        setTimeout(() => setInput(''), 3000);
+      }
+    } catch (error) {
+      console.error('MOBILE MIC - Transcription error:', error);
+      setInput('🎤 Transcription service unavailable. Please try typing.');
+      setTimeout(() => setInput(''), 3000);
+    } finally {
+      setLoading(false);
     }
-    if (userLower.includes('goal') || userLower.includes('achieve') || userLower.includes('success')) {
-      themes.push('goal setting');
-    }
-    if (userLower.includes('feel') || userLower.includes('emotion') || userLower.includes('mood')) {
-      themes.push('emotional awareness');
-    }
-    if (userLower.includes('grateful') || userLower.includes('thank') || userLower.includes('appreciate')) {
-      themes.push('gratitude practice');
-    }
-    if (userLower.includes('mindful') || userLower.includes('present') || userLower.includes('moment')) {
-      themes.push('mindfulness');
-    }
-    
-    const reflectionPrompts = themes.length > 0 ? [
-      `This ${timeOfDay}, your exploration of ${themes.join(' and ')} shows meaningful self-awareness and growth.`,
-      `Your willingness to discuss ${themes.join(' and ')} demonstrates courage in facing life's challenges.`,
-      `Today's focus on ${themes.join(' and ')} reflects your commitment to personal development.`,
-      `The depth of your conversation about ${themes.join(' and ')} reveals genuine introspection.`
-    ] : [
-      `This ${timeOfDay}, you've engaged in meaningful dialogue that shows your commitment to growth.`,
-      `Your thoughtful conversation today demonstrates self-awareness and emotional intelligence.`,
-      `Today's interaction reflects your journey toward greater understanding and wellness.`,
-      `The openness in your communication today highlights your strength and resilience.`
-    ];
-    
-    const newReflection = reflectionPrompts[Math.floor(Math.random() * reflectionPrompts.length)];
-    setDailyReflection(newReflection);
   };
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
-    
-    const userMessageText = input.trim();
-    const newMessage: Message = {
+
+    const userMessage: Message = {
       sender: 'user',
-      text: userMessageText,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      text: input,
+      time: new Date().toLocaleTimeString()
     };
-    
-    setMessages(prev => [...prev, newMessage]);
+
+    setMessages(prev => [...prev, userMessage]);
     setInput('');
     setLoading(true);
-    
+
     try {
-      const res = await axios.post('/api/chat', { 
-        message: userMessageText,
-        userId: 1,
-        personalityMode: personalityMode,
-        sessionId: `chat-${Date.now()}`
+      const response = await axios.post('/api/chat', {
+        message: input,
+        personalityMode: personalityMode
       });
-      
-      const botResponse = res.data.response;
-      const botMessage = {
-        sender: 'bot' as const,
-        text: botResponse,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setMessages(prev => [...prev, botMessage]);
-      
-      // Handle crisis detection response
-      if (res.data.crisisAnalysis && res.data.crisisAnalysis.riskLevel !== 'none' && res.data.crisisAnalysis.riskLevel !== 'low') {
-        setCrisisAlert(res.data.crisisAnalysis);
+
+      // Check for crisis detection
+      if (response.data.crisisDetected) {
+        setCrisisAlert(response.data.crisisData);
         setShowCrisisAlert(true);
       }
-      
-      updateDailyReflection(userMessageText, botResponse);
-      
-      // Generate audio for bot response
-      try {
-        const audioResponse = await fetch('/api/text-to-speech', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            text: botResponse,
-            voiceId: selectedReflectionVoice
-          })
-        });
-        
-        if (audioResponse.ok) {
-          const audioBlob = await audioResponse.blob();
-          
-          if (audioBlob.size > 0) {
+
+      const botMessage: Message = {
+        sender: 'bot',
+        text: response.data.message,
+        time: new Date().toLocaleTimeString()
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+
+      // Generate and play audio response
+      if (audioEnabled && selectedReflectionVoice) {
+        try {
+          const audioResponse = await fetch('/api/text-to-speech', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              text: response.data.message,
+              voiceId: selectedReflectionVoice
+            })
+          });
+
+          if (audioResponse.ok) {
+            const audioBlob = await audioResponse.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
             setLastBotAudio(audioUrl);
-            
-            const audio = new Audio(audioUrl);
-            audio.volume = 1.0;
-            
-            audio.addEventListener('ended', () => {
-              URL.revokeObjectURL(audioUrl);
-            });
-            
-            const playAttempt = audio.play();
-            
-            if (playAttempt !== undefined) {
-              playAttempt
-                .then(() => {
-                  console.log('Audio playing successfully!');
-                })
-                .catch(error => {
-                  console.error('Audio play failed:', error);
-                  
-                  if (error.name === 'NotAllowedError') {
-                    setPendingAudio(audioUrl);
-                  }
-                });
+
+            if (audioEnabled) {
+              const audio = new Audio(audioUrl);
+              audio.volume = 1.0;
+              audio.play().catch(error => {
+                console.log('Audio playback failed:', error);
+                setPendingAudio(audioUrl);
+              });
+            } else {
+              setPendingAudio(audioUrl);
             }
           }
+        } catch (audioError) {
+          console.error('Audio generation failed:', audioError);
         }
-      } catch (audioError) {
-        console.error('Error generating audio:', audioError);
       }
-      
     } catch (error) {
-      console.error('Chat request failed:', error);
-      const errorMessage = {
-        sender: 'bot' as const,
-        text: 'Sorry, I had trouble processing that. Please try again.',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
+        sender: 'bot',
+        text: 'I apologize, but I\'m having trouble responding right now. Please try again.',
+        time: new Date().toLocaleTimeString()
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -758,81 +507,23 @@ const AppLayout = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+  const enableAudio = () => {
+    setAudioEnabled(true);
+    
+    if (pendingAudio) {
+      const audio = new Audio(pendingAudio);
+      audio.volume = 1.0;
+      audio.play();
+      setPendingAudio(null);
     }
   };
 
-  const generateAudioForText = async (text: string) => {
+  const refreshPersonalityInsights = async () => {
     try {
-      const response = await fetch('/api/text-to-speech', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          text,
-          voiceId: selectedReflectionVoice
-        })
-      });
-      
-      if (response.ok) {
-        const audioBlob = await response.blob();
-        
-        if (audioBlob.size > 0) {
-          const audioUrl = URL.createObjectURL(audioBlob);
-          const audio = new Audio(audioUrl);
-          
-          audio.addEventListener('ended', () => {
-            URL.revokeObjectURL(audioUrl);
-          });
-          
-          const playPromise = audio.play();
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                console.log('Manual audio playing successfully!');
-              })
-              .catch(error => {
-                console.error('Manual audio play failed:', error);
-              });
-          }
-        }
-      }
+      const response = await axios.get('/api/personality-insights');
+      setPersonalityInsights(response.data);
     } catch (error) {
-      console.error('Error generating manual audio:', error);
-    }
-  };
-
-  const enableAudio = async () => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      if (audioContext.state === 'suspended') {
-        await audioContext.resume();
-      }
-      
-      setAudioEnabled(true);
-      
-      if (pendingAudio) {
-        const audio = new Audio(pendingAudio);
-        audio.addEventListener('ended', () => {
-          URL.revokeObjectURL(pendingAudio);
-          setPendingAudio(null);
-        });
-        
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log('Pending audio playing!');
-            })
-            .catch(error => {
-              console.error('Pending audio failed:', error);
-            });
-        }
-      }
-    } catch (error) {
-      console.error('Failed to enable audio:', error);
+      console.error('Failed to refresh personality insights:', error);
     }
   };
 
@@ -851,14 +542,22 @@ const AppLayout = () => {
     }
   };
 
-  const readReflection = () => {
-    if (weeklySummary) {
-      generateAudioForText(weeklySummary);
-    }
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
   };
 
   const renderActiveSection = () => {
     switch (activeSection) {
+      case 'home':
+        return (
+          <DashboardHome 
+            botStats={botStats}
+            goals={goals}
+            dailyReflection={dailyReflection}
+            onNavigate={handleSectionChange}
+          />
+        );
+
       case 'chat':
         return (
           <div className="flex flex-col h-full">
@@ -903,7 +602,7 @@ const AppLayout = () => {
 
               {loading && (
                 <div className="flex justify-start">
-                  <div className="bg-white rounded-2xl rounded-bl-md p-3 shadow-sm border" style={{ borderColor: 'var(--gentle-lavender-dark)' }}>
+                  <div className="max-w-[80%] p-3 rounded-2xl rounded-bl-md shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -926,7 +625,7 @@ const AppLayout = () => {
               )}
             </div>
 
-            {/* Chat Input - Fixed at bottom */}
+            {/* Enhanced Mobile Chat Input */}
             <div className="border-t p-4" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--gentle-lavender-dark)' }}>
               <div className="flex items-center space-x-3">
                 <div className="flex-1 relative">
@@ -936,7 +635,7 @@ const AppLayout = () => {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                     placeholder="Share your thoughts..."
-                    className="w-full px-4 py-3 pr-12 rounded-2xl border text-sm"
+                    className="w-full px-4 py-3 pr-16 rounded-2xl border text-sm"
                     style={{ 
                       borderColor: 'var(--gentle-lavender-dark)',
                       backgroundColor: 'var(--surface-secondary)',
@@ -952,24 +651,27 @@ const AppLayout = () => {
                     onTouchEnd={(e) => {
                       e.preventDefault();
                       console.log('MOBILE MIC - Touch end detected');
-                      if (isRecording) {
-                        stopRecording();
-                      } else {
-                        startRecording();
-                      }
+                      // Use a small delay to ensure the click handler doesn't interfere
+                      setTimeout(() => {
+                        if (isRecording) {
+                          stopRecording();
+                        } else {
+                          startRecording();
+                        }
+                      }, 50);
                     }}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-3 rounded-full transition-all touch-manipulation"
+                    className="absolute right-14 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all touch-manipulation"
                     style={{ 
                       backgroundColor: isRecording ? '#EF4444' : 'var(--soft-blue-dark)',
                       color: 'white',
                       animation: isRecording ? 'pulse 1s infinite' : 'none',
-                      minWidth: '44px',
-                      minHeight: '44px',
+                      minWidth: '40px',
+                      minHeight: '40px',
                       WebkitTapHighlightColor: 'transparent'
                     }}
                     title={isRecording ? "Stop Recording" : "Start Voice Recording"}
                   >
-                    <Mic className="w-5 h-5" />
+                    <Mic className="w-4 h-4" />
                   </button>
                 </div>
                 <button
@@ -990,732 +692,356 @@ const AppLayout = () => {
 
       case 'reflect':
         return (
-          <div className="p-4">
-            <div className="mb-4">
-              <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Personality Insights</h2>
+          <div className="p-4 space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Personality Insights</h2>
               <button
-                onClick={() => {
-                  // Refresh personality insights
-                  axios.get('/api/personality-insights?userId=1')
-                    .then(res => setPersonalityInsights(res.data))
-                    .catch(() => {});
-                }}
-                className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
-                style={{ 
-                  backgroundColor: 'var(--soft-blue-dark)',
-                  color: 'white'
-                }}
+                onClick={refreshPersonalityInsights}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                title="Refresh insights"
               >
-                🔄 Refresh Insights
+                <RotateCcw className="w-5 h-5" style={{ color: 'var(--soft-blue-dark)' }} />
               </button>
             </div>
-
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              {personalityInsights ? (
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Communication Style</h3>
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{personalityInsights.communicationStyle}</p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Insights About You</h3>
-                    <div className="space-y-2">
-                      {personalityInsights.insights.map((insight, index) => (
-                        <p key={index} className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                          • {insight}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-
-                  {personalityInsights.traits.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Key Traits</h3>
-                      <div className="space-y-1">
-                        {personalityInsights.traits.map((trait, index) => (
-                          <p key={index} className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            • {trait}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {personalityInsights.interests.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Interests</h3>
-                      <div className="space-y-1">
-                        {personalityInsights.interests.map((interest, index) => (
-                          <p key={index} className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            • {interest}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+            
+            {personalityInsights ? (
+              <div className="space-y-4">
+                <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                  <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Communication Style</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    {personalityInsights.communicationStyle || 'Analyzing your communication patterns...'}
+                  </p>
                 </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Loading personality insights...</p>
+
+                <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Key Insights</h3>
+                  <div className="space-y-2">
+                    {personalityInsights.insights && personalityInsights.insights.length > 0 ? (
+                      personalityInsights.insights.map((insight: any, index: number) => (
+                        <div key={index} className="flex items-start space-x-2">
+                          <div className="w-1.5 h-1.5 rounded-full mt-2" style={{ backgroundColor: 'var(--soft-blue-dark)' }}></div>
+                          <p className="text-sm flex-1" style={{ color: 'var(--text-secondary)' }}>{insight}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Continue conversations to discover more insights about yourself.</p>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
+
+                <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Personality Traits</h3>
+                  <div className="space-y-2">
+                    {personalityInsights.traits && personalityInsights.traits.length > 0 ? (
+                      personalityInsights.traits.map((trait: any, index: number) => (
+                        <div key={index} className="inline-block">
+                          <span className="px-3 py-1 rounded-full text-xs font-medium mr-2 mb-2 inline-block" 
+                                style={{ backgroundColor: 'var(--pale-green)', color: 'var(--text-primary)' }}>
+                            {trait}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Your unique traits will appear as we learn more about you.</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Interests & Values</h3>
+                  <div className="space-y-2">
+                    {personalityInsights.interests && personalityInsights.interests.length > 0 ? (
+                      personalityInsights.interests.map((interest: any, index: number) => (
+                        <div key={index} className="flex items-start space-x-2">
+                          <Star className="w-4 h-4 mt-0.5" style={{ color: 'var(--soft-blue-dark)' }} />
+                          <p className="text-sm flex-1" style={{ color: 'var(--text-secondary)' }}>{interest}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Share more about what matters to you to see your interests reflected here.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Brain className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--soft-blue-dark)' }} />
+                <p className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Building Your Profile</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  Start chatting to help me learn about your unique personality
+                </p>
+              </div>
+            )}
           </div>
         );
 
       case 'daily':
         return (
-          <div className="p-4">
-            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Daily Inspiration</h2>
-            
-            {/* Content area */}
-            <div className="space-y-4 pb-4">
-              {/* Zodiac Sign Selector - Mobile optimized */}
-              <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Your Zodiac Sign:</label>
-                <select
-                  value={selectedZodiacSign}
-                  onChange={(e) => handleZodiacChange(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg text-sm border"
-                  style={{ 
-                    borderColor: 'var(--gentle-lavender-dark)',
-                    backgroundColor: 'var(--surface-secondary)',
-                    color: 'var(--text-primary)'
-                  }}
-                >
-                  <option value="">Random Sign</option>
-                  <option value="aries">♈ Aries (Mar 21 - Apr 19)</option>
-                  <option value="taurus">♉ Taurus (Apr 20 - May 20)</option>
-                  <option value="gemini">♊ Gemini (May 21 - Jun 20)</option>
-                  <option value="cancer">♋ Cancer (Jun 21 - Jul 22)</option>
-                  <option value="leo">♌ Leo (Jul 23 - Aug 22)</option>
-                  <option value="virgo">♍ Virgo (Aug 23 - Sep 22)</option>
-                  <option value="libra">♎ Libra (Sep 23 - Oct 22)</option>
-                  <option value="scorpio">♏ Scorpio (Oct 23 - Nov 21)</option>
-                  <option value="sagittarius">♐ Sagittarius (Nov 22 - Dec 21)</option>
-                  <option value="capricorn">♑ Capricorn (Dec 22 - Jan 19)</option>
-                  <option value="aquarius">♒ Aquarius (Jan 20 - Feb 18)</option>
-                  <option value="pisces">♓ Pisces (Feb 19 - Mar 20)</option>
-                </select>
-              </div>
-              
-              {/* Daily Affirmation Section - Mobile optimized */}
-              <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
-                <div className="flex items-center mb-3">
-                  <Sun className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
-                  <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Affirmation</h3>
-                </div>
-                <div className="bg-white/60 rounded-xl p-3 mb-3">
-                  <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-primary)' }}>
-                    "{dailyAffirmation}"
-                  </p>
-                </div>
-                <button
-                  onClick={() => generateAudioForText(dailyAffirmation)}
-                  className="w-full px-4 py-2 rounded-xl text-sm font-medium shadow-sm"
-                  style={{ 
-                    backgroundColor: 'var(--soft-blue-dark)',
-                    color: 'white'
-                  }}
-                >
-                  🔊 Listen to Affirmation
-                </button>
-              </div>
+          <div className="p-4 space-y-6">
+            <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Daily Wellness</h2>
 
-              {/* Daily Horoscope Section - Mobile optimized */}
-              <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
-                <div className="flex items-center mb-3">
-                  <Star className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
-                  <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                    Daily Horoscope {zodiacSign && `- ${zodiacSign}`}
-                  </h3>
-                </div>
-                <div className="bg-white/60 rounded-xl p-3 mb-3">
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
-                    {dailyHoroscope}
-                  </p>
-                </div>
-                <button
-                  onClick={() => generateAudioForText(dailyHoroscope)}
-                  className="w-full px-4 py-2 rounded-xl text-sm font-medium shadow-sm"
-                  style={{ 
-                    backgroundColor: 'var(--soft-blue-dark)',
-                    color: 'white'
-                  }}
-                >
-                  🔊 Listen to Horoscope
-                </button>
-              </div>
-
-              {/* Refresh Daily Content - Mobile optimized */}
-              <div className="mt-4">
-                <button
-                  onClick={() => handleZodiacChange(selectedZodiacSign)}
-                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm flex items-center justify-center"
-                  style={{ 
-                    backgroundColor: 'var(--surface-secondary)',
-                    color: 'var(--text-primary)'
-                  }}
-                >
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  Get New Daily Content
-                </button>
-              </div>
+            {/* Zodiac Selection */}
+            <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Personalize Your Experience</h3>
+              <select
+                value={selectedZodiacSign}
+                onChange={(e) => handleZodiacChange(e.target.value)}
+                className="w-full p-3 rounded-lg border text-sm"
+                style={{ 
+                  borderColor: 'var(--gentle-lavender-dark)',
+                  backgroundColor: 'var(--surface-primary)',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                <option value="">Select Your Zodiac Sign</option>
+                <option value="aries">Aries</option>
+                <option value="taurus">Taurus</option>
+                <option value="gemini">Gemini</option>
+                <option value="cancer">Cancer</option>
+                <option value="leo">Leo</option>
+                <option value="virgo">Virgo</option>
+                <option value="libra">Libra</option>
+                <option value="scorpio">Scorpio</option>
+                <option value="sagittarius">Sagittarius</option>
+                <option value="capricorn">Capricorn</option>
+                <option value="aquarius">Aquarius</option>
+                <option value="pisces">Pisces</option>
+              </select>
             </div>
-          </div>
-        );
 
-      case 'journal':
-        return (
-          <div className="h-full">
-            <JournalDashboard userId={1} />
-          </div>
-        );
+            {/* Daily Affirmation */}
+            <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--pale-green)' }}>
+              <div className="flex items-center space-x-2 mb-3">
+                <Sun className="w-5 h-5" style={{ color: 'var(--soft-blue-dark)' }} />
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Today's Affirmation</h3>
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                {dailyAffirmation || 'Loading your daily affirmation...'}
+              </p>
+            </div>
 
-      case 'therapist':
-        return (
-          <div className="h-full">
-            <TherapistPortal userId="1" />
-          </div>
-        );
-
-      case 'community':
-        return (
-          <div className="h-full">
-            <CommunityPortal userId={1} />
-          </div>
-        );
-
-      case 'achievements':
-        return (
-          <div className="p-4">
-            <AchievementDashboard userId={1} />
-          </div>
-        );
-
-      case 'health':
-        return (
-          <div className="h-full">
-            <HealthDashboard />
-          </div>
-        );
-
-      case 'vr-therapy':
-        return (
-          <div className="h-full">
-            <VRTherapyDashboard />
-          </div>
-        );
-
-      case 'wellness-rewards':
-        return (
-          <div className="h-full">
-            <EnhancedGamificationDashboard />
-          </div>
-        );
-
-      case 'emotional-intelligence':
-        return (
-          <div className="h-full">
-            <EmotionalIntelligenceDashboard />
-          </div>
-        );
-
-      case 'ai-monitoring':
-        return (
-          <div className="h-full">
-            <AiPerformanceMonitoringDashboard />
-          </div>
-        );
-
-      case 'privacy':
-        return (
-          <div className="h-full">
-            <PrivacyComplianceDashboard />
-          </div>
-        );
-
-      case 'memory':
-        return (
-          <div className="p-4">
-            <MemoryDashboard />
+            {/* Daily Horoscope */}
+            <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+              <div className="flex items-center space-x-2 mb-3">
+                <Star className="w-5 h-5" style={{ color: 'var(--soft-blue-dark)' }} />
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  {zodiacSign ? `${zodiacSign} Horoscope` : 'Daily Horoscope'}
+                </h3>
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                {dailyHoroscope || 'Select your zodiac sign to see your personalized horoscope.'}
+              </p>
+            </div>
           </div>
         );
 
       case 'mood':
-        return (
-          <div className="p-4">
-            <MoodTracker />
-          </div>
-        );
-
-      case 'progress':
-        return (
-          <div className="p-4">
-            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Wellness Progress</h2>
-            
-            {/* Bot Growth Stats - Mobile optimized */}
-            <div className="rounded-2xl p-4 mb-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
-              <div className="flex items-center mb-3">
-                <Target className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Your Growth</h3>
-              </div>
-              {botStats && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white/60 rounded-xl p-3">
-                    <div className="text-xl font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{botStats.level}</div>
-                    <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Level</div>
-                  </div>
-                  <div className="bg-white/60 rounded-xl p-3">
-                    <div className="text-xl font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{botStats.stage}</div>
-                    <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Stage</div>
-                  </div>
-                  <div className="bg-white/60 rounded-xl p-3 col-span-2">
-                    <div className="text-xl font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{botStats.wordsLearned} words</div>
-                    <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Words Learned</div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Conversation Insights - Mobile optimized */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
-              <div className="flex items-center mb-3">
-                <Brain className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Conversation Stats</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white/60 rounded-xl p-3">
-                  <div className="text-xl font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{messages.length}</div>
-                  <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Messages</div>
-                </div>
-                <div className="bg-white/60 rounded-xl p-3">
-                  <div className="text-sm font-bold" style={{ color: 'var(--soft-blue-dark)' }}>{personalityMode}</div>
-                  <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Mode</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'voice':
-        return (
-          <div className="p-4 space-y-4">
-            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Voice Settings</h2>
-            
-            {/* Audio Status - Mobile optimized */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Audio Status</h3>
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Audio Enabled</span>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${audioEnabled ? 'text-white' : 'text-white'}`}
-                  style={{ backgroundColor: audioEnabled ? '#10B981' : '#EF4444' }}>
-                  {audioEnabled ? 'Active' : 'Disabled'}
-                </span>
-              </div>
-              {!audioEnabled && (
-                <button
-                  onClick={enableAudio}
-                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
-                  style={{ 
-                    backgroundColor: 'var(--soft-blue-dark)',
-                    color: 'white'
-                  }}
-                >
-                  🔊 Enable Audio
-                </button>
-              )}
-            </div>
-
-            {/* Voice Selection - Mobile optimized */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
-              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Voice Selection</h3>
-              <VoiceSelector onVoiceChange={() => {}} />
-            </div>
-          </div>
-        );
-
+        return <MoodTracker />;
+      case 'memory':
+        return <MemoryDashboard />;
+      case 'journal':
+        return <JournalDashboard userId="1" />;
+      case 'therapist':
+        return <TherapistPortal userId="1" />;
+      case 'achievements':
+        return <AchievementDashboard userId="1" />;
+      case 'community':
+        return <CommunityPortal userId="1" />;
+      case 'health':
+        return <HealthDashboard />;
+      case 'vr':
+        return <VRTherapyDashboard />;
+      case 'wellness-rewards':
+        return <EnhancedGamificationDashboard />;
+      case 'ai-intelligence':
+        return <EmotionalIntelligenceDashboard />;
+      case 'ai-performance':
+        return <AiPerformanceMonitoringDashboard />;
+      case 'privacy':
+        return <PrivacyComplianceDashboard />;
       case 'settings':
         return (
           <div className="p-4 space-y-4">
             <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Settings</h2>
             
-            {/* Profile Management */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Profile</h3>
-              <button
-                onClick={() => {
-                  localStorage.removeItem('onboardingCompleted');
-                  window.location.reload();
-                }}
-                className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
-                style={{ 
-                  backgroundColor: 'var(--soft-blue-dark)',
-                  color: 'white'
-                }}
-              >
-                Retake Personality Quiz
-              </button>
-            </div>
+            <div className="space-y-4">
+              <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Voice & Audio</h3>
+                <VoiceSelector
+                  selectedVoice={selectedReflectionVoice}
+                  onVoiceChange={(voice) => setSelectedReflectionVoice(voice)}
+                  audioEnabled={audioEnabled}
+                  onEnableAudio={enableAudio}
+                />
+              </div>
 
-            {/* Data Management */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
-              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Data Management</h3>
-              <div className="space-y-3">
+              <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Profile Management</h3>
                 <button
-                  onClick={(e) => {
-                    console.log('EMERGENCY FIX - Clear Chat button clicked');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setMessages([]);
-                  }}
-                  onTouchStart={(e) => {
-                    console.log('EMERGENCY FIX - Clear Chat button touched');
-                    e.stopPropagation();
-                  }}
-                  onTouchEnd={(e) => {
-                    console.log('EMERGENCY FIX - Clear Chat button touch end');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setMessages([]);
-                  }}
-                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm active:scale-95 transition-transform"
-                  style={{ 
-                    backgroundColor: '#F59E0B',
-                    color: 'white',
-                    touchAction: 'manipulation',
-                    userSelect: 'none',
-                    WebkitTapHighlightColor: 'transparent',
-                    cursor: 'pointer'
-                  }}
+                  onClick={() => setShowOnboarding(true)}
+                  className="w-full p-3 rounded-lg text-left transition-colors"
+                  style={{ backgroundColor: 'var(--pale-green)', color: 'var(--text-primary)' }}
                 >
-                  Clear Chat History
+                  <div className="flex items-center space-x-3">
+                    <User className="w-5 h-5" />
+                    <div>
+                      <div className="font-medium">Retake Personality Quiz</div>
+                      <div className="text-sm opacity-75">Update your personality profile</div>
+                    </div>
+                  </div>
                 </button>
-                <div
-                  onClick={async (e) => {
-                    console.log('EMERGENCY FIX - Reset Bot DIV clicked');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    try {
-                      const response = await axios.post('/api/clear-memories', { userId: 1 });
-                      console.log('API Response:', response.status);
+              </div>
+
+              <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Data Management</h3>
+                <button
+                  onClick={() => {
+                    if (confirm('This will clear all conversation history. Continue?')) {
                       setMessages([]);
-                      
-                      // Refresh bot stats after reset
-                      try {
-                        const statsRes = await axios.get('/api/stats?userId=1');
-                        setBotStats({
-                          level: statsRes.data.stage === 'Infant' ? 1 : 
-                                 statsRes.data.stage === 'Toddler' ? 2 : 
-                                 statsRes.data.stage === 'Child' ? 3 : 
-                                 statsRes.data.stage === 'Adolescent' ? 4 : 
-                                 statsRes.data.stage === 'Therapist' ? 3 : 5,
-                          stage: statsRes.data.stage,
-                          wordsLearned: statsRes.data.wordCount
-                        });
-                        console.log('Bot stats refreshed after reset');
-                      } catch (statsError) {
-                        console.error('Failed to refresh stats:', statsError);
-                        // Set default reset values if stats fetch fails
-                        setBotStats({ level: 3, stage: 'Therapist', wordsLearned: 1000 });
-                      }
-                      
-                      console.log('Messages cleared, bot memory reset successful');
-                      alert('Bot memory has been reset successfully!');
-                    } catch (error) {
-                      console.error('Failed to clear memories:', error);
-                      alert('Failed to reset bot memory. Check console for details.');
+                      localStorage.clear();
                     }
                   }}
-                  onMouseDown={() => console.log('EMERGENCY FIX - Reset Bot mousedown')}
-                  onMouseUp={() => console.log('EMERGENCY FIX - Reset Bot mouseup')}
-                  onTouchStart={(e) => {
-                    console.log('EMERGENCY FIX - Reset Bot touch start');
-                    e.stopPropagation();
-                  }}
-                  onTouchEnd={async (e) => {
-                    console.log('EMERGENCY FIX - Reset Bot touch end');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    try {
-                      const response = await axios.post('/api/clear-memories', { userId: 1 });
-                      console.log('API Response via touch:', response.status);
-                      setMessages([]);
-                      
-                      // Refresh bot stats after reset
-                      try {
-                        const statsRes = await axios.get('/api/stats?userId=1');
-                        setBotStats({
-                          level: statsRes.data.stage === 'Infant' ? 1 : 
-                                 statsRes.data.stage === 'Toddler' ? 2 : 
-                                 statsRes.data.stage === 'Child' ? 3 : 
-                                 statsRes.data.stage === 'Adolescent' ? 4 : 
-                                 statsRes.data.stage === 'Therapist' ? 3 : 5,
-                          stage: statsRes.data.stage,
-                          wordsLearned: statsRes.data.wordCount
-                        });
-                        console.log('Bot stats refreshed after reset via touch');
-                      } catch (statsError) {
-                        console.error('Failed to refresh stats via touch:', statsError);
-                        setBotStats({ level: 3, stage: 'Therapist', wordsLearned: 1000 });
-                      }
-                      
-                      console.log('Messages cleared via touch, bot memory reset successful');
-                      alert('Bot memory has been reset successfully via touch!');
-                    } catch (error) {
-                      console.error('Failed to clear memories via touch:', error);
-                      alert('Failed to reset bot memory via touch. Check console for details.');
-                    }
-                  }}
-                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm active:scale-95 transition-transform cursor-pointer select-none"
-                  style={{ 
-                    backgroundColor: '#EF4444',
-                    color: 'white',
-                    touchAction: 'manipulation',
-                    userSelect: 'none',
-                    WebkitTapHighlightColor: 'transparent',
-                    cursor: 'pointer',
-                    border: 'none',
-                    outline: 'none'
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      console.log('EMERGENCY FIX - Reset Bot key pressed');
-                      e.preventDefault();
-                      e.stopPropagation();
-                      // Trigger click
-                      (e.target as HTMLElement).click();
-                    }
-                  }}
+                  className="w-full p-3 rounded-lg text-left transition-colors"
+                  style={{ backgroundColor: 'var(--gentle-lavender)', color: 'var(--text-primary)' }}
                 >
-                  Reset Bot Memory
+                  <div className="flex items-center space-x-3">
+                    <Target className="w-5 h-5" />
+                    <div>
+                      <div className="font-medium">Clear Data</div>
+                      <div className="text-sm opacity-75">Reset conversations and preferences</div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>App Information</h3>
+                <div className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <p><strong>Version:</strong> 1.0.0</p>
+                  <p><strong>Build:</strong> Therapeutic AI Assistant</p>
+                  <p><strong>Last Updated:</strong> {new Date().toLocaleDateString()}</p>
                 </div>
               </div>
-            </div>
-
-            {/* App Information */}
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
-              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>About TraI</h3>
-              <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
-                Your AI companion for mental wellness and self-reflection.
-              </p>
-              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                Version 2.0 - Enhanced with crisis detection and emotional intelligence
-              </p>
             </div>
           </div>
         );
 
       default:
         return (
-          <div className="flex flex-col h-full">
-            {/* Mobile-Optimized Dashboard Home */}
-            <div className="flex-1 overflow-y-auto">
-              <DashboardHome 
-                botStats={botStats} 
-                goals={goals} 
-                dailyReflection={dailyReflection}
-                onNavigate={handleSectionChange}
-              />
-            </div>
-          </div>
+          <DashboardHome 
+            botStats={botStats}
+            goals={goals}
+            dailyReflection={dailyReflection}
+            onNavigate={handleSectionChange}
+          />
         );
     }
   };
 
-  // Show onboarding if needed
   if (showOnboarding) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <OnboardingQuiz 
-          userId={1} 
-          onComplete={() => {
-            setShowOnboarding(false);
-            localStorage.setItem('onboardingCompleted', 'true');
-          }} 
-        />
-      </QueryClientProvider>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--surface-primary)' }}>
+        <OnboardingQuiz onComplete={() => setShowOnboarding(false)} />
+      </div>
     );
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--soft-blue)' }}>
-        {/* Mobile Header */}
-        <div className="flex items-center justify-between p-4 bg-white shadow-sm">
-          <div className="flex items-center">
-            <img src={traiLogo} alt="TrAI Logo" className="w-8 h-8 mr-3" />
-            <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>TraI</h1>
-          </div>
-          <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
-            Level {botStats?.level || 1}
-          </div>
-        </div>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--surface-primary)' }}>
+      <div className="flex-1 overflow-hidden">
+        {renderActiveSection()}
+      </div>
 
-        {/* Mobile Content */}
-        <div className="mobile-scroll-container">
-          <div className="mobile-content">
-            {renderActiveSection()}
-          </div>
-        </div>
-
-        {/* Mobile Chat Input - Always visible and floating */}
-        <div className="fixed bottom-20 left-0 right-0 bg-white shadow-lg z-50 border-t mobile-input-shift" style={{ borderColor: 'var(--gentle-lavender-dark)' }}>
-          {/* Voice Selector */}
-          <div className="px-2 pt-2 pb-1 mobile-voice-shift">
-            <select
-              value={selectedReflectionVoice}
-              onChange={(e) => setSelectedReflectionVoice(e.target.value)}
-              className="w-full px-2 py-1 bg-white border rounded-lg text-xs font-medium"
+      {/* Enhanced Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <div className="grid grid-cols-4 border-t" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--gentle-lavender-dark)' }}>
+          {/* Therapy Category */}
+          <div className="p-2">
+            <button
+              onClick={() => setActiveSection('chat')}
+              className={`w-full p-3 rounded-xl transition-all text-center ${
+                activeSection === 'chat' ? 'scale-105' : ''
+              }`}
               style={{ 
-                borderColor: 'var(--gentle-lavender-dark)', 
-                color: 'var(--text-primary)',
-                backgroundColor: 'var(--surface-secondary)'
+                backgroundColor: activeSection === 'chat' ? 'var(--soft-blue-dark)' : 'transparent',
+                color: activeSection === 'chat' ? 'white' : 'var(--text-primary)'
               }}
             >
-              {voiceOptions.map(voice => (
-                <option key={voice.id} value={voice.id}>
-                  {voice.name} - {voice.description}
-                </option>
-              ))}
-            </select>
+              <MessageCircle className="w-5 h-5 mx-auto mb-1" />
+              <span className="text-xs font-medium">Therapy</span>
+            </button>
           </div>
-          
-          {/* Input Area */}
-          <div className="flex items-stretch gap-1 pl-0 pr-1 pb-3">
-            <div className="flex-1 flex">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Share your thoughts..."
-                className="w-full p-2 text-sm rounded-l-lg border-r-0 border focus:outline-none focus:ring-0"
-                style={{ 
-                  borderColor: 'var(--gentle-lavender-dark)',
-                  backgroundColor: 'var(--surface-secondary)',
-                  color: 'var(--text-primary)'
-                }}
-              />
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`px-3 border-l-0 border border-r-0 bg-blue-100 flex items-center justify-center transition-all ${
-                  isRecording ? 'animate-pulse bg-red-500' : ''
-                }`}
-                style={{ 
-                  borderColor: 'var(--gentle-lavender-dark)',
-                  backgroundColor: isRecording ? '#EF4444' : '#E0F2FE',
-                  color: isRecording ? 'white' : '#0369A1'
-                }}
-                title={isRecording ? "Stop Recording" : "Start Voice Recording"}
-              >
-                {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-              </button>
-              <button
-                onClick={sendMessage}
-                disabled={!input.trim() || loading}
-                className="px-3 rounded-r-lg border transition-all disabled:opacity-50"
-                style={{ 
-                  backgroundColor: '#4F46E5',
-                  borderColor: '#4338CA',
-                  color: 'white'
-                }}
-                title="Send Message"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
+
+          {/* Wellness Category */}
+          <div className="p-2">
+            <button
+              onClick={() => setActiveSection('mood')}
+              className={`w-full p-3 rounded-xl transition-all text-center ${
+                activeSection === 'mood' ? 'scale-105' : ''
+              }`}
+              style={{ 
+                backgroundColor: activeSection === 'mood' ? 'var(--soft-blue-dark)' : 'transparent',
+                color: activeSection === 'mood' ? 'white' : 'var(--text-primary)'
+              }}
+            >
+              <Heart className="w-5 h-5 mx-auto mb-1" />
+              <span className="text-xs font-medium">Wellness</span>
+            </button>
+          </div>
+
+          {/* Community Category */}
+          <div className="p-2">
+            <button
+              onClick={() => setActiveSection('journal')}
+              className={`w-full p-3 rounded-xl transition-all text-center ${
+                activeSection === 'journal' ? 'scale-105' : ''
+              }`}
+              style={{ 
+                backgroundColor: activeSection === 'journal' ? 'var(--soft-blue-dark)' : 'transparent',
+                color: activeSection === 'journal' ? 'white' : 'var(--text-primary)'
+              }}
+            >
+              <FileText className="w-5 h-5 mx-auto mb-1" />
+              <span className="text-xs font-medium">Journal</span>
+            </button>
+          </div>
+
+          {/* Advanced Category */}
+          <div className="p-2">
+            <button
+              onClick={() => setActiveSection('reflect')}
+              className={`w-full p-3 rounded-xl transition-all text-center ${
+                activeSection === 'reflect' ? 'scale-105' : ''
+              }`}
+              style={{ 
+                backgroundColor: activeSection === 'reflect' ? 'var(--soft-blue-dark)' : 'transparent',
+                color: activeSection === 'reflect' ? 'white' : 'var(--text-primary)'
+              }}
+            >
+              <Brain className="w-5 h-5 mx-auto mb-1" />
+              <span className="text-xs font-medium">Insights</span>
+            </button>
           </div>
         </div>
-
-        {/* Mobile Bottom Navigation - Grouped categories */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg mobile-nav z-50" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
-          {/* Category Tabs */}
-          <div className="flex border-b" style={{ borderColor: 'var(--gentle-lavender)' }}>
-            {navigationCategories.map((category) => {
-              const CategoryIcon = category.icon;
-              const isActiveCategory = selectedCategory === category.id;
-              return (
-                <button
-                  key={category.id}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('EMERGENCY FIX - Category button clicked:', category.id);
-                    setSelectedCategory(category.id);
-                  }}
-                  className="flex-1 flex flex-col items-center py-2 px-1 transition-all"
-                  style={{
-                    backgroundColor: isActiveCategory ? 'var(--soft-blue-light)' : 'transparent',
-                    color: isActiveCategory ? category.color : 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    touchAction: 'manipulation',
-                    border: 'none',
-                    outline: 'none'
-                  }}
-                >
-                  <CategoryIcon className="w-5 h-5 mb-1" />
-                  <span className="text-xs font-medium">{category.label}</span>
-                </button>
-              );
-            })}
-          </div>
-          
-          {/* Section Buttons for Selected Category */}
-          <div className="flex justify-center py-2 px-2">
-            <div className="flex w-full max-w-7xl">
-              {getCurrentSections().map((section) => {
-                const IconComponent = section.icon;
-                const isActive = activeSection === section.id;
-                return (
-                  <button
-                    key={section.id}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('EMERGENCY FIX - Button clicked:', section.id);
-                      handleDirectNavigation(section.id);
-                    }}
-                    className="flex-1 flex flex-col items-center py-2 px-2 rounded-xl transition-all mx-1"
-                    style={{
-                      backgroundColor: isActive ? 'var(--soft-blue-light)' : 'transparent',
-                      color: isActive ? 'var(--soft-blue-dark)' : 'var(--text-secondary)',
-                      minWidth: '0',
-                      cursor: 'pointer',
-                      touchAction: 'manipulation',
-                      border: 'none',
-                      outline: 'none'
-                    }}
-                  >
-                    <IconComponent className="w-6 h-6 mb-1 flex-shrink-0" />
-                    <span className="text-xs font-medium truncate w-full text-center">{section.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Crisis Alert Modal */}
-        {showCrisisAlert && crisisAlert && (
-          <CrisisAlert
-            crisisAnalysis={crisisAlert}
-            onClose={() => setShowCrisisAlert(false)}
-            onGetHelp={() => {
-              // Open mental health resources or crisis support
-              window.open('https://www.mentalhealth.gov/get-help/immediate-help', '_blank');
-              setShowCrisisAlert(false);
-            }}
-          />
-        )}
       </div>
-    </QueryClientProvider>
+
+      {/* Crisis Alert Modal */}
+      {showCrisisAlert && crisisAlert && (
+        <CrisisAlert
+          alert={crisisAlert}
+          onClose={() => setShowCrisisAlert(false)}
+        />
+      )}
+    </div>
   );
-};
+}
 
 export default function App() {
-  return <AppLayout />;
+  const queryClient = new QueryClient();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppLayout />
+    </QueryClientProvider>
+  );
 }
