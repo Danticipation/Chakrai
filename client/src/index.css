@@ -4,25 +4,27 @@
 
 :root {
   /* Therapeutic Color Palette */
-  --soft-blue: #0e1525;      /* Main calming background */
-  --pale-green: #1c2333;     /* Accent for success/wellness */
-  --gentle-lavender: #1c2333; /* Accent for highlights */
+  --soft-blue: #ADD8E6;      /* Main calming background */
+  --pale-green: #98FB98;     /* Accent for success/wellness */
+  --gentle-lavender: #E6E6FA; /* Accent for highlights */
   
   /* Derived therapeutic colors */
-  --soft-blue-dark: #90feec;
-  --soft-blue-light: #1c2333;
-  --pale-green-dark: #1c2333;;
-  --gentle-lavender-dark: #fff700;
+  --soft-blue-dark: #4682B4;
+  --soft-blue-light: #E0F6FF;
+  --pale-green-dark: #32CD32;
+  --pale-green-light: #F0FFF0;
+  --gentle-lavender-dark: #9370DB;
+  --gentle-lavender-light: #F8F8FF;
   
   /* Text colors for therapeutic design */
-  --text-primary: #ffffff;    /* Calm dark blue-grey */
-  --text-secondary: #ffffff;  /* Medium blue-grey */
-  --text-muted: #ff0000;      /* Light blue-grey */
+  --text-primary: #2C3E50;    /* Calm dark blue-grey */
+  --text-secondary: #5D6D7E;  /* Medium blue-grey */
+  --text-muted: #85929E;      /* Light blue-grey */
   
   /* Surface colors */
-  --surface-primary: #ff0000;   /* Very light blue-white */
-  --surface-secondary: #ff0000; /* Light blue-grey */
-  --surface-elevated: #ff0000;  /* Pure white for cards */
+  --surface-primary: #FFFFFF;   /* Pure white */
+  --surface-secondary: #F8F9FA; /* Light grey-white */
+  --surface-elevated: #FFFFFF;  /* Pure white for cards */
 }
 
 body {

@@ -20,6 +20,163 @@ import PrivacyComplianceDashboard from './components/PrivacyComplianceDashboard'
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
+// DashboardHome Component - Mobile-optimized home dashboard
+interface DashboardHomeProps {
+  botStats: BotStats | null;
+  goals: Goal[];
+  dailyReflection: string;
+  onNavigate: (section: string) => void;
+}
+
+const DashboardHome: React.FC<DashboardHomeProps> = ({ botStats, goals, dailyReflection, onNavigate }) => {
+  return (
+    <div className="p-4 space-y-4 pb-32">
+      {/* Welcome Header */}
+      <div className="text-center mb-6">
+        <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+          <img src={traiLogo} alt="TrAI Logo" className="w-12 h-12" />
+        </div>
+        <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Welcome to TrAI</h1>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          "Reflect. Refine. Rise."
+        </p>
+      </div>
+
+      {/* Progress Overview Cards */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--pale-green)' }}>
+          <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
+            {botStats?.level || 1}
+          </div>
+          <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Current Level</div>
+          <div className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+            {botStats?.stage || 'Infant'}
+          </div>
+        </div>
+        
+        <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+          <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
+            {botStats?.wordsLearned || 0}
+          </div>
+          <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Words Learned</div>
+          <div className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+            Growing vocabulary
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Goals Overview */}
+      <div className="rounded-2xl p-4 mb-6" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+        <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Today's Goals</h3>
+        <div className="space-y-3">
+          {goals.slice(0, 3).map((goal) => {
+            const percentage = Math.round((goal.current / goal.target) * 100);
+            return (
+              <div key={goal.id} className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                      {goal.name}
+                    </span>
+                    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {goal.current}/{goal.target}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${Math.min(percentage, 100)}%`,
+                        backgroundColor: goal.color === 'blue' ? 'var(--soft-blue-dark)' : 
+                                       goal.color === 'green' ? 'var(--pale-green-dark)' : 
+                                       'var(--gentle-lavender-dark)'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <button
+          onClick={() => onNavigate('progress')}
+          className="w-full mt-3 px-4 py-2 rounded-xl text-sm font-medium"
+          style={{ 
+            backgroundColor: 'var(--soft-blue-dark)',
+            color: 'white'
+          }}
+        >
+          View All Goals
+        </button>
+      </div>
+
+      {/* Quick Actions Grid */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <button
+          onClick={() => onNavigate('chat')}
+          className="rounded-2xl p-4 text-left transition-all"
+          style={{ backgroundColor: 'var(--soft-blue-light)' }}
+        >
+          <MessageCircle className="w-8 h-8 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
+          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Start Chat</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Begin conversation</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate('mood')}
+          className="rounded-2xl p-4 text-left transition-all"
+          style={{ backgroundColor: 'var(--pale-green-light)' }}
+        >
+          <Heart className="w-8 h-8 mb-2" style={{ color: 'var(--pale-green-dark)' }} />
+          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Track Mood</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>How are you feeling?</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate('journal')}
+          className="rounded-2xl p-4 text-left transition-all"
+          style={{ backgroundColor: 'var(--gentle-lavender-light)' }}
+        >
+          <FileText className="w-8 h-8 mb-2" style={{ color: 'var(--gentle-lavender-dark)' }} />
+          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Journal</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Write your thoughts</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate('daily')}
+          className="rounded-2xl p-4 text-left transition-all"
+          style={{ backgroundColor: 'var(--soft-blue-light)' }}
+        >
+          <Sun className="w-8 h-8 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
+          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Daily</div>
+          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Inspiration & horoscope</div>
+        </button>
+      </div>
+
+      {/* Daily Reflection */}
+      <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+        <div className="flex items-center mb-3">
+          <Brain className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
+          <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Reflection</h3>
+        </div>
+        <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
+          {dailyReflection}
+        </p>
+        <button
+          onClick={() => onNavigate('reflect')}
+          className="w-full px-4 py-2 rounded-xl text-sm font-medium"
+          style={{ 
+            backgroundColor: 'var(--gentle-lavender-dark)',
+            color: 'white'
+          }}
+        >
+          View Full Reflection
+        </button>
+      </div>
+    </div>
+  );
+};
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -91,25 +248,67 @@ const AppLayout = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
-  const sections = [
-    { id: 'chat', icon: MessageCircle, label: 'Chat' },
-    { id: 'daily', icon: Sun, label: 'Daily' },
-    { id: 'journal', icon: FileText, label: 'Journal' },
-    { id: 'therapist', icon: UserCheck, label: 'Therapist' },
-    { id: 'community', icon: Users, label: 'Community' },
-    { id: 'achievements', icon: Award, label: 'Achievements' },
-    { id: 'wellness-rewards', icon: Gift, label: 'Rewards' },
-    { id: 'health', icon: Activity, label: 'Health' },
-    { id: 'vr-therapy', icon: Headphones, label: 'VR Therapy' },
-    { id: 'emotional-intelligence', icon: Zap, label: 'AI Intelligence' },
-    { id: 'ai-monitoring', icon: Shield, label: 'AI Monitor' },
-    { id: 'privacy', icon: Lock, label: 'Privacy' },
-    { id: 'reflect', icon: Brain, label: 'Reflect' },
-    { id: 'memory', icon: BookOpen, label: 'Memory' },
-    { id: 'mood', icon: Heart, label: 'Mood' },
-    { id: 'progress', icon: Target, label: 'Progress' },
-    { id: 'settings', icon: User, label: 'Settings' }
+  // Grouped navigation categories for better mobile UX
+  const navigationCategories = [
+    {
+      id: 'therapy',
+      label: 'Therapy',
+      icon: MessageCircle,
+      color: 'var(--soft-blue-dark)',
+      sections: [
+        { id: 'chat', icon: MessageCircle, label: 'Chat' },
+        { id: 'mood', icon: Heart, label: 'Mood' },
+        { id: 'journal', icon: FileText, label: 'Journal' },
+        { id: 'therapist', icon: UserCheck, label: 'Therapist' }
+      ]
+    },
+    {
+      id: 'wellness',
+      label: 'Wellness',
+      icon: Sun,
+      color: 'var(--pale-green-dark)',
+      sections: [
+        { id: 'daily', icon: Sun, label: 'Daily' },
+        { id: 'vr-therapy', icon: Headphones, label: 'VR Therapy' },
+        { id: 'health', icon: Activity, label: 'Health' },
+        { id: 'reflect', icon: Brain, label: 'Reflect' }
+      ]
+    },
+    {
+      id: 'community',
+      label: 'Community',
+      icon: Users,
+      color: 'var(--gentle-lavender-dark)',
+      sections: [
+        { id: 'community', icon: Users, label: 'Community' },
+        { id: 'achievements', icon: Award, label: 'Achievements' },
+        { id: 'wellness-rewards', icon: Gift, label: 'Rewards' },
+        { id: 'progress', icon: Target, label: 'Progress' }
+      ]
+    },
+    {
+      id: 'advanced',
+      label: 'Advanced',
+      icon: Zap,
+      color: 'var(--soft-blue-dark)',
+      sections: [
+        { id: 'emotional-intelligence', icon: Zap, label: 'AI Intelligence' },
+        { id: 'ai-monitoring', icon: Shield, label: 'AI Monitor' },
+        { id: 'privacy', icon: Lock, label: 'Privacy' },
+        { id: 'memory', icon: BookOpen, label: 'Memory' },
+        { id: 'settings', icon: User, label: 'Settings' }
+      ]
+    }
   ];
+
+  const [selectedCategory, setSelectedCategory] = useState('therapy');
+  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+
+  // Get current sections from selected category
+  const getCurrentSections = () => {
+    const category = navigationCategories.find(cat => cat.id === selectedCategory);
+    return category ? category.sections : navigationCategories[0].sections;
+  };
 
   const voiceOptions = [
     { id: 'EkK5I93UQWFDigLMpZcX', name: 'James', description: 'Professional male voice', gender: 'Male', default: true },
@@ -928,25 +1127,14 @@ const AppLayout = () => {
       default:
         return (
           <div className="flex flex-col h-full">
-            {/* Compact Welcome Section for Mobile */}
-            <div className="p-3 text-center mobile-welcome-shift" style={{ backgroundColor: 'var(--soft-blue)' }}>
-              <div className="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                <img src={traiLogo} alt="TrAI Logo" className="w-8 h-8" />
-              </div>
-              <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>TrAI</h2>
-              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                "Reflect. Refine. Rise."
-              </p>
-            </div>
-
-            {/* Default Content */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              <div className="text-center py-8">
-                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Welcome to TrAI</h3>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Select a section from the navigation below to get started with your mental wellness journey.
-                </p>
-              </div>
+            {/* Mobile-Optimized Dashboard Home */}
+            <div className="flex-1 overflow-y-auto">
+              <DashboardHome 
+                botStats={botStats} 
+                goals={goals} 
+                dailyReflection={dailyReflection}
+                onNavigate={setActiveSection}
+              />
             </div>
           </div>
         );
@@ -1058,26 +1246,48 @@ const AppLayout = () => {
           </div>
         </div>
 
-        {/* Mobile Bottom Navigation - Fixed position */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg mobile-nav z-50 mobile-nav-shift" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
+        {/* Mobile Bottom Navigation - Grouped categories */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg mobile-nav z-50" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
+          {/* Category Tabs */}
+          <div className="flex border-b" style={{ borderColor: 'var(--gentle-lavender)' }}>
+            {navigationCategories.map((category) => {
+              const CategoryIcon = category.icon;
+              const isActiveCategory = selectedCategory === category.id;
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className="flex-1 flex flex-col items-center py-2 px-1 transition-all"
+                  style={{
+                    backgroundColor: isActiveCategory ? 'var(--soft-blue-light)' : 'transparent',
+                    color: isActiveCategory ? category.color : 'var(--text-secondary)'
+                  }}
+                >
+                  <CategoryIcon className="w-5 h-5 mb-1" />
+                  <span className="text-xs font-medium">{category.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          
+          {/* Section Buttons for Selected Category */}
           <div className="flex justify-center py-2 px-2">
             <div className="flex w-full max-w-7xl">
-              {sections.map((section) => {
+              {getCurrentSections().map((section) => {
                 const IconComponent = section.icon;
                 const isActive = activeSection === section.id;
                 return (
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className="flex-1 flex flex-col items-center py-2 px-2 rounded-x1 transition-all mx-1"
+                    className="flex-1 flex flex-col items-center py-2 px-2 rounded-xl transition-all mx-1"
                     style={{
                       backgroundColor: isActive ? 'var(--soft-blue-light)' : 'transparent',
                       color: isActive ? 'var(--soft-blue-dark)' : 'var(--text-secondary)',
-                      minWidth: '0',
-                      maxWidth: '80px'
+                      minWidth: '0'
                     }}
                   >
-                    <IconComponent className="w-7 h-7 mb-1 flex-shrink-0" />
+                    <IconComponent className="w-6 h-6 mb-1 flex-shrink-0" />
                     <span className="text-xs font-medium truncate w-full text-center">{section.label}</span>
                   </button>
                 );
