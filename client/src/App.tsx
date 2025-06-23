@@ -1202,7 +1202,7 @@ const AppLayout = () => {
       case 'vr-therapy':
         return (
           <div className="h-full">
-            <VRTherapyDashboard userId={1} />
+            <VRTherapyDashboard />
           </div>
         );
 
@@ -1237,14 +1237,14 @@ const AppLayout = () => {
       case 'memory':
         return (
           <div className="p-4">
-            <MemoryDashboard userId={1} />
+            <MemoryDashboard />
           </div>
         );
 
       case 'mood':
         return (
           <div className="p-4">
-            <MoodTracker userId={1} />
+            <MoodTracker />
           </div>
         );
 
@@ -1329,7 +1329,7 @@ const AppLayout = () => {
             {/* Voice Selection - Mobile optimized */}
             <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
               <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Voice Selection</h3>
-              <VoiceSelector userId={1} onVoiceChange={() => {}} />
+              <VoiceSelector onVoiceChange={() => {}} />
             </div>
           </div>
         );
