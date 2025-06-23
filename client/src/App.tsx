@@ -219,6 +219,7 @@ const AppLayout = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [weeklySummary, setWeeklySummary] = useState<string>('');
+  const [personalityInsights, setPersonalityInsights] = useState<any>(null);
   const [showReflection, setShowReflection] = useState(false);
   const [showMemory, setShowMemory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -364,6 +365,16 @@ const AppLayout = () => {
     axios.get('/api/weekly-summary?userId=1')
       .then(res => setWeeklySummary(res.data.summary))
       .catch(() => setWeeklySummary('No reflection available yet. Start chatting to build your weekly summary!'));
+
+    // Load personality insights for reflection tab
+    axios.get('/api/personality-insights?userId=1')
+      .then(res => setPersonalityInsights(res.data))
+      .catch(() => setPersonalityInsights({
+        insights: ["I'm still learning about you through our conversations.", "Share more about yourself so I can provide better insights."],
+        traits: [],
+        communicationStyle: "Getting to know you",
+        interests: []
+      }));
 
     // Load saved zodiac preference
     const savedZodiacSign = localStorage.getItem('userZodiacSign') || '';
@@ -1013,24 +1024,74 @@ const AppLayout = () => {
         return (
           <div className="p-4">
             <div className="mb-4">
-              <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Daily Reflection</h2>
+              <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Personality Insights</h2>
               <button
-                onClick={readReflection}
-                disabled={!weeklySummary}
-                className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm disabled:opacity-50"
+                onClick={() => {
+                  // Refresh personality insights
+                  axios.get('/api/personality-insights?userId=1')
+                    .then(res => setPersonalityInsights(res.data))
+                    .catch(() => {});
+                }}
+                className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
                 style={{ 
                   backgroundColor: 'var(--soft-blue-dark)',
                   color: 'white'
                 }}
               >
-                🔊 Listen to Reflection
+                🔄 Refresh Insights
               </button>
             </div>
 
             <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <div className="whitespace-pre-wrap text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
-                {weeklySummary}
-              </div>
+              {personalityInsights ? (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Communication Style</h3>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{personalityInsights.communicationStyle}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Insights About You</h3>
+                    <div className="space-y-2">
+                      {personalityInsights.insights.map((insight, index) => (
+                        <p key={index} className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                          • {insight}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+
+                  {personalityInsights.traits.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Key Traits</h3>
+                      <div className="space-y-1">
+                        {personalityInsights.traits.map((trait, index) => (
+                          <p key={index} className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            • {trait}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {personalityInsights.interests.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Interests</h3>
+                      <div className="space-y-1">
+                        {personalityInsights.interests.map((interest, index) => (
+                          <p key={index} className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            • {interest}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Loading personality insights...</p>
+                </div>
+              )}
             </div>
           </div>
         );
