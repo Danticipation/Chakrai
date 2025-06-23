@@ -1182,7 +1182,7 @@ const AppLayout = () => {
                 botStats={botStats} 
                 goals={goals} 
                 dailyReflection={dailyReflection}
-                onNavigate={setActiveSection}
+                onNavigate={handleSectionChange}
               />
             </div>
           </div>
