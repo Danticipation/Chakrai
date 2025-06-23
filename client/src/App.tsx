@@ -571,17 +571,24 @@ const AppLayout = () => {
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.wav');
 
+      console.log('🚀 Sending audio to transcription service...');
+      
       const response = await axios.post('/api/transcribe', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
+      console.log('📨 Transcription response received:', response.data);
+      
       // Handle both successful transcriptions and graceful fallbacks
       if (response.data.text) {
+        console.log('✅ Setting transcribed text:', response.data.text);
         setInput(response.data.text);
         
         // If it's a fallback message, clear it after a moment so user can type
         if (response.data.fallback) {
+          console.log('⚠️ Fallback message detected, will clear in 3 seconds');
           setTimeout(() => {
+            console.log('🧹 Clearing fallback message');
             setInput('');
           }, 3000);
         }
