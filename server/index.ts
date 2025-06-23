@@ -869,10 +869,12 @@ app.post('/api/chat', async (req, res) => {
 
     // Send response immediately with crisis analysis data
     res.json({
-      response: botResponse,
+      message: botResponse,
+      response: botResponse, // Keep backward compatibility
       wordsLearned: totalWords,
       stage: stage,
-      crisisAnalysis: crisisAnalysis ? {
+      crisisDetected: crisisAnalysis && crisisAnalysis.riskLevel !== 'none',
+      crisisData: crisisAnalysis ? {
         riskLevel: crisisAnalysis.riskLevel,
         indicators: crisisAnalysis.indicators,
         supportMessage: crisisAnalysis.supportMessage,
