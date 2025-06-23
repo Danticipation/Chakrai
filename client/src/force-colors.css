@@ -63,7 +63,7 @@ div[style*="backgroundColor: 'var(--gentle-lavender')"] {
 
 /* Add personality to goal progress bars */
 div[style*="width:"] {
-  background: linear-gradient(90deg, #870d0d 0%, #000000 50%, #000000 100%) !important;
+  background: linear-gradient(90deg, #772737 0%, #279029 50%, #000000 100%) !important;
   border-radius: 25px !important;
   position: relative !important;
   overflow: hidden !important;

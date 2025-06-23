@@ -447,6 +447,7 @@ const AppLayout = () => {
 
   const startRecording = async () => {
     try {
+      // Request microphone permission
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
@@ -466,8 +467,25 @@ const AppLayout = () => {
 
       mediaRecorder.start();
       setIsRecording(true);
+      
+      // Auto-stop recording after 30 seconds
+      setTimeout(() => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          stopRecording();
+        }
+      }, 30000);
+      
     } catch (error) {
       console.error('Recording failed:', error);
+      
+      // Provide user-friendly error feedback
+      if ((error as any).name === 'NotAllowedError') {
+        setInput('Microphone access denied. Please allow microphone permission and try again.');
+      } else if ((error as any).name === 'NotFoundError') {
+        setInput('No microphone found. Please check your device and try again.');
+      } else {
+        setInput('Could not start recording. Please try again or type your message.');
+      }
     }
   };
 
@@ -480,6 +498,10 @@ const AppLayout = () => {
 
   const sendAudioToWhisper = async (audioBlob: Blob) => {
     try {
+      // Show loading state
+      setInput('Transcribing audio...');
+      setLoading(true);
+      
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.wav');
 
@@ -489,10 +511,19 @@ const AppLayout = () => {
 
       if (response.data.text) {
         setInput(response.data.text);
+      } else {
+        setInput('No speech detected. Please try again or type your message.');
       }
     } catch (error) {
       console.error('Transcription failed:', error);
-      setInput('Could not transcribe audio - please try again or type your message');
+      
+      if ((error as any).response?.status === 429) {
+        setInput('Transcription service is temporarily unavailable. Please type your message instead.');
+      } else {
+        setInput('Could not transcribe audio. Please try again or type your message.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -819,12 +850,12 @@ const AppLayout = () => {
                     }}
                   />
                   <button
-                    onClick={startRecording}
-                    disabled={isRecording}
+                    onClick={isRecording ? stopRecording : startRecording}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
                     style={{ 
                       backgroundColor: isRecording ? '#EF4444' : 'var(--soft-blue-dark)',
-                      color: 'white'
+                      color: 'white',
+                      animation: isRecording ? 'pulse 1s infinite' : 'none'
                     }}
                   >
                     <Mic className="w-4 h-4" />
