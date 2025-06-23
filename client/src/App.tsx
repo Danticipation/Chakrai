@@ -807,8 +807,8 @@ const AppLayout = () => {
                 <div className="flex-1 relative">
                   <input
                     type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                     placeholder="Share your thoughts..."
                     className="w-full px-4 py-3 pr-12 rounded-2xl border text-sm"
@@ -832,7 +832,7 @@ const AppLayout = () => {
                 </div>
                 <button
                   onClick={sendMessage}
-                  disabled={!inputMessage.trim() || loading}
+                  disabled={!input.trim() || loading}
                   className="p-3 rounded-2xl transition-all disabled:opacity-50"
                   style={{ 
                     backgroundColor: 'var(--soft-blue-dark)',
