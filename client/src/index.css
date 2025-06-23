@@ -25,6 +25,7 @@
   --surface-primary: #FFFFFF;   /* Pure white */
   --surface-secondary: #F8F9FA; /* Light grey-white */
   --surface-elevated: #FFFFFF;  /* Pure white for cards */
+  --surface-danger: #DC3545;    /* Red for dangerous actions */
 }
 
 body {

@@ -542,6 +542,28 @@ function AppLayout() {
     }
   };
 
+  const resetBot = async () => {
+    if (confirm('This will completely reset the bot and clear ALL data including your personality profile, memories, and conversation history. You will need to enter your name and retake the personality quiz. Continue?')) {
+      try {
+        // Clear server-side data
+        await axios.post('/api/clear-memories', { userId: 1 });
+        
+        // Clear client-side data
+        setMessages([]);
+        setPersonalityInsights(null);
+        setBotStats({ level: 1, stage: 'Infant', wordsLearned: 0 });
+        localStorage.clear();
+        
+        // Trigger onboarding flow
+        setShowOnboarding(true);
+        setActiveSection('home');
+      } catch (error) {
+        console.error('Bot reset failed:', error);
+        alert('Failed to reset bot. Please try again.');
+      }
+    }
+  };
+
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
   };
@@ -894,24 +916,40 @@ function AppLayout() {
 
               <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
                 <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Data Management</h3>
-                <button
-                  onClick={() => {
-                    if (confirm('This will clear all conversation history. Continue?')) {
-                      setMessages([]);
-                      localStorage.clear();
-                    }
-                  }}
-                  className="w-full p-3 rounded-lg text-left transition-colors"
-                  style={{ backgroundColor: 'var(--gentle-lavender)', color: 'var(--text-primary)' }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <Target className="w-5 h-5" />
-                    <div>
-                      <div className="font-medium">Clear Data</div>
-                      <div className="text-sm opacity-75">Reset conversations and preferences</div>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => {
+                      if (confirm('This will clear all conversation history. Continue?')) {
+                        setMessages([]);
+                        localStorage.clear();
+                      }
+                    }}
+                    className="w-full p-3 rounded-lg text-left transition-colors"
+                    style={{ backgroundColor: 'var(--gentle-lavender)', color: 'var(--text-primary)' }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Target className="w-5 h-5" />
+                      <div>
+                        <div className="font-medium">Clear Chat History</div>
+                        <div className="text-sm opacity-75">Clear conversations only</div>
+                      </div>
                     </div>
-                  </div>
-                </button>
+                  </button>
+                  
+                  <button
+                    onClick={resetBot}
+                    className="w-full p-3 rounded-lg text-left transition-colors"
+                    style={{ backgroundColor: 'var(--surface-danger)', color: 'white' }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <RotateCcw className="w-5 h-5" />
+                      <div>
+                        <div className="font-medium">Reset Bot Completely</div>
+                        <div className="text-sm opacity-75">Start fresh with new name and personality quiz</div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
               </div>
 
               <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
