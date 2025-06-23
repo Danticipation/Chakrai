@@ -284,6 +284,7 @@ const AppLayout = () => {
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const speechRecognitionRef = useRef<any>(null);
 
   // Grouped navigation categories for better mobile UX
   const navigationCategories = [
@@ -449,44 +450,82 @@ const AppLayout = () => {
     try {
       console.log('Starting speech recognition...');
       
-      // Use browser's built-in speech recognition for immediate transcription
+      // First ensure microphone permission
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (err) {
+        setInput('Microphone access denied. Please allow microphone access and try again.');
+        setTimeout(() => setInput(''), 3000);
+        return;
+      }
+      
+      // Use browser's built-in speech recognition
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         
-        recognition.continuous = false;
-        recognition.interimResults = false;
+        recognition.continuous = true;
+        recognition.interimResults = true;
         recognition.lang = 'en-US';
         recognition.maxAlternatives = 1;
         
         setIsRecording(true);
-        setInput('Listening...');
+        setInput('🎤 Speak now...');
+        
+        let finalTranscript = '';
+        let interimTranscript = '';
         
         recognition.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript;
-          console.log('Speech recognized:', transcript);
-          setInput(transcript);
-          setIsRecording(false);
+          interimTranscript = '';
+          
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+          
+          const displayText = finalTranscript + interimTranscript;
+          console.log('Speech recognized:', displayText);
+          setInput(displayText);
         };
         
         recognition.onerror = (event: any) => {
           console.log('Speech recognition error:', event.error);
-          setInput('');
+          
+          if (event.error === 'no-speech') {
+            setInput('No speech detected. Please speak clearly and try again.');
+          } else if (event.error === 'not-allowed') {
+            setInput('Microphone access denied. Please allow microphone access.');
+          } else {
+            setInput('Speech recognition failed. Please try typing instead.');
+          }
+          
+          setTimeout(() => setInput(''), 3000);
           setIsRecording(false);
         };
         
         recognition.onend = () => {
+          console.log('Speech recognition ended');
           setIsRecording(false);
+          
+          // Keep the final transcript in the input
+          if (finalTranscript.trim()) {
+            setInput(finalTranscript.trim());
+          }
         };
         
         recognition.start();
         
-        // Auto-stop after 10 seconds
+        // Auto-stop after 8 seconds
         setTimeout(() => {
-          if (recognition) {
+          if (recognition && isRecording) {
             recognition.stop();
           }
-        }, 10000);
+        }, 8000);
         
         return;
       }
