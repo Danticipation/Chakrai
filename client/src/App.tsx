@@ -1372,6 +1372,25 @@ const AppLayout = () => {
                       const response = await axios.post('/api/clear-memories', { userId: 1 });
                       console.log('API Response:', response.status);
                       setMessages([]);
+                      
+                      // Refresh bot stats after reset
+                      try {
+                        const statsRes = await axios.get('/api/stats?userId=1');
+                        setBotStats({
+                          level: statsRes.data.stage === 'Infant' ? 1 : 
+                                 statsRes.data.stage === 'Toddler' ? 2 : 
+                                 statsRes.data.stage === 'Child' ? 3 : 
+                                 statsRes.data.stage === 'Adolescent' ? 4 : 5,
+                          stage: statsRes.data.stage,
+                          wordsLearned: statsRes.data.wordCount
+                        });
+                        console.log('Bot stats refreshed after reset');
+                      } catch (statsError) {
+                        console.error('Failed to refresh stats:', statsError);
+                        // Set default reset values if stats fetch fails
+                        setBotStats({ level: 1, stage: 'Infant', wordsLearned: 0 });
+                      }
+                      
                       console.log('Messages cleared, bot memory reset successful');
                       alert('Bot memory has been reset successfully!');
                     } catch (error) {
@@ -1393,6 +1412,24 @@ const AppLayout = () => {
                       const response = await axios.post('/api/clear-memories', { userId: 1 });
                       console.log('API Response via touch:', response.status);
                       setMessages([]);
+                      
+                      // Refresh bot stats after reset
+                      try {
+                        const statsRes = await axios.get('/api/stats?userId=1');
+                        setBotStats({
+                          level: statsRes.data.stage === 'Infant' ? 1 : 
+                                 statsRes.data.stage === 'Toddler' ? 2 : 
+                                 statsRes.data.stage === 'Child' ? 3 : 
+                                 statsRes.data.stage === 'Adolescent' ? 4 : 5,
+                          stage: statsRes.data.stage,
+                          wordsLearned: statsRes.data.wordCount
+                        });
+                        console.log('Bot stats refreshed after reset via touch');
+                      } catch (statsError) {
+                        console.error('Failed to refresh stats via touch:', statsError);
+                        setBotStats({ level: 1, stage: 'Infant', wordsLearned: 0 });
+                      }
+                      
                       console.log('Messages cleared via touch, bot memory reset successful');
                       alert('Bot memory has been reset successfully via touch!');
                     } catch (error) {
