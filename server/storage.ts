@@ -96,6 +96,7 @@ export interface IStorage {
   getUserFacts(userId: number): Promise<UserFact[]>;
   createUserFact(fact: InsertUserFact): Promise<UserFact>;
   clearUserFacts(userId: number): Promise<void>;
+  resetBotStats(userId: number): Promise<void>;
 
   // Mood tracking methods
   getMoodEntries(userId: number, limit?: number): Promise<MoodEntry[]>;
@@ -389,6 +390,29 @@ export class DatabaseStorage implements IStorage {
 
   async clearUserFacts(userId: number): Promise<void> {
     await db.delete(userFacts).where(eq(userFacts.userId, userId));
+  }
+
+  async resetBotStats(userId: number): Promise<void> {
+    // Reset bot to initial stats: Level 1, Infant stage, 0 words learned
+    const [bot] = await db.select().from(bots).where(eq(bots.userId, userId));
+    if (bot) {
+      await db.update(bots)
+        .set({
+          level: 1,
+          stage: 'Infant',
+          wordsLearned: 0
+        })
+        .where(eq(bots.userId, userId));
+    }
+    
+    // Clear learned words
+    await db.delete(learnedWords).where(eq(learnedWords.botId, bot?.id || 0));
+    
+    // Clear milestones
+    await db.delete(milestones).where(eq(milestones.botId, bot?.id || 0));
+    
+    // Clear messages
+    await db.delete(messages).where(eq(messages.botId, bot?.id || 0));
   }
 
   // Mood tracking methods

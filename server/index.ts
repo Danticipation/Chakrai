@@ -2084,6 +2084,27 @@ app.get('/api/personalization/wellness-insights/:userId', async (req, res) => {
   }
 });
 
+// Clear bot memory and reset stats
+app.post('/api/clear-memories', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    console.log('Clearing memories for user:', userId);
+    
+    // Clear all user memories, facts, and conversation history
+    await storage.clearUserMemories(userId);
+    await storage.clearUserFacts(userId);
+    
+    // Reset bot stats to initial values
+    await storage.resetBotStats(userId);
+    
+    console.log('Bot memory cleared successfully for user:', userId);
+    res.json({ success: true, message: 'Bot memory cleared successfully' });
+  } catch (error) {
+    console.error('Failed to clear bot memory:', error);
+    res.status(500).json({ error: 'Failed to clear bot memory' });
+  }
+});
+
 // Initialize user preferences
 app.post('/api/personalization/initialize', async (req, res) => {
   try {
