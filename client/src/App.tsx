@@ -1347,10 +1347,14 @@ const AppLayout = () => {
                   Clear Chat History
                 </button>
                 <button
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    console.log('EMERGENCY FIX - Reset Bot button clicked');
+                    e.preventDefault();
+                    e.stopPropagation();
                     try {
                       await axios.post('/api/clear-memories', { userId: 1 });
                       setMessages([]);
+                      console.log('Bot memory reset successful');
                     } catch (error) {
                       console.error('Failed to clear memories:', error);
                     }
