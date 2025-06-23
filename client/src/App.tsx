@@ -800,6 +800,49 @@ const AppLayout = () => {
                 </div>
               )}
             </div>
+
+            {/* Chat Input - Fixed at bottom */}
+            <div className="border-t p-4" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--gentle-lavender-dark)' }}>
+              <div className="flex items-center space-x-3">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                    placeholder="Share your thoughts..."
+                    className="w-full px-4 py-3 pr-12 rounded-2xl border text-sm"
+                    style={{ 
+                      borderColor: 'var(--gentle-lavender-dark)',
+                      backgroundColor: 'var(--surface-secondary)',
+                      color: 'var(--text-primary)'
+                    }}
+                  />
+                  <button
+                    onClick={startRecording}
+                    disabled={isRecording}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
+                    style={{ 
+                      backgroundColor: isRecording ? '#EF4444' : 'var(--soft-blue-dark)',
+                      color: 'white'
+                    }}
+                  >
+                    <Mic className="w-4 h-4" />
+                  </button>
+                </div>
+                <button
+                  onClick={sendMessage}
+                  disabled={!inputMessage.trim() || loading}
+                  className="p-3 rounded-2xl transition-all disabled:opacity-50"
+                  style={{ 
+                    backgroundColor: 'var(--soft-blue-dark)',
+                    color: 'white'
+                  }}
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
           </div>
         );
 
