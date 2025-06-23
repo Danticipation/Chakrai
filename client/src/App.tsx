@@ -315,7 +315,7 @@ const AppLayout = () => {
 
   // Update category when section changes
   const handleSectionChange = (section: string) => {
-    console.log('Navigating to section:', section);
+    console.log('BUTTON CLICKED - Navigating to section:', section);
     setActiveSection(section);
     
     // Auto-update category based on section
@@ -325,6 +325,12 @@ const AppLayout = () => {
         break;
       }
     }
+  };
+
+  // Simple direct navigation handler
+  const handleDirectNavigation = (section: string) => {
+    console.log('DIRECT NAVIGATION to:', section);
+    setActiveSection(section);
   };
 
   const voiceOptions = [
@@ -1505,8 +1511,10 @@ const AppLayout = () => {
               return (
                 <button
                   key={category.id}
-                  onClick={() => {
-                    console.log('Category button clicked:', category.id);
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('EMERGENCY FIX - Category button clicked:', category.id);
                     setSelectedCategory(category.id);
                   }}
                   className="flex-1 flex flex-col items-center py-2 px-1 transition-all"
@@ -1514,7 +1522,9 @@ const AppLayout = () => {
                     backgroundColor: isActiveCategory ? 'var(--soft-blue-light)' : 'transparent',
                     color: isActiveCategory ? category.color : 'var(--text-secondary)',
                     cursor: 'pointer',
-                    touchAction: 'manipulation'
+                    touchAction: 'manipulation',
+                    border: 'none',
+                    outline: 'none'
                   }}
                 >
                   <CategoryIcon className="w-5 h-5 mb-1" />
@@ -1533,9 +1543,11 @@ const AppLayout = () => {
                 return (
                   <button
                     key={section.id}
-                    onClick={() => {
-                      console.log('Button clicked:', section.id);
-                      handleSectionChange(section.id);
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('EMERGENCY FIX - Button clicked:', section.id);
+                      handleDirectNavigation(section.id);
                     }}
                     className="flex-1 flex flex-col items-center py-2 px-2 rounded-xl transition-all mx-1"
                     style={{
@@ -1543,7 +1555,9 @@ const AppLayout = () => {
                       color: isActive ? 'var(--soft-blue-dark)' : 'var(--text-secondary)',
                       minWidth: '0',
                       cursor: 'pointer',
-                      touchAction: 'manipulation'
+                      touchAction: 'manipulation',
+                      border: 'none',
+                      outline: 'none'
                     }}
                   >
                     <IconComponent className="w-6 h-6 mb-1 flex-shrink-0" />
