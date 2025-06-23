@@ -2084,6 +2084,54 @@ app.get('/api/personalization/wellness-insights/:userId', async (req, res) => {
   }
 });
 
+// Get personality insights for reflection tab
+app.get('/api/personality-insights', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const userIdNum = parseInt(userId as string) || 1;
+    
+    // Get user facts and memories for personality analysis
+    const facts = await storage.getUserFacts(userIdNum);
+    const memories = await storage.getUserMemories(userIdNum);
+    
+    if (facts.length === 0 && memories.length === 0) {
+      return res.json({
+        insights: [
+          "I'm still learning about you through our conversations.",
+          "Share more about yourself so I can provide better insights.",
+          "Every interaction helps me understand your personality better."
+        ],
+        traits: [],
+        communicationStyle: "Getting to know you",
+        interests: []
+      });
+    }
+    
+    // Extract personality traits from facts and memories
+    const traits = facts.map(f => f.fact).slice(0, 5);
+    const interests = facts.filter(f => f.category === 'personal' || f.category === 'interests')
+                          .map(f => f.fact).slice(0, 3);
+    
+    const personalityInsights = [
+      traits.length > 0 ? `Based on our conversations, I've learned that ${traits[0]}` : "You have a unique personality that's emerging through our chats.",
+      interests.length > 0 ? `Your interests include ${interests.join(', ')}.` : "I'm discovering more about your interests with each conversation.",
+      memories.length > 0 ? `You tend to communicate in a thoughtful way that shows depth.` : "You're building a meaningful conversation history with me.",
+      "I'm continuously learning about your communication patterns and preferences.",
+      "Your personality reflects someone who values growth and self-reflection."
+    ];
+    
+    res.json({
+      insights: personalityInsights,
+      traits: traits,
+      communicationStyle: facts.length > 2 ? "Thoughtful and reflective" : "Developing our connection",
+      interests: interests
+    });
+  } catch (error) {
+    console.error('Failed to get personality insights:', error);
+    res.status(500).json({ error: 'Failed to get personality insights' });
+  }
+});
+
 // Clear bot memory and reset stats
 app.post('/api/clear-memories', async (req, res) => {
   try {

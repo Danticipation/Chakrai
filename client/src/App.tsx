@@ -1380,7 +1380,8 @@ const AppLayout = () => {
                           level: statsRes.data.stage === 'Infant' ? 1 : 
                                  statsRes.data.stage === 'Toddler' ? 2 : 
                                  statsRes.data.stage === 'Child' ? 3 : 
-                                 statsRes.data.stage === 'Adolescent' ? 4 : 5,
+                                 statsRes.data.stage === 'Adolescent' ? 4 : 
+                                 statsRes.data.stage === 'Therapist' ? 3 : 5,
                           stage: statsRes.data.stage,
                           wordsLearned: statsRes.data.wordCount
                         });
@@ -1388,7 +1389,7 @@ const AppLayout = () => {
                       } catch (statsError) {
                         console.error('Failed to refresh stats:', statsError);
                         // Set default reset values if stats fetch fails
-                        setBotStats({ level: 1, stage: 'Infant', wordsLearned: 0 });
+                        setBotStats({ level: 3, stage: 'Therapist', wordsLearned: 1000 });
                       }
                       
                       console.log('Messages cleared, bot memory reset successful');
@@ -1420,14 +1421,15 @@ const AppLayout = () => {
                           level: statsRes.data.stage === 'Infant' ? 1 : 
                                  statsRes.data.stage === 'Toddler' ? 2 : 
                                  statsRes.data.stage === 'Child' ? 3 : 
-                                 statsRes.data.stage === 'Adolescent' ? 4 : 5,
+                                 statsRes.data.stage === 'Adolescent' ? 4 : 
+                                 statsRes.data.stage === 'Therapist' ? 3 : 5,
                           stage: statsRes.data.stage,
                           wordsLearned: statsRes.data.wordCount
                         });
                         console.log('Bot stats refreshed after reset via touch');
                       } catch (statsError) {
                         console.error('Failed to refresh stats via touch:', statsError);
-                        setBotStats({ level: 1, stage: 'Infant', wordsLearned: 0 });
+                        setBotStats({ level: 3, stage: 'Therapist', wordsLearned: 1000 });
                       }
                       
                       console.log('Messages cleared via touch, bot memory reset successful');
