@@ -29,40 +29,6 @@ interface DashboardHomeProps {
 }
 
 // Navigation Categories and Sections
-const navigationCategories = [
-  { id: 'home', label: 'Home', icon: Home, color: 'var(--soft-blue-dark)' },
-  { id: 'wellness', label: 'Wellness', icon: Heart, color: 'var(--pale-green-dark)' },
-  { id: 'progress', label: 'Progress', icon: Target, color: 'var(--gentle-lavender-dark)' },
-  { id: 'tools', label: 'Tools', icon: Brain, color: 'var(--soft-blue-dark)' },
-  { id: 'more', label: 'More', icon: Menu, color: 'var(--text-secondary)' }
-];
-
-const navigationSections = {
-  home: [
-    { id: 'home', label: 'Dashboard', icon: Home },
-    { id: 'chat', label: 'Chat', icon: MessageCircle }
-  ],
-  wellness: [
-    { id: 'daily', label: 'Daily', icon: Sun },
-    { id: 'mood', label: 'Mood', icon: Heart },
-    { id: 'journal', label: 'Journal', icon: FileText }
-  ],
-  progress: [
-    { id: 'progress', label: 'Goals', icon: Target },
-    { id: 'achievements', label: 'Badges', icon: Award },
-    { id: 'analytics', label: 'Reports', icon: BarChart }
-  ],
-  tools: [
-    { id: 'memory', label: 'Memory', icon: Brain },
-    { id: 'reflect', label: 'Reflect', icon: Lightbulb },
-    { id: 'voice', label: 'Voice', icon: Mic }
-  ],
-  more: [
-    { id: 'settings', label: 'Settings', icon: Settings },
-    { id: 'community', label: 'Community', icon: Users },
-    { id: 'therapist', label: 'Therapist', icon: UserCheck }
-  ]
-};
 
 const DashboardHome: React.FC<DashboardHomeProps> = ({ botStats, goals, dailyReflection, onNavigate }) => {
   return (
@@ -349,6 +315,7 @@ const AppLayout = () => {
 
   // Update category when section changes
   const handleSectionChange = (section: string) => {
+    console.log('Navigating to section:', section);
     setActiveSection(section);
     
     // Auto-update category based on section
@@ -1538,11 +1505,16 @@ const AppLayout = () => {
               return (
                 <button
                   key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => {
+                    console.log('Category button clicked:', category.id);
+                    setSelectedCategory(category.id);
+                  }}
                   className="flex-1 flex flex-col items-center py-2 px-1 transition-all"
                   style={{
                     backgroundColor: isActiveCategory ? 'var(--soft-blue-light)' : 'transparent',
-                    color: isActiveCategory ? category.color : 'var(--text-secondary)'
+                    color: isActiveCategory ? category.color : 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    touchAction: 'manipulation'
                   }}
                 >
                   <CategoryIcon className="w-5 h-5 mb-1" />
@@ -1561,12 +1533,17 @@ const AppLayout = () => {
                 return (
                   <button
                     key={section.id}
-                    onClick={() => handleSectionChange(section.id)}
+                    onClick={() => {
+                      console.log('Button clicked:', section.id);
+                      handleSectionChange(section.id);
+                    }}
                     className="flex-1 flex flex-col items-center py-2 px-2 rounded-xl transition-all mx-1"
                     style={{
                       backgroundColor: isActive ? 'var(--soft-blue-light)' : 'transparent',
                       color: isActive ? 'var(--soft-blue-dark)' : 'var(--text-secondary)',
-                      minWidth: '0'
+                      minWidth: '0',
+                      cursor: 'pointer',
+                      touchAction: 'manipulation'
                     }}
                   >
                     <IconComponent className="w-6 h-6 mb-1 flex-shrink-0" />
