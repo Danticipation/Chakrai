@@ -130,7 +130,7 @@ export default function TherapistPortal({ userId }: TherapistPortalProps) {
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab.id
                   ? 'text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
+                  : 'text-white hover:text-gray-200'
               }`}
               style={{
                 backgroundColor: activeTab === tab.id ? 'var(--soft-blue)' : 'transparent',

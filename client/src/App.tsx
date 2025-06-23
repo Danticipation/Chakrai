@@ -1012,7 +1012,7 @@ const AppLayout = () => {
           </div>
           
           {/* Input Area */}
-          <div className="flex items-stretch gap-1 pl-0 pr-1 pb-2">
+          <div className="flex items-stretch gap-1 pl-0 pr-1 pb-3">
             <div className="flex-1 flex">
               <input
                 type="text"
@@ -1061,7 +1061,7 @@ const AppLayout = () => {
         {/* Mobile Bottom Navigation - Fixed position */}
         <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg mobile-nav z-50 mobile-nav-shift" style={{ borderTop: '1px solid var(--gentle-lavender)' }}>
           <div className="flex justify-center py-2 px-2">
-            <div className="flex w-full max-w-2xl">
+            <div className="flex w-full max-w-7xl">
               {sections.map((section) => {
                 const IconComponent = section.icon;
                 const isActive = activeSection === section.id;
@@ -1069,7 +1069,7 @@ const AppLayout = () => {
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className="flex-1 flex flex-col items-center py-2 px-1 rounded-xl transition-all mx-1"
+                    className="flex-1 flex flex-col items-center py-2 px-2 rounded-x1 transition-all mx-1"
                     style={{
                       backgroundColor: isActive ? 'var(--soft-blue-light)' : 'transparent',
                       color: isActive ? 'var(--soft-blue-dark)' : 'var(--text-secondary)',
@@ -1077,7 +1077,7 @@ const AppLayout = () => {
                       maxWidth: '80px'
                     }}
                   >
-                    <IconComponent className="w-5 h-5 mb-1 flex-shrink-0" />
+                    <IconComponent className="w-7 h-7 mb-1 flex-shrink-0" />
                     <span className="text-xs font-medium truncate w-full text-center">{section.label}</span>
                   </button>
                 );

@@ -109,17 +109,12 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
       }
     } catch (error) {
       console.error('Error transcribing audio:', error);
-      console.log('Error object:', JSON.stringify(error, null, 2));
-      console.log('Error response:', error?.response);
-      console.log('Error status:', error?.response?.status);
-      console.log('Error data:', error?.response?.data);
       
       // Show user-friendly error message based on error type
       let errorMessage = 'Voice transcription failed. Please try again or use text input.';
       
       // Check if it's an axios error with response
       if (error?.response?.data) {
-        console.log('Has response data:', error.response.data);
         if (error.response.data.errorType === 'quota_exceeded') {
           errorMessage = 'Voice transcription temporarily unavailable due to high demand. Please try again later or type your entry manually.';
         } else if (error.response.data.errorType === 'auth_error') {
@@ -132,8 +127,6 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
       } else if (error?.response?.status === 429) {
         errorMessage = 'Voice transcription temporarily unavailable due to high demand. Please try again later or type your entry manually.';
       }
-      
-      console.log('Setting error message:', errorMessage);
       
       // Show user-friendly error notification
       setErrorMessage(errorMessage);

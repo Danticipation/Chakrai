@@ -20,6 +20,7 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Mobile-Optimized Interface**: Positioned voice input button within textarea for easy thumb access on mobile devices
 - **Enhanced Error Handling System**: Replaced basic alert() notifications with polished toast notification system featuring visual error display with AlertCircle icon, manual dismiss button, and 5-second auto-timeout
 - **User-Friendly API Error Messages**: Comprehensive error handling for OpenAI API quota limits with clear, therapeutic messaging when transcription service is temporarily unavailable
+- **UI Text Color Fix**: Updated Therapist Collaboration Portal and AI Performance Monitoring dashboard tab buttons to display white text for improved visibility and readability
 - **Production Ready**: Complete voice input system integrated into existing journal editor with proper state management, professional error notifications, and seamless user experience
 
 ### June 22, 2025 - Enhanced Privacy & Compliance System Completed
