@@ -1161,9 +1161,9 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
 
       // Handle API errors with graceful fallback
       if (response.status === 429) {
-        console.log('Rate limit exceeded (429)');
+        console.log('OpenAI quota exceeded - implementing local fallback');
         return res.json({ 
-          text: "[Voice recorded - transcription temporarily at capacity. Please type your message or try again shortly.]",
+          text: "I heard you speaking but transcription is temporarily unavailable. Could you type your message?",
           fallback: true
         });
       }

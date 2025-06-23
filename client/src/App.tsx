@@ -552,58 +552,53 @@ const AppLayout = () => {
 
   const sendAudioToWhisper = async (audioBlob: Blob) => {
     try {
-      console.log('=== AUDIO CAPTURE ANALYSIS ===');
-      console.log('Audio blob size:', audioBlob.size, 'bytes');
-      console.log('Audio blob type:', audioBlob.type);
+      console.log('Audio captured:', audioBlob.size, 'bytes');
       
-      // Check if we actually captured meaningful audio data
-      if (audioBlob.size < 1000) {
-        console.log('⚠️ Audio blob too small - no speech detected');
-        setInput('No audio captured. Please speak louder or hold the microphone button longer.');
-        setTimeout(() => setInput(''), 3000);
-        return;
-      }
-      
-      // Show loading state
-      setInput('Transcribing audio...');
-      setLoading(true);
-      
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.wav');
-
-      console.log('🚀 Sending audio to transcription service...');
-      
-      const response = await axios.post('/api/transcribe', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
-      console.log('📨 Transcription response received:', response.data);
-      
-      // Handle both successful transcriptions and graceful fallbacks
-      if (response.data.text) {
-        console.log('✅ Setting transcribed text:', response.data.text);
-        setInput(response.data.text);
+      // Use browser's built-in speech recognition for immediate results
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        console.log('Using browser speech recognition...');
         
-        // If it's a fallback message, clear it after a moment so user can type
-        if (response.data.fallback) {
-          console.log('⚠️ Fallback message detected, will clear in 3 seconds');
-          setTimeout(() => {
-            console.log('🧹 Clearing fallback message');
-            setInput('');
-          }, 3000);
-        }
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        
+        setInput('Listening...');
+        
+        recognition.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          console.log('Transcribed:', transcript);
+          setInput(transcript);
+        };
+        
+        recognition.onerror = (event: any) => {
+          console.log('Speech recognition error:', event.error);
+          setInput('');
+        };
+        
+        recognition.onend = () => {
+          setLoading(false);
+        };
+        
+        recognition.start();
+        setLoading(true);
+        
+        // Auto-stop after 5 seconds
+        setTimeout(() => {
+          recognition.stop();
+        }, 5000);
+        
       } else {
-        setInput('No speech detected. Please try again or type your message.');
-        setTimeout(() => setInput(''), 3000);
+        // Fallback for browsers without speech recognition
+        setInput('Voice input detected - please type your message.');
+        setTimeout(() => setInput(''), 2000);
       }
-    } catch (error) {
-      console.error('Transcription failed:', error);
       
-      // Handle any remaining error cases with graceful messages
-      setInput('Voice input received. Please type your message or try again.');
-      setTimeout(() => setInput(''), 3000);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Voice processing error:', error);
+      setInput('');
     }
   };
 
