@@ -40,10 +40,17 @@ const ProfessionalApp: React.FC = () => {
   const loadStats = async () => {
     try {
       const response = await axios.get('/api/stats');
-      setBotStats(response.data);
+      const data = response.data;
+      
+      // Parse the actual API response format
+      const level = Math.floor(data.wordCount / 500) + 1; // Calculate level based on words
+      setBotStats({
+        level: Math.min(level, 10), // Cap at level 10
+        stage: data.stage || 'Therapist',
+        wordsLearned: data.wordCount || 1000
+      });
     } catch (error) {
       console.error('Failed to load stats:', error);
-      // Set professional defaults if API fails
       setBotStats({ level: 3, stage: 'Therapist', wordsLearned: 1000 });
     }
   };
