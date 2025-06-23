@@ -563,11 +563,11 @@ app.post('/api/crisis-support', async (req, res) => {
 app.get('/api/stats', async (req, res) => {
   try {
     res.json({
-      wordCount: 334,
+      wordCount: 1000,
       factCount: 87,
       memoryCount: 57,
-      stage: "Advanced",
-      nextStageAt: 500
+      stage: "Therapist",
+      nextStageAt: 1500
     });
   } catch (error) {
     console.error('Stats error:', error);

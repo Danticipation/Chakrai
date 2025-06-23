@@ -355,7 +355,11 @@ const AppLayout = () => {
     axios.get('/api/stats?userId=1')
       .then(res => {
         setBotStats({
-          level: res.data.stage === 'Infant' ? 1 : res.data.stage === 'Toddler' ? 2 : res.data.stage === 'Child' ? 3 : res.data.stage === 'Adolescent' ? 4 : 5,
+          level: res.data.stage === 'Infant' ? 1 : 
+                 res.data.stage === 'Toddler' ? 2 : 
+                 res.data.stage === 'Child' ? 3 : 
+                 res.data.stage === 'Adolescent' ? 4 : 
+                 res.data.stage === 'Therapist' ? 3 : 5,
           stage: res.data.stage,
           wordsLearned: res.data.wordCount
         });
