@@ -518,12 +518,14 @@ const AppLayout = () => {
           }
         };
         
+        // Store reference for stopping
+        speechRecognitionRef.current = recognition;
         recognition.start();
         
         // Auto-stop after 8 seconds
         setTimeout(() => {
-          if (recognition && isRecording) {
-            recognition.stop();
+          if (speechRecognitionRef.current && isRecording) {
+            speechRecognitionRef.current.stop();
           }
         }, 8000);
         
@@ -622,6 +624,10 @@ const AppLayout = () => {
   };
 
   const stopRecording = () => {
+    if (speechRecognitionRef.current) {
+      speechRecognitionRef.current.stop();
+      setIsRecording(false);
+    }
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
