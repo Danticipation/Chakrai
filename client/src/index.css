@@ -16,10 +16,10 @@
   --gentle-lavender-dark: #9370DB;
   --gentle-lavender-light: #F8F8FF;
   
-  /* Text colors for therapeutic design */
-  --text-primary: #2C3E50;    /* Calm dark blue-grey */
-  --text-secondary: #5D6D7E;  /* Medium blue-grey */
-  --text-muted: #85929E;      /* Light blue-grey */
+  /* Text colors for therapeutic design - All White */
+  --text-primary: #FFFFFF;    /* White text */
+  --text-secondary: #FFFFFF;  /* White text */
+  --text-muted: #FFFFFF;      /* White text */
   
   /* Surface colors */
   --surface-primary: #FFFFFF;   /* Pure white */
@@ -29,7 +29,7 @@
 
 body {
   background-color: var(--soft-blue) !important;
-  color: var(--text-primary) !important;
+  color: #FFFFFF !important;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -47,6 +47,26 @@ html, body, #root {
 /* Override any white backgrounds in the app */
 .min-h-screen, .h-screen, .h-full {
   background-color: var(--soft-blue) !important;
+}
+
+/* Force all text to be white */
+*, *::before, *::after {
+  color: #FFFFFF !important;
+}
+
+/* Ensure all text elements are white */
+h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
+  color: #FFFFFF !important;
+}
+
+/* Navigation and UI elements */
+.text-primary, .text-secondary, .text-muted {
+  color: #FFFFFF !important;
+}
+
+/* Override any dark text classes */
+.text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-black {
+  color: #FFFFFF !important;
 }
 
 /* Pulse animation for recording microphone */

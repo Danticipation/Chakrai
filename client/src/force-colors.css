@@ -2,7 +2,7 @@
 
 /* Main background - soft blue */
 body, html, #root {
-  background-color: #1c2333 !important;
+  background-color: #d41111 !important;
   background: linear-gradient(180deg, #1c2333 0%, #d4f7e1 100%) !important;
 }
 
@@ -14,7 +14,7 @@ body, html, #root {
 
 /* Cards and content areas - layered depth */
 div[class*="rounded-2xl"] {
-  background: linear-gradient(180deg, #000000 0%, #1c2333 100%) !important;
+  background: linear-gradient(180deg, #0ed6f1 0%, #1c2333 100%) !important;
   border: 8px solid rgb(0, 0, 0, 0.4) !important;
   box-shadow: 0 24px 12px rgb(0, 0, 0, 0.15) !important;
 }
