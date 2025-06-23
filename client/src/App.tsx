@@ -447,9 +447,53 @@ const AppLayout = () => {
 
   const startRecording = async () => {
     try {
-      console.log('🎤 Starting audio recording...');
+      console.log('Starting speech recognition...');
       
-      // Request microphone with basic settings
+      // Use browser's built-in speech recognition for immediate transcription
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        recognition.maxAlternatives = 1;
+        
+        setIsRecording(true);
+        setInput('Listening...');
+        
+        recognition.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          console.log('Speech recognized:', transcript);
+          setInput(transcript);
+          setIsRecording(false);
+        };
+        
+        recognition.onerror = (event: any) => {
+          console.log('Speech recognition error:', event.error);
+          setInput('');
+          setIsRecording(false);
+        };
+        
+        recognition.onend = () => {
+          setIsRecording(false);
+        };
+        
+        recognition.start();
+        
+        // Auto-stop after 10 seconds
+        setTimeout(() => {
+          if (recognition) {
+            recognition.stop();
+          }
+        }, 10000);
+        
+        return;
+      }
+      
+      // Fallback: Original audio recording approach
+      console.log('Using audio recording fallback...');
+      
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -460,14 +504,9 @@ const AppLayout = () => {
         } 
       });
       
-      // Create audio context for better audio handling
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const source = audioContext.createMediaStreamSource(stream);
       
-      console.log('Audio context sample rate:', audioContext.sampleRate);
-      console.log('Microphone track settings:', stream.getAudioTracks()[0].getSettings());
-      
-      // Use the most compatible format
       let options: MediaRecorderOptions = {};
       if (MediaRecorder.isTypeSupported('audio/webm')) {
         options.mimeType = 'audio/webm';
