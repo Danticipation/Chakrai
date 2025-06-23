@@ -447,21 +447,30 @@ const AppLayout = () => {
 
   const startRecording = async () => {
     try {
-      // Request microphone permission with proper audio constraints
+      // Request microphone permission with compatible audio constraints
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false,
-          sampleRate: 44100
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
         } 
       });
       
       console.log('Microphone stream started:', stream.getAudioTracks()[0].getSettings());
       
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
+      // Try different mime types for better compatibility
+      let mimeType = 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        mimeType = 'audio/webm;codecs=opus';
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mimeType = 'audio/mp4';
+      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+        mimeType = 'audio/wav';
+      }
+      
+      console.log('Using mime type:', mimeType);
+      
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
@@ -475,12 +484,13 @@ const AppLayout = () => {
       mediaRecorder.onstop = () => {
         console.log('Recording stopped, total chunks:', chunksRef.current.length);
         if (chunksRef.current.length > 0) {
-          const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
-          console.log('Audio blob created:', audioBlob.size, 'bytes');
+          const audioBlob = new Blob(chunksRef.current, { type: mimeType });
+          console.log('Audio blob created:', audioBlob.size, 'bytes, type:', mimeType);
           sendAudioToWhisper(audioBlob);
         } else {
           console.log('No audio data captured');
           setInput('No audio captured. Please try speaking louder or check microphone permissions.');
+          setTimeout(() => setInput(''), 3000);
         }
         stream.getTracks().forEach(track => track.stop());
       };
