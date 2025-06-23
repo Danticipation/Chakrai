@@ -509,19 +509,26 @@ const AppLayout = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
+      // Handle both successful transcriptions and graceful fallbacks
       if (response.data.text) {
         setInput(response.data.text);
+        
+        // If it's a fallback message, clear it after a moment so user can type
+        if (response.data.fallback) {
+          setTimeout(() => {
+            setInput('');
+          }, 3000);
+        }
       } else {
         setInput('No speech detected. Please try again or type your message.');
+        setTimeout(() => setInput(''), 3000);
       }
     } catch (error) {
       console.error('Transcription failed:', error);
       
-      if ((error as any).response?.status === 429) {
-        setInput('Transcription service is temporarily unavailable. Please type your message instead.');
-      } else {
-        setInput('Could not transcribe audio. Please try again or type your message.');
-      }
+      // Handle any remaining error cases with graceful messages
+      setInput('Voice input received. Please type your message or try again.');
+      setTimeout(() => setInput(''), 3000);
     } finally {
       setLoading(false);
     }
