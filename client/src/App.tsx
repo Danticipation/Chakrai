@@ -447,26 +447,47 @@ const AppLayout = () => {
 
   const startRecording = async () => {
     try {
-      // Request microphone permission
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      // Request microphone permission with proper audio constraints
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          sampleRate: 44100
+        } 
+      });
+      
+      console.log('Microphone stream started:', stream.getAudioTracks()[0].getSettings());
+      
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 1) {
+        console.log('Audio data received:', event.data.size, 'bytes');
+        if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(chunksRef.current, { type: 'audio/wav' });
-        sendAudioToWhisper(audioBlob);
+        console.log('Recording stopped, total chunks:', chunksRef.current.length);
+        if (chunksRef.current.length > 0) {
+          const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+          console.log('Audio blob created:', audioBlob.size, 'bytes');
+          sendAudioToWhisper(audioBlob);
+        } else {
+          console.log('No audio data captured');
+          setInput('No audio captured. Please try speaking louder or check microphone permissions.');
+        }
         stream.getTracks().forEach(track => track.stop());
       };
 
-      mediaRecorder.start();
+      mediaRecorder.start(1000); // Record in 1-second chunks
       setIsRecording(true);
+      console.log('Recording started');
       
       // Auto-stop recording after 30 seconds
       setTimeout(() => {
