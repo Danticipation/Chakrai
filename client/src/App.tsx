@@ -447,59 +447,82 @@ const AppLayout = () => {
 
   const startRecording = async () => {
     try {
-      // Request microphone permission with compatible audio constraints
+      console.log('🎤 Starting audio recording...');
+      
+      // Request microphone with basic settings
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true
+          autoGainControl: true,
+          sampleRate: 44100,
+          channelCount: 1
         } 
       });
       
-      console.log('Microphone stream started:', stream.getAudioTracks()[0].getSettings());
+      // Create audio context for better audio handling
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const source = audioContext.createMediaStreamSource(stream);
       
-      // Try different mime types for better compatibility
-      let mimeType = 'audio/webm';
-      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-        mimeType = 'audio/webm;codecs=opus';
+      console.log('Audio context sample rate:', audioContext.sampleRate);
+      console.log('Microphone track settings:', stream.getAudioTracks()[0].getSettings());
+      
+      // Use the most compatible format
+      let options: MediaRecorderOptions = {};
+      if (MediaRecorder.isTypeSupported('audio/webm')) {
+        options.mimeType = 'audio/webm';
       } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-        mimeType = 'audio/mp4';
-      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
-        mimeType = 'audio/wav';
+        options.mimeType = 'audio/mp4';
       }
       
-      console.log('Using mime type:', mimeType);
-      
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        console.log('Audio data received:', event.data.size, 'bytes');
+        console.log('📡 Audio chunk received:', event.data.size, 'bytes');
         if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
 
-      mediaRecorder.onstop = () => {
-        console.log('Recording stopped, total chunks:', chunksRef.current.length);
+      mediaRecorder.onstop = async () => {
+        console.log('⏹️ Recording stopped. Total chunks:', chunksRef.current.length);
+        
         if (chunksRef.current.length > 0) {
-          const audioBlob = new Blob(chunksRef.current, { type: mimeType });
-          console.log('Audio blob created:', audioBlob.size, 'bytes, type:', mimeType);
-          sendAudioToWhisper(audioBlob);
+          const audioBlob = new Blob(chunksRef.current, { 
+            type: options.mimeType || 'audio/webm' 
+          });
+          
+          console.log('🎵 Audio blob created:', {
+            size: audioBlob.size,
+            type: audioBlob.type,
+            durationEstimate: Math.round(audioBlob.size / 16000) + 's'
+          });
+          
+          if (audioBlob.size > 500) {
+            sendAudioToWhisper(audioBlob);
+          } else {
+            console.log('⚠️ Audio blob too small, likely no speech');
+            setInput('No speech detected. Please speak clearly into your microphone.');
+            setTimeout(() => setInput(''), 3000);
+          }
         } else {
-          console.log('No audio data captured');
-          setInput('No audio captured. Please try speaking louder or check microphone permissions.');
+          console.log('❌ No audio data captured');
+          setInput('Recording failed. Please check microphone permissions and try again.');
           setTimeout(() => setInput(''), 3000);
         }
+        
+        // Clean up
         stream.getTracks().forEach(track => track.stop());
+        audioContext.close();
       };
 
-      mediaRecorder.start(1000); // Record in 1-second chunks
+      mediaRecorder.start(250); // Smaller chunks for better responsiveness
       setIsRecording(true);
-      console.log('Recording started');
+      console.log('✅ Recording started successfully');
       
-      // Auto-stop recording after 30 seconds
+      // Auto-stop after 30 seconds
       setTimeout(() => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
           stopRecording();
@@ -507,16 +530,16 @@ const AppLayout = () => {
       }, 30000);
       
     } catch (error) {
-      console.error('Recording failed:', error);
+      console.error('❌ Recording failed:', error);
       
-      // Provide user-friendly error feedback
       if ((error as any).name === 'NotAllowedError') {
-        setInput('Microphone access denied. Please allow microphone permission and try again.');
+        setInput('Microphone permission denied. Please allow microphone access and try again.');
       } else if ((error as any).name === 'NotFoundError') {
-        setInput('No microphone found. Please check your device and try again.');
+        setInput('No microphone found. Please check your device settings.');
       } else {
-        setInput('Could not start recording. Please try again or type your message.');
+        setInput('Recording failed. Please refresh the page and try again.');
       }
+      setTimeout(() => setInput(''), 4000);
     }
   };
 
@@ -529,6 +552,18 @@ const AppLayout = () => {
 
   const sendAudioToWhisper = async (audioBlob: Blob) => {
     try {
+      console.log('=== AUDIO CAPTURE ANALYSIS ===');
+      console.log('Audio blob size:', audioBlob.size, 'bytes');
+      console.log('Audio blob type:', audioBlob.type);
+      
+      // Check if we actually captured meaningful audio data
+      if (audioBlob.size < 1000) {
+        console.log('⚠️ Audio blob too small - no speech detected');
+        setInput('No audio captured. Please speak louder or hold the microphone button longer.');
+        setTimeout(() => setInput(''), 3000);
+        return;
+      }
+      
       // Show loading state
       setInput('Transcribing audio...');
       setLoading(true);
