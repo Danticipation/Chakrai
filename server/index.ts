@@ -1117,12 +1117,25 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     }
 
     // Create FormData for OpenAI API
+    console.log('Received audio file:', {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size
+    });
+
     const formData = new FormData();
-    formData.append('file', new Blob([req.file.buffer], { type: 'audio/wav' }), 'audio.wav');
+    // Use the actual mime type from the uploaded file
+    const mimeType = req.file.mimetype || 'audio/webm';
+    const extension = mimeType.includes('webm') ? 'webm' : 
+                     mimeType.includes('mp4') ? 'mp4' : 'wav';
+    
+    formData.append('file', new Blob([req.file.buffer], { type: mimeType }), `audio.${extension}`);
     formData.append('model', 'whisper-1');
 
-    // Direct API call with graceful fallback on any error
+    // OpenAI API call with detailed logging
     try {
+      console.log('Calling OpenAI Whisper API...');
+      
       const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
         method: 'POST',
         headers: {
@@ -1131,28 +1144,37 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
         body: formData
       });
 
+      console.log('OpenAI API response status:', response.status);
+      console.log('OpenAI API response headers:', Object.fromEntries(response.headers));
+
       if (response.ok) {
         const result = await response.json();
+        console.log('OpenAI transcription result:', result);
         return res.json({
           text: result.text || "No speech detected in audio"
         });
       }
 
+      // Log the actual error response
+      const errorText = await response.text();
+      console.log('OpenAI API error response:', errorText);
+
       // Handle API errors with graceful fallback
       if (response.status === 429) {
+        console.log('Rate limit exceeded (429)');
         return res.json({ 
           text: "[Voice recorded - transcription temporarily at capacity. Please type your message or try again shortly.]",
           fallback: true
         });
       }
 
-      // Any other API error
+      console.log('Other API error, status:', response.status);
       return res.json({ 
         text: "[Voice input received - please type your message or try voice again.]",
         fallback: true
       });
     } catch (networkError) {
-      // Network or other errors
+      console.log('Network error calling OpenAI:', networkError);
       return res.json({ 
         text: "[Voice recorded successfully. Please type your message or try voice again in a moment.]",
         fallback: true
