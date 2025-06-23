@@ -28,6 +28,42 @@ interface DashboardHomeProps {
   onNavigate: (section: string) => void;
 }
 
+// Navigation Categories and Sections
+const navigationCategories = [
+  { id: 'home', label: 'Home', icon: Home, color: 'var(--soft-blue-dark)' },
+  { id: 'wellness', label: 'Wellness', icon: Heart, color: 'var(--pale-green-dark)' },
+  { id: 'progress', label: 'Progress', icon: Target, color: 'var(--gentle-lavender-dark)' },
+  { id: 'tools', label: 'Tools', icon: Brain, color: 'var(--soft-blue-dark)' },
+  { id: 'more', label: 'More', icon: Menu, color: 'var(--text-secondary)' }
+];
+
+const navigationSections = {
+  home: [
+    { id: 'home', label: 'Dashboard', icon: Home },
+    { id: 'chat', label: 'Chat', icon: MessageCircle }
+  ],
+  wellness: [
+    { id: 'daily', label: 'Daily', icon: Sun },
+    { id: 'mood', label: 'Mood', icon: Heart },
+    { id: 'journal', label: 'Journal', icon: FileText }
+  ],
+  progress: [
+    { id: 'progress', label: 'Goals', icon: Target },
+    { id: 'achievements', label: 'Badges', icon: Award },
+    { id: 'analytics', label: 'Reports', icon: BarChart }
+  ],
+  tools: [
+    { id: 'memory', label: 'Memory', icon: Brain },
+    { id: 'reflect', label: 'Reflect', icon: Lightbulb },
+    { id: 'voice', label: 'Voice', icon: Mic }
+  ],
+  more: [
+    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'community', label: 'Community', icon: Users },
+    { id: 'therapist', label: 'Therapist', icon: UserCheck }
+  ]
+};
+
 const DashboardHome: React.FC<DashboardHomeProps> = ({ botStats, goals, dailyReflection, onNavigate }) => {
   return (
     <div className="p-4 space-y-4 pb-32">
@@ -207,7 +243,8 @@ interface Goal {
 }
 
 const AppLayout = () => {
-  const [activeSection, setActiveSection] = useState('chat');
+  const [activeSection, setActiveSection] = useState('home');
+  const [selectedCategory, setSelectedCategory] = useState('home');
   const [isRecording, setIsRecording] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
@@ -301,7 +338,6 @@ const AppLayout = () => {
     }
   ];
 
-  const [selectedCategory, setSelectedCategory] = useState('therapy');
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
 
   // Get current sections from selected category
@@ -1279,7 +1315,7 @@ const AppLayout = () => {
                 return (
                   <button
                     key={section.id}
-                    onClick={() => setActiveSection(section.id)}
+                    onClick={() => handleSectionChange(section.id)}
                     className="flex-1 flex flex-col items-center py-2 px-2 rounded-xl transition-all mx-1"
                     style={{
                       backgroundColor: isActive ? 'var(--soft-blue-light)' : 'transparent',

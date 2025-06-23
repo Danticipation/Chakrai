@@ -40,13 +40,13 @@ body {
 
 /* Global therapeutic background enforcement */
 html, body, #root {
-  background-color: #1c2333 !important;
+  background-color: var(--soft-blue) !important;
   min-height: 100vh !important;
 }
 
 /* Override any white backgrounds in the app */
 .min-h-screen, .h-screen, .h-full {
-  background-color: #0e1525 !important;
+  background-color: var(--soft-blue) !important;
 }
 
 /* Ensure all main containers use therapeutic colors */
