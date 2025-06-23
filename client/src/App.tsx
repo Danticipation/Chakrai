@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users, Activity, Headphones, Gift, Zap, Shield, Lock } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users, Activity, Headphones, Gift, Zap, Shield, Lock, Home, Menu, BarChart, Settings, Lightbulb } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -344,6 +344,19 @@ const AppLayout = () => {
   const getCurrentSections = () => {
     const category = navigationCategories.find(cat => cat.id === selectedCategory);
     return category ? category.sections : navigationCategories[0].sections;
+  };
+
+  // Update category when section changes
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+    
+    // Auto-update category based on section
+    for (const category of navigationCategories) {
+      if (category.sections.some(s => s.id === section)) {
+        setSelectedCategory(category.id);
+        break;
+      }
+    }
   };
 
   const voiceOptions = [
