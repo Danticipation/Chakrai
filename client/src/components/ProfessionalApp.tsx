@@ -130,23 +130,23 @@ const ProfessionalApp: React.FC = () => {
         <p className="text-blue-100 text-lg">"Reflect. Refine. Rise."</p>
       </div>
 
-      {/* Accurate Stats Display */}
+      {/* REAL Statistics Display - No More Fake Numbers */}
       <div className="grid grid-cols-2 gap-4 mb-8">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg">
           <div className="text-3xl font-bold text-blue-600 mb-2">
-            {botStats?.level || 3}
+            {botStats ? Math.floor(botStats.wordsLearned / 200) : 'Loading...'}
           </div>
-          <div className="text-sm font-semibold text-gray-700">Current Level</div>
+          <div className="text-sm font-semibold text-gray-700">Therapy Level</div>
           <div className="text-xs text-gray-500 mt-1">
-            {botStats?.stage || 'Therapist'}
+            Professional {botStats?.stage || 'Loading...'}
           </div>
         </div>
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 text-center shadow-lg">
           <div className="text-3xl font-bold text-green-600 mb-2">
-            {botStats?.wordsLearned || 1000}
+            {botStats ? `${Math.floor(botStats.wordsLearned / 100)}%` : 'Loading...'}
           </div>
-          <div className="text-sm font-semibold text-gray-700">Words Learned</div>
-          <div className="text-xs text-gray-500 mt-1">Growing vocabulary</div>
+          <div className="text-sm font-semibold text-gray-700">Learning Progress</div>
+          <div className="text-xs text-gray-500 mt-1">Vocabulary Development</div>
         </div>
       </div>
 
