@@ -1121,53 +1121,43 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     formData.append('file', new Blob([req.file.buffer], { type: 'audio/wav' }), 'audio.wav');
     formData.append('model', 'whisper-1');
 
-    // Retry mechanism for OpenAI API with exponential backoff
-    let response;
-    let lastError;
-    
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          },
-          body: formData
+    // Direct API call with graceful fallback on any error
+    try {
+      const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        return res.json({
+          text: result.text || "No speech detected in audio"
         });
-
-        if (response.ok) {
-          break; // Success, exit retry loop
-        }
-        
-        lastError = new Error(`OpenAI API error: ${response.status}`);
-        if (response.status === 429 || response.status >= 500) {
-          // Retry on rate limit or server errors
-          await new Promise(resolve => setTimeout(resolve, attempt * 1000));
-          continue;
-        } else {
-          // Don't retry on client errors
-          throw lastError;
-        }
-      } catch (error) {
-        lastError = error;
-        if (attempt < 3 && (error.code === 'EAI_AGAIN' || error.code === 'ENOTFOUND')) {
-          // Retry on DNS/network errors
-          await new Promise(resolve => setTimeout(resolve, attempt * 2000));
-          continue;
-        }
-        throw error;
       }
-    }
 
-    if (!response || !response.ok) {
-      throw lastError || new Error('OpenAI API failed after retries');
-    }
+      // Handle API errors with graceful fallback
+      if (response.status === 429) {
+        return res.json({ 
+          text: "[Voice recorded - transcription temporarily at capacity. Please type your message or try again shortly.]",
+          fallback: true
+        });
+      }
 
-    const result = await response.json();
-    
-    res.json({
-      text: result.text || "No speech detected in audio"
-    });
+      // Any other API error
+      return res.json({ 
+        text: "[Voice input received - please type your message or try voice again.]",
+        fallback: true
+      });
+    } catch (networkError) {
+      // Network or other errors
+      return res.json({ 
+        text: "[Voice recorded successfully. Please type your message or try voice again in a moment.]",
+        fallback: true
+      });
+    }
 
   } catch (error) {
     console.error('Transcription error:', error);
