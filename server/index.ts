@@ -591,12 +591,12 @@ app.get('/api/weekly-summary', async (req, res) => {
       return;
     }
 
-    // Import personality analysis for summary generation
-    const { buildPersonalityProfile } = await import('./personalityAnalysis.js');
-    const profile = await buildPersonalityProfile(userId);
+    // Temporarily disabled personality analysis to preserve API quota for transcription
+    // const { buildPersonalityProfile } = await import('./personalityAnalysis.js');
+    // const profile = await buildPersonalityProfile(userId);
     
     const recentMemories = memories.slice(-5).map(m => m.memory).join(' ');
-    const summary = `Your recent conversations reveal ${profile.communicationStyle.toLowerCase()}. You've shown ${profile.coreTraits.slice(0, 2).join(' and ').toLowerCase()} qualities, with interests in ${profile.interests.slice(0, 3).join(', ').toLowerCase()}. Your journey reflects ${profile.lifePhilosophy.toLowerCase()}.`;
+    const summary = recentMemories || "Continue your journey of self-reflection through meaningful conversations.";
     
     res.json({ summary });
   } catch (error) {
@@ -613,16 +613,16 @@ app.get('/api/memory-profile', async (req, res) => {
     const memories = await storage.getUserMemories(userId);
     const facts = await storage.getUserFacts(userId);
     
-    // Import personality analysis
-    const { buildPersonalityProfile } = await import('./personalityAnalysis.js');
-    const profile = await buildPersonalityProfile(userId);
+    // Temporarily disabled personality analysis to preserve API quota for transcription
+    // const { buildPersonalityProfile } = await import('./personalityAnalysis.js');
+    // const profile = await buildPersonalityProfile(userId);
     
     res.json({
       totalMemories: memories.length,
       totalFacts: facts.length,
       recentMemories: memories.slice(-10),
       keyFacts: facts.slice(-15),
-      personalityProfile: profile,
+      personalityProfile: { communicationStyle: "Thoughtful", coreTraits: ["Reflective", "Growing"] },
       stage: memories.length > 50 ? "Advanced" : memories.length > 20 ? "Developing" : "Learning"
     });
   } catch (error) {
