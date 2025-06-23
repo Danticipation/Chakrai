@@ -1335,38 +1335,96 @@ const AppLayout = () => {
               <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Data Management</h3>
               <div className="space-y-3">
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    console.log('EMERGENCY FIX - Clear Chat button clicked');
+                    e.preventDefault();
+                    e.stopPropagation();
                     setMessages([]);
                   }}
-                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
+                  onTouchStart={(e) => {
+                    console.log('EMERGENCY FIX - Clear Chat button touched');
+                    e.stopPropagation();
+                  }}
+                  onTouchEnd={(e) => {
+                    console.log('EMERGENCY FIX - Clear Chat button touch end');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMessages([]);
+                  }}
+                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm active:scale-95 transition-transform"
                   style={{ 
                     backgroundColor: '#F59E0B',
-                    color: 'white'
+                    color: 'white',
+                    touchAction: 'manipulation',
+                    userSelect: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    cursor: 'pointer'
                   }}
                 >
                   Clear Chat History
                 </button>
-                <button
+                <div
                   onClick={async (e) => {
-                    console.log('EMERGENCY FIX - Reset Bot button clicked');
+                    console.log('EMERGENCY FIX - Reset Bot DIV clicked');
                     e.preventDefault();
                     e.stopPropagation();
                     try {
-                      await axios.post('/api/clear-memories', { userId: 1 });
+                      const response = await axios.post('/api/clear-memories', { userId: 1 });
+                      console.log('API Response:', response.status);
                       setMessages([]);
-                      console.log('Bot memory reset successful');
+                      console.log('Messages cleared, bot memory reset successful');
+                      alert('Bot memory has been reset successfully!');
                     } catch (error) {
                       console.error('Failed to clear memories:', error);
+                      alert('Failed to reset bot memory. Check console for details.');
                     }
                   }}
-                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm"
+                  onMouseDown={() => console.log('EMERGENCY FIX - Reset Bot mousedown')}
+                  onMouseUp={() => console.log('EMERGENCY FIX - Reset Bot mouseup')}
+                  onTouchStart={(e) => {
+                    console.log('EMERGENCY FIX - Reset Bot touch start');
+                    e.stopPropagation();
+                  }}
+                  onTouchEnd={async (e) => {
+                    console.log('EMERGENCY FIX - Reset Bot touch end');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    try {
+                      const response = await axios.post('/api/clear-memories', { userId: 1 });
+                      console.log('API Response via touch:', response.status);
+                      setMessages([]);
+                      console.log('Messages cleared via touch, bot memory reset successful');
+                      alert('Bot memory has been reset successfully via touch!');
+                    } catch (error) {
+                      console.error('Failed to clear memories via touch:', error);
+                      alert('Failed to reset bot memory via touch. Check console for details.');
+                    }
+                  }}
+                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium shadow-sm active:scale-95 transition-transform cursor-pointer select-none"
                   style={{ 
                     backgroundColor: '#EF4444',
-                    color: 'white'
+                    color: 'white',
+                    touchAction: 'manipulation',
+                    userSelect: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    cursor: 'pointer',
+                    border: 'none',
+                    outline: 'none'
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      console.log('EMERGENCY FIX - Reset Bot key pressed');
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // Trigger click
+                      (e.target as HTMLElement).click();
+                    }
                   }}
                 >
                   Reset Bot Memory
-                </button>
+                </div>
               </div>
             </div>
 

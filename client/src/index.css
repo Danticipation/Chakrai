@@ -52,6 +52,7 @@ html, body, #root {
 /* Force all text to be white */
 *, *::before, *::after {
   color: #FFFFFF !important;
+  pointer-events: inherit !important;
 }
 
 /* Ensure all text elements are white */
