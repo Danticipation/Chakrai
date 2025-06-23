@@ -436,99 +436,47 @@ const AppLayout = () => {
 
   const startRecording = async () => {
     try {
-      console.log('Starting speech recognition...');
+      console.log('MOBILE MIC - Starting voice recording for mobile...');
       
-      // First ensure microphone permission
+      // Detect mobile device
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log('MOBILE MIC - Mobile device detected:', isMobile);
+      
+      // First ensure microphone permission with mobile-specific handling
       try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+        const testStream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            sampleRate: isMobile ? 22050 : 44100,
+            channelCount: 1
+          } 
+        });
+        
+        // Test the stream briefly then stop
+        testStream.getTracks().forEach(track => {
+          console.log('MOBILE MIC - Audio track settings:', track.getSettings());
+          track.stop();
+        });
       } catch (err) {
-        setInput('Microphone access denied. Please allow microphone access and try again.');
-        setTimeout(() => setInput(''), 3000);
+        console.error('MOBILE MIC - Permission error:', err);
+        setInput('🎤 Microphone permission needed. Please allow access and tap the mic button again.');
+        setTimeout(() => setInput(''), 4000);
         return;
       }
       
-      // Use browser's built-in speech recognition
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = 'en-US';
-        recognition.maxAlternatives = 1;
-        
-        setIsRecording(true);
-        setInput('🎤 Speak now...');
-        
-        let finalTranscript = '';
-        let interimTranscript = '';
-        
-        recognition.onresult = (event: any) => {
-          interimTranscript = '';
-          
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            
-            if (event.results[i].isFinal) {
-              finalTranscript += transcript;
-            } else {
-              interimTranscript += transcript;
-            }
-          }
-          
-          const displayText = finalTranscript + interimTranscript;
-          console.log('Speech recognized:', displayText);
-          setInput(displayText);
-        };
-        
-        recognition.onerror = (event: any) => {
-          console.log('Speech recognition error:', event.error);
-          
-          if (event.error === 'no-speech') {
-            setInput('No speech detected. Please speak clearly and try again.');
-          } else if (event.error === 'not-allowed') {
-            setInput('Microphone access denied. Please allow microphone access.');
-          } else {
-            setInput('Speech recognition failed. Please try typing instead.');
-          }
-          
-          setTimeout(() => setInput(''), 3000);
-          setIsRecording(false);
-        };
-        
-        recognition.onend = () => {
-          console.log('Speech recognition ended');
-          setIsRecording(false);
-          
-          // Keep the final transcript in the input
-          if (finalTranscript.trim()) {
-            setInput(finalTranscript.trim());
-          }
-        };
-        
-        // Store reference for stopping
-        speechRecognitionRef.current = recognition;
-        recognition.start();
-        
-        // Auto-stop after 8 seconds
-        setTimeout(() => {
-          if (speechRecognitionRef.current && isRecording) {
-            speechRecognitionRef.current.stop();
-          }
-        }, 8000);
-        
-        return;
-      }
+      console.log('MOBILE MIC - Starting audio recording...');
+      setInput('🎤 Recording...');
+      setIsRecording(true);
       
-      // Fallback: Original audio recording approach
-      console.log('Using audio recording fallback...');
-      
+      // Get fresh audio stream for recording
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          sampleRate: 44100,
+          sampleRate: isMobile ? 22050 : 44100,
           channelCount: 1
         } 
       });
@@ -548,21 +496,21 @@ const AppLayout = () => {
       chunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        console.log('📡 Audio chunk received:', event.data.size, 'bytes');
+        console.log('MOBILE MIC - Audio chunk received:', event.data.size, 'bytes');
         if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
 
       mediaRecorder.onstop = async () => {
-        console.log('⏹️ Recording stopped. Total chunks:', chunksRef.current.length);
+        console.log('MOBILE MIC - Recording stopped. Total chunks:', chunksRef.current.length);
         
         if (chunksRef.current.length > 0) {
           const audioBlob = new Blob(chunksRef.current, { 
             type: options.mimeType || 'audio/webm' 
           });
           
-          console.log('🎵 Audio blob created:', {
+          console.log('MOBILE MIC - Audio blob created:', {
             size: audioBlob.size,
             type: audioBlob.type,
             durationEstimate: Math.round(audioBlob.size / 16000) + 's'
@@ -571,12 +519,12 @@ const AppLayout = () => {
           if (audioBlob.size > 500) {
             sendAudioToWhisper(audioBlob);
           } else {
-            console.log('⚠️ Audio blob too small, likely no speech');
+            console.log('MOBILE MIC - Audio blob too small, likely no speech');
             setInput('No speech detected. Please speak clearly into your microphone.');
             setTimeout(() => setInput(''), 3000);
           }
         } else {
-          console.log('❌ No audio data captured');
+          console.log('MOBILE MIC - No audio data captured');
           setInput('Recording failed. Please check microphone permissions and try again.');
           setTimeout(() => setInput(''), 3000);
         }
@@ -586,9 +534,8 @@ const AppLayout = () => {
         audioContext.close();
       };
 
-      mediaRecorder.start(250); // Smaller chunks for better responsiveness
-      setIsRecording(true);
-      console.log('✅ Recording started successfully');
+      mediaRecorder.start(250); // Smaller chunks for better mobile responsiveness
+      console.log('MOBILE MIC - Recording started successfully');
       
       // Auto-stop after 30 seconds
       setTimeout(() => {
@@ -998,14 +945,31 @@ const AppLayout = () => {
                   />
                   <button
                     onClick={isRecording ? stopRecording : startRecording}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all"
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      console.log('MOBILE MIC - Touch start detected');
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      console.log('MOBILE MIC - Touch end detected');
+                      if (isRecording) {
+                        stopRecording();
+                      } else {
+                        startRecording();
+                      }
+                    }}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-3 rounded-full transition-all touch-manipulation"
                     style={{ 
                       backgroundColor: isRecording ? '#EF4444' : 'var(--soft-blue-dark)',
                       color: 'white',
-                      animation: isRecording ? 'pulse 1s infinite' : 'none'
+                      animation: isRecording ? 'pulse 1s infinite' : 'none',
+                      minWidth: '44px',
+                      minHeight: '44px',
+                      WebkitTapHighlightColor: 'transparent'
                     }}
+                    title={isRecording ? "Stop Recording" : "Start Voice Recording"}
                   >
-                    <Mic className="w-4 h-4" />
+                    <Mic className="w-5 h-5" />
                   </button>
                 </div>
                 <button
