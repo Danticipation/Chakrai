@@ -110,22 +110,24 @@ function TraiApp() {
   const sendMessage = async () => {
     if (!inputValue.trim()) return;
     
+    const messageText = inputValue;
     const newMessage: Message = {
       sender: 'user',
-      text: inputValue,
+      text: messageText,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     
     setMessages(prev => [...prev, newMessage]);
-    const messageText = inputValue;
     setInputValue('');
 
     try {
+      console.log('Sending message:', messageText);
       const response = await axios.post('/api/chat', {
-        message: inputValue,
-        userId,
-        voice: selectedVoice
+        message: messageText,
+        userId
       });
+      
+      console.log('Response received:', response.data);
       
       const botMessage: Message = {
         sender: 'bot',
@@ -138,7 +140,7 @@ function TraiApp() {
       console.error('Chat error:', error);
       const errorMessage: Message = {
         sender: 'bot',
-        text: 'I apologize, but I encountered an issue. Please try again.',
+        text: 'Connection failed. Please try again.',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMessage]);
