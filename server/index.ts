@@ -466,7 +466,7 @@ app.post('/api/safety-checkin-response', async (req, res) => {
     // Update check-in with user response
     const updatedCheckIn = await storage.updateSafetyCheckIn(checkInId, {
       responseReceived: true,
-      responseNotes: userResponse,
+      responseReceived: true,
       updatedAt: new Date()
     });
     
@@ -476,9 +476,8 @@ app.post('/api/safety-checkin-response', async (req, res) => {
         userId: updatedCheckIn.userId,
         safetyCheckInId: updatedCheckIn.id,
         interventionType: 'scheduled_followup',
-        contactMethod: 'mental_health_professional',
-        notes: `User reported still needing help. Current mood: ${currentMood}`,
-        scheduledAt: new Date(Date.now() + 4 * 60 * 60 * 1000) // 4 hours
+        severity: 'medium',
+        actionTaken: 'follow_up_scheduled'
       });
     }
     
