@@ -1917,7 +1917,11 @@ app.post('/api/personalization/recommendations', async (req, res) => {
     // Generate personalized recommendations
     const recommendations = await generatePersonalizedRecommendations(
       insights,
-      preferences,
+      preferences ? {
+        ...preferences,
+        sessionTiming: 'flexible',
+        voicePreference: 'James'
+      } : undefined,
       [] // recent activities - could be enhanced with activity tracking
     );
     
