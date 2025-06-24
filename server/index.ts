@@ -2274,8 +2274,8 @@ app.get('/api/analytics/monthly-report/:userId/:year/:month', async (req, res) =
     // Try to get existing report from storage
     const existingReport = await storage.getMonthlyReport(
       parseInt(userId),
-      parseInt(year),
-      parseInt(month)
+      year,
+      month
     );
     
     if (existingReport) {
@@ -3249,11 +3249,11 @@ app.post('/api/wearable-devices', async (req, res) => {
     
     // Log successful connection
     await storage.createSyncLog({
+      userId: 1,
       deviceId: device.id,
       syncStatus: 'success',
       recordsSync: 0,
-      syncDuration: 0,
-      dataTypes: []
+      syncDuration: 0
     });
     
     res.json(device);
@@ -3336,6 +3336,7 @@ app.post('/api/wearable-devices/:deviceId/sync', async (req, res) => {
       
       // Log successful sync
       await storage.createSyncLog({
+        userId: parseInt(userId),
         deviceId,
         syncStatus: 'success',
         recordsSync: processedCount,
@@ -3350,6 +3351,7 @@ app.post('/api/wearable-devices/:deviceId/sync', async (req, res) => {
     } catch (processingError) {
       // Log failed sync
       await storage.createSyncLog({
+        userId: parseInt(userId),
         deviceId,
         syncStatus: 'failed',
         recordsSync: processedCount,
