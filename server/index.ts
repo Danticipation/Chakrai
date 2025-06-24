@@ -12,8 +12,8 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 app.use(cors());
 app.use(express.json());
 
-// Chat endpoint - working version
-app.post('/api/chat', (req, res) => {
+// Chat endpoint with OpenAI integration
+app.post('/api/chat', async (req, res) => {
   try {
     const { message, userId = 1 } = req.body;
     
@@ -21,11 +21,40 @@ app.post('/api/chat', (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const response = "I understand you're reaching out. I'm here to support you through your mental wellness journey. How are you feeling right now?";
+    // OpenAI API call
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are TrAI, a compassionate mental wellness and therapy companion. Provide supportive, therapeutic responses that are empathetic, professional, and helpful. Keep responses conversational and supportive.'
+          },
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      })
+    });
+
+    if (!openaiResponse.ok) {
+      throw new Error(`OpenAI API error: ${openaiResponse.status}`);
+    }
+
+    const openaiData = await openaiResponse.json();
+    const aiResponse = openaiData.choices[0].message.content;
 
     res.json({
-      message: response,
-      response: response,
+      message: aiResponse,
+      response: aiResponse,
       wordsLearned: 1000,
       stage: "Therapist",
       crisisDetected: false,
@@ -36,7 +65,17 @@ app.post('/api/chat', (req, res) => {
     
   } catch (error) {
     console.error('Chat error:', error);
-    res.status(500).json({ error: 'Chat failed' });
+    const fallbackResponse = "I'm here to support you. Sometimes I have trouble connecting to my full capabilities, but I'm still listening. How are you feeling right now?";
+    res.json({
+      message: fallbackResponse,
+      response: fallbackResponse,
+      wordsLearned: 1000,
+      stage: "Therapist",
+      crisisDetected: false,
+      crisisData: null,
+      personalityMode: "supportive",
+      timestamp: new Date().toISOString()
+    });
   }
 });
 
