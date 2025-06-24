@@ -393,9 +393,7 @@ app.post('/api/crisis-analysis', async (req, res) => {
         indicators: crisisAnalysis.indicators,
         checkInRequired: crisisAnalysis.requiresCheckIn,
         responseReceived: false,
-        followUpScheduled: crisisAnalysis.riskLevel === 'critical' ? 
-          new Date(Date.now() + 2 * 60 * 60 * 1000) : // 2 hours for critical
-          new Date(Date.now() + 6 * 60 * 60 * 1000)    // 6 hours for high
+        followUpScheduled: true
       });
       
       // Create crisis intervention record
@@ -468,7 +466,7 @@ app.post('/api/safety-checkin-response', async (req, res) => {
     // Update check-in with user response
     const updatedCheckIn = await storage.updateSafetyCheckIn(checkInId, {
       responseReceived: true,
-      userResponse,
+      responseNotes: userResponse,
       updatedAt: new Date()
     });
     
@@ -476,7 +474,7 @@ app.post('/api/safety-checkin-response', async (req, res) => {
       // Create follow-up intervention if user still needs help
       await storage.createCrisisIntervention({
         userId: updatedCheckIn.userId,
-        checkInId: updatedCheckIn.id,
+        safetyCheckInId: updatedCheckIn.id,
         interventionType: 'scheduled_followup',
         contactMethod: 'mental_health_professional',
         notes: `User reported still needing help. Current mood: ${currentMood}`,
@@ -650,7 +648,7 @@ app.post('/api/onboarding-profile', async (req, res) => {
       const username = answers.name || `user_${Date.now()}`;
       user = await storage.createUser({
         username,
-        password: 'temp_password'
+        passwordHash: 'temp_password'
       });
       actualUserId = user.id;
     } else if (!user) {
@@ -677,7 +675,7 @@ app.post('/api/onboarding-profile', async (req, res) => {
         userId: actualUserId,
         memory: insight.memory,
         category: insight.category,
-        importance: insight.importance
+        importance: 3
       });
     }
 

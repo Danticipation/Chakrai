@@ -360,7 +360,7 @@ export class DatabaseStorage {
   }
 
   async getPeerCheckInsByUserId(userId: number): Promise<PeerCheckIn[]> {
-    return await db.select().from(peerCheckIns).where(eq(peerCheckIns.checkInDate, new Date()));
+    return await db.select().from(peerCheckIns);
   }
 
   // Peer sessions
@@ -370,7 +370,7 @@ export class DatabaseStorage {
   }
 
   async getPeerSessionsByUserId(userId: number): Promise<PeerSession[]> {
-    return await db.select().from(peerSessions).where(eq(peerSessions.sessionDate, new Date()));
+    return await db.select().from(peerSessions);
   }
 
   // Community moderations
