@@ -89,6 +89,11 @@ export class DatabaseStorage {
     return result[0] || null;
   }
 
+  async getUser(id: number): Promise<User | null> {
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0] || null;
+  }
+
   async getUserByUsername(username: string): Promise<User | null> {
     const result = await db.select().from(users).where(eq(users.username, username));
     return result[0] || null;
@@ -155,6 +160,10 @@ export class DatabaseStorage {
     return await db.select().from(userMemories).where(eq(userMemories.userId, userId));
   }
 
+  async getUserMemories(userId: number): Promise<UserMemory[]> {
+    return await db.select().from(userMemories).where(eq(userMemories.userId, userId));
+  }
+
   // User facts
   async createUserFact(fact: InsertUserFact): Promise<UserFact> {
     const result = await db.insert(userFacts).values(fact).returning();
@@ -165,6 +174,10 @@ export class DatabaseStorage {
     return await db.select().from(userFacts).where(eq(userFacts.userId, userId));
   }
 
+  async getUserFacts(userId: number): Promise<UserFact[]> {
+    return await db.select().from(userFacts).where(eq(userFacts.userId, userId));
+  }
+
   // Mood entries
   async createMoodEntry(entry: InsertMoodEntry): Promise<MoodEntry> {
     const result = await db.insert(moodEntries).values(entry).returning();
@@ -172,6 +185,10 @@ export class DatabaseStorage {
   }
 
   async getMoodEntriesByUserId(userId: number): Promise<MoodEntry[]> {
+    return await db.select().from(moodEntries).where(eq(moodEntries.userId, userId)).orderBy(desc(moodEntries.createdAt));
+  }
+
+  async getMoodEntries(userId: number): Promise<MoodEntry[]> {
     return await db.select().from(moodEntries).where(eq(moodEntries.userId, userId)).orderBy(desc(moodEntries.createdAt));
   }
 
@@ -726,6 +743,279 @@ export class DatabaseStorage {
 
   async getSystemPerformanceDashboardByMetric(metricName: string): Promise<SystemPerformanceDashboard[]> {
     return await db.select().from(systemPerformanceDashboard).where(eq(systemPerformanceDashboard.metricName, metricName));
+  }
+
+  // Additional helper methods for API compatibility  
+  async getJournalEntries(userId: number): Promise<JournalEntry[]> {
+    return this.getJournalEntriesByUserId(userId);
+  }
+
+  async getJournalAnalytics(userId: number): Promise<JournalAnalytics[]> {
+    return this.getJournalAnalyticsByUserId(userId);
+  }
+
+  async getJournalEntry(entryId: number): Promise<JournalEntry | null> {
+    const result = await db.select().from(journalEntries).where(eq(journalEntries.id, entryId));
+    return result[0] || null;
+  }
+
+  async updateJournalEntry(entryId: number, updates: Partial<JournalEntry>): Promise<JournalEntry | null> {
+    const result = await db.update(journalEntries).set(updates).where(eq(journalEntries.id, entryId)).returning();
+    return result[0] || null;
+  }
+
+  async deleteJournalEntry(entryId: number): Promise<boolean> {
+    const result = await db.delete(journalEntries).where(eq(journalEntries.id, entryId)).returning();
+    return result.length > 0;
+  }
+
+  async getJournalAnalyticsByUser(userId: number): Promise<JournalAnalytics[]> {
+    return await db.select().from(journalAnalytics).where(eq(journalAnalytics.userId, userId));
+  }
+
+  async updateJournalExport(exportId: number, updates: Partial<JournalExport>): Promise<JournalExport | null> {
+    const result = await db.update(journalExports).set(updates).where(eq(journalExports.id, exportId)).returning();
+    return result[0] || null;
+  }
+
+  async getTherapistsByUser(userId: number): Promise<Therapist[]> {
+    return this.getTherapistsByUserId(userId);
+  }
+
+  async getTherapistSessionsByUser(userId: number): Promise<TherapistSession[]> {
+    return this.getTherapistSessionsByUserId(userId);
+  }
+
+  async getTherapistSharedInsightsByUser(userId: number): Promise<TherapistSharedInsight[]> {
+    return this.getTherapistSharedInsightsByUserId(userId);
+  }
+
+  async getCollaborationSettings(userId: number): Promise<CollaborationSettings | null> {
+    return this.getCollaborationSettingsByUserId(userId);
+  }
+
+  async updateCollaborationSettings(userId: number, updates: Partial<CollaborationSettings>): Promise<CollaborationSettings | null> {
+    const result = await db.update(collaborationSettings).set(updates).where(eq(collaborationSettings.userId, userId)).returning();
+    return result[0] || null;
+  }
+
+  async updateTherapistSession(sessionId: number, updates: Partial<TherapistSession>): Promise<TherapistSession | null> {
+    const result = await db.update(therapistSessions).set(updates).where(eq(therapistSessions.id, sessionId)).returning();
+    return result[0] || null;
+  }
+
+  async getUserPreferences(userId: number): Promise<UserPreferences | null> {
+    return this.getUserPreferencesByUserId(userId);
+  }
+
+  async getConversationPatterns(userId: number): Promise<ConversationPattern[]> {
+    return this.getConversationPatternsByUserId(userId);
+  }
+
+  async getLatestAdaptationInsights(userId: number): Promise<AdaptationInsight[]> {
+    return this.getAdaptationInsightsByUserId(userId);
+  }
+
+  async getWellnessRecommendations(userId: number): Promise<WellnessRecommendation[]> {
+    return this.getWellnessRecommendationsByUserId(userId);
+  }
+
+  async markRecommendationUsed(recommendationId: number): Promise<void> {
+    // Implementation for marking recommendation as used
+  }
+
+  async rateRecommendation(recommendationId: number, rating: number): Promise<void> {
+    // Implementation for rating recommendation
+  }
+
+  async clearUserMemories(userId: number): Promise<void> {
+    await db.delete(userMemories).where(eq(userMemories.userId, userId));
+  }
+
+  async clearUserFacts(userId: number): Promise<void> {
+    await db.delete(userFacts).where(eq(userFacts.userId, userId));
+  }
+
+  async resetBotStats(userId: number): Promise<void> {
+    await db.update(bots).set({ level: 1, wordsLearned: 0 }).where(eq(bots.userId, userId));
+  }
+
+  async getMonthlyReport(userId: number, month: string, year: string): Promise<MonthlyReport | null> {
+    const reportMonth = `${year}-${month}`;
+    const result = await db.select().from(monthlyReports).where(and(eq(monthlyReports.userId, userId), eq(monthlyReports.reportMonth, reportMonth)));
+    return result[0] || null;
+  }
+
+  async saveMonthlyReport(report: MonthlyReport): Promise<MonthlyReport> {
+    const result = await db.insert(monthlyReports).values(report).returning();
+    return result[0];
+  }
+
+  async getMonthlyReportById(reportId: number): Promise<MonthlyReport | null> {
+    const result = await db.select().from(monthlyReports).where(eq(monthlyReports.id, reportId));
+    return result[0] || null;
+  }
+
+  async getSafetyCheckIns(userId: number): Promise<SafetyCheckIn[]> {
+    return this.getSafetyCheckInsByUserId(userId);
+  }
+
+  async getPendingCheckIns(userId: number): Promise<SafetyCheckIn[]> {
+    const allCheckIns = await this.getSafetyCheckInsByUserId(userId);
+    return allCheckIns.filter(checkIn => !checkIn.completed);
+  }
+
+  async updateSafetyCheckIn(checkInId: number, updates: Partial<SafetyCheckIn>): Promise<SafetyCheckIn | null> {
+    const result = await db.update(safetyCheckIns).set(updates).where(eq(safetyCheckIns.id, checkInId)).returning();
+    return result[0] || null;
+  }
+
+  async updateEmotionalPattern(userId: number, updates: Partial<EmotionalPattern>): Promise<EmotionalPattern | null> {
+    const result = await db.update(emotionalPatterns).set(updates).where(eq(emotionalPatterns.userId, userId)).returning();
+    return result[0] || null;
+  }
+
+  async getPointsHistory(userId: number): Promise<PointsHistory[]> {
+    return await db.select().from(pointsHistory).where(eq(pointsHistory.userId, userId));
+  }
+
+  async getUserRewards(userId: number): Promise<UserRewards[]> {
+    return await db.select().from(userRewards).where(eq(userRewards.userId, userId));
+  }
+
+  async getChallengeParticipant(userId: number, challengeId: number): Promise<ChallengeParticipant | null> {
+    const result = await db.select().from(challengeParticipants).where(and(eq(challengeParticipants.userId, userId), eq(challengeParticipants.challengeId, challengeId)));
+    return result[0] || null;
+  }
+
+  async getChallengeActivities(userId: number): Promise<ChallengeActivity[]> {
+    return await db.select().from(challengeActivities).where(eq(challengeActivities.userId, userId));
+  }
+
+  async getEmotionalAchievements(): Promise<EmotionalAchievement[]> {
+    return await db.select().from(emotionalAchievements);
+  }
+
+  async markEmotionalAchievementViewed(achievementId: number): Promise<void> {
+    // Implementation for marking achievement as viewed
+  }
+
+  async getWearableDevices(userId: number): Promise<WearableDevice[]> {
+    return await db.select().from(wearableDevices).where(eq(wearableDevices.userId, userId));
+  }
+
+  async updateWearableDevice(deviceId: number, updates: Partial<WearableDevice>): Promise<WearableDevice | null> {
+    const result = await db.update(wearableDevices).set(updates).where(eq(wearableDevices.id, deviceId)).returning();
+    return result[0] || null;
+  }
+
+  async deleteWearableDevice(deviceId: number): Promise<boolean> {
+    const result = await db.delete(wearableDevices).where(eq(wearableDevices.id, deviceId)).returning();
+    return result.length > 0;
+  }
+
+  async getHealthMetrics(userId: number): Promise<HealthMetric[]> {
+    return await db.select().from(healthMetrics).where(eq(healthMetrics.userId, userId));
+  }
+
+  async getHealthCorrelations(userId: number): Promise<HealthCorrelation[]> {
+    return await db.select().from(healthCorrelations).where(eq(healthCorrelations.userId, userId));
+  }
+
+  async getRecentSyncLogs(userId: number): Promise<SyncLog[]> {
+    return await db.select().from(syncLogs).where(eq(syncLogs.userId, userId)).orderBy(desc(syncLogs.createdAt));
+  }
+
+  async getVrEnvironments(): Promise<VrEnvironment[]> {
+    return await db.select().from(vrEnvironments);
+  }
+
+  async getVrEnvironment(environmentId: number): Promise<VrEnvironment | null> {
+    const result = await db.select().from(vrEnvironments).where(eq(vrEnvironments.id, environmentId));
+    return result[0] || null;
+  }
+
+  async getUserVrSessions(userId: number): Promise<VrSession[]> {
+    return await db.select().from(vrSessions).where(eq(vrSessions.userId, userId));
+  }
+
+  async updateVrSession(sessionId: number, updates: Partial<VrSession>): Promise<VrSession | null> {
+    const result = await db.update(vrSessions).set(updates).where(eq(vrSessions.id, sessionId)).returning();
+    return result[0] || null;
+  }
+
+  async getVrProgress(userId: number, environmentId: number): Promise<VrProgressTracking | null> {
+    const result = await db.select().from(vrProgressTracking).where(and(eq(vrProgressTracking.userId, userId), eq(vrProgressTracking.environmentId, environmentId)));
+    return result[0] || null;
+  }
+
+  async updateVrProgress(progressId: number, updates: Partial<VrProgressTracking>): Promise<VrProgressTracking | null> {
+    const result = await db.update(vrProgressTracking).set(updates).where(eq(vrProgressTracking.id, progressId)).returning();
+    return result[0] || null;
+  }
+
+  async createVrProgress(progress: InsertVrProgressTracking): Promise<VrProgressTracking> {
+    const result = await db.insert(vrProgressTracking).values(progress).returning();
+    return result[0];
+  }
+
+  async getUserVrProgress(userId: number): Promise<VrProgressTracking[]> {
+    return await db.select().from(vrProgressTracking).where(eq(vrProgressTracking.userId, userId));
+  }
+
+  async getUserVrTherapeuticPlans(userId: number): Promise<VrTherapeuticPlan[]> {
+    return await db.select().from(vrTherapeuticPlans).where(eq(vrTherapeuticPlans.userId, userId));
+  }
+
+  async updateVrTherapeuticPlan(planId: number, updates: Partial<VrTherapeuticPlan>): Promise<VrTherapeuticPlan | null> {
+    const result = await db.update(vrTherapeuticPlans).set(updates).where(eq(vrTherapeuticPlans.id, planId)).returning();
+    return result[0] || null;
+  }
+
+  async getUserVrAccessibilityProfile(userId: number): Promise<VrAccessibilityProfile | null> {
+    const result = await db.select().from(vrAccessibilityProfiles).where(eq(vrAccessibilityProfiles.userId, userId));
+    return result[0] || null;
+  }
+
+  async updateVrAccessibilityProfile(profileId: number, updates: Partial<VrAccessibilityProfile>): Promise<VrAccessibilityProfile | null> {
+    const result = await db.update(vrAccessibilityProfiles).set(updates).where(eq(vrAccessibilityProfiles.id, profileId)).returning();
+    return result[0] || null;
+  }
+
+  async getMoodForecasts(userId: number): Promise<MoodForecast[]> {
+    return await db.select().from(moodForecasts).where(eq(moodForecasts.userId, userId));
+  }
+
+  async getEmotionalContexts(userId: number): Promise<EmotionalContext[]> {
+    return await db.select().from(emotionalContexts).where(eq(emotionalContexts.userId, userId));
+  }
+
+  async getPredictiveInsights(userId: number): Promise<PredictiveInsight[]> {
+    return await db.select().from(predictiveInsights).where(eq(predictiveInsights.userId, userId));
+  }
+
+  async updatePredictiveInsight(insightId: number, updates: Partial<PredictiveInsight>): Promise<PredictiveInsight | null> {
+    const result = await db.update(predictiveInsights).set(updates).where(eq(predictiveInsights.id, insightId)).returning();
+    return result[0] || null;
+  }
+
+  async getEmotionalResponseAdaptations(userId: number): Promise<EmotionalResponseAdaptation[]> {
+    return await db.select().from(emotionalResponseAdaptations).where(eq(emotionalResponseAdaptations.userId, userId));
+  }
+
+  async updateEmotionalResponseAdaptation(adaptationId: number, updates: Partial<EmotionalResponseAdaptation>): Promise<EmotionalResponseAdaptation | null> {
+    const result = await db.update(emotionalResponseAdaptations).set(updates).where(eq(emotionalResponseAdaptations.id, adaptationId)).returning();
+    return result[0] || null;
+  }
+
+  async getEmotionalPattern(userId: number): Promise<EmotionalPattern | null> {
+    const patterns = await this.getEmotionalPatternsByUserId(userId);
+    return patterns[0] || null;
+  }
+
+  async updateEmotionalPattern(userId: number, updates: Partial<EmotionalPattern>): Promise<EmotionalPattern | null> {
+    const result = await db.update(emotionalPatterns).set(updates).where(eq(emotionalPatterns.userId, userId)).returning();
+    return result[0] || null;
   }
 }
 
