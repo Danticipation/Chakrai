@@ -140,11 +140,6 @@ app.get('/api/horoscope/:sign', (req, res) => {
   });
 });
 
-// Test simple page
-app.get('/simple', (req, res) => {
-  res.sendFile(path.join(__dirname, '../test-simple.html'));
-});
-
 // Serve static files and handle React routes
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
