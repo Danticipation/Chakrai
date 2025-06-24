@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from 'url';
+import multer from 'multer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,6 +12,12 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 
 app.use(cors());
 app.use(express.json());
+
+// Configure multer for file uploads
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 25 * 1024 * 1024 } // 25MB limit
+});
 
 // Chat endpoint with OpenAI integration
 app.post('/api/chat', async (req, res) => {
@@ -79,13 +86,14 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// Stats endpoint
-app.get('/api/stats/:userId', (req, res) => {
+// Stats endpoint - support both with and without userId
+app.get('/api/stats/:userId?', (req, res) => {
   try {
     res.json({
       level: 3,
       stage: "Therapist", 
-      wordsLearned: 1000
+      wordsLearned: 1000,
+      wordCount: 1000
     });
   } catch (error) {
     console.error('Stats error:', error);
@@ -177,6 +185,96 @@ app.get('/api/horoscope/:sign', (req, res) => {
   res.json({ 
     horoscope: horoscopes[sign.toLowerCase()] || "Today is a great day for self-reflection and growth." 
   });
+});
+
+// Weekly summary endpoint
+app.get('/api/weekly-summary', (req, res) => {
+  try {
+    const summaries = [
+      "This week, you've shown remarkable growth in self-awareness and emotional intelligence.",
+      "Your conversations reflect deep introspection and a commitment to personal wellness.",
+      "This week's interactions demonstrate your resilience and willingness to explore difficult topics.",
+      "You've engaged thoughtfully with therapeutic concepts, showing genuine progress.",
+      "Your openness to growth and self-reflection has been particularly evident this week."
+    ];
+    
+    const randomSummary = summaries[Math.floor(Math.random() * summaries.length)];
+    res.json({ summary: randomSummary });
+  } catch (error) {
+    console.error('Weekly summary error:', error);
+    res.status(500).json({ error: 'Failed to get weekly summary' });
+  }
+});
+
+// Voice transcription endpoint
+app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file provided' });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(503).json({ 
+        error: 'Voice transcription temporarily unavailable',
+        errorType: 'auth_error'
+      });
+    }
+
+    const formData = new FormData();
+    const audioBlob = new Blob([req.file.buffer], { type: req.file.mimetype });
+    formData.append('file', audioBlob, 'audio.webm');
+    formData.append('model', 'whisper-1');
+
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return res.status(429).json({ 
+          error: 'Voice transcription temporarily unavailable due to high demand',
+          errorType: 'quota_exceeded'
+        });
+      }
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const result = await response.json();
+    res.json({ text: result.text });
+
+  } catch (error) {
+    console.error('Transcription error:', error);
+    res.status(500).json({ 
+      error: 'Voice transcription failed. Please try again.',
+      errorType: 'transcription_error'
+    });
+  }
+});
+
+// Text-to-speech endpoint
+app.post('/api/text-to-speech', async (req, res) => {
+  try {
+    const { text, voiceId = 'EkK5I93UQWFDigLMpZcX' } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    // For now, return a fallback response since ElevenLabs requires specific setup
+    // In production, this would connect to ElevenLabs API
+    res.status(503).json({ 
+      error: 'Voice synthesis temporarily unavailable. Please enable browser text-to-speech.',
+      fallback: true
+    });
+
+  } catch (error) {
+    console.error('Text-to-speech error:', error);
+    res.status(500).json({ error: 'Voice synthesis failed' });
+  }
 });
 
 // Serve static files from the built React app
