@@ -3373,11 +3373,7 @@ app.get('/api/health-metrics/:userId', async (req, res) => {
     const userId = parseInt(req.params.userId);
     const { metricType, limit } = req.query;
     
-    const metrics = await storage.getHealthMetrics(
-      userId, 
-      metricType as string, 
-      limit ? parseInt(limit as string) : undefined
-    );
+    const metrics = await storage.getHealthMetrics(parseInt(userId));
     
     res.json(metrics);
   } catch (error) {
@@ -3435,10 +3431,7 @@ app.get('/api/wearable-devices/:deviceId/sync-logs', async (req, res) => {
     const deviceId = parseInt(req.params.deviceId);
     const { limit } = req.query;
     
-    const logs = await storage.getRecentSyncLogs(
-      deviceId, 
-      limit ? parseInt(limit as string) : undefined
-    );
+    const logs = await storage.getRecentSyncLogs(deviceId);
     
     res.json(logs);
   } catch (error) {
@@ -3455,7 +3448,7 @@ app.get('/api/wearable-devices/:deviceId/sync-logs', async (req, res) => {
 app.get('/api/vr/environments', async (req, res) => {
   try {
     const { category } = req.query;
-    const environments = await storage.getVrEnvironments(category as string);
+    const environments = await storage.getVrEnvironments();
     res.json({ environments });
   } catch (error) {
     console.error('Failed to fetch VR environments:', error);
