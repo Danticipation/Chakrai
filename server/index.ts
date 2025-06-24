@@ -409,7 +409,6 @@ app.post('/api/crisis-analysis', async (req, res) => {
       await storage.createUserMemory({
         userId: userId || 1,
         memory: `Crisis analysis detected ${crisisAnalysis.riskLevel} risk - immediate support provided`,
-        category: 'crisis_intervention',
         importance: 5
       });
     }
@@ -537,7 +536,6 @@ app.post('/api/crisis-support', async (req, res) => {
       await storage.createUserMemory({
         userId: userId || 1,
         memory: `Crisis support provided - Risk level: ${riskLevel}`,
-        category: 'crisis_support',
         importance: 5
       });
       
@@ -683,7 +681,7 @@ app.post('/api/onboarding-profile', async (req, res) => {
         name: "Mirror",
         level: 1,
         wordsLearned: 0,
-        personalityTraits: profileData.initialTraits
+        personalityMode: 'therapist'
       });
     } else {
       await storage.updateBot(bot.id, {
@@ -740,7 +738,7 @@ app.post('/api/chat', async (req, res) => {
         name: "Mirror",
         level: 1,
         wordsLearned: 0,
-        personalityTraits: {}
+        personalityMode: 'therapist'
       });
     }
 
@@ -774,9 +772,7 @@ app.post('/api/chat', async (req, res) => {
           indicators: crisisAnalysis.indicators,
           checkInRequired: crisisAnalysis.requiresCheckIn,
           responseReceived: false,
-          followUpScheduled: crisisAnalysis.riskLevel === 'critical' ? 
-            new Date(Date.now() + 2 * 60 * 60 * 1000) : // 2 hours for critical
-            new Date(Date.now() + 6 * 60 * 60 * 1000)    // 6 hours for high
+          followUpScheduled: crisisAnalysis.riskLevel === 'critical'
         });
         
         checkInScheduled = true;
@@ -784,7 +780,7 @@ app.post('/api/chat', async (req, res) => {
         // Create crisis intervention record
         await storage.createCrisisIntervention({
           userId,
-          checkInId: checkIn.id,
+          safetyCheckInId: checkIn.id,
           interventionType: crisisAnalysis.riskLevel === 'critical' ? 'immediate_contact' : 'scheduled_followup',
           contactMethod: crisisAnalysis.riskLevel === 'critical' ? 'crisis_hotline' : 'mental_health_professional',
           scheduledAt: new Date()
@@ -795,7 +791,7 @@ app.post('/api/chat', async (req, res) => {
           userId,
           memory: `Crisis detection: ${crisisAnalysis.riskLevel} risk identified - support resources provided`,
           category: 'crisis_intervention',
-          importance: 'critical'
+          importance: 5
         });
       }
     } catch (error) {
@@ -805,9 +801,9 @@ app.post('/api/chat', async (req, res) => {
 
     // Store the user's message immediately
     await storage.createMessage({
-      botId: bot.id,
-      sender: 'user',
-      text: message
+      userId: userId || 1,
+      content: message,
+      isBot: false
     });
 
     // Get existing personality data for response generation
@@ -842,9 +838,9 @@ app.post('/api/chat', async (req, res) => {
 
     // Store bot's response
     await storage.createMessage({
-      botId: bot.id,
-      sender: 'bot',
-      text: botResponse
+      userId: userId || 1,
+      content: botResponse,
+      isBot: true
     });
 
     // Update word count
