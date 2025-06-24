@@ -265,7 +265,8 @@ const AppLayout = () => {
         personalityMode: personalityMode
       });
       
-      const botResponse = res.data.response;
+      console.log('Chat API Response:', res.data);
+      const botResponse = res.data.message || res.data.response;
       // Add bot message without triggering screen readers
       const botMessage = {
         sender: 'bot' as const,
