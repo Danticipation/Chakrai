@@ -851,11 +851,11 @@ app.post('/api/chat', async (req, res) => {
     });
 
     // Calculate stage
-    let stage = "Infant";
-    if (totalWords > 500) stage = "Adult";
-    else if (totalWords > 300) stage = "Adolescent";
-    else if (totalWords > 150) stage = "Child";
-    else if (totalWords > 50) stage = "Toddler";
+    let stage = "Therapist";
+    if (totalWords > 500) stage = "Therapist";
+    else if (totalWords > 300) stage = "Therapist";
+    else if (totalWords > 150) stage = "Therapist";
+    else if (totalWords > 50) stage = "Therapist";
 
     // Send response immediately with crisis analysis data
     res.json({
