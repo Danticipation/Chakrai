@@ -870,11 +870,6 @@ export class DatabaseStorage {
     return result[0] || null;
   }
 
-  async updateEmotionalPattern(userId: number, updates: Partial<EmotionalPattern>): Promise<EmotionalPattern | null> {
-    const result = await db.update(emotionalPatterns).set(updates).where(eq(emotionalPatterns.userId, userId)).returning();
-    return result[0] || null;
-  }
-
   async getPointsHistory(userId: number): Promise<PointsHistory[]> {
     return await db.select().from(pointsHistory).where(eq(pointsHistory.userId, userId));
   }
@@ -1013,10 +1008,6 @@ export class DatabaseStorage {
     return patterns[0] || null;
   }
 
-  async updateEmotionalPattern(userId: number, updates: Partial<EmotionalPattern>): Promise<EmotionalPattern | null> {
-    const result = await db.update(emotionalPatterns).set(updates).where(eq(emotionalPatterns.userId, userId)).returning();
-    return result[0] || null;
-  }
 }
 
 export const storage = new DatabaseStorage();
