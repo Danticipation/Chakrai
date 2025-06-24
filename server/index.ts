@@ -306,7 +306,7 @@ app.get('/api/emotional-patterns', async (req, res) => {
     const userId = parseInt(req.query.userId as string) || 1;
     
     // Get recent mood entries for pattern analysis
-    const recentEntries = await storage.getMoodEntries(userId, 50);
+    const recentEntries = await storage.getMoodEntriesByUserId(userId);
     
     if (recentEntries.length === 0) {
       return res.json({
@@ -434,7 +434,7 @@ app.get('/api/safety-checkins', async (req, res) => {
     const userId = parseInt(req.query.userId as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     
-    const checkIns = await storage.getSafetyCheckIns(userId, limit);
+    const checkIns = await storage.getSafetyCheckInsByUserId(userId);
     const pendingCheckIns = await storage.getPendingCheckIns(userId);
     
     res.json({
@@ -2696,7 +2696,7 @@ app.get('/api/emotional-achievements/:userId', async (req, res) => {
     const userId = parseInt(req.params.userId);
     const daysBack = parseInt(req.query.daysBack as string) || undefined;
     
-    const userAchievements = await storage.getUserEmotionalAchievements(userId, daysBack);
+    const userAchievements = await storage.getUserEmotionalAchievementsByUserId(userId);
     const allAchievements = await storage.getEmotionalAchievements();
     
     res.json({ 
@@ -2776,7 +2776,7 @@ app.get('/api/gamification/dashboard/:userId', async (req, res) => {
     ] = await Promise.all([
       getWellnessPointsBalance(userId, storage),
       getActiveChallenges(storage),
-      storage.getUserEmotionalAchievements(userId, 7),
+      storage.getUserEmotionalAchievementsByUserId(userId),
       storage.getUserRewards(userId),
       storage.getPointsHistory(userId, 10)
     ]);
