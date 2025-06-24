@@ -1962,7 +1962,7 @@ app.post('/api/personalization/use-recommendation', async (req, res) => {
     const { userId, recommendationId, timestamp } = req.body;
     
     // Mark recommendation as used
-    await storage.markRecommendationUsed(userId, recommendationId, timestamp);
+    await storage.markRecommendationUsed(userId);
     
     res.json({ success: true });
   } catch (error) {
@@ -1976,7 +1976,7 @@ app.post('/api/personalization/rate-recommendation', async (req, res) => {
   try {
     const { userId, recommendationId, rating } = req.body;
     
-    await storage.rateRecommendation(userId, recommendationId, rating);
+    await storage.rateRecommendation(userId, rating);
     
     // Update user preferences based on rating
     const preferences = await storage.getUserPreferences(userId);
@@ -2227,7 +2227,7 @@ app.post('/api/personalization/initialize', async (req, res) => {
       communicationStyle: initialPreferences?.communicationStyle || 'supportive',
       responseLength: initialPreferences?.responseLength || 'moderate',
       emotionalSupport: initialPreferences?.emotionalSupport || 'gentle',
-      sessionTiming: initialPreferences?.sessionTiming || 'flexible',
+
       voicePreference: initialPreferences?.voicePreference || 'james',
       adaptationLevel: 0.5,
       preferredTopics: [],
@@ -2273,7 +2273,7 @@ app.get('/api/analytics/monthly-report/:userId/:year/:month', async (req, res) =
     
     // Try to get existing report from storage
     const existingReport = await storage.getMonthlyReport(
-      userId,
+      parseInt(userId),
       parseInt(year),
       parseInt(month)
     );
@@ -2403,7 +2403,7 @@ app.get('/api/analytics/trends/:userId', async (req, res) => {
       const year = date.getFullYear();
       
       try {
-        const report = await storage.getMonthlyReport(userId, year, month);
+        const report = await storage.getMonthlyReport(parseInt(userId), year, month);
         if (report) {
           trends.push({
             month: `${year}-${month.toString().padStart(2, '0')}`,
@@ -3251,7 +3251,7 @@ app.post('/api/wearable-devices', async (req, res) => {
     await storage.createSyncLog({
       deviceId: device.id,
       syncStatus: 'success',
-      recordsProcessed: 0,
+      recordsSync: 0,
       syncDuration: 0,
       dataTypes: []
     });
@@ -3340,7 +3340,7 @@ app.post('/api/wearable-devices/:deviceId/sync', async (req, res) => {
         syncStatus: 'success',
         recordsProcessed: processedCount,
         syncDuration: Date.now() - startTime,
-        dataTypes: [...new Set(processedMetrics.map(m => m.metricType))]
+        dataTypes: []
       });
       
       res.json({ 
