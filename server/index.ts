@@ -3498,7 +3498,7 @@ app.get('/api/vr/recommendations/:userId', async (req, res) => {
     const { mood, goals } = req.query;
     const { generateVrRecommendations } = await import('./vrTherapyEngine');
     
-    const sessions = await storage.getUserVrSessions(userId, 10);
+    const sessions = await storage.getUserVrSessions(parseInt(userId));
     const therapeuticGoals = goals ? (goals as string).split(',') : undefined;
     
     const recommendations = await generateVrRecommendations(
@@ -3576,10 +3576,7 @@ app.post('/api/vr/sessions/:sessionId/complete', async (req, res) => {
       completionStatus: 'completed',
       effectivenessRating: effectiveness,
       stressLevelAfter: stressLevel,
-      heartRate,
-      interactions,
-      sideEffects,
-      notes
+      therapeuticNotes: notes
     });
     
     // Analyze session effectiveness
@@ -3589,7 +3586,9 @@ app.post('/api/vr/sessions/:sessionId/complete', async (req, res) => {
     if (session) {
       const existingProgress = await storage.getVrProgress(session.userId, session.environmentId);
       if (existingProgress && existingProgress.totalSessions !== null) {
-        await storage.updateVrProgress(existingProgress.id, existingProgress.totalSessions + 1);
+        await storage.updateVrProgress(existingProgress.id, {
+          totalSessions: existingProgress.totalSessions + 1
+        });
       } else {
         await storage.createVrProgress({
           userId: session.userId,
@@ -3633,7 +3632,7 @@ app.get('/api/vr/sessions/:userId', async (req, res) => {
     const userId = parseInt(req.params.userId);
     const { limit } = req.query;
     
-    const sessions = await storage.getUserVrSessions(userId, limit ? parseInt(limit as string) : 50);
+    const sessions = await storage.getUserVrSessions(parseInt(userId));
     res.json({ sessions });
   } catch (error) {
     console.error('Failed to fetch VR sessions:', error);
@@ -3648,8 +3647,8 @@ app.get('/api/vr/progress/:userId', async (req, res) => {
     const { environmentId } = req.query;
     
     const progress = environmentId 
-      ? await storage.getUserVrProgress(userId, parseInt(environmentId as string))
-      : await storage.getUserVrProgress(userId);
+      ? await storage.getUserVrProgress(parseInt(userId))
+      : await storage.getUserVrProgress(parseInt(userId));
     
     res.json({ progress });
   } catch (error) {
