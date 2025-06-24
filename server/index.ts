@@ -674,7 +674,6 @@ app.post('/api/onboarding-profile', async (req, res) => {
       await storage.createUserMemory({
         userId: actualUserId,
         memory: insight.memory,
-        category: insight.category,
         importance: 3
       });
     }
