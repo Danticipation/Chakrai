@@ -338,7 +338,7 @@ app.get('/api/emotional-patterns', async (req, res) => {
     const patterns = analyzeEmotionalPatterns(moodData);
     
     // Store updated patterns
-    await storage.updateEmotionalPattern(userId, {
+    await storage.createEmotionalPattern({
       userId,
       dominantEmotions: patterns.dominantEmotions,
       averageValence: Math.round(patterns.averageValence * 100),
@@ -662,8 +662,7 @@ app.post('/api/onboarding-profile', async (req, res) => {
       await storage.createUserFact({
         userId: actualUserId,
         fact: fact.fact,
-        category: fact.category,
-        confidence: 'high'
+        category: fact.category
       });
     }
 
@@ -1083,7 +1082,7 @@ async function processPersonalityAnalysisAsync(message: string, userId: number) 
           userId,
           fact: info,
           category: 'personal',
-          confidence: 'high'
+  
         });
       }
     }
