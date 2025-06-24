@@ -466,7 +466,6 @@ app.post('/api/safety-checkin-response', async (req, res) => {
     // Update check-in with user response
     const updatedCheckIn = await storage.updateSafetyCheckIn(checkInId, {
       responseReceived: true,
-      responseReceived: true,
       updatedAt: new Date()
     });
     
