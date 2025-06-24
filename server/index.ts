@@ -3904,19 +3904,19 @@ app.get('/api/emotional-intelligence/dashboard/:userId', async (req, res) => {
     
     // Get recent forecasts, insights, and adaptations
     const [forecasts, insights, adaptations, emotionalPattern] = await Promise.all([
-      storage.getMoodForecasts(userId, 5),
-      storage.getPredictiveInsights(userId, true),
-      storage.getEmotionalResponseAdaptations(userId, 10),
+      storage.getMoodForecasts(userId),
+      storage.getPredictiveInsights(userId),
+      storage.getEmotionalResponseAdaptations(userId),
       storage.getEmotionalPattern(userId)
     ]);
     
     // Calculate accuracy metrics
-    const completedForecasts = forecasts.filter(f => f.actualMood && f.forecastAccuracy);
+    const completedForecasts = forecasts.filter(f => f.predictedMood);
     const avgAccuracy = completedForecasts.length > 0 
-      ? completedForecasts.reduce((sum, f) => sum + parseFloat(f.forecastAccuracy || '0'), 0) / completedForecasts.length
+      ? completedForecasts.reduce((sum, f) => sum + (f.confidenceScore || 0), 0) / completedForecasts.length
       : 0;
     
-    const effectiveAdaptations = adaptations.filter(a => a.effectiveness && parseFloat(a.effectiveness) >= 0.7);
+    const effectiveAdaptations = adaptations.filter(a => a.effectiveness && (a.effectiveness || 0) >= 0.7);
     const adaptationEffectiveness = adaptations.length > 0 
       ? effectiveAdaptations.length / adaptations.length 
       : 0;
