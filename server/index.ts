@@ -179,17 +179,12 @@ app.get('/api/horoscope/:sign', (req, res) => {
   });
 });
 
-// Serve working app
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../working-app.html'));
-});
+// Serve static files from the built React app
+app.use(express.static(path.join(__dirname, '../dist/public')));
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '../client/dist')));
-
-// Handle all other routes
+// Handle all other routes - serve React app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../working-app.html'));
+  res.sendFile(path.join(__dirname, '../dist/public/index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
