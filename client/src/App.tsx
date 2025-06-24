@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, Route, useLocation } from 'wouter';
-import { MessageSquare, Brain, BarChart3, RefreshCw, Settings, User, Mic, Send, MicOff } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Heart, MessageSquare, BarChart3, Brain, User, Mic, Send, MicOff, RefreshCw, Settings } from 'lucide-react';
 import { apiRequest } from './lib/queryClient';
 
 // Type definitions
@@ -98,128 +97,156 @@ function useVoiceRecording() {
           resolve(data.text || '');
         } catch (error) {
           console.error('Transcription error:', error);
-          reject('Voice transcription temporarily unavailable');
+          reject('Failed to transcribe audio');
         } finally {
           setIsTranscribing(false);
-          
-          // Clean up media stream
-          if (mediaRecorderRef.current?.stream) {
-            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-          }
         }
       };
 
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+
+      // Stop all audio tracks
+      if (mediaRecorderRef.current.stream) {
+        mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      }
     });
   };
 
-  return {
-    isRecording,
-    isTranscribing,
-    startRecording,
-    stopRecording
-  };
+  return { isRecording, isTranscribing, startRecording, stopRecording };
 }
 
-// Chat Component
-function ChatTab() {
+// Daily Reflection Component
+function DailyReflection() {
+  const reflections = [
+    "Today is a new opportunity for growth and healing.",
+    "Your journey of self-discovery is unique and valuable.",
+    "Every small step forward is worth celebrating.",
+    "You have the strength to overcome challenges.",
+    "Remember to be kind to yourself today."
+  ];
+
+  const todayReflection = reflections[new Date().getDay() % reflections.length];
+
+  return (
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg border border-blue-200">
+      <div className="flex items-center gap-3 mb-4">
+        <Heart className="h-6 w-6 text-pink-500" />
+        <h2 className="text-lg font-semibold text-gray-800">Daily Reflection</h2>
+      </div>
+      <p className="text-gray-700 leading-relaxed mb-4">{todayReflection}</p>
+      <div className="text-sm text-gray-600">
+        Take a moment to reflect on your thoughts and feelings today.
+      </div>
+    </div>
+  );
+}
+
+// Chat Component with Voice
+function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { isRecording, isTranscribing, startRecording, stopRecording } = useVoiceRecording();
 
-  const sendMessage = async (text: string) => {
+  const chatMutation = useMutation({
+    mutationFn: async (message: string) => {
+      const response = await apiRequest('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({ message }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return response;
+    },
+    onSuccess: (data) => {
+      const botMessage: Message = {
+        sender: 'bot',
+        text: data.message || data.response || 'I understand.',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, botMessage]);
+    },
+    onError: (error) => {
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
+        sender: 'bot',
+        text: 'I apologize, but I\'m having trouble responding right now. Please try again.',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    }
+  });
+
+  const handleSendMessage = (text: string) => {
     if (!text.trim() || isLoading) return;
 
     const userMessage: Message = {
       sender: 'user',
       text: text.trim(),
-      time: new Date().toLocaleTimeString()
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
+    setInputText('');
     setIsLoading(true);
-
-    try {
-      const response = await apiRequest('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text.trim(), userId: 1 })
-      });
-
-      if (response.message) {
-        const botMessage: Message = {
-          sender: 'bot',
-          text: response.message,
-          time: new Date().toLocaleTimeString()
-        };
-        setMessages(prev => [...prev, botMessage]);
-        
-        // Invalidate stats to refresh after conversation
-        queryClient.invalidateQueries({ queryKey: ['/api/bot-stats'] });
-      }
-    } catch (error) {
-      console.error('Chat error:', error);
-      const errorMessage: Message = {
-        sender: 'bot',
-        text: 'I apologize, but I\'m having trouble responding right now. Please try again.',
-        time: new Date().toLocaleTimeString()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
+    chatMutation.mutate(text.trim());
   };
 
-  const handleVoiceToggle = async () => {
+  const handleVoiceRecord = async () => {
     if (isRecording) {
       try {
-        const transcription = await stopRecording();
-        if (transcription) {
-          await sendMessage(transcription);
+        const transcribedText = await stopRecording();
+        if (transcribedText.trim()) {
+          setInputText(transcribedText);
         }
       } catch (error) {
         console.error('Voice recording error:', error);
       }
     } else {
-      startRecording();
+      await startRecording();
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    sendMessage(inputValue);
+    handleSendMessage(inputText);
   };
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-blue-50 to-white">
-      {/* Header */}
-      <div className="bg-white border-b border-blue-200 p-4">
-        <h2 className="text-xl font-semibold text-gray-800">Chat with TraI</h2>
-        <p className="text-sm text-gray-600">Your personal mental wellness companion</p>
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col" style={{ height: '600px' }}>
+      {/* Chat Header */}
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-2xl">
+        <div className="flex items-center gap-3">
+          <MessageSquare className="h-6 w-6" />
+          <h2 className="text-lg font-semibold">Welcome to TraI</h2>
+        </div>
+        <p className="text-blue-100 text-sm mt-1">Start a conversation to begin your wellness journey. I'm here to listen and support you.</p>
       </div>
 
-      {/* Messages */}
+      {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="text-center py-8">
-            <div className="bg-blue-100 rounded-lg p-6 max-w-sm mx-auto">
-              <MessageSquare className="h-12 w-12 text-blue-600 mx-auto mb-3" />
-              <h3 className="text-lg font-medium text-gray-800 mb-2">Welcome to TraI</h3>
-              <p className="text-gray-600 text-sm">Start a conversation to begin your wellness journey. I'm here to listen and support you.</p>
-            </div>
+          <div className="text-center text-gray-500 mt-8">
+            <MessageSquare className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+            <p>Start a conversation to begin your wellness journey.</p>
           </div>
         )}
         
         {messages.map((message, index) => (
           <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-              message.sender === 'user'
-                ? 'bg-blue-500 text-white'
-                : 'bg-white border border-gray-200 text-gray-800'
+            <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+              message.sender === 'user' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-gray-100 text-gray-800'
             }`}>
               <p className="text-sm">{message.text}</p>
               <p className={`text-xs mt-1 ${
@@ -233,213 +260,312 @@ function ChatTab() {
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-gray-200 rounded-lg px-4 py-2 max-w-xs">
+            <div className="bg-gray-100 text-gray-800 max-w-xs lg:max-w-md px-4 py-2 rounded-2xl">
               <div className="flex items-center space-x-2">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
-                <span className="text-xs text-gray-500">TraI is thinking...</span>
+                <span className="text-xs text-gray-500">Thinking...</span>
               </div>
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="bg-white border-t border-gray-200 p-4">
-        <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+      {/* Input Area */}
+      <div className="p-4 border-t border-gray-200">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <div className="flex-1 relative">
             <input
               type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder={isTranscribing ? "Transcribing..." : "Type your message..."}
-              disabled={isLoading || isTranscribing}
-              className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Share your thoughts..."
+              className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white"
+              style={{ backgroundColor: '#1e3a8a' }}
+              disabled={isLoading}
             />
             <button
               type="button"
-              onClick={handleVoiceToggle}
-              disabled={isLoading || isTranscribing}
-              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded ${
+              onClick={handleVoiceRecord}
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-colors ${
                 isRecording 
-                  ? 'text-red-500 animate-pulse' 
-                  : 'text-gray-400 hover:text-blue-500'
+                  ? 'bg-red-500 text-white animate-pulse' 
+                  : 'bg-gray-600 text-white hover:bg-gray-700'
               }`}
+              disabled={isLoading || isTranscribing}
             >
-              {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+              {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </button>
           </div>
           <button
             type="submit"
-            disabled={isLoading || !inputValue.trim() || isTranscribing}
-            className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!inputText.trim() || isLoading}
+            className="bg-gray-600 text-white p-3 rounded-xl hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Send className="h-5 w-5" />
           </button>
         </form>
+        {isTranscribing && (
+          <p className="text-sm text-gray-500 mt-2">Transcribing your voice...</p>
+        )}
       </div>
     </div>
   );
 }
 
-// Stats Component
-function StatsTab() {
-  const queryClient = useQueryClient();
-  
-  const { data: stats, isLoading } = useQuery({
+// Progress Component
+function ProgressTracking() {
+  const { data: stats } = useQuery({
     queryKey: ['/api/bot-stats'],
-    queryFn: () => apiRequest('/api/bot-stats?userId=1')
+    queryFn: async () => {
+      const response = await apiRequest('/api/bot-stats');
+      return response as BotStats;
+    }
   });
 
+  const queryClient = useQueryClient();
+
   const resetMutation = useMutation({
-    mutationFn: () => apiRequest('/api/clear-memories', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: 1 })
-    }),
+    mutationFn: async () => {
+      return await apiRequest('/api/reset-bot', { method: 'POST' });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bot-stats'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/personality-insights'] });
     }
   });
 
   const handleReset = () => {
-    if (confirm('Are you sure you want to reset all bot progress? This will clear all memories and reset statistics to zero.')) {
+    if (confirm('Are you sure you want to reset the bot to starting values? This will clear all progress.')) {
       resetMutation.mutate();
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading statistics...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-6 bg-gradient-to-b from-green-50 to-white h-full">
-      <div className="max-w-md mx-auto">
-        <div className="text-center mb-6">
-          <Brain className="h-12 w-12 text-green-600 mx-auto mb-3" />
-          <h2 className="text-2xl font-bold text-gray-800">Bot Progress</h2>
-          <p className="text-gray-600">Track your AI companion's learning journey</p>
+    <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-6 shadow-lg border border-green-200">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <BarChart3 className="h-6 w-6 text-green-500" />
+          <h2 className="text-lg font-semibold text-gray-800">Wellness Goals</h2>
         </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-green-200 p-6 mb-6">
-          <div className="space-y-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">{stats?.level || 1}</div>
-              <div className="text-sm text-gray-600">Current Level</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-xl font-semibold text-gray-800">{stats?.stage || 'Learning'}</div>
-              <div className="text-sm text-gray-600">Development Stage</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{stats?.wordsLearned || 0}</div>
-              <div className="text-sm text-gray-600">Words Learned</div>
-            </div>
-          </div>
-        </div>
-
         <button
           onClick={handleReset}
           disabled={resetMutation.isPending}
-          className="w-full bg-red-500 text-white py-3 px-4 rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+          className="flex items-center gap-2 px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm disabled:opacity-50"
         >
-          <RefreshCw className={`h-5 w-5 ${resetMutation.isPending ? 'animate-spin' : ''}`} />
-          <span>{resetMutation.isPending ? 'Resetting...' : 'Reset Bot Progress'}</span>
+          <RefreshCw className={`h-4 w-4 ${resetMutation.isPending ? 'animate-spin' : ''}`} />
+          Reset
         </button>
-        
-        {resetMutation.isSuccess && (
-          <div className="mt-4 p-3 bg-green-100 border border-green-200 rounded-lg">
-            <p className="text-green-800 text-sm text-center">Bot successfully reset to fresh state!</p>
-          </div>
-        )}
       </div>
+      
+      {stats ? (
+        <div className="space-y-4">
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-600">Current Stage</span>
+              <span className="text-lg font-bold text-blue-600">{stats.stage}</span>
+            </div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-600">Level</span>
+              <span className="text-lg font-bold text-green-600">{stats.level}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-gray-600">Words Learned</span>
+              <span className="text-lg font-bold text-purple-600">{stats.wordsLearned}</span>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Progress Overview</h3>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min((stats.level / 10) * 100, 100)}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Level {stats.level} of 10</p>
+          </div>
+        </div>
+      ) : (
+        <div className="animate-pulse space-y-4">
+          <div className="bg-gray-200 h-4 rounded"></div>
+          <div className="bg-gray-200 h-4 rounded w-3/4"></div>
+          <div className="bg-gray-200 h-4 rounded w-1/2"></div>
+        </div>
+      )}
     </div>
   );
 }
 
-// Insights Component
-function InsightsTab() {
-  const { data: insights, isLoading } = useQuery({
+// Memory Component
+function MemoryInsights() {
+  const { data: insights } = useQuery({
     queryKey: ['/api/personality-insights'],
-    queryFn: () => apiRequest('/api/personality-insights?userId=1')
+    queryFn: async () => {
+      const response = await apiRequest('/api/personality-insights');
+      return response as PersonalityInsights;
+    }
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading insights...</p>
-        </div>
+  return (
+    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-lg border border-purple-200">
+      <div className="flex items-center gap-3 mb-4">
+        <Brain className="h-6 w-6 text-purple-500" />
+        <h2 className="text-lg font-semibold text-gray-800">Memory & Insights</h2>
       </div>
-    );
-  }
+      
+      {insights ? (
+        <div className="space-y-4">
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Communication Style</h3>
+            <p className="text-gray-800">{insights.communicationStyle}</p>
+          </div>
+          
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Key Insights</h3>
+            <ul className="space-y-1">
+              {insights.keyInsights.map((insight, index) => (
+                <li key={index} className="text-gray-800 text-sm">• {insight}</li>
+              ))}
+            </ul>
+          </div>
+          
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Dominant Traits</h3>
+            <div className="flex flex-wrap gap-2">
+              {insights.dominantTraits.map((trait, index) => (
+                <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
+                  {trait}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="animate-pulse space-y-4">
+          <div className="bg-gray-200 h-4 rounded"></div>
+          <div className="bg-gray-200 h-4 rounded w-3/4"></div>
+          <div className="bg-gray-200 h-4 rounded w-1/2"></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Reflection Component
+function ReflectionTab() {
+  const queryClient = useQueryClient();
+  
+  const { data: insights, refetch } = useQuery({
+    queryKey: ['/api/personality-insights'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/personality-insights');
+      return response as PersonalityInsights;
+    }
+  });
+
+  const handleRefresh = () => {
+    refetch();
+  };
 
   return (
-    <div className="p-6 bg-gradient-to-b from-purple-50 to-white h-full overflow-y-auto">
-      <div className="max-w-md mx-auto">
-        <div className="text-center mb-6">
-          <User className="h-12 w-12 text-purple-600 mx-auto mb-3" />
-          <h2 className="text-2xl font-bold text-gray-800">Personality Insights</h2>
-          <p className="text-gray-600">Discover your communication patterns</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <User className="h-6 w-6 text-indigo-500" />
+          <h2 className="text-xl font-semibold text-gray-800">Personality Reflection</h2>
         </div>
+        <button
+          onClick={handleRefresh}
+          className="flex items-center gap-2 px-3 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Refresh
+        </button>
+      </div>
 
-        {insights ? (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border border-purple-200 p-4">
-              <h3 className="font-semibold text-gray-800 mb-2">Communication Style</h3>
-              <p className="text-gray-600 capitalize">{insights.communicationStyle}</p>
-            </div>
+      {insights ? (
+        <div className="grid gap-6">
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 shadow-lg border border-indigo-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Communication Style Analysis</h3>
+            <p className="text-gray-700 leading-relaxed">{insights.communicationStyle}</p>
+          </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-purple-200 p-4">
-              <h3 className="font-semibold text-gray-800 mb-3">Key Insights</h3>
-              <ul className="space-y-2">
-                {insights.keyInsights?.map((insight: string, index: number) => (
-                  <li key={index} className="text-gray-600 text-sm">• {insight}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-purple-200 p-4">
-              <h3 className="font-semibold text-gray-800 mb-3">Dominant Traits</h3>
-              <div className="flex flex-wrap gap-2">
-                {insights.dominantTraits?.map((trait: string, index: number) => (
-                  <span key={index} className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                    {trait}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-purple-200 p-4">
-              <h3 className="font-semibold text-gray-800 mb-3">Interests</h3>
-              <div className="flex flex-wrap gap-2">
-                {insights.interests?.map((interest: string, index: number) => (
-                  <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                    {interest}
-                  </span>
-                ))}
-              </div>
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 shadow-lg border border-blue-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Key Personality Insights</h3>
+            <div className="space-y-3">
+              {insights.keyInsights.map((insight, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">{insight}</p>
+                </div>
+              ))}
             </div>
           </div>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-gray-600">Start chatting to generate personality insights</p>
+
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 shadow-lg border border-green-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Dominant Traits & Characteristics</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {insights.dominantTraits.map((trait, index) => (
+                <div key={index} className="bg-white rounded-lg p-3 border border-gray-200 text-center">
+                  <span className="text-sm font-medium text-gray-800">{trait}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
+
+          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 shadow-lg border border-orange-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Interests & Focus Areas</h3>
+            <div className="flex flex-wrap gap-2">
+              {insights.interests.map((interest, index) => (
+                <span key={index} className="px-3 py-2 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
+                  {interest}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="animate-pulse space-y-6">
+          <div className="bg-gray-200 h-32 rounded-2xl"></div>
+          <div className="bg-gray-200 h-24 rounded-2xl"></div>
+          <div className="bg-gray-200 h-20 rounded-2xl"></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Settings Component
+function SettingsTab() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <Settings className="h-6 w-6 text-gray-600" />
+        <h2 className="text-xl font-semibold text-gray-800">Settings</h2>
+      </div>
+      
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Application Information</h3>
+        <div className="space-y-3 text-gray-600">
+          <p><strong>Application:</strong> TraI - Mental Wellness & Therapy</p>
+          <p><strong>Version:</strong> 1.0.0</p>
+          <p><strong>Purpose:</strong> Professional therapeutic support and mental wellness</p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Features</h3>
+        <ul className="space-y-2 text-gray-600">
+          <li>• Voice-enabled conversations</li>
+          <li>• Personality analysis and insights</li>
+          <li>• Progress tracking</li>
+          <li>• Daily reflections</li>
+          <li>• Therapeutic support</li>
+        </ul>
       </div>
     </div>
   );
@@ -447,58 +573,68 @@ function InsightsTab() {
 
 // Main App Component
 export default function App() {
-  const [location] = useLocation();
-  
-  const navItems = [
-    { path: '/', icon: MessageSquare, label: 'Chat', component: ChatTab },
-    { path: '/stats', icon: BarChart3, label: 'Stats', component: StatsTab },
-    { path: '/insights', icon: User, label: 'Insights', component: InsightsTab }
+  const [activeTab, setActiveTab] = useState('daily');
+
+  const tabs = [
+    { id: 'daily', label: 'Daily', icon: Heart, component: DailyReflection },
+    { id: 'voice', label: 'Voice', icon: MessageSquare, component: ChatInterface },
+    { id: 'progress', label: 'Progress', icon: BarChart3, component: ProgressTracking },
+    { id: 'memory', label: 'Memory', icon: Brain, component: MemoryInsights },
+    { id: 'reflect', label: 'Reflect', icon: User, component: ReflectionTab },
+    { id: 'settings', label: 'Settings', icon: Settings, component: SettingsTab },
   ];
 
-  const currentTab = navItems.find(item => item.path === location) || navItems[0];
-  const CurrentComponent = currentTab.component;
+  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || DailyReflection;
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#ADD8E6' }}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Brain className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold text-gray-800">TraI</span>
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <Brain className="h-8 w-8 text-blue-600" />
+              <h1 className="text-xl font-bold text-gray-900">TraI</h1>
+            </div>
+            <div className="text-sm text-gray-600">Mental Wellness & Therapy</div>
           </div>
-          <div className="text-sm text-gray-600">Mental Wellness Companion</div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
-        <CurrentComponent />
-      </main>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar Navigation */}
+          <div className="lg:col-span-1">
+            <nav className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4">
+              <div className="space-y-2">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors ${
+                        activeTab === tab.id
+                          ? 'bg-blue-100 text-blue-700 font-medium'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </nav>
+          </div>
 
-      {/* Bottom Navigation */}
-      <nav className="bg-white border-t border-gray-200 px-4 py-2">
-        <div className="flex justify-around">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location === item.path;
-            return (
-              <Link
-                key={item.path}
-                href={item.path}
-                className={`flex flex-col items-center py-2 px-3 rounded-lg min-w-0 ${
-                  isActive
-                    ? 'bg-blue-100 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <Icon className="h-6 w-6 mb-1" />
-                <span className="text-xs font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
+          {/* Main Content Area */}
+          <div className="lg:col-span-3">
+            <ActiveComponent />
+          </div>
         </div>
-      </nav>
+      </div>
     </div>
   );
 }
