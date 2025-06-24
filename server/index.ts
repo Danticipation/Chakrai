@@ -1329,7 +1329,7 @@ app.post('/api/journal', async (req, res) => {
         emotionalThemes: analysis.emotionalThemes,
 
         sentiment: analysis.sentimentScore,
-        emotionalIntensity: analysis.emotionalIntensity,
+
         copingStrategies: analysis.copingStrategies,
         growthIndicators: analysis.growthIndicators,
         concernAreas: analysis.concernAreas,
@@ -1408,7 +1408,7 @@ app.get('/api/journal/analytics/:userId', async (req, res) => {
     const userId = parseInt(req.params.userId);
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
     
-    const analytics = await storage.getJournalAnalyticsByUser(userId, limit);
+    const analytics = await storage.getJournalAnalyticsByUser(userId);
     res.json(analytics);
   } catch (error) {
     console.error('Failed to fetch journal analytics:', error);
@@ -1423,8 +1423,8 @@ app.post('/api/journal/export', async (req, res) => {
     const { userId, format, dateRange, includeAnalytics, recipientType } = req.body;
     
     // Get entries and analytics
-    const entries = await storage.getJournalEntries(userId, 1000);
-    const analytics = includeAnalytics ? await storage.getJournalAnalyticsByUser(userId, 1000) : [];
+    const entries = await storage.getJournalEntries(userId);
+    const analytics = includeAnalytics ? await storage.getJournalAnalyticsByUser(userId) : [];
     
     let exportData: any;
     let summary: string;
@@ -1525,7 +1525,7 @@ app.post('/api/therapists', async (req, res) => {
 app.get('/api/therapist-sessions', async (req, res) => {
   try {
     const { userId } = req.query;
-    const sessions = await storage.getTherapistSessionsByUser(userId as string);
+    const sessions = await storage.getTherapistSessionsByUser(parseInt(userId as string));
     res.json(sessions);
   } catch (error) {
     console.error('Failed to fetch sessions:', error);
@@ -1538,8 +1538,8 @@ app.post('/api/therapist-sessions', async (req, res) => {
     const sessionData = req.body;
     
     // Generate AI session preparation
-    const userJournalEntries = await storage.getJournalEntries(sessionData.userId, 5);
-    const userMoodEntries = await storage.getMoodEntries(sessionData.userId, 10);
+    const userJournalEntries = await storage.getJournalEntries(sessionData.userId);
+    const userMoodEntries = await storage.getMoodEntries(sessionData.userId);
     
     // AI-generated session preparation
     const sessionPrep = await generateSessionPreparation(userJournalEntries, userMoodEntries);
@@ -1559,7 +1559,7 @@ app.post('/api/therapist-sessions', async (req, res) => {
 app.get('/api/therapist-insights', async (req, res) => {
   try {
     const { userId } = req.query;
-    const insights = await storage.getTherapistSharedInsightsByUser(userId as string);
+    const insights = await storage.getTherapistSharedInsightsByUser(parseInt(userId as string));
     res.json(insights);
   } catch (error) {
     console.error('Failed to fetch insights:', error);
@@ -1581,18 +1581,18 @@ app.post('/api/therapist-insights', async (req, res) => {
 app.get('/api/collaboration-settings', async (req, res) => {
   try {
     const { userId } = req.query;
-    let settings = await storage.getCollaborationSettings(userId as string);
+    let settings = await storage.getCollaborationSettings(parseInt(userId as string));
     
     // Create default settings if none exist
     if (!settings) {
       settings = await storage.createCollaborationSettings({
-        userId: userId as string,
+        userId: parseInt(userId as string),
         autoShareJournalSummaries: false,
         shareFrequency: 'weekly',
         allowCrisisAlerts: true,
         shareEmotionalPatterns: true,
         shareProgressMetrics: true,
-        privacyLevel: 'standard'
+        privacyLevel: 'comprehensive'
       });
     }
     
@@ -1661,7 +1661,7 @@ app.post('/api/sessions/:id/meeting-link', async (req, res) => {
     const meetingLink = `https://meet.example.com/session-${sessionId}-${Date.now()}`;
     
     const session = await storage.updateTherapistSession(sessionId, { 
-      meetingLink,
+
       status: 'scheduled'
     });
     
