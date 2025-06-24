@@ -1334,7 +1334,7 @@ app.post('/api/journal', async (req, res) => {
 
 
         recommendedActions: analysis.recommendedActions,
-        therapistNotes: analysis.therapistNotes,
+
         patternConnections: analysis.patternConnections,
         confidenceScore: analysis.confidenceScore
       });
@@ -1998,10 +1998,7 @@ app.post('/api/personalization/feedback', async (req, res) => {
       rating: responseQuality,
       feedbackType: 'session_feedback',
       comments: specificFeedback,
-      responseQuality,
-      helpfulness,
-      personalRelevance,
-      communicationMatch,
+
       specificFeedback
     });
     
@@ -2202,7 +2199,9 @@ app.get('/api/analytics/monthly-report/:userId/:year/:month', async (req, res) =
     
     // Try to get existing report from storage
     const existingReport = await storage.getMonthlyReport(
-      userId.toString()
+      userId.toString(),
+      parseInt(year),
+      parseInt(month)
     );
     
     if (existingReport) {
@@ -2330,7 +2329,7 @@ app.get('/api/analytics/trends/:userId', async (req, res) => {
       const year = date.getFullYear();
       
       try {
-        const report = await storage.getMonthlyReport(userId, year, month);
+        const report = await storage.getMonthlyReport(userId.toString(), year, month);
         if (report) {
           trends.push({
             month: `${year}-${month.toString().padStart(2, '0')}`,
@@ -2571,7 +2570,7 @@ app.get('/api/wellness-points/:userId/history', async (req, res) => {
     const userId = parseInt(req.params.userId);
     const limit = parseInt(req.query.limit as string) || 50;
     
-    const history = await storage.getPointsHistory(userId, limit);
+    const history = await storage.getPointsHistory(userId);
     res.json({ history });
   } catch (error) {
     console.error('Error getting points history:', error);
@@ -2652,7 +2651,7 @@ app.get('/api/community-challenges/:challengeId/progress/:userId', async (req, r
     const userId = parseInt(req.params.userId);
     
     const participant = await storage.getChallengeParticipant(challengeId, userId);
-    const activities = await storage.getChallengeActivities(challengeId, userId);
+    const activities = await storage.getChallengeActivities(challengeId);
     
     res.json({ 
       participant,
@@ -2721,7 +2720,7 @@ app.post('/api/emotional-achievements/:userId/mark-viewed', async (req, res) => 
     const userId = parseInt(req.params.userId);
     const { achievementId } = req.body;
     
-    await storage.markEmotionalAchievementViewed(userId, achievementId);
+    await storage.markEmotionalAchievementViewed(userId);
     res.json({ success: true });
   } catch (error) {
     console.error('Error marking achievement as viewed:', error);
@@ -2767,7 +2766,7 @@ app.get('/api/gamification/dashboard/:userId', async (req, res) => {
       getActiveChallenges(storage),
       storage.getUserEmotionalAchievementsByUserId(userId),
       storage.getUserRewards(userId),
-      storage.getPointsHistory(userId, 10)
+      storage.getPointsHistory(userId)
     ]);
 
     // Get user's challenge participation
@@ -2777,8 +2776,8 @@ app.get('/api/gamification/dashboard/:userId', async (req, res) => {
         return {
           ...challenge,
           isParticipating: !!participant,
-          progress: participant?.currentProgress || 0,
-          completedDays: participant?.completedDays || 0
+          progress: participant?.progress || 0,
+          completedDays: participant?.completed ? 1 : 0
         };
       })
     );
