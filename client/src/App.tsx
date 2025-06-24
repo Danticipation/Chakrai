@@ -1,34 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users, Activity, Headphones, Gift, Zap, Shield, Lock, Home, Menu, BarChart, Settings, Lightbulb } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, FileText, UserCheck, Award, Users, Activity, Headphones, Gift, Zap, Shield, Lock, Home, Menu, BarChart, Settings, Lightbulb, MicOff } from 'lucide-react';
 import axios from 'axios';
-import MemoryDashboard from './components/MemoryDashboard';
-import VoiceSelector from './components/VoiceSelector';
-import OnboardingQuiz from './components/OnboardingQuiz';
-import MoodTracker from './components/MoodTracker';
-import CrisisAlert from './components/CrisisAlert';
-import JournalDashboard from './components/JournalDashboard';
-import TherapistPortal from './components/TherapistPortal';
-import AchievementDashboard from './components/AchievementDashboard';
-import CommunityPortal from './components/CommunityPortal';
-import HealthDashboard from './components/HealthDashboard';
-import VRTherapyDashboard from './components/VRTherapyDashboard';
-import EnhancedGamificationDashboard from './components/EnhancedGamificationDashboard';
-import EmotionalIntelligenceDashboard from './components/EmotionalIntelligenceDashboard';
-import AiPerformanceMonitoringDashboard from './components/AiPerformanceMonitoringDashboard';
-import PrivacyComplianceDashboard from './components/PrivacyComplianceDashboard';
+
+// Set up CSS variables for therapeutic design
+const cssVariables = `
+:root {
+  --soft-blue: #ADD8E6;
+  --pale-green: #98FB98;
+  --gentle-lavender: #E6E6FA;
+  --soft-blue-dark: #4682B4;
+  --surface-primary: #FFFFFF;
+  --surface-secondary: #F8F9FA;
+  --text-primary: #FFFFFF;
+  --text-secondary: #E0E0E0;
+  --border-light: #E5E7EB;
+}
+
+body {
+  background: linear-gradient(135deg, var(--soft-blue) 0%, var(--pale-green) 50%, var(--gentle-lavender) 100%);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+* {
+  color: #FFFFFF !important;
+}
+`;
+
+// Inject CSS
+const styleSheet = document.createElement("style");
+styleSheet.innerText = cssVariables;
+document.head.appendChild(styleSheet);
 
 // Use the actual TrAI logo from public directory
 const traiLogo = '/TrAI-Logo.png';
 
-// DashboardHome Component - Mobile-optimized home dashboard
-interface DashboardHomeProps {
-  botStats: BotStats | null;
-  goals: Goal[];
-  dailyReflection: string;
-  onNavigate: (section: string) => void;
-}
+// Query client setup
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+    },
+  },
+});
 
+// Interfaces
 interface BotStats {
   level: number;
   stage: string;
@@ -49,1037 +68,654 @@ interface Goal {
   color: string;
 }
 
-const DashboardHome: React.FC<DashboardHomeProps> = ({ botStats, goals, dailyReflection, onNavigate }) => {
+interface Voice {
+  id: string;
+  name: string;
+  description: string;
+}
+
+// Voice options
+const voices: Voice[] = [
+  { id: 'james', name: 'James', description: 'Warm, encouraging voice' },
+  { id: 'brian', name: 'Brian', description: 'Calm, steady voice' },
+  { id: 'alexandra', name: 'Alexandra', description: 'Gentle, supportive voice' },
+  { id: 'carla', name: 'Carla', description: 'Friendly, understanding voice' }
+];
+
+// Main Navigation Component
+interface NavigationProps {
+  currentSection: string;
+  onNavigate: (section: string) => void;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ currentSection, onNavigate }) => {
+  const navigationItems = [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'chat', label: 'Chat', icon: MessageCircle },
+    { id: 'mood', label: 'Mood', icon: Heart },
+    { id: 'journal', label: 'Journal', icon: FileText },
+    { id: 'settings', label: 'Settings', icon: Settings }
+  ];
+
   return (
-    <div className="p-4 space-y-4 pb-32">
-      {/* Welcome Header */}
-      <div className="text-center mb-6">
-        <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-          <img src={traiLogo} alt="TrAI Logo" className="w-12 h-12" />
-        </div>
-        <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Welcome to TrAI</h1>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          "Reflect. Refine. Rise."
-        </p>
+    <div className="fixed bottom-0 left-0 right-0 bg-white/20 backdrop-blur-md border-t border-white/30 z-50">
+      <div className="flex justify-around items-center py-2 px-4">
+        {navigationItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = currentSection === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => {
+                console.log('Navigation clicked:', item.id);
+                onNavigate(item.id);
+              }}
+              className={`flex flex-col items-center space-y-1 p-2 rounded-lg transition-all ${
+                isActive 
+                  ? 'bg-white/30 text-white scale-105' 
+                  : 'text-white/70 hover:text-white hover:bg-white/20'
+              }`}
+            >
+              <Icon size={20} />
+              <span className="text-xs font-medium">{item.label}</span>
+            </button>
+          );
+        })}
       </div>
-
-      {/* Progress Overview Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--pale-green)' }}>
-          <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
-            {botStats?.level || 3}
-          </div>
-          <div className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Current Level</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-            {botStats?.stage || 'Therapist'}
-          </div>
-        </div>
-        <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--soft-blue)' }}>
-          <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
-            {botStats?.wordsLearned || 1000}
-          </div>
-          <div className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Words Learned</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-            Growing vocabulary
-          </div>
-        </div>
-      </div>
-
-      {/* Today's Goals Section */}
-      <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
-        <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Today's Goals</h3>
-        <div className="space-y-3">
-          {goals.slice(0, 3).map((goal) => (
-            <div key={goal.id} className="space-y-1">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{goal.name}</span>
-                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{goal.current}/{goal.target}</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="h-2 rounded-full transition-all duration-300" 
-                  style={{ 
-                    width: `${(goal.current / goal.target) * 100}%`,
-                    backgroundColor: goal.color
-                  }}
-                ></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Actions Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <button 
-          onClick={() => onNavigate('chat')}
-          className="p-4 rounded-2xl text-left transition-all"
-          style={{ backgroundColor: 'var(--soft-blue)' }}
-        >
-          <MessageCircle className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
-          <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Chat Therapy</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Start conversation</div>
-        </button>
-
-        <button 
-          onClick={() => onNavigate('mood')}
-          className="p-4 rounded-2xl text-left transition-all"
-          style={{ backgroundColor: 'var(--pale-green)' }}
-        >
-          <Heart className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
-          <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Mood Check</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Track emotions</div>
-        </button>
-
-        <button 
-          onClick={() => onNavigate('journal')}
-          className="p-4 rounded-2xl text-left transition-all"
-          style={{ backgroundColor: 'var(--gentle-lavender)' }}
-        >
-          <FileText className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
-          <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Journal</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Reflect & write</div>
-        </button>
-
-        <button 
-          onClick={() => onNavigate('reflect')}
-          className="p-4 rounded-2xl text-left transition-all"
-          style={{ backgroundColor: 'var(--soft-blue)' }}
-        >
-          <Brain className="w-6 h-6 mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
-          <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Insights</div>
-          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>View progress</div>
-        </button>
-      </div>
-
-      {/* Daily Reflection Card */}
-      {dailyReflection && (
-        <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Today's Reflection</h3>
-          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            {dailyReflection}
-          </p>
-        </div>
-      )}
     </div>
   );
 };
 
-// Main App Component
-function AppLayout() {
-  // State management
-  const [activeSection, setActiveSection] = useState('home');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [pendingAudio, setPendingAudio] = useState<string | null>(null);
-  const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
-  const [personalityMode, setPersonalityMode] = useState('Friend');
-  const [showOnboarding, setShowOnboarding] = useState(false);
+// Home Page Component
+interface HomePageProps {
+  botStats: BotStats | null;
+  onNavigate: (section: string) => void;
+}
+
+const HomePage: React.FC<HomePageProps> = ({ botStats, onNavigate }) => {
   const [dailyAffirmation, setDailyAffirmation] = useState('');
-  const [dailyHoroscope, setDailyHoroscope] = useState('');
-  const [zodiacSign, setZodiacSign] = useState('');
-  const [selectedZodiacSign, setSelectedZodiacSign] = useState('');
-  const [botStats, setBotStats] = useState<BotStats | null>(null);
-  const [goals, setGoals] = useState<Goal[]>([
-    { id: 1, name: 'Daily Chat Goal', current: 7, target: 10, color: '#4A90E2' },
-    { id: 2, name: 'Weekly Reflection', current: 4, target: 7, color: '#7ED321' },
-    { id: 3, name: 'Voice Practice', current: 12, target: 15, color: '#F5A623' }
-  ]);
-  const [dailyReflection, setDailyReflection] = useState('');
-  const [weeklySummary, setWeeklySummary] = useState('');
-  const [personalityInsights, setPersonalityInsights] = useState<any>(null);
-  const [crisisAlert, setCrisisAlert] = useState<any>(null);
-  const [showCrisisAlert, setShowCrisisAlert] = useState(false);
-  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState('James');
 
-  // Refs for audio recording
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const speechRecognitionRef = useRef<any>(null);
-
-  // Voice mode cycling
-  const personalityModes = ['Friend', 'Counsel', 'Study', 'Diary', 'Goal-Setting', 'Wellness', 'Creative'];
-
-  // Check for onboarding completion
   useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      try {
-        const response = await axios.get('/api/user-profile');
-        if (!response.data || response.data.length === 0) {
-          setShowOnboarding(true);
-        }
-      } catch (error) {
-        console.log('No existing profile found, showing onboarding');
-        setShowOnboarding(true);
-      }
-    };
-
-    checkOnboardingStatus();
+    // Generate daily affirmation
+    const affirmations = [
+      "Today is a fresh start. You have the power to create positive change.",
+      "Your feelings are valid, and your healing journey matters.",
+      "Every small step forward is progress worth celebrating.",
+      "You are stronger than you realize and more resilient than you know.",
+      "This moment is an opportunity to practice self-compassion."
+    ];
+    
+    const today = new Date().getDate();
+    setDailyAffirmation(affirmations[today % affirmations.length]);
   }, []);
 
-  // Load initial data
+  const quickActions = [
+    { id: 'chat', title: 'Start Conversation', subtitle: 'Talk with your AI therapist', icon: MessageCircle, color: 'var(--soft-blue)' },
+    { id: 'mood', title: 'Track Mood', subtitle: 'Log how you\'re feeling', icon: Heart, color: 'var(--pale-green)' },
+    { id: 'journal', title: 'Write Journal', subtitle: 'Express your thoughts', icon: FileText, color: 'var(--gentle-lavender)' }
+  ];
+
+  return (
+    <div className="p-6 pb-24 max-w-md mx-auto space-y-6">
+      {/* Welcome Header */}
+      <div className="text-center mb-8">
+        <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
+          <img src={traiLogo} alt="TrAI Logo" className="w-16 h-16" />
+        </div>
+        <h1 className="text-3xl font-bold mb-2 text-white">Welcome to TrAI</h1>
+        <p className="text-white/80 text-lg">"Reflect. Refine. Rise."</p>
+      </div>
+
+      {/* Bot Stats */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center">
+          <div className="text-2xl font-bold mb-1">{botStats?.level || 3}</div>
+          <div className="text-sm font-medium">Bot Level</div>
+          <div className="text-xs opacity-75">{botStats?.stage || 'Therapist'}</div>
+        </div>
+        <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center">
+          <div className="text-2xl font-bold mb-1">{botStats?.wordsLearned || 1000}</div>
+          <div className="text-sm font-medium">Words Learned</div>
+          <div className="text-xs opacity-75">Growing vocabulary</div>
+        </div>
+      </div>
+
+      {/* Daily Affirmation */}
+      <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <Star className="w-5 h-5 mr-2" />
+          Today's Affirmation
+        </h3>
+        <p className="text-white/90 leading-relaxed">{dailyAffirmation}</p>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold mb-3">Quick Actions</h3>
+        {quickActions.map((action) => {
+          const Icon = action.icon;
+          return (
+            <button
+              key={action.id}
+              onClick={() => onNavigate(action.id)}
+              className="w-full bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-left transition-all hover:bg-white/30 hover:scale-102"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: action.color }}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <div className="font-semibold text-white">{action.title}</div>
+                  <div className="text-sm text-white/70">{action.subtitle}</div>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Chat Component with working microphone
+const ChatPage: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputText, setInputText] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState('james');
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        // Load bot stats
-        const statsRes = await axios.get('/api/stats');
-        setBotStats(statsRes.data);
+    scrollToBottom();
+  }, [messages]);
 
-        // Load daily content
-        const savedZodiac = localStorage.getItem('userZodiacSign') || '';
-        const zodiacParam = savedZodiac ? `?zodiacSign=${savedZodiac}` : '';
-        const contentRes = await axios.get(`/api/daily-content${zodiacParam}`);
-        
-        setDailyAffirmation(contentRes.data.affirmation);
-        setDailyHoroscope(contentRes.data.horoscope);
-        setZodiacSign(contentRes.data.zodiacSign || '');
-        setSelectedZodiacSign(savedZodiac);
-
-        // Load weekly summary for reflection
-        const summaryRes = await axios.get('/api/weekly-summary');
-        setWeeklySummary(summaryRes.data.summary);
-        setDailyReflection(summaryRes.data.dailyReflection || 'Take a moment to reflect on your thoughts and feelings today.');
-
-        // Load personality insights
-        const insightsRes = await axios.get('/api/personality-insights');
-        setPersonalityInsights(insightsRes.data);
-      } catch (error) {
-        console.error('Failed to load initial data:', error);
-      }
-    };
-
-    if (!showOnboarding) {
-      loadInitialData();
+  // Enable audio context
+  const enableAudio = async () => {
+    try {
+      // Create and play a silent audio to enable audio context
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      await audioContext.resume();
+      setAudioEnabled(true);
+      console.log('Audio enabled successfully');
+    } catch (error) {
+      console.error('Failed to enable audio:', error);
     }
-  }, [showOnboarding]);
+  };
 
-  // Global keyboard shortcuts
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'r' || e.key === 'R') {
-        if (activeSection === 'chat') {
-          e.preventDefault();
-          if (isRecording) {
-            stopRecording();
-          } else {
-            startRecording();
-          }
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleGlobalKeyDown);
-    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [isRecording, activeSection]);
-
-  // Enhanced mobile microphone functionality
+  // Start voice recording
   const startRecording = async () => {
     try {
-      console.log('MOBILE MIC - Starting voice recording...');
-      
-      // Detect mobile device
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      console.log('MOBILE MIC - Mobile device detected:', isMobile);
-      
-      // Mobile-optimized audio settings
-      const audioConstraints = {
+      console.log('Starting voice recording...');
+      const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true,
-          sampleRate: isMobile ? 22050 : 44100,
-          channelCount: 1
-        }
-      };
+          sampleRate: 44100
+        } 
+      });
+      
+      mediaRecorderRef.current = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      audioChunksRef.current = [];
 
-      console.log('MOBILE MIC - Requesting microphone permission...');
-      setInput('🎤 Requesting microphone access...');
-      
-      const stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
-      console.log('MOBILE MIC - Microphone access granted');
-      
-      setInput('🎤 Recording...');
-      setIsRecording(true);
-      
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const source = audioContext.createMediaStreamSource(stream);
-      
-      let options: MediaRecorderOptions = {};
-      if (MediaRecorder.isTypeSupported('audio/webm')) {
-        options.mimeType = 'audio/webm';
-      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-        options.mimeType = 'audio/mp4';
-      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
-        options.mimeType = 'audio/wav';
-      }
-      
-      const mediaRecorder = new MediaRecorder(stream, options);
-      mediaRecorderRef.current = mediaRecorder;
-      chunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        console.log('MOBILE MIC - Audio chunk received:', event.data.size, 'bytes');
+      mediaRecorderRef.current.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
+          audioChunksRef.current.push(event.data);
         }
       };
 
-      mediaRecorder.onstop = async () => {
-        console.log('MOBILE MIC - Recording stopped. Total chunks:', chunksRef.current.length);
-        
-        if (chunksRef.current.length > 0) {
-          const audioBlob = new Blob(chunksRef.current, { 
-            type: options.mimeType || 'audio/webm' 
-          });
-          
-          console.log('MOBILE MIC - Audio blob created:', {
-            size: audioBlob.size,
-            type: audioBlob.type
-          });
-          
-          if (audioBlob.size > 500) {
-            setInput('🎤 Processing speech...');
-            sendAudioToWhisper(audioBlob);
-          } else {
-            console.log('MOBILE MIC - Audio blob too small');
-            setInput('🎤 No speech detected. Please speak clearly and try again.');
-            setTimeout(() => setInput(''), 3000);
-          }
-        } else {
-          console.log('MOBILE MIC - No audio data captured');
-          setInput('🎤 Recording failed. Please check microphone permissions.');
-          setTimeout(() => setInput(''), 3000);
-        }
-        
-        // Clean up
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await sendAudioToWhisper(audioBlob);
         stream.getTracks().forEach(track => track.stop());
-        audioContext.close();
       };
 
-      mediaRecorder.start(250);
-      console.log('MOBILE MIC - Recording started successfully');
-      
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+
       // Auto-stop after 30 seconds
       setTimeout(() => {
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        if (isRecording && mediaRecorderRef.current?.state === 'recording') {
           stopRecording();
         }
       }, 30000);
-      
+
     } catch (error) {
-      console.error('MOBILE MIC - Recording failed:', error);
-      setIsRecording(false);
-      
-      if ((error as any).name === 'NotAllowedError') {
-        setInput('🎤 Microphone permission denied. Please allow access and try again.');
-      } else if ((error as any).name === 'NotFoundError') {
-        setInput('🎤 No microphone found. Please check your device settings.');
-      } else {
-        setInput('🎤 Recording failed. Please refresh and try again.');
-      }
-      setTimeout(() => setInput(''), 4000);
+      console.error('Error starting recording:', error);
+      setMessages(prev => [...prev, {
+        sender: 'bot',
+        text: 'Sorry, I need microphone permission to use voice input. Please enable microphone access and try again.',
+        time: new Date().toLocaleTimeString()
+      }]);
     }
   };
 
+  // Stop voice recording
   const stopRecording = () => {
-    console.log('MOBILE MIC - Stopping recording...');
-    setIsRecording(false);
-    
-    if (speechRecognitionRef.current) {
-      speechRecognitionRef.current.stop();
-      speechRecognitionRef.current = null;
-    }
-    
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      console.log('Recording stopped');
     }
   };
 
+  // Send audio to Whisper API
   const sendAudioToWhisper = async (audioBlob: Blob) => {
     try {
-      setLoading(true);
-      console.log('MOBILE MIC - Sending audio to Whisper API...');
-      
+      setIsLoading(true);
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
 
       const response = await fetch('/api/transcribe', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('MOBILE MIC - Transcription received:', data.text);
-        setInput(data.text || '');
+        if (data.text && data.text.trim()) {
+          setInputText(data.text);
+          // Auto-send the transcribed message
+          await sendMessage(data.text);
+        }
       } else {
-        console.error('MOBILE MIC - Transcription failed');
-        setInput('🎤 Transcription failed. Please try typing your message.');
-        setTimeout(() => setInput(''), 3000);
+        throw new Error('Transcription failed');
       }
     } catch (error) {
-      console.error('MOBILE MIC - Transcription error:', error);
-      setInput('🎤 Transcription service unavailable. Please try typing.');
-      setTimeout(() => setInput(''), 3000);
+      console.error('Error transcribing audio:', error);
+      setMessages(prev => [...prev, {
+        sender: 'bot',
+        text: 'Sorry, I had trouble understanding your voice message. Please try typing instead.',
+        time: new Date().toLocaleTimeString()
+      }]);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return;
+  // Send message to bot
+  const sendMessage = async (text?: string) => {
+    const messageText = text || inputText.trim();
+    if (!messageText) return;
 
     const userMessage: Message = {
       sender: 'user',
-      text: input,
+      text: messageText,
       time: new Date().toLocaleTimeString()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setLoading(true);
+    setInputText('');
+    setIsLoading(true);
 
     try {
-      const response = await axios.post('/api/chat', {
-        message: input,
-        personalityMode: personalityMode
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: messageText })
       });
 
-      // Check for crisis detection
-      if (response.data.crisisDetected) {
-        setCrisisAlert(response.data.crisisData);
-        setShowCrisisAlert(true);
-      }
+      if (response.ok) {
+        const data = await response.json();
+        const botMessage: Message = {
+          sender: 'bot',
+          text: data.message || data.response || 'I understand you, and I\'m here to help.',
+          time: new Date().toLocaleTimeString()
+        };
 
-      const botMessage: Message = {
-        sender: 'bot',
-        text: response.data.message,
-        time: new Date().toLocaleTimeString()
-      };
+        setMessages(prev => [...prev, botMessage]);
 
-      setMessages(prev => [...prev, botMessage]);
-
-      // Generate and play audio response
-      if (audioEnabled && selectedReflectionVoice) {
-        try {
-          const audioResponse = await fetch('/api/text-to-speech', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              text: response.data.message,
-              voiceId: selectedReflectionVoice
-            })
-          });
-
-          if (audioResponse.ok) {
-            const audioBlob = await audioResponse.blob();
-            const audioUrl = URL.createObjectURL(audioBlob);
-            setLastBotAudio(audioUrl);
-
-            if (audioEnabled) {
-              const audio = new Audio(audioUrl);
-              audio.volume = 1.0;
-              audio.play().catch(error => {
-                console.log('Audio playback failed:', error);
-                setPendingAudio(audioUrl);
-              });
-            } else {
-              setPendingAudio(audioUrl);
-            }
-          }
-        } catch (audioError) {
-          console.error('Audio generation failed:', audioError);
+        // Play voice response if audio is enabled
+        if (audioEnabled && data.message) {
+          playVoiceResponse(data.message);
         }
+      } else {
+        throw new Error('Chat request failed');
       }
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('Error sending message:', error);
       const errorMessage: Message = {
         sender: 'bot',
-        text: 'I apologize, but I\'m having trouble responding right now. Please try again.',
+        text: 'I\'m having trouble connecting right now. Please try again in a moment.',
         time: new Date().toLocaleTimeString()
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const enableAudio = () => {
-    setAudioEnabled(true);
-    
-    if (pendingAudio) {
-      const audio = new Audio(pendingAudio);
-      audio.volume = 1.0;
-      audio.play();
-      setPendingAudio(null);
-    }
-  };
-
-  const refreshPersonalityInsights = async () => {
+  // Play voice response
+  const playVoiceResponse = async (text: string) => {
     try {
-      const response = await axios.get('/api/personality-insights');
-      setPersonalityInsights(response.data);
-    } catch (error) {
-      console.error('Failed to refresh personality insights:', error);
-    }
-  };
+      const response = await fetch('/api/voice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text, 
+          voice: selectedVoice,
+          emotionalContext: 'supportive'
+        })
+      });
 
-  const handleZodiacChange = async (zodiacValue: string) => {
-    setSelectedZodiacSign(zodiacValue);
-    localStorage.setItem('userZodiacSign', zodiacValue);
-    
-    try {
-      const zodiacParam = zodiacValue ? `?zodiacSign=${zodiacValue}` : '';
-      const res = await axios.get(`/api/daily-content${zodiacParam}`);
-      setDailyAffirmation(res.data.affirmation);
-      setDailyHoroscope(res.data.horoscope);
-      setZodiacSign(res.data.zodiacSign || '');
-    } catch (error) {
-      console.error('Failed to load daily content:', error);
-    }
-  };
-
-  const resetBot = async () => {
-    if (confirm('This will completely reset the bot and clear ALL data including your personality profile, memories, and conversation history. You will need to enter your name and retake the personality quiz. Continue?')) {
-      try {
-        // Clear server-side data
-        await axios.post('/api/clear-memories', { userId: 1 });
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
         
-        // Clear client-side data
-        setMessages([]);
-        setPersonalityInsights(null);
-        setBotStats({ level: 1, stage: 'Infant', wordsLearned: 0 });
-        localStorage.clear();
-        
-        // Trigger onboarding flow
-        setShowOnboarding(true);
-        setActiveSection('home');
-      } catch (error) {
-        console.error('Bot reset failed:', error);
-        alert('Failed to reset bot. Please try again.');
+        audio.onended = () => URL.revokeObjectURL(audioUrl);
+        await audio.play();
+        console.log('Voice response played successfully');
       }
+    } catch (error) {
+      console.error('Error playing voice response:', error);
     }
   };
 
-  const handleSectionChange = (section: string) => {
-    setActiveSection(section);
-  };
-
-  const renderActiveSection = () => {
-    switch (activeSection) {
-      case 'home':
-        return (
-          <DashboardHome 
-            botStats={botStats}
-            goals={goals}
-            dailyReflection={dailyReflection}
-            onNavigate={handleSectionChange}
-          />
-        );
-
-      case 'chat':
-        return (
-          <div className="flex flex-col h-full">
-            {/* Compact Welcome Section for Mobile */}
-            <div className="p-3 text-center mobile-welcome-shift" style={{ backgroundColor: 'var(--soft-blue)' }}>
-              <div className="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                <img src={traiLogo} alt="TrAI Logo" className="w-8 h-8" />
-              </div>
-              <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>TrAI</h2>
-              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                "Reflect. Refine. Rise."
-              </p>
-            </div>
-
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${
-                      message.sender === 'user' 
-                        ? 'rounded-br-md' 
-                        : 'rounded-bl-md'
-                    }`}
-                    style={{
-                      backgroundColor: message.sender === 'user' 
-                        ? 'var(--soft-blue-dark)' 
-                        : 'var(--surface-secondary)',
-                      color: message.sender === 'user' 
-                        ? 'white' 
-                        : 'var(--text-primary)'
-                    }}
-                  >
-                    <p className="text-sm leading-relaxed">{message.text}</p>
-                    <p className="text-xs mt-1 opacity-70">{message.time}</p>
-                  </div>
-                </div>
-              ))}
-
-              {loading && (
-                <div className="flex justify-start">
-                  <div className="max-w-[80%] p-3 rounded-2xl rounded-bl-md shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {pendingAudio && !audioEnabled && (
-                <div className="fixed top-4 right-4 bg-purple-600 text-white p-4 rounded-lg shadow-lg z-50">
-                  <p className="text-sm mb-2">Click to enable audio</p>
-                  <button
-                    onClick={enableAudio}
-                    className="px-4 py-2 bg-white text-purple-600 rounded font-medium hover:bg-gray-100"
-                  >
-                    Enable Audio
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Enhanced Mobile Chat Input */}
-            <div className="border-t p-4" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--gentle-lavender-dark)' }}>
-              <div className="flex items-center space-x-3">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                    placeholder="Share your thoughts..."
-                    className="w-full px-4 py-3 pr-16 rounded-2xl border text-sm"
-                    style={{ 
-                      borderColor: 'var(--gentle-lavender-dark)',
-                      backgroundColor: 'var(--surface-secondary)',
-                      color: 'var(--text-primary)'
-                    }}
-                  />
-                  <button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    onTouchStart={(e) => {
-                      e.preventDefault();
-                      console.log('MOBILE MIC - Touch start detected');
-                    }}
-                    onTouchEnd={(e) => {
-                      e.preventDefault();
-                      console.log('MOBILE MIC - Touch end detected');
-                      // Use a small delay to ensure the click handler doesn't interfere
-                      setTimeout(() => {
-                        if (isRecording) {
-                          stopRecording();
-                        } else {
-                          startRecording();
-                        }
-                      }, 50);
-                    }}
-                    className="absolute right-14 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all touch-manipulation"
-                    style={{ 
-                      backgroundColor: isRecording ? '#EF4444' : 'var(--soft-blue-dark)',
-                      color: 'white',
-                      animation: isRecording ? 'pulse 1s infinite' : 'none',
-                      minWidth: '40px',
-                      minHeight: '40px',
-                      WebkitTapHighlightColor: 'transparent'
-                    }}
-                    title={isRecording ? "Stop Recording" : "Start Voice Recording"}
-                  >
-                    <Mic className="w-4 h-4" />
-                  </button>
-                </div>
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || loading}
-                  className="p-3 rounded-2xl transition-all disabled:opacity-50"
-                  style={{ 
-                    backgroundColor: 'var(--soft-blue-dark)',
-                    color: 'white'
-                  }}
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'reflect':
-        return (
-          <div className="p-4 space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Personality Insights</h2>
-              <button
-                onClick={refreshPersonalityInsights}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                title="Refresh insights"
-              >
-                <RotateCcw className="w-5 h-5" style={{ color: 'var(--soft-blue-dark)' }} />
-              </button>
-            </div>
-            
-            {personalityInsights ? (
-              <div className="space-y-4">
-                <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                  <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Communication Style</h3>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                    {personalityInsights.communicationStyle || 'Analyzing your communication patterns...'}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Key Insights</h3>
-                  <div className="space-y-2">
-                    {personalityInsights.insights && personalityInsights.insights.length > 0 ? (
-                      personalityInsights.insights.map((insight: any, index: number) => (
-                        <div key={index} className="flex items-start space-x-2">
-                          <div className="w-1.5 h-1.5 rounded-full mt-2" style={{ backgroundColor: 'var(--soft-blue-dark)' }}></div>
-                          <p className="text-sm flex-1" style={{ color: 'var(--text-secondary)' }}>{insight}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Continue conversations to discover more insights about yourself.</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Personality Traits</h3>
-                  <div className="space-y-2">
-                    {personalityInsights.traits && personalityInsights.traits.length > 0 ? (
-                      personalityInsights.traits.map((trait: any, index: number) => (
-                        <div key={index} className="inline-block">
-                          <span className="px-3 py-1 rounded-full text-xs font-medium mr-2 mb-2 inline-block" 
-                                style={{ backgroundColor: 'var(--pale-green)', color: 'var(--text-primary)' }}>
-                            {trait}
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Your unique traits will appear as we learn more about you.</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                  <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Interests & Values</h3>
-                  <div className="space-y-2">
-                    {personalityInsights.interests && personalityInsights.interests.length > 0 ? (
-                      personalityInsights.interests.map((interest: any, index: number) => (
-                        <div key={index} className="flex items-start space-x-2">
-                          <Star className="w-4 h-4 mt-0.5" style={{ color: 'var(--soft-blue-dark)' }} />
-                          <p className="text-sm flex-1" style={{ color: 'var(--text-secondary)' }}>{interest}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Share more about what matters to you to see your interests reflected here.</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Brain className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--soft-blue-dark)' }} />
-                <p className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Building Your Profile</p>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Start chatting to help me learn about your unique personality
-                </p>
-              </div>
-            )}
-          </div>
-        );
-
-      case 'daily':
-        return (
-          <div className="p-4 space-y-6">
-            <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Daily Wellness</h2>
-
-            {/* Zodiac Selection */}
-            <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Personalize Your Experience</h3>
-              <select
-                value={selectedZodiacSign}
-                onChange={(e) => handleZodiacChange(e.target.value)}
-                className="w-full p-3 rounded-lg border text-sm"
-                style={{ 
-                  borderColor: 'var(--gentle-lavender-dark)',
-                  backgroundColor: 'var(--surface-primary)',
-                  color: 'var(--text-primary)'
-                }}
-              >
-                <option value="">Select Your Zodiac Sign</option>
-                <option value="aries">Aries</option>
-                <option value="taurus">Taurus</option>
-                <option value="gemini">Gemini</option>
-                <option value="cancer">Cancer</option>
-                <option value="leo">Leo</option>
-                <option value="virgo">Virgo</option>
-                <option value="libra">Libra</option>
-                <option value="scorpio">Scorpio</option>
-                <option value="sagittarius">Sagittarius</option>
-                <option value="capricorn">Capricorn</option>
-                <option value="aquarius">Aquarius</option>
-                <option value="pisces">Pisces</option>
-              </select>
-            </div>
-
-            {/* Daily Affirmation */}
-            <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--pale-green)' }}>
-              <div className="flex items-center space-x-2 mb-3">
-                <Sun className="w-5 h-5" style={{ color: 'var(--soft-blue-dark)' }} />
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Today's Affirmation</h3>
-              </div>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                {dailyAffirmation || 'Loading your daily affirmation...'}
-              </p>
-            </div>
-
-            {/* Daily Horoscope */}
-            <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
-              <div className="flex items-center space-x-2 mb-3">
-                <Star className="w-5 h-5" style={{ color: 'var(--soft-blue-dark)' }} />
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  {zodiacSign ? `${zodiacSign} Horoscope` : 'Daily Horoscope'}
-                </h3>
-              </div>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                {dailyHoroscope || 'Select your zodiac sign to see your personalized horoscope.'}
-              </p>
-            </div>
-          </div>
-        );
-
-      case 'mood':
-        return <MoodTracker />;
-      case 'memory':
-        return <MemoryDashboard />;
-      case 'journal':
-        return <JournalDashboard userId="1" />;
-      case 'therapist':
-        return <TherapistPortal userId="1" />;
-      case 'achievements':
-        return <AchievementDashboard userId="1" />;
-      case 'community':
-        return <CommunityPortal userId="1" />;
-      case 'health':
-        return <HealthDashboard />;
-      case 'vr':
-        return <VRTherapyDashboard />;
-      case 'wellness-rewards':
-        return <EnhancedGamificationDashboard />;
-      case 'ai-intelligence':
-        return <EmotionalIntelligenceDashboard />;
-      case 'ai-performance':
-        return <AiPerformanceMonitoringDashboard />;
-      case 'privacy':
-        return <PrivacyComplianceDashboard />;
-      case 'settings':
-        return (
-          <div className="p-4 space-y-4">
-            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Settings</h2>
-            
-            <div className="space-y-4">
-              <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Voice & Audio</h3>
-                <VoiceSelector
-                  selectedVoice={selectedReflectionVoice}
-                  onVoiceChange={(voice) => setSelectedReflectionVoice(voice)}
-                  audioEnabled={audioEnabled}
-                  onEnableAudio={enableAudio}
-                />
-              </div>
-
-              <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Profile Management</h3>
-                <button
-                  onClick={() => setShowOnboarding(true)}
-                  className="w-full p-3 rounded-lg text-left transition-colors"
-                  style={{ backgroundColor: 'var(--pale-green)', color: 'var(--text-primary)' }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <User className="w-5 h-5" />
-                    <div>
-                      <div className="font-medium">Retake Personality Quiz</div>
-                      <div className="text-sm opacity-75">Update your personality profile</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Data Management</h3>
-                <div className="space-y-3">
-                  <button
-                    onClick={() => {
-                      if (confirm('This will clear all conversation history. Continue?')) {
-                        setMessages([]);
-                        localStorage.clear();
-                      }
-                    }}
-                    className="w-full p-3 rounded-lg text-left transition-colors"
-                    style={{ backgroundColor: 'var(--gentle-lavender)', color: 'var(--text-primary)' }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Target className="w-5 h-5" />
-                      <div>
-                        <div className="font-medium">Clear Chat History</div>
-                        <div className="text-sm opacity-75">Clear conversations only</div>
-                      </div>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={resetBot}
-                    className="w-full p-3 rounded-lg text-left transition-colors"
-                    style={{ backgroundColor: 'var(--surface-danger)', color: 'white' }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <RotateCcw className="w-5 h-5" />
-                      <div>
-                        <div className="font-medium">Reset Bot Completely</div>
-                        <div className="text-sm opacity-75">Start fresh with new name and personality quiz</div>
-                      </div>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>App Information</h3>
-                <div className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  <p><strong>Version:</strong> 1.0.0</p>
-                  <p><strong>Build:</strong> Therapeutic AI Assistant</p>
-                  <p><strong>Last Updated:</strong> {new Date().toLocaleDateString()}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return (
-          <DashboardHome 
-            botStats={botStats}
-            goals={goals}
-            dailyReflection={dailyReflection}
-            onNavigate={handleSectionChange}
-          />
-        );
+  // Reset conversation
+  const resetConversation = async () => {
+    try {
+      const response = await fetch('/api/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        setMessages([]);
+        console.log('Conversation reset successfully');
+      }
+    } catch (error) {
+      console.error('Error resetting conversation:', error);
     }
   };
-
-  if (showOnboarding) {
-    return (
-      <div className="min-h-screen" style={{ backgroundColor: 'var(--surface-primary)' }}>
-        <OnboardingQuiz onComplete={() => setShowOnboarding(false)} />
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--surface-primary)' }}>
-      <div className="flex-1 overflow-hidden">
-        {renderActiveSection()}
-      </div>
-
-      {/* Enhanced Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-50">
-        <div className="grid grid-cols-4 border-t" style={{ backgroundColor: 'var(--surface-primary)', borderColor: 'var(--gentle-lavender-dark)' }}>
-          {/* Therapy Category */}
-          <div className="p-2">
-            <button
-              onClick={() => setActiveSection('chat')}
-              className={`w-full p-3 rounded-xl transition-all text-center ${
-                activeSection === 'chat' ? 'scale-105' : ''
-              }`}
-              style={{ 
-                backgroundColor: activeSection === 'chat' ? 'var(--soft-blue-dark)' : 'transparent',
-                color: activeSection === 'chat' ? 'white' : 'var(--text-primary)'
-              }}
-            >
-              <MessageCircle className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-xs font-medium">Therapy</span>
-            </button>
+    <div className="flex flex-col h-screen pb-20">
+      {/* Chat Header */}
+      <div className="bg-white/20 backdrop-blur-md p-4 border-b border-white/30">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <Brain className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-white">TrAI Therapist</h2>
+              <p className="text-sm text-white/70">Your personal AI therapist</p>
+            </div>
           </div>
-
-          {/* Wellness Category */}
-          <div className="p-2">
+          <div className="flex space-x-2">
             <button
-              onClick={() => setActiveSection('mood')}
-              className={`w-full p-3 rounded-xl transition-all text-center ${
-                activeSection === 'mood' ? 'scale-105' : ''
-              }`}
-              style={{ 
-                backgroundColor: activeSection === 'mood' ? 'var(--soft-blue-dark)' : 'transparent',
-                color: activeSection === 'mood' ? 'white' : 'var(--text-primary)'
-              }}
+              onClick={resetConversation}
+              className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-all"
+              title="Reset conversation"
             >
-              <Heart className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-xs font-medium">Wellness</span>
-            </button>
-          </div>
-
-          {/* Community Category */}
-          <div className="p-2">
-            <button
-              onClick={() => setActiveSection('journal')}
-              className={`w-full p-3 rounded-xl transition-all text-center ${
-                activeSection === 'journal' ? 'scale-105' : ''
-              }`}
-              style={{ 
-                backgroundColor: activeSection === 'journal' ? 'var(--soft-blue-dark)' : 'transparent',
-                color: activeSection === 'journal' ? 'white' : 'var(--text-primary)'
-              }}
-            >
-              <FileText className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-xs font-medium">Journal</span>
-            </button>
-          </div>
-
-          {/* Advanced Category */}
-          <div className="p-2">
-            <button
-              onClick={() => setActiveSection('reflect')}
-              className={`w-full p-3 rounded-xl transition-all text-center ${
-                activeSection === 'reflect' ? 'scale-105' : ''
-              }`}
-              style={{ 
-                backgroundColor: activeSection === 'reflect' ? 'var(--soft-blue-dark)' : 'transparent',
-                color: activeSection === 'reflect' ? 'white' : 'var(--text-primary)'
-              }}
-            >
-              <Brain className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-xs font-medium">Insights</span>
+              <RotateCcw className="w-4 h-4 text-white" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Crisis Alert Modal */}
-      {showCrisisAlert && crisisAlert && (
-        <CrisisAlert
-          alert={crisisAlert}
-          onClose={() => setShowCrisisAlert(false)}
-        />
-      )}
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 && (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
+              <MessageCircle className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Start Your Conversation</h3>
+            <p className="text-white/70">Share what's on your mind. I'm here to listen and support you.</p>
+          </div>
+        )}
+
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                message.sender === 'user'
+                  ? 'bg-white/30 text-white'
+                  : 'bg-white/20 text-white'
+              }`}
+            >
+              <p className="text-sm">{message.text}</p>
+              <p className="text-xs opacity-70 mt-1">{message.time}</p>
+            </div>
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-white/20 px-4 py-2 rounded-2xl">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input Area */}
+      <div className="p-4 bg-white/20 backdrop-blur-md border-t border-white/30">
+        {/* Audio Control */}
+        {!audioEnabled && (
+          <div className="mb-3">
+            <button
+              onClick={enableAudio}
+              className="w-full bg-white/20 hover:bg-white/30 text-white py-2 px-4 rounded-lg text-sm transition-all"
+            >
+              Enable Audio & Voice Features
+            </button>
+          </div>
+        )}
+
+        {/* Voice Selector */}
+        <div className="mb-3 flex items-center space-x-2">
+          <span className="text-sm text-white/70">Voice:</span>
+          <select
+            value={selectedVoice}
+            onChange={(e) => setSelectedVoice(e.target.value)}
+            className="bg-white/20 text-white border border-white/30 rounded px-2 py-1 text-sm"
+          >
+            {voices.map(voice => (
+              <option key={voice.id} value={voice.id} className="bg-gray-800 text-white">
+                {voice.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Message Input */}
+        <div className="flex items-center space-x-2">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && !isLoading && sendMessage()}
+              placeholder="Type your message or use voice..."
+              className="w-full bg-white/20 border border-white/30 rounded-2xl px-4 py-3 pr-12 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
+              disabled={isLoading}
+            />
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-all ${
+                isRecording 
+                  ? 'bg-red-500 text-white animate-pulse' 
+                  : 'bg-white/20 hover:bg-white/30 text-white'
+              }`}
+              disabled={isLoading}
+            >
+              {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+          </div>
+          <button
+            onClick={() => sendMessage()}
+            disabled={!inputText.trim() || isLoading}
+            className="bg-white/30 hover:bg-white/40 disabled:bg-white/10 text-white p-3 rounded-2xl transition-all disabled:opacity-50"
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
-export default function App() {
-  const queryClient = new QueryClient();
+// Simple Settings Page
+const SettingsPage: React.FC = () => {
+  const [botStats, setBotStats] = useState<BotStats | null>(null);
 
+  const resetBot = async () => {
+    try {
+      const response = await fetch('/api/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        // Refresh bot stats
+        const statsResponse = await fetch('/api/stats');
+        if (statsResponse.ok) {
+          const stats = await statsResponse.json();
+          setBotStats(stats);
+        }
+        console.log('Bot reset successfully');
+      }
+    } catch (error) {
+      console.error('Error resetting bot:', error);
+    }
+  };
+
+  return (
+    <div className="p-6 pb-24 max-w-md mx-auto space-y-6">
+      <h1 className="text-2xl font-bold text-white mb-6">Settings</h1>
+      
+      <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-white">Bot Management</h3>
+        
+        <div className="space-y-3">
+          <button
+            onClick={resetBot}
+            className="w-full bg-white/20 hover:bg-white/30 text-white py-3 px-4 rounded-lg transition-all"
+          >
+            Reset Bot Memory
+          </button>
+          
+          <p className="text-sm text-white/70">
+            This will clear the bot's memory and reset it to initial state. You can then retake the personality quiz.
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Current Bot Status</h3>
+        {botStats ? (
+          <div className="space-y-2 text-white/90">
+            <p>Level: {botStats.level}</p>
+            <p>Stage: {botStats.stage}</p>
+            <p>Words Learned: {botStats.wordsLearned}</p>
+          </div>
+        ) : (
+          <p className="text-white/70">Loading bot status...</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Simple placeholder components for other pages
+const MoodPage: React.FC = () => (
+  <div className="p-6 pb-24 max-w-md mx-auto">
+    <h1 className="text-2xl font-bold text-white mb-6">Mood Tracker</h1>
+    <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+      <p className="text-white">Mood tracking features coming soon...</p>
+    </div>
+  </div>
+);
+
+const JournalPage: React.FC = () => (
+  <div className="p-6 pb-24 max-w-md mx-auto">
+    <h1 className="text-2xl font-bold text-white mb-6">Journal</h1>
+    <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+      <p className="text-white">Journal features coming soon...</p>
+    </div>
+  </div>
+);
+
+// Main App Layout Component
+const AppLayout: React.FC = () => {
+  const [currentSection, setCurrentSection] = useState('home');
+  const [botStats, setBotStats] = useState<BotStats | null>(null);
+
+  // Fetch bot stats
+  const { data: stats } = useQuery({
+    queryKey: ['/api/stats'],
+    queryFn: async () => {
+      const response = await axios.get('/api/stats');
+      return response.data;
+    },
+    staleTime: 30000,
+  });
+
+  useEffect(() => {
+    if (stats) {
+      setBotStats(stats);
+    }
+  }, [stats]);
+
+  // Navigate to section
+  const handleNavigate = (section: string) => {
+    console.log('Navigating to:', section);
+    setCurrentSection(section);
+  };
+
+  // Render current page
+  const renderCurrentPage = () => {
+    switch (currentSection) {
+      case 'home':
+        return <HomePage botStats={botStats} onNavigate={handleNavigate} />;
+      case 'chat':
+        return <ChatPage />;
+      case 'mood':
+        return <MoodPage />;
+      case 'journal':
+        return <JournalPage />;
+      case 'settings':
+        return <SettingsPage />;
+      default:
+        return <HomePage botStats={botStats} onNavigate={handleNavigate} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen">
+      {renderCurrentPage()}
+      <Navigation currentSection={currentSection} onNavigate={handleNavigate} />
+    </div>
+  );
+};
+
+// Main App Component
+const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AppLayout />
     </QueryClientProvider>
   );
-}
+};
+
+export default App;
