@@ -1918,9 +1918,18 @@ app.post('/api/personalization/recommendations', async (req, res) => {
     const recommendations = await generatePersonalizedRecommendations(
       insights,
       preferences ? {
-        ...preferences,
-        sessionTiming: 'flexible',
-        voicePreference: 'James'
+        communicationStyle: preferences.communicationStyle as "supportive" | "formal" | "casual" | "warm" | "direct",
+        responseLength: preferences.responseLength as "brief" | "moderate" | "detailed",
+        emotionalSupport: 'gentle' as "gentle" | "motivational" | "practical" | "reflective",
+        sessionTiming: 'flexible' as "flexible" | "morning" | "afternoon" | "evening",
+        voicePreference: 'James' as "James" | "Brian" | "Alexandra" | "Carla",
+        adaptationLevel: preferences.adaptationLevel,
+        preferredTopics: preferences.preferredTopics || [],
+        avoidedTopics: preferences.avoidedTopics || [],
+        exercisePreferences: preferences.exercisePreferences || [],
+        id: preferences.id,
+        userId: preferences.userId,
+        lastUpdated: preferences.lastUpdated
       } : undefined,
       [] // recent activities - could be enhanced with activity tracking
     );
@@ -1981,7 +1990,17 @@ app.post('/api/personalization/rate-recommendation', async (req, res) => {
         communicationMatch: rating
       };
       
-      const updatedPreferences = updatePersonalizationFromFeedback(preferences, feedbackData);
+      const updatedPreferences = updatePersonalizationFromFeedback({
+        communicationStyle: preferences.communicationStyle as "supportive" | "formal" | "casual" | "warm" | "direct",
+        responseLength: preferences.responseLength as "brief" | "moderate" | "detailed",
+        emotionalSupport: 'gentle' as "gentle" | "motivational" | "practical" | "reflective",
+        sessionTiming: 'flexible' as "flexible" | "morning" | "afternoon" | "evening",
+        voicePreference: 'James' as "James" | "Brian" | "Alexandra" | "Carla",
+        adaptationLevel: preferences.adaptationLevel,
+        preferredTopics: preferences.preferredTopics || [],
+        avoidedTopics: preferences.avoidedTopics || [],
+        exercisePreferences: preferences.exercisePreferences || []
+      }, feedbackData);
       await storage.updateUserPreferences(userId, updatedPreferences);
     }
     
@@ -2011,7 +2030,17 @@ app.post('/api/personalization/feedback', async (req, res) => {
     if (preferences) {
       const { updatePersonalizationFromFeedback } = await import('./adaptiveLearning');
       
-      const updatedPreferences = updatePersonalizationFromFeedback(preferences, {
+      const updatedPreferences = updatePersonalizationFromFeedback({
+        communicationStyle: preferences.communicationStyle as "supportive" | "formal" | "casual" | "warm" | "direct",
+        responseLength: preferences.responseLength as "brief" | "moderate" | "detailed",
+        emotionalSupport: 'gentle' as "gentle" | "motivational" | "practical" | "reflective",
+        sessionTiming: 'flexible' as "flexible" | "morning" | "afternoon" | "evening",
+        voicePreference: 'James' as "James" | "Brian" | "Alexandra" | "Carla",
+        adaptationLevel: preferences.adaptationLevel,
+        preferredTopics: preferences.preferredTopics || [],
+        avoidedTopics: preferences.avoidedTopics || [],
+        exercisePreferences: preferences.exercisePreferences || []
+      }, {
         responseQuality,
         helpfulness,
         personalRelevance,
@@ -2044,7 +2073,17 @@ app.post('/api/personalization/adapt-response', async (req, res) => {
     const adaptedResponse = await adaptConversationResponse(
       originalResponse,
       userMessage,
-      preferences,
+      {
+        communicationStyle: preferences.communicationStyle as "supportive" | "formal" | "casual" | "warm" | "direct",
+        responseLength: preferences.responseLength as "brief" | "moderate" | "detailed",
+        emotionalSupport: 'gentle' as "gentle" | "motivational" | "practical" | "reflective",
+        sessionTiming: 'flexible' as "flexible" | "morning" | "afternoon" | "evening",
+        voicePreference: 'James' as "James" | "Brian" | "Alexandra" | "Carla",
+        adaptationLevel: preferences.adaptationLevel,
+        preferredTopics: preferences.preferredTopics || [],
+        avoidedTopics: preferences.avoidedTopics || [],
+        exercisePreferences: preferences.exercisePreferences || []
+      },
       context || []
     );
     
@@ -2069,7 +2108,16 @@ app.get('/api/personalization/wellness-insights/:userId', async (req, res) => {
     
     const { generateWellnessInsights } = await import('./adaptiveLearning');
     
-    const wellnessInsights = generateWellnessInsights(insights, preferences);
+    const wellnessInsights = generateWellnessInsights(insights.length > 0 ? insights[0] : {
+      userId,
+      conversationThemes: [],
+      emotionalPatterns: [],
+      effectiveApproaches: [],
+      preferredTimes: [],
+      wellnessNeeds: [],
+      learningProgress: 0,
+      confidenceScore: 0.5
+    }, preferences);
     
     res.json({ insights: wellnessInsights });
   } catch (error) {
@@ -2203,7 +2251,7 @@ app.get('/api/analytics/monthly-report/:userId/:year/:month', async (req, res) =
     
     // Try to get existing report from storage
     const existingReport = await storage.getMonthlyReport(
-      parseInt(userId),
+      userId,
       parseInt(year),
       parseInt(month)
     );
@@ -2333,7 +2381,7 @@ app.get('/api/analytics/trends/:userId', async (req, res) => {
       const year = date.getFullYear();
       
       try {
-        const report = await storage.getMonthlyReport(parseInt(userId), year, month);
+        const report = await storage.getMonthlyReport(userId, year, month);
         if (report) {
           trends.push({
             month: `${year}-${month.toString().padStart(2, '0')}`,
@@ -3254,16 +3302,14 @@ app.post('/api/wearable-devices/:deviceId/sync', async (req, res) => {
           metricType: metric.metricType,
           value: metric.value,
           unit: metric.unit,
-          timestamp: metric.timestamp,
-          metadata: metric.metadata,
-          confidence: metric.confidence
+          recordedAt: metric.timestamp || new Date()
         });
         processedCount++;
       }
       
       // Update device sync timestamp
       await storage.updateWearableDevice(deviceId, {
-        lastSyncAt: new Date()
+        lastSync: new Date()
       });
       
       // Log successful sync
