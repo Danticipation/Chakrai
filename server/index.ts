@@ -1331,7 +1331,7 @@ app.post('/api/journal', async (req, res) => {
         sentiment: analysis.sentimentScore,
 
         copingStrategies: analysis.copingStrategies,
-        growthIndicators: analysis.growthIndicators,
+
         concernAreas: analysis.concernAreas,
         recommendedActions: analysis.recommendedActions,
         therapistNotes: analysis.therapistNotes,
