@@ -1929,7 +1929,7 @@ app.post('/api/personalization/recommendations', async (req, res) => {
         exercisePreferences: preferences.exercisePreferences || [],
         id: preferences.id,
         userId: preferences.userId,
-        lastUpdated: preferences.lastUpdated
+        lastUpdated: preferences.lastUpdated || new Date()
       } : undefined,
       [] // recent activities - could be enhanced with activity tracking
     );
@@ -1999,7 +1999,10 @@ app.post('/api/personalization/rate-recommendation', async (req, res) => {
         adaptationLevel: preferences.adaptationLevel,
         preferredTopics: preferences.preferredTopics || [],
         avoidedTopics: preferences.avoidedTopics || [],
-        exercisePreferences: preferences.exercisePreferences || []
+        exercisePreferences: preferences.exercisePreferences || [],
+        id: preferences.id,
+        userId: preferences.userId,
+        lastUpdated: preferences.lastUpdated || new Date()
       }, feedbackData);
       await storage.updateUserPreferences(userId, updatedPreferences);
     }
@@ -2039,7 +2042,10 @@ app.post('/api/personalization/feedback', async (req, res) => {
         adaptationLevel: preferences.adaptationLevel,
         preferredTopics: preferences.preferredTopics || [],
         avoidedTopics: preferences.avoidedTopics || [],
-        exercisePreferences: preferences.exercisePreferences || []
+        exercisePreferences: preferences.exercisePreferences || [],
+        id: preferences.id,
+        userId: preferences.userId,
+        lastUpdated: preferences.lastUpdated || new Date()
       }, {
         responseQuality,
         helpfulness,
@@ -2082,7 +2088,10 @@ app.post('/api/personalization/adapt-response', async (req, res) => {
         adaptationLevel: preferences.adaptationLevel,
         preferredTopics: preferences.preferredTopics || [],
         avoidedTopics: preferences.avoidedTopics || [],
-        exercisePreferences: preferences.exercisePreferences || []
+        exercisePreferences: preferences.exercisePreferences || [],
+        id: preferences.id,
+        userId: preferences.userId,
+        lastUpdated: preferences.lastUpdated || new Date()
       },
       context || []
     );
@@ -2117,7 +2126,20 @@ app.get('/api/personalization/wellness-insights/:userId', async (req, res) => {
       wellnessNeeds: [],
       learningProgress: 0,
       confidenceScore: 0.5
-    }, preferences);
+    }, preferences ? {
+      communicationStyle: preferences.communicationStyle as "supportive" | "formal" | "casual" | "warm" | "direct",
+      responseLength: preferences.responseLength as "brief" | "moderate" | "detailed",
+      emotionalSupport: 'gentle' as "gentle" | "motivational" | "practical" | "reflective",
+      sessionTiming: 'flexible' as "flexible" | "morning" | "afternoon" | "evening",
+      voicePreference: 'James' as "James" | "Brian" | "Alexandra" | "Carla",
+      adaptationLevel: preferences.adaptationLevel,
+      preferredTopics: preferences.preferredTopics || [],
+      avoidedTopics: preferences.avoidedTopics || [],
+      exercisePreferences: preferences.exercisePreferences || [],
+      id: preferences.id,
+      userId: preferences.userId,
+      lastUpdated: preferences.lastUpdated || new Date()
+    } : undefined);
     
     res.json({ insights: wellnessInsights });
   } catch (error) {
@@ -3302,7 +3324,7 @@ app.post('/api/wearable-devices/:deviceId/sync', async (req, res) => {
           metricType: metric.metricType,
           value: metric.value,
           unit: metric.unit,
-          recordedAt: metric.timestamp || new Date()
+          recordedAt: new Date()
         });
         processedCount++;
       }
