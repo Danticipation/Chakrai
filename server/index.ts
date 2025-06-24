@@ -3647,8 +3647,8 @@ app.get('/api/vr/progress/:userId', async (req, res) => {
     const { environmentId } = req.query;
     
     const progress = environmentId 
-      ? await storage.getUserVrProgress(parseInt(userId))
-      : await storage.getUserVrProgress(parseInt(userId));
+      ? await storage.getUserVrProgress(userId)
+      : await storage.getUserVrProgress(userId);
     
     res.json({ progress });
   } catch (error) {
@@ -3764,7 +3764,7 @@ app.get('/api/emotional-intelligence/mood-forecasts/:userId', async (req, res) =
     const userId = parseInt(req.params.userId);
     const limit = parseInt(req.query.limit as string) || 10;
     
-    const forecasts = await storage.getMoodForecasts(userId, limit);
+    const forecasts = await storage.getMoodForecasts(userId);
     
     res.json({
       forecasts,
@@ -3806,7 +3806,7 @@ app.get('/api/emotional-intelligence/contexts/:userId', async (req, res) => {
     const sessionId = req.query.sessionId as string;
     const limit = parseInt(req.query.limit as string) || 20;
     
-    const contexts = await storage.getEmotionalContexts(userId, sessionId, limit);
+    const contexts = await storage.getEmotionalContexts(userId);
     
     res.json({
       contexts,
@@ -3824,7 +3824,7 @@ app.get('/api/emotional-intelligence/insights/:userId', async (req, res) => {
     const userId = parseInt(req.params.userId);
     const isActive = req.query.active !== 'false';
     
-    const insights = await storage.getPredictiveInsights(userId, isActive);
+    const insights = await storage.getPredictiveInsights(userId);
     
     res.json({
       insights,
@@ -3843,8 +3843,7 @@ app.patch('/api/emotional-intelligence/insights/:insightId', async (req, res) =>
     const { wasAccurate, userFeedback } = req.body;
     
     const updatedInsight = await storage.updatePredictiveInsight(insightId, {
-      wasAccurate,
-      userFeedback
+      accuracy: wasAccurate ? 1.0 : 0.0
     });
     
     if (!updatedInsight) {
