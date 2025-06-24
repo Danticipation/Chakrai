@@ -1088,8 +1088,7 @@ async function processPersonalityAnalysisAsync(message: string, userId: number) 
       await storage.createUserMemory({
         userId,
         memory: `User said: "${message}" [Tone: ${analysis.emotionalTone}]`,
-        category: 'conversation',
-        importance: analysis.stressIndicators.length > 0 ? 'high' : 'medium'
+        importance: analysis.stressIndicators.length > 0 ? 5 : 3
       });
     }
   } catch (error) {
@@ -1178,12 +1177,12 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     
     // Provide specific error messages based on the error type
     // Provide graceful fallback text instead of errors
-    if (error.message && error.message.includes('429')) {
+    if ((error as Error).message && (error as Error).message.includes('429')) {
       res.json({ 
         text: "[Voice recorded - transcription temporarily at capacity. Please type your message or try again shortly.]",
         fallback: true
       });
-    } else if (error.message && error.message.includes('401')) {
+    } else if ((error as Error).message && (error as Error).message.includes('401')) {
       res.json({ 
         text: "[Voice input received - please type your message or try voice again.]",
         fallback: true
@@ -1282,7 +1281,7 @@ app.get('/api/journal', async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
     const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
     
-    const entries = await storage.getJournalEntries(userId, limit, offset);
+    const entries = await storage.getJournalEntries(userId);
     res.json(entries);
   } catch (error) {
     console.error('Failed to fetch journal entries:', error);
@@ -1321,14 +1320,14 @@ app.post('/api/journal', async (req, res) => {
 
     // Perform AI analysis in background
     try {
-      const previousEntries = await storage.getJournalEntries(entryData.userId, 10);
+      const previousEntries = await storage.getJournalEntries(entryData.userId);
       const analysis = await analyzeJournalEntry(entry, previousEntries);
       
       await storage.createJournalAnalytics({
         userId: entryData.userId,
         entryId: entry.id!,
         emotionalThemes: analysis.emotionalThemes,
-        keyInsights: analysis.keyInsights,
+
         sentimentScore: analysis.sentimentScore,
         emotionalIntensity: analysis.emotionalIntensity,
         copingStrategies: analysis.copingStrategies,
