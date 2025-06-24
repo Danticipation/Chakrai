@@ -830,7 +830,7 @@ app.post('/api/chat', async (req, res) => {
       console.log('OpenAI response generated successfully:', botResponse.substring(0, 50) + '...');
     } catch (error) {
       console.error('OpenAI response generation failed, using fallback:', error);
-      console.error('Error stack:', error.stack);
+      console.error('Error stack:', (error as Error).stack);
       // Fallback to basic personality response only if OpenAI fails
       botResponse = generatePersonalityResponse(message, facts, memories, personalityMode);
       console.log('Using fallback response:', botResponse);
@@ -1332,7 +1332,7 @@ app.post('/api/journal', async (req, res) => {
 
         copingStrategies: analysis.copingStrategies,
 
-        concernAreas: analysis.concernAreas,
+
         recommendedActions: analysis.recommendedActions,
         therapistNotes: analysis.therapistNotes,
         patternConnections: analysis.patternConnections,
@@ -1458,7 +1458,7 @@ app.post('/api/journal/export', async (req, res) => {
     
     res.json({
       id: exportRecord.id,
-      format: format.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      format: format.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
       entryCount: entries.length,
       dateRange: `${entries.length > 0 ? new Date(entries[entries.length - 1].createdAt!).toLocaleDateString() : 'N/A'} - ${entries.length > 0 ? new Date(entries[0].createdAt!).toLocaleDateString() : 'N/A'}`,
       fileSize: `${Math.round(JSON.stringify(exportData).length / 1024)}KB`,
@@ -1995,7 +1995,9 @@ app.post('/api/personalization/feedback', async (req, res) => {
     
     const feedback = await storage.createUserFeedback({
       userId,
-      sessionId,
+      rating: responseQuality,
+      feedbackType: 'session_feedback',
+      comments: specificFeedback,
       responseQuality,
       helpfulness,
       personalRelevance,
@@ -2200,9 +2202,7 @@ app.get('/api/analytics/monthly-report/:userId/:year/:month', async (req, res) =
     
     // Try to get existing report from storage
     const existingReport = await storage.getMonthlyReport(
-      parseInt(userId),
-      parseInt(year),
-      parseInt(month)
+      userId.toString()
     );
     
     if (existingReport) {
