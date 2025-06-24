@@ -279,7 +279,7 @@ app.get('/api/mood-entries', async (req, res) => {
     const userId = parseInt(req.query.userId as string) || 1;
     const limit = parseInt(req.query.limit as string) || 30;
     
-    const entries = await storage.getMoodEntries(userId, limit);
+    const entries = await storage.getMoodEntriesByUserId(userId);
     
     res.json({
       entries: entries.map(entry => ({

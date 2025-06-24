@@ -360,7 +360,7 @@ export class DatabaseStorage {
   }
 
   async getPeerCheckInsByUserId(userId: number): Promise<PeerCheckIn[]> {
-    return await db.select().from(peerCheckIns).where(eq(peerCheckIns.userId, userId));
+    return await db.select().from(peerCheckIns).where(eq(peerCheckIns.participantId, userId));
   }
 
   // Peer sessions
@@ -370,7 +370,7 @@ export class DatabaseStorage {
   }
 
   async getPeerSessionsByUserId(userId: number): Promise<PeerSession[]> {
-    return await db.select().from(peerSessions).where(eq(peerSessions.userId, userId));
+    return await db.select().from(peerSessions).where(eq(peerSessions.participant1Id, userId));
   }
 
   // Community moderations
@@ -862,7 +862,7 @@ export class DatabaseStorage {
 
   async getPendingCheckIns(userId: number): Promise<SafetyCheckIn[]> {
     const allCheckIns = await this.getSafetyCheckInsByUserId(userId);
-    return allCheckIns.filter(checkIn => !checkIn.completed);
+    return allCheckIns.filter(checkIn => !checkIn.followUpCompleted);
   }
 
   async updateSafetyCheckIn(checkInId: number, updates: Partial<SafetyCheckIn>): Promise<SafetyCheckIn | null> {
