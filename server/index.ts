@@ -1328,7 +1328,7 @@ app.post('/api/journal', async (req, res) => {
         entryId: entry.id!,
         emotionalThemes: analysis.emotionalThemes,
 
-        sentimentScore: analysis.sentimentScore,
+        sentiment: analysis.sentimentScore,
         emotionalIntensity: analysis.emotionalIntensity,
         copingStrategies: analysis.copingStrategies,
         growthIndicators: analysis.growthIndicators,
