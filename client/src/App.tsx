@@ -259,14 +259,20 @@ const AppLayout = () => {
     setLoading(true);
     
     try {
+      console.log('=== SENDING CHAT REQUEST ===');
+      console.log('Message:', userMessageText);
+      console.log('URL: /api/chat');
+      
       const res = await axios.post('/api/chat', { 
         message: userMessageText,
-        userId: 1,
-        personalityMode: personalityMode
+        userId: 1
       });
       
-      console.log('Chat API Response:', res.data);
-      const botResponse = res.data.message || res.data.response;
+      console.log('=== RECEIVED RESPONSE ===');
+      console.log('Status:', res.status);
+      console.log('Full response:', res.data);
+      
+      const botResponse = res.data.message || res.data.response || 'No response received';
       // Add bot message without triggering screen readers
       const botMessage = {
         sender: 'bot' as const,
