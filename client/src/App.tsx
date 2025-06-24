@@ -102,8 +102,8 @@ function TraiApp() {
 
   // Bot stats query
   const { data: botStats } = useQuery({
-    queryKey: ['/api/bot-stats', userId],
-    queryFn: () => axios.get(`/api/bot-stats/${userId}`).then(res => res.data),
+    queryKey: ['/api/stats', userId],
+    queryFn: () => axios.get(`/api/stats/${userId}`).then(res => res.data),
     initialData: { level: 3, stage: 'Therapist', wordsLearned: 1000 }
   });
 
@@ -117,6 +117,7 @@ function TraiApp() {
     };
     
     setMessages(prev => [...prev, newMessage]);
+    const messageText = inputValue;
     setInputValue('');
 
     try {
@@ -213,7 +214,28 @@ function TraiApp() {
         return (
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6">
             <h2 className="text-2xl font-bold text-white mb-6">Mood Tracker</h2>
-            <p className="text-white/80">Mood tracking functionality will be available soon.</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { emoji: '😊', label: 'Happy' },
+                  { emoji: '😐', label: 'Neutral' },
+                  { emoji: '😔', label: 'Sad' },
+                  { emoji: '😰', label: 'Anxious' }
+                ].map((mood, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleMoodSubmit(mood.emoji, mood.label)}
+                    className="p-4 text-3xl bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/20"
+                  >
+                    <div className="text-center">
+                      <div>{mood.emoji}</div>
+                      <div className="text-xs text-white/70 mt-1">{mood.label}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <p className="text-white/70 text-sm text-center">Tap an emoji to record your current mood</p>
+            </div>
           </div>
         );
       
