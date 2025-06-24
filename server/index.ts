@@ -782,15 +782,15 @@ app.post('/api/chat', async (req, res) => {
           userId,
           safetyCheckInId: checkIn.id,
           interventionType: crisisAnalysis.riskLevel === 'critical' ? 'immediate_contact' : 'scheduled_followup',
-          contactMethod: crisisAnalysis.riskLevel === 'critical' ? 'crisis_hotline' : 'mental_health_professional',
-          scheduledAt: new Date()
+          severity: crisisAnalysis.riskLevel,
+          actionTaken: 'crisis_support_provided'
         });
         
         // Store crisis memory
         await storage.createUserMemory({
           userId,
           memory: `Crisis detection: ${crisisAnalysis.riskLevel} risk identified - support resources provided`,
-          category: 'crisis_intervention',
+
           importance: 5
         });
       }
