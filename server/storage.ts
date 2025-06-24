@@ -393,14 +393,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async resetBotStats(userId: number): Promise<void> {
-    // Reset bot to initial therapist state - knowledgeable but learning about user
+    // Reset bot to completely fresh state - zero words learned
     const [bot] = await db.select().from(bots).where(eq(bots.userId, userId));
     if (bot) {
       await db.update(bots)
         .set({
-          level: 3,
-          stage: 'Therapist',
-          wordsLearned: 1000
+          level: 1,
+          wordsLearned: 0
         })
         .where(eq(bots.userId, userId));
     }
