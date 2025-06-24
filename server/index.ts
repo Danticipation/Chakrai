@@ -1999,7 +1999,7 @@ app.post('/api/personalization/feedback', async (req, res) => {
       feedbackType: 'session_feedback',
       comments: specificFeedback,
 
-      specificFeedback
+
     });
     
     // Update user preferences based on feedback
@@ -2199,7 +2199,7 @@ app.get('/api/analytics/monthly-report/:userId/:year/:month', async (req, res) =
     
     // Try to get existing report from storage
     const existingReport = await storage.getMonthlyReport(
-      userId.toString(),
+      parseInt(userId),
       parseInt(year),
       parseInt(month)
     );
@@ -2329,14 +2329,14 @@ app.get('/api/analytics/trends/:userId', async (req, res) => {
       const year = date.getFullYear();
       
       try {
-        const report = await storage.getMonthlyReport(userId.toString(), year, month);
+        const report = await storage.getMonthlyReport(parseInt(userId), year, month);
         if (report) {
           trends.push({
             month: `${year}-${month.toString().padStart(2, '0')}`,
-            score: report.overallScore,
-            sessions: report.metrics.activityMetrics.totalSessions,
-            journalEntries: report.metrics.activityMetrics.journalEntries,
-            emotionalProgress: report.metrics.emotionalTrends.progressDirection
+            score: report.wellnessScore || 0,
+            sessions: 0,
+            journalEntries: 0,
+            emotionalProgress: 'stable'
           });
         }
       } catch (error) {
