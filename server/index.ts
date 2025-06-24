@@ -399,10 +399,10 @@ app.post('/api/crisis-analysis', async (req, res) => {
       // Create crisis intervention record
       await storage.createCrisisIntervention({
         userId: userId || 1,
-        checkInId: checkIn.id,
+        safetyCheckInId: checkIn.id,
         interventionType: crisisAnalysis.riskLevel === 'critical' ? 'immediate_contact' : 'scheduled_followup',
-        contactMethod: crisisAnalysis.riskLevel === 'critical' ? 'crisis_hotline' : 'mental_health_professional',
-        scheduledAt: new Date()
+        severity: crisisAnalysis.riskLevel,
+        actionTaken: 'crisis_support_provided'
       });
       
       // Store crisis memory
@@ -410,7 +410,7 @@ app.post('/api/crisis-analysis', async (req, res) => {
         userId: userId || 1,
         memory: `Crisis analysis detected ${crisisAnalysis.riskLevel} risk - immediate support provided`,
         category: 'crisis_intervention',
-        importance: 'critical'
+        importance: 5
       });
     }
     
@@ -538,7 +538,7 @@ app.post('/api/crisis-support', async (req, res) => {
         userId: userId || 1,
         memory: `Crisis support provided - Risk level: ${riskLevel}`,
         category: 'crisis_support',
-        importance: 'critical'
+        importance: 5
       });
       
       res.json(support);
@@ -687,7 +687,7 @@ app.post('/api/onboarding-profile', async (req, res) => {
       });
     } else {
       await storage.updateBot(bot.id, {
-        personalityTraits: profileData.initialTraits
+        personalityMode: 'therapist'
       });
     }
 
