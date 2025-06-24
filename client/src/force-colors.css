@@ -14,11 +14,11 @@ body, html, #root {
 
 /* Cards and content areas - layered depth */
 div[class*="rounded-2xl"] {
-  background: linear-gradient(180deg, #0ed6f1 0%, #1c2333 100%) !important;
-  border: 8px solid rgb(0, 0, 0, 0.4) !important;
-  box-shadow: 0 24px 12px rgb(0, 0, 0, 0.15) !important;
+  background: linear-gradient(180deg, #000000 0%, #111318 100%) !important;
+  border: 8px solid rgb(8, 32, 150, 0.4) !important;
+  box-shadow: 0 24px 12px rgb(3, 32, 176, 0.15) !important;
 }
-
+  
 /* Buttons with personality */
 button {
   background: linear-gradient(180deg, #000000 0%, #70a7ff 100%) !important;

@@ -2228,7 +2228,7 @@ app.post('/api/personalization/initialize', async (req, res) => {
       responseLength: initialPreferences?.responseLength || 'moderate',
       emotionalSupport: initialPreferences?.emotionalSupport || 'gentle',
 
-      voicePreference: initialPreferences?.voicePreference || 'james',
+
       adaptationLevel: 0.5,
       preferredTopics: [],
       avoidedTopics: [],
@@ -3338,9 +3338,8 @@ app.post('/api/wearable-devices/:deviceId/sync', async (req, res) => {
       await storage.createSyncLog({
         deviceId,
         syncStatus: 'success',
-        recordsProcessed: processedCount,
-        syncDuration: Date.now() - startTime,
-        dataTypes: []
+        recordsSync: processedCount,
+        syncDuration: Date.now() - startTime
       });
       
       res.json({ 
@@ -3353,10 +3352,9 @@ app.post('/api/wearable-devices/:deviceId/sync', async (req, res) => {
       await storage.createSyncLog({
         deviceId,
         syncStatus: 'failed',
-        recordsProcessed: processedCount,
+        recordsSync: processedCount,
         errorMessage: processingError instanceof Error ? processingError.message : 'Processing failed',
-        syncDuration: Date.now() - startTime,
-        dataTypes: []
+        syncDuration: Date.now() - startTime
       });
       
       throw processingError;
