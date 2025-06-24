@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrAI - Mental Wellness Companion</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1rem; }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .nav-tab:hover, .nav-tab.active {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+        .content {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 30px;
+            overflow: hidden;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: 600px;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 15px;
+            min-height: 400px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+        .message.user {
+            background: #4f46e5;
+            margin-left: auto;
+            text-align: right;
+        }
+        .message.bot {
+            background: rgba(255,255,255,0.15);
+            margin-right: auto;
+        }
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+        .chat-input input::placeholder { color: rgba(255,255,255,0.7); }
+        .send-btn, .voice-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+        }
+        .send-btn:hover, .voice-btn:hover {
+            background: #6366f1;
+            transform: scale(1.05);
+        }
+        .voice-btn.recording { background: #ef4444; }
+        .mood-tracker {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .mood-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .mood-card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.3);
+        }
+        .mood-emoji { font-size: 3rem; margin-bottom: 10px; }
+        .mood-label { font-weight: 500; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+        .stat-number { font-size: 2.5rem; font-weight: bold; margin-bottom: 5px; }
+        .stat-label { opacity: 0.8; }
+        .journal-area {
+            width: 100%;
+            min-height: 300px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+        }
+        .journal-area::placeholder { color: rgba(255,255,255,0.7); }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: #4f46e5;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #6366f1;
+            transform: translateY(-2px);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .header h1 { font-size: 2rem; }
+            .content { padding: 20px; }
+            .nav-tabs { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 TrAI</h1>
+            <p>Your Personal Mental Wellness & Therapy Companion</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('chat')">💬 Chat</button>
+            <button class="nav-tab" onclick="showTab('mood')">😊 Mood Tracker</button>
+            <button class="nav-tab" onclick="showTab('journal')">📝 Journal</button>
+            <button class="nav-tab" onclick="showTab('progress')">📊 Progress</button>
+            <button class="nav-tab" onclick="showTab('settings')">⚙️ Settings</button>
+        </div>
+
+        <div class="content">
+            <!-- Chat Tab -->
+            <div id="chat" class="tab-content">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot">
+                            Hello! I'm TrAI, your mental wellness companion. I'm here to provide therapeutic support, listen to your concerns, and help you on your journey toward better mental health. How are you feeling today?
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="messageInput" placeholder="Share what's on your mind..." />
+                        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎤</button>
+                        <button class="send-btn" onclick="sendMessage()">➤</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood Tracker Tab -->
+            <div id="mood" class="tab-content" style="display: none;">
+                <h2 style="margin-bottom: 20px;">How are you feeling right now?</h2>
+                <div class="mood-tracker">
+                    <div class="mood-card" onclick="recordMood('😊', 'Happy')">
+                        <div class="mood-emoji">😊</div>
+                        <div class="mood-label">Happy</div>
+                    </div>
+                    <div class="mood-card" onclick="recordMood('😐', 'Neutral')">
+                        <div class="mood-emoji">😐</div>
+                        <div class="mood-label">Neutral</div>
+                    </div>
+                    <div class="mood-card" onclick="recordMood('😔', 'Sad')">
+                        <div class="mood-emoji">😔</div>
+                        <div class="mood-label">Sad</div>
+                    </div>
+                    <div class="mood-card" onclick="recordMood('😰', 'Anxious')">
+                        <div class="mood-emoji">😰</div>
+                        <div class="mood-label">Anxious</div>
+                    </div>
+                </div>
+                <div id="moodFeedback" style="text-align: center; margin-top: 20px;"></div>
+            </div>
+
+            <!-- Journal Tab -->
+            <div id="journal" class="tab-content" style="display: none;">
+                <h2 style="margin-bottom: 20px;">Daily Journal</h2>
+                <textarea class="journal-area" id="journalText" placeholder="Write about your thoughts, feelings, experiences, or anything that's on your mind today..."></textarea>
+                <div style="margin-top: 15px;">
+                    <button class="btn" onclick="saveJournal()">💾 Save Entry</button>
+                    <button class="btn" onclick="clearJournal()">🗑️ Clear</button>
+                </div>
+                <div id="journalFeedback" style="margin-top: 15px; text-align: center;"></div>
+            </div>
+
+            <!-- Progress Tab -->
+            <div id="progress" class="tab-content" style="display: none;">
+                <h2 style="margin-bottom: 30px;">Your Wellness Journey</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="chatCount">0</div>
+                        <div class="stat-label">Chat Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="moodCount">0</div>
+                        <div class="stat-label">Mood Entries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="journalCount">0</div>
+                        <div class="stat-label">Journal Entries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="streakCount">1</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content" style="display: none;">
+                <h2 style="margin-bottom: 30px;">Settings</h2>
+                <div style="max-width: 500px;">
+                    <h3 style="margin-bottom: 15px;">Voice Selection</h3>
+                    <select id="voiceSelect" style="width: 100%; padding: 10px; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white; margin-bottom: 20px;">
+                        <option value="james">James - Warm and supportive</option>
+                        <option value="brian">Brian - Calm and professional</option>
+                        <option value="alexandra">Alexandra - Gentle and understanding</option>
+                        <option value="carla">Carla - Energetic and encouraging</option>
+                    </select>
+                    
+                    <h3 style="margin-bottom: 15px;">Privacy & Data</h3>
+                    <button class="btn" onclick="clearAllData()">🗑️ Clear All Data</button>
+                    <button class="btn" onclick="exportData()">📥 Export Data</button>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+                        <h4>About TrAI</h4>
+                        <p style="margin-top: 10px; opacity: 0.9; line-height: 1.6;">
+                            TrAI is a mental wellness companion designed to provide therapeutic support and help you track your emotional well-being. 
+                            All conversations are private and secure.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isRecording = false;
+        let chatCount = 0;
+        let moodCount = 0;
+        let journalCount = 0;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+        });
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab and mark nav as active
+            document.getElementById(tabName).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            chatCount++;
+            updateStats();
+
+            // Show loading
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message bot';
+            loadingDiv.innerHTML = '<div class="loading"></div>';
+            document.getElementById('chatMessages').appendChild(loadingDiv);
+            scrollToBottom();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, userId: 1 })
+                });
+
+                // Remove loading
+                loadingDiv.remove();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const botResponse = data.message || data.response || 'I appreciate you sharing with me. How else can I support you today?';
+                addMessage(botResponse, 'bot');
+
+            } catch (error) {
+                loadingDiv.remove();
+                addMessage('I apologize, but I encountered a connection issue. Please try again in a moment.', 'bot');
+                console.error('Chat error:', error);
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const messages = document.getElementById('chatMessages');
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function toggleVoice() {
+            const btn = document.getElementById('voiceBtn');
+            if (isRecording) {
+                isRecording = false;
+                btn.textContent = '🎤';
+                btn.classList.remove('recording');
+            } else {
+                isRecording = true;
+                btn.textContent = '⏹️';
+                btn.classList.add('recording');
+                // Simulate voice recording
+                setTimeout(() => {
+                    if (isRecording) {
+                        document.getElementById('messageInput').value = 'Voice message received';
+                        toggleVoice();
+                    }
+                }, 3000);
+            }
+        }
+
+        async function recordMood(emoji, mood) {
+            try {
+                const response = await fetch('/api/mood', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: 1, mood, intensity: 5 })
+                });
+
+                if (response.ok) {
+                    document.getElementById('moodFeedback').innerHTML = 
+                        `<div style="color: #4ade80;">✅ Mood "${mood}" recorded successfully!</div>`;
+                    moodCount++;
+                    updateStats();
+                } else {
+                    throw new Error('Failed to record mood');
+                }
+            } catch (error) {
+                document.getElementById('moodFeedback').innerHTML = 
+                    '<div style="color: #f87171;">❌ Failed to record mood. Please try again.</div>';
+            }
+
+            setTimeout(() => {
+                document.getElementById('moodFeedback').innerHTML = '';
+            }, 3000);
+        }
+
+        function saveJournal() {
+            const text = document.getElementById('journalText').value.trim();
+            if (!text) {
+                document.getElementById('journalFeedback').innerHTML = 
+                    '<div style="color: #fbbf24;">⚠️ Please write something before saving.</div>';
+                return;
+            }
+
+            // Save to localStorage
+            const date = new Date().toISOString().split('T')[0];
+            localStorage.setItem(`journal_${date}`, text);
+            
+            document.getElementById('journalFeedback').innerHTML = 
+                '<div style="color: #4ade80;">✅ Journal entry saved successfully!</div>';
+            journalCount++;
+            updateStats();
+
+            setTimeout(() => {
+                document.getElementById('journalFeedback').innerHTML = '';
+            }, 3000);
+        }
+
+        function clearJournal() {
+            document.getElementById('journalText').value = '';
+        }
+
+        function updateStats() {
+            document.getElementById('chatCount').textContent = chatCount;
+            document.getElementById('moodCount').textContent = moodCount;
+            document.getElementById('journalCount').textContent = journalCount;
+            
+            // Save to localStorage
+            localStorage.setItem('traiStats', JSON.stringify({
+                chatCount, moodCount, journalCount
+            }));
+        }
+
+        function loadStats() {
+            const stats = localStorage.getItem('traiStats');
+            if (stats) {
+                const data = JSON.parse(stats);
+                chatCount = data.chatCount || 0;
+                moodCount = data.moodCount || 0;
+                journalCount = data.journalCount || 0;
+                updateStats();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all your data? This cannot be undone.')) {
+                localStorage.clear();
+                chatCount = moodCount = journalCount = 0;
+                updateStats();
+                document.getElementById('journalText').value = '';
+                alert('All data cleared successfully.');
+            }
+        }
+
+        function exportData() {
+            const data = {
+                stats: { chatCount, moodCount, journalCount },
+                journals: {},
+                timestamp: new Date().toISOString()
+            };
+
+            // Collect journal entries
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('journal_')) {
+                    data.journals[key] = localStorage.getItem(key);
+                }
+            }
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `trai_data_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

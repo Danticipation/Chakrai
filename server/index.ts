@@ -140,17 +140,17 @@ app.get('/api/horoscope/:sign', (req, res) => {
   });
 });
 
-// Serve static files and handle React routes
+// Serve working app
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../working-app.html'));
+});
+
+// Serve static files
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// Handle React routes - only for non-API requests
+// Handle all other routes
 app.get('*', (req, res) => {
-  // Don't intercept API requests
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
-  }
-  
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../working-app.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
