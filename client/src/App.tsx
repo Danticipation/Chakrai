@@ -294,12 +294,14 @@ const AppLayout = () => {
       // Update daily reflection based on this interaction
       updateDailyReflection(userMessageText, botResponse);
       
-      // Generate audio for bot response
+      // Generate audio for bot response - SINGLE SOURCE ONLY
       try {
         console.log('=== CHAT AUDIO DEBUG START ===');
         console.log('Selected voice ID:', selectedReflectionVoice);
         console.log('Bot response text:', botResponse.substring(0, 50) + '...');
-        console.log('Will request voice:', selectedReflectionVoice);
+        
+        // Cancel any existing audio first
+        speechSynthesis.cancel();
         
         const audioResponse = await fetch('/api/text-to-speech', {
           method: 'POST',
@@ -315,51 +317,48 @@ const AppLayout = () => {
         
         if (audioResponse.ok) {
           const audioData = await audioResponse.json();
-          console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length, useBrowserTTS: audioData.useBrowserTTS });
+          console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length });
           
-          // Use ElevenLabs if server sent valid audio data (base64 should be >5k for real audio)
+          // Check for valid ElevenLabs audio data
           if (audioData.audioUrl && audioData.audioUrl.length > 5000) {
-            console.log('DETECTED ELEVENLABS AUDIO - Length:', audioData.audioUrl.length);
-            console.log('PLAYING ELEVENLABS VOICE:', selectedReflectionVoice);
-            speechSynthesis.cancel();
+            console.log('USING ELEVENLABS AUDIO ONLY - Length:', audioData.audioUrl.length);
+            console.log('VOICE:', selectedReflectionVoice);
             
             const audio = new Audio(audioData.audioUrl);
             audio.volume = 1.0;
-            
-            // Force audio to play immediately
             audio.play().then(() => {
               console.log('ElevenLabs audio playing successfully');
               setAudioEnabled(true);
             }).catch(err => {
-              console.log('ElevenLabs audio failed to play:', err);
-              // Only fallback if audio actually fails to play
+              console.log('ElevenLabs failed, fallback to browser TTS:', err);
               speechSynthesis.cancel();
               const utterance = new SpeechSynthesisUtterance(botResponse);
               utterance.rate = 0.9;
               speechSynthesis.speak(utterance);
               setAudioEnabled(true);
             });
+            // Exit here - no browser TTS should play
+            console.log('=== CHAT AUDIO DEBUG END ===');
+            return;
           }
-          
-          // Use browser TTS as fallback
-          console.log('Using browser TTS fallback - audio length:', audioData.audioUrl?.length || 'no audio');
-          speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(botResponse);
-          utterance.rate = 0.9;
-          speechSynthesis.speak(utterance);
-          setAudioEnabled(true);
-
-        } else {
-          // API failed - use browser TTS
-          speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(botResponse);
-          utterance.rate = 0.9;
-          speechSynthesis.speak(utterance);
-          setAudioEnabled(true);
         }
+        
+        // Only reach here if ElevenLabs failed completely
+        console.log('ElevenLabs not available, using browser TTS fallback');
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(botResponse);
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+        setAudioEnabled(true);
         console.log('=== CHAT AUDIO DEBUG END ===');
+        
       } catch (voiceError) {
-        console.log('Voice generation error:', voiceError);
+        console.log('Voice generation error, using browser TTS:', voiceError);
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(botResponse);
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+        setAudioEnabled(true);
       }
       
       setBotStats(prev => prev ? {
