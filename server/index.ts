@@ -279,6 +279,50 @@ app.post('/api/text-to-speech', async (req, res) => {
   }
 });
 
+// Onboarding status endpoint
+app.get('/api/onboarding-status/:userId', async (req, res) => {
+  try {
+    // Return that onboarding is complete to bypass the quiz
+    res.json({ 
+      isComplete: true,
+      completedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Onboarding status error:', error);
+    res.status(500).json({ error: 'Failed to get onboarding status' });
+  }
+});
+
+// Complete onboarding endpoint
+app.post('/api/complete-onboarding', async (req, res) => {
+  try {
+    const { userId, responses } = req.body;
+    
+    // Store onboarding responses (simplified for now)
+    res.json({ 
+      success: true,
+      completedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Complete onboarding error:', error);
+    res.status(500).json({ error: 'Failed to complete onboarding' });
+  }
+});
+
+// Bot stats endpoint
+app.get('/api/stats/:userId', async (req, res) => {
+  try {
+    res.json({
+      level: 3,
+      stage: "Therapist",
+      wordsLearned: 1000
+    });
+  } catch (error) {
+    console.error('Stats error:', error);
+    res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+
 // Setup development or production serving AFTER all API routes
 if (process.env.NODE_ENV === "production") {
   serveStatic(app);

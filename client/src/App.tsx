@@ -1944,7 +1944,6 @@ function AppWithOnboarding() {
   if ((!onboardingStatus?.isComplete && !onboardingComplete)) {
     return (
       <OnboardingQuiz 
-        userId={1} 
         onComplete={() => setOnboardingComplete(true)} 
       />
     );
