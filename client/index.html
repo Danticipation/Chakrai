@@ -11,23 +11,11 @@
     <meta name="version" content="2.0-VOICE-FORCE-RELOAD">
     <meta name="cache-bust" content="FORCE-RELOAD-NOW-1749595400000">
     <link rel="stylesheet" href="/src/main.tsx?v=1749237670918">
-    <script>
-      // Nuclear cache bust - force complete reload
-      if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
-        window.location.reload(true);
-      }
-    </script>
+
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx?bust=1749237670918&force=reload"></script>
-    <script>
-      // Force hard refresh on load
-      window.addEventListener('load', function() {
-        if (!window.location.search.includes('refreshed')) {
-          window.location.href = window.location.href + '?refreshed=true';
-        }
-      });
-    </script>
+
   </body>
 </html>
