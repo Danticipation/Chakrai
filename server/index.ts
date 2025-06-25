@@ -1,17 +1,19 @@
 import express from "express";
-import cors from "cors";
+import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from 'url';
 import multer from 'multer';
+import { setupVite, serveStatic, log } from "./vite.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const server = createServer(app);
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
-app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Configure multer for file uploads
 const upload = multer({ 
@@ -277,21 +279,13 @@ app.post('/api/text-to-speech', async (req, res) => {
   }
 });
 
-// Serve static files from the built React app
-app.use(express.static(path.join(__dirname, '../dist/public')));
+// Setup development or production serving
+if (process.env.NODE_ENV === "production") {
+  serveStatic(app);
+} else {
+  await setupVite(app, server);
+}
 
-// Handle API routes first before catch-all
-// (API routes are already defined above)
-
-// Handle all non-API routes - serve React app
-app.get('*', (req, res) => {
-  // Skip API routes
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
-  }
-  res.sendFile(path.join(__dirname, '../dist/public/index.html'));
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+server.listen(PORT, "0.0.0.0", () => {
+  log(`Server running on port ${PORT}`);
 });
