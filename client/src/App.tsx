@@ -322,27 +322,47 @@ const AppLayout = () => {
           console.log('audioUrl length:', audioData.audioUrl ? audioData.audioUrl.length : 0);
           
           if (!audioData.useBrowserTTS && audioData.audioUrl) {
-            // ElevenLabs audio - play it directly
+            // Force ElevenLabs audio playback
             speechSynthesis.cancel();
             
-            const audio = new Audio(audioData.audioUrl);
-            audio.volume = 1.0;
-            
-            audio.play()
-              .then(() => {
-                console.log('ElevenLabs voice playing:', selectedReflectionVoice);
-                setAudioEnabled(true);
-                return;
-              })
-              .catch(() => {
-                // Silent fallback to browser TTS
-                const utterance = new SpeechSynthesisUtterance(botResponse);
-                utterance.rate = 0.9;
-                speechSynthesis.speak(utterance);
-                setAudioEnabled(true);
-              });
-            
-            return; // Don't continue to browser TTS
+            try {
+              // Create audio element and force it to play
+              const audio = new Audio();
+              audio.src = audioData.audioUrl;
+              audio.volume = 1.0;
+              audio.preload = 'auto';
+              
+              // Multiple playback attempts
+              const forcePlay = async () => {
+                try {
+                  await audio.play();
+                  console.log('ElevenLabs audio SUCCESS:', selectedReflectionVoice);
+                  setAudioEnabled(true);
+                } catch (e1) {
+                  // Try with user gesture simulation
+                  try {
+                    audio.muted = true;
+                    await audio.play();
+                    audio.muted = false;
+                    console.log('ElevenLabs audio SUCCESS (unmuted):', selectedReflectionVoice);
+                    setAudioEnabled(true);
+                  } catch (e2) {
+                    // Final fallback to browser TTS only if everything fails
+                    console.log('ElevenLabs blocked - using browser TTS');
+                    const utterance = new SpeechSynthesisUtterance(botResponse);
+                    utterance.rate = 0.9;
+                    speechSynthesis.speak(utterance);
+                    setAudioEnabled(true);
+                  }
+                }
+              };
+              
+              forcePlay();
+              return;
+              
+            } catch (error) {
+              console.log('ElevenLabs setup failed');
+            }
           }
           
           // Fallback to browser TTS only if needed
