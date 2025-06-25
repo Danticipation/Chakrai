@@ -320,25 +320,27 @@ const AppLayout = () => {
           console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length });
           
           // Check for valid ElevenLabs audio data
-          if (audioData.audioUrl && audioData.audioUrl.length > 5000) {
-            console.log('USING ELEVENLABS AUDIO ONLY - Length:', audioData.audioUrl.length);
-            console.log('VOICE:', selectedReflectionVoice);
+          if (audioData.audioUrl && audioData.audioUrl.includes('data:audio/mpeg;base64,')) {
+            console.log('ELEVENLABS DETECTED - Playing immediately');
+            console.log('Audio length:', audioData.audioUrl.length);
             
+            // Force immediate playback without promises
             const audio = new Audio(audioData.audioUrl);
             audio.volume = 1.0;
-            audio.play().then(() => {
-              console.log('ElevenLabs audio playing successfully');
-              setAudioEnabled(true);
-            }).catch(err => {
-              console.log('ElevenLabs failed, fallback to browser TTS:', err);
-              speechSynthesis.cancel();
-              const utterance = new SpeechSynthesisUtterance(botResponse);
-              utterance.rate = 0.9;
-              speechSynthesis.speak(utterance);
-              setAudioEnabled(true);
+            audio.autoplay = true;
+            
+            // Bypass browser restrictions
+            document.body.appendChild(audio);
+            audio.play();
+            
+            // Clean up after playing
+            audio.addEventListener('ended', () => {
+              document.body.removeChild(audio);
             });
-            // Exit here - no browser TTS should play
-            console.log('=== CHAT AUDIO DEBUG END ===');
+            
+            console.log('ElevenLabs audio started');
+            setAudioEnabled(true);
+            console.log('=== ELEVENLABS ONLY - NO BROWSER TTS ===');
             return;
           }
         }
