@@ -321,68 +321,30 @@ const AppLayout = () => {
           
           // Check for valid ElevenLabs audio data
           if (audioData.audioUrl && audioData.audioUrl.length > 1000 && audioData.audioUrl.includes('data:audio/mpeg;base64,')) {
-            console.log('ELEVENLABS DETECTED - FORCING PLAYBACK');
+            console.log('ELEVENLABS DETECTED - FORCING CARLA VOICE');
+            console.log('Voice selected:', selectedReflectionVoice);
+            console.log('Audio URL starts with:', audioData.audioUrl.substring(0, 50));
             
-            // Create audio element in DOM and force immediate play
-            const audioElement = document.createElement('audio');
-            audioElement.src = audioData.audioUrl;
-            audioElement.volume = 1.0;
-            audioElement.controls = false;
-            audioElement.style.display = 'none';
+            // Stop any browser TTS
+            speechSynthesis.cancel();
             
-            document.body.appendChild(audioElement);
+            // Play ElevenLabs audio directly
+            const audio = new Audio(audioData.audioUrl);
+            audio.volume = 1.0;
+            audio.play();
+            console.log('CARLA VOICE FROM ELEVENLABS PLAYING');
             
-            // Force immediate playback with multiple fallbacks
-            audioElement.play().then(() => {
-              console.log('ELEVENLABS PLAYING SUCCESSFULLY');
-            }).catch(() => {
-              // Mute then unmute trick
-              audioElement.muted = true;
-              audioElement.play().then(() => {
-                setTimeout(() => {
-                  audioElement.muted = false;
-                }, 100);
-              }).catch(() => {
-                // Web Audio API fallback
-                try {
-                  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-                  fetch(audioData.audioUrl)
-                    .then(response => response.arrayBuffer())
-                    .then(data => audioContext.decodeAudioData(data))
-                    .then(buffer => {
-                      const source = audioContext.createBufferSource();
-                      source.buffer = buffer;
-                      source.connect(audioContext.destination);
-                      source.start();
-                      console.log('Web Audio API playing ElevenLabs');
-                    });
-                } catch (e) {
-                  console.log('All ElevenLabs methods failed');
-                }
-              });
-            });
-            
-            // Clean up after 30 seconds
-            setTimeout(() => {
-              if (document.body.contains(audioElement)) {
-                document.body.removeChild(audioElement);
-              }
-            }, 30000);
-            
-            setAudioEnabled(true);
-            console.log('=== ELEVENLABS FORCED - NO BROWSER TTS ===');
+            console.log('=== ELEVENLABS ONLY - EXIT ===');
             return;
           }
         }
         
-        // Only reach here if ElevenLabs failed completely
-        console.log('ElevenLabs not available, using browser TTS fallback');
-        speechSynthesis.cancel();
+        // Only use browser TTS if ElevenLabs completely failed
+        console.log('ElevenLabs failed - using browser TTS');
         const utterance = new SpeechSynthesisUtterance(botResponse);
         utterance.rate = 0.9;
         speechSynthesis.speak(utterance);
         setAudioEnabled(true);
-        console.log('=== CHAT AUDIO DEBUG END ===');
         
       } catch (voiceError) {
         console.log('Voice generation error, using browser TTS:', voiceError);
