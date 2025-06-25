@@ -322,46 +322,24 @@ const AppLayout = () => {
           console.log('audioUrl starts with data:audio:', audioData.audioUrl?.startsWith('data:audio'));
           console.log('audioUrl length:', audioData.audioUrl?.length);
           
-          // Check if we have ElevenLabs audio data
-          if (audioData.audioUrl && audioData.audioUrl.startsWith('data:audio')) {
-            console.log('🎵 ELEVENLABS AUDIO DETECTED - LENGTH:', audioData.audioUrl.length);
-            console.log('🎤 VOICE:', selectedReflectionVoice);
-            
-            // Stop any existing audio
+          // FORCE ElevenLabs audio if we have any audio data
+          if (audioData.audioUrl && audioData.audioUrl.length > 100) {
+            console.log('ELEVENLABS AUDIO PLAYING:', selectedReflectionVoice);
             speechSynthesis.cancel();
             
-            // Create and play audio immediately
             const audio = new Audio(audioData.audioUrl);
             audio.volume = 1.0;
             
-            // Force playback with multiple strategies
-            const playAudio = async () => {
-              try {
-                await audio.play();
-                console.log('✅ ELEVENLABS PLAYING SUCCESSFULLY');
-              } catch (err) {
-                console.log('⚠️ Direct play failed, trying muted approach');
-                try {
-                  audio.muted = true;
-                  await audio.play();
-                  audio.muted = false;
-                  console.log('✅ ELEVENLABS PLAYING (unmuted)');
-                } catch (err2) {
-                  console.log('❌ ElevenLabs completely blocked, using browser TTS');
-                  const utterance = new SpeechSynthesisUtterance(botResponse);
-                  utterance.rate = 0.9;
-                  speechSynthesis.speak(utterance);
-                }
-              }
-            };
+            audio.play().catch(() => {
+              audio.muted = true;
+              audio.play().then(() => audio.muted = false).catch(() => {
+                const utterance = new SpeechSynthesisUtterance(botResponse);
+                speechSynthesis.speak(utterance);
+              });
+            });
             
-            playAudio();
             setAudioEnabled(true);
             return;
-          } else {
-            console.log('📢 No ElevenLabs data detected');
-            console.log('Reason: audioUrl exists?', !!audioData.audioUrl);
-            console.log('Reason: starts with data:audio?', audioData.audioUrl?.startsWith('data:audio'));
           }
           
           // Browser TTS fallback
