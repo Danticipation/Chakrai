@@ -320,27 +320,57 @@ const AppLayout = () => {
           console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length });
           
           // Check for valid ElevenLabs audio data
-          if (audioData.audioUrl && audioData.audioUrl.includes('data:audio/mpeg;base64,')) {
-            console.log('ELEVENLABS DETECTED - Playing immediately');
-            console.log('Audio length:', audioData.audioUrl.length);
+          if (audioData.audioUrl && audioData.audioUrl.length > 1000 && audioData.audioUrl.includes('data:audio/mpeg;base64,')) {
+            console.log('ELEVENLABS DETECTED - FORCING PLAYBACK');
             
-            // Force immediate playback without promises
-            const audio = new Audio(audioData.audioUrl);
-            audio.volume = 1.0;
-            audio.autoplay = true;
+            // Create audio element in DOM and force immediate play
+            const audioElement = document.createElement('audio');
+            audioElement.src = audioData.audioUrl;
+            audioElement.volume = 1.0;
+            audioElement.controls = false;
+            audioElement.style.display = 'none';
             
-            // Bypass browser restrictions
-            document.body.appendChild(audio);
-            audio.play();
+            document.body.appendChild(audioElement);
             
-            // Clean up after playing
-            audio.addEventListener('ended', () => {
-              document.body.removeChild(audio);
+            // Force immediate playback with multiple fallbacks
+            audioElement.play().then(() => {
+              console.log('ELEVENLABS PLAYING SUCCESSFULLY');
+            }).catch(() => {
+              // Mute then unmute trick
+              audioElement.muted = true;
+              audioElement.play().then(() => {
+                setTimeout(() => {
+                  audioElement.muted = false;
+                }, 100);
+              }).catch(() => {
+                // Web Audio API fallback
+                try {
+                  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                  fetch(audioData.audioUrl)
+                    .then(response => response.arrayBuffer())
+                    .then(data => audioContext.decodeAudioData(data))
+                    .then(buffer => {
+                      const source = audioContext.createBufferSource();
+                      source.buffer = buffer;
+                      source.connect(audioContext.destination);
+                      source.start();
+                      console.log('Web Audio API playing ElevenLabs');
+                    });
+                } catch (e) {
+                  console.log('All ElevenLabs methods failed');
+                }
+              });
             });
             
-            console.log('ElevenLabs audio started');
+            // Clean up after 30 seconds
+            setTimeout(() => {
+              if (document.body.contains(audioElement)) {
+                document.body.removeChild(audioElement);
+              }
+            }, 30000);
+            
             setAudioEnabled(true);
-            console.log('=== ELEVENLABS ONLY - NO BROWSER TTS ===');
+            console.log('=== ELEVENLABS FORCED - NO BROWSER TTS ===');
             return;
           }
         }

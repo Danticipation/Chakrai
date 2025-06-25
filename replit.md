@@ -7,7 +7,8 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Persistent memory system**: Bot MUST have persistent memory to remember users across sessions and build personality profiles
 - **Self-reflection through mirroring**: Core purpose is reflection of self through the bot's learned personality mirror
 - **Original voice system**: Maintain only the 4 approved voices (James, Brian, Alexandra, Carla)
-- **Voice functionality**: All voices must work properly when tested, not produce identical outputs
+- **Voice functionality**: ElevenLabs voices must work properly - user extremely frustrated with voice system failures
+- **Critical priority**: Voice system is causing significant user frustration and must be resolved immediately
 - **Communication style**: Direct, technical communication preferred
 - **Identity reflection**: Bot should reflect user's persona, identity, and mannerisms over time
 
