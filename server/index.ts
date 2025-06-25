@@ -365,13 +365,11 @@ app.post('/api/text-to-speech', async (req, res) => {
     } catch (elevenLabsError) {
       console.log('ElevenLabs API failed:', elevenLabsError.message);
       
-      // Fallback to browser TTS
+      // NO BROWSER TTS FALLBACK
       res.json({ 
         audioUrl: null,
-        useBrowserTTS: true,
-        text: text,
-        voice: voice,
-        message: 'ElevenLabs failed - using browser text-to-speech',
+        useBrowserTTS: false,
+        success: false,
         error: elevenLabsError.message
       });
     }

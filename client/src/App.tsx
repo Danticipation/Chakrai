@@ -319,52 +319,23 @@ const AppLayout = () => {
           const audioData = await audioResponse.json();
           console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length });
           
-          // FORCE ELEVENLABS ONLY - NO BROWSER TTS EVER
+          // ELEVENLABS CARLA VOICE ONLY
           if (audioData.audioUrl && audioData.audioUrl.length > 1000) {
-            console.log('ELEVENLABS AUDIO DETECTED - BLOCKING ALL BROWSER TTS');
+            console.log('PLAYING CARLA VOICE FROM ELEVENLABS');
             
-            // Completely disable browser TTS
-            speechSynthesis.cancel();
-            speechSynthesis.pause();
+            const audio = new Audio(audioData.audioUrl);
+            audio.volume = 1.0;
+            audio.play();
             
-            // Create and immediately play ElevenLabs audio
-            const audioElement = document.createElement('audio');
-            audioElement.src = audioData.audioUrl;
-            audioElement.volume = 1.0;
-            audioElement.preload = 'auto';
-            audioElement.autoplay = true;
-            
-            document.body.appendChild(audioElement);
-            
-            audioElement.play().then(() => {
-              console.log('CARLA ELEVENLABS VOICE PLAYING');
-            }).catch(() => {
-              // Force play with mute trick
-              audioElement.muted = true;
-              audioElement.play().then(() => {
-                audioElement.muted = false;
-                console.log('CARLA VOICE PLAYING (UNMUTED)');
-              });
-            });
-            
-            // Clean up after playing
-            audioElement.addEventListener('ended', () => {
-              document.body.removeChild(audioElement);
-            });
-            
-            setAudioEnabled(true);
-            console.log('=== ELEVENLABS FORCED - NO BROWSER TTS ALLOWED ===');
+            console.log('CARLA VOICE STARTED');
             return;
           }
         }
         
-        // NO BROWSER TTS - ELEVENLABS ONLY
-        console.log('ElevenLabs not available - NO AUDIO');
-        setAudioEnabled(false);
+        console.log('ElevenLabs audio not available - NO FALLBACK');
         
       } catch (voiceError) {
-        console.log('Voice generation error - NO FALLBACK AUDIO');
-        setAudioEnabled(false);
+        console.log('Voice error - NO AUDIO FALLBACK');
       }
       
       setBotStats(prev => prev ? {
