@@ -1,22 +1,13 @@
-/* THERAPEUTIC COLOR SCHEME WITH VISUAL HIERARCHY */
+/* THERAPEUTIC COLOR SCHEME - CLEAN VERSION */
 
-/* Main background - soft blue */
+/* Ensure text visibility */
+* {
+  color: inherit !important;
+}
+
+/* Therapeutic background */
 body, html, #root {
-  background-color: #d41111 !important;
-  background: linear-gradient(180deg, #1c2333 0%, #d4f7e1 100%) !important;
-}
-
-/* Panel backgrounds with subtle gradients */
-.w-1\/4, .w-1\/2 {
-  background: linear-gradient(180deg, #1c2333 0%, #f2f2f2 100%) !important;
-  border: 1px solid rgb(0, 0, 0, 0.3) !important;
-}
-
-/* Cards and content areas - layered depth */
-div[class*="rounded-2xl"] {
-  background: linear-gradient(180deg, #000000 0%, #111318 100%) !important;
-  border: 8px solid rgb(8, 32, 150, 0.4) !important;
-  box-shadow: 0 24px 12px rgb(3, 32, 176, 0.15) !important;
+  background: linear-gradient(to bottom right, #f0f8ff, #f5f0ff, #fff0f5) !important;
 }
   
 /* Buttons with personality */
