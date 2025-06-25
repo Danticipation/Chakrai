@@ -317,8 +317,8 @@ const AppLayout = () => {
           const audioData = await audioResponse.json();
           console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length, useBrowserTTS: audioData.useBrowserTTS });
           
-          // Use ElevenLabs if server sent valid audio data (base64 should be >10k for real audio)
-          if (audioData.audioUrl && audioData.audioUrl.length > 10000) {
+          // Use ElevenLabs if server sent valid audio data (base64 should be >5k for real audio)
+          if (audioData.audioUrl && audioData.audioUrl.length > 5000) {
             console.log('DETECTED ELEVENLABS AUDIO - Length:', audioData.audioUrl.length);
             console.log('PLAYING ELEVENLABS VOICE:', selectedReflectionVoice);
             speechSynthesis.cancel();
@@ -339,17 +339,15 @@ const AppLayout = () => {
               speechSynthesis.speak(utterance);
               setAudioEnabled(true);
             });
-            return;
           }
           
           // Use browser TTS as fallback
-          console.log('Using browser TTS fallback');
+          console.log('Using browser TTS fallback - audio length:', audioData.audioUrl?.length || 'no audio');
           speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(botResponse);
           utterance.rate = 0.9;
           speechSynthesis.speak(utterance);
           setAudioEnabled(true);
-          return;
 
         } else {
           // API failed - use browser TTS
