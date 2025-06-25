@@ -315,31 +315,56 @@ const AppLayout = () => {
         
         if (audioResponse.ok) {
           const audioData = await audioResponse.json();
-          console.log('Audio response received - useBrowserTTS:', audioData.useBrowserTTS);
+          console.log('=== AUDIO DATA RECEIVED ===');
+          console.log('useBrowserTTS:', audioData.useBrowserTTS);
+          console.log('audioUrl exists:', !!audioData.audioUrl);
+          console.log('audioUrl type:', typeof audioData.audioUrl);
+          console.log('audioUrl starts with data:audio:', audioData.audioUrl?.startsWith('data:audio'));
+          console.log('audioUrl length:', audioData.audioUrl?.length);
           
-          // FORCE ELEVENLABS AUDIO PLAYBACK
-          if (audioData.audioUrl && audioData.audioUrl.length > 1000) {
-            console.log('PLAYING ELEVENLABS AUDIO NOW');
+          // Check if we have ElevenLabs audio data
+          if (audioData.audioUrl && audioData.audioUrl.startsWith('data:audio')) {
+            console.log('🎵 ELEVENLABS AUDIO DETECTED - LENGTH:', audioData.audioUrl.length);
+            console.log('🎤 VOICE:', selectedReflectionVoice);
+            
+            // Stop any existing audio
             speechSynthesis.cancel();
             
+            // Create and play audio immediately
             const audio = new Audio(audioData.audioUrl);
             audio.volume = 1.0;
             
-            audio.play().catch(() => {
-              console.log('Browser blocked audio - trying muted trick');
-              audio.muted = true;
-              audio.play().then(() => {
-                audio.muted = false;
-              });
-            });
+            // Force playback with multiple strategies
+            const playAudio = async () => {
+              try {
+                await audio.play();
+                console.log('✅ ELEVENLABS PLAYING SUCCESSFULLY');
+              } catch (err) {
+                console.log('⚠️ Direct play failed, trying muted approach');
+                try {
+                  audio.muted = true;
+                  await audio.play();
+                  audio.muted = false;
+                  console.log('✅ ELEVENLABS PLAYING (unmuted)');
+                } catch (err2) {
+                  console.log('❌ ElevenLabs completely blocked, using browser TTS');
+                  const utterance = new SpeechSynthesisUtterance(botResponse);
+                  utterance.rate = 0.9;
+                  speechSynthesis.speak(utterance);
+                }
+              }
+            };
             
-            console.log('ElevenLabs audio initiated for:', selectedReflectionVoice);
+            playAudio();
             setAudioEnabled(true);
             return;
+          } else {
+            console.log('📢 No ElevenLabs data detected');
+            console.log('Reason: audioUrl exists?', !!audioData.audioUrl);
+            console.log('Reason: starts with data:audio?', audioData.audioUrl?.startsWith('data:audio'));
           }
           
-          // Only if no ElevenLabs audio data
-          console.log('Using browser TTS fallback');
+          // Browser TTS fallback
           speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(botResponse);
           utterance.rate = 0.9;
