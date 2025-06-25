@@ -335,16 +335,30 @@ const AppLayout = () => {
               
               // Immediately try to play without waiting
               const playAttempt = () => {
-                audio.play()
-                  .then(() => {
-                    console.log('SUCCESS: ElevenLabs audio playing with voice:', selectedReflectionVoice);
-                    setAudioEnabled(true);
-                  })
-                  .catch(err => {
-                    console.log('ElevenLabs playback blocked:', err.message);
-                    console.log('FALLING BACK to browser TTS due to audio policy');
-                    fallbackToBrowserTTS();
-                  });
+                console.log('Attempting to play ElevenLabs audio for voice:', selectedReflectionVoice);
+                
+                // Force user interaction context
+                audio.muted = false;
+                audio.loop = false;
+                audio.currentTime = 0;
+                
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                  playPromise
+                    .then(() => {
+                      console.log('SUCCESS: ElevenLabs audio playing with voice:', selectedReflectionVoice);
+                      setAudioEnabled(true);
+                    })
+                    .catch(err => {
+                      console.log('ElevenLabs playback failed:', err.name, err.message);
+                      console.log('Audio blocked by browser - using text-to-speech fallback');
+                      fallbackToBrowserTTS();
+                    });
+                } else {
+                  console.log('Audio play() returned undefined - browser compatibility issue');
+                  fallbackToBrowserTTS();
+                }
               };
               
               const fallbackToBrowserTTS = () => {
@@ -359,6 +373,9 @@ const AppLayout = () => {
               
               // Try immediate playback
               playAttempt();
+              
+              // Clean up blob URL after use
+              setTimeout(() => URL.revokeObjectURL(audioUrl), 10000);
               
               // Don't fall through to browser TTS immediately
               return;

@@ -30,6 +30,8 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
+    console.log('Making OpenAI API call...');
+    
     // OpenAI API call
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -54,12 +56,17 @@ app.post('/api/chat', async (req, res) => {
       })
     });
 
+    console.log('OpenAI response status:', openaiResponse.status);
+
     if (!openaiResponse.ok) {
+      const errorText = await openaiResponse.text();
+      console.log('OpenAI API error:', errorText);
       throw new Error(`OpenAI API error: ${openaiResponse.status}`);
     }
 
     const openaiData = await openaiResponse.json();
     const aiResponse = openaiData.choices[0].message.content;
+    console.log('OpenAI response received:', aiResponse.substring(0, 50) + '...');
 
     res.json({
       message: aiResponse,
@@ -277,6 +284,8 @@ app.post('/api/text-to-speech', async (req, res) => {
     const voiceId = voiceMap[voice] || voiceMap['james'];
     
     try {
+      console.log(`Making ElevenLabs request for voice: ${voice} (ID: ${voiceId})`);
+      
       const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
         headers: {
@@ -296,21 +305,33 @@ app.post('/api/text-to-speech', async (req, res) => {
         })
       });
 
+      console.log('ElevenLabs response status:', response.status);
+
       if (response.ok) {
         const audioBuffer = await response.arrayBuffer();
-        const base64Audio = Buffer.from(audioBuffer).toString('base64');
+        console.log('Audio buffer size:', audioBuffer.byteLength);
         
-        return res.json({
-          audioUrl: `data:audio/mpeg;base64,${base64Audio}`,
-          useBrowserTTS: false,
-          voice: voice
-        });
+        if (audioBuffer.byteLength > 0) {
+          const base64Audio = Buffer.from(audioBuffer).toString('base64');
+          console.log('Base64 audio length:', base64Audio.length);
+          
+          return res.json({
+            audioUrl: `data:audio/mpeg;base64,${base64Audio}`,
+            useBrowserTTS: false,
+            voice: voice,
+            success: true
+          });
+        } else {
+          console.log('Empty audio buffer received from ElevenLabs');
+          throw new Error('Empty audio response');
+        }
       } else {
-        console.log('ElevenLabs API error:', response.status, response.statusText);
-        throw new Error('ElevenLabs API request failed');
+        const errorText = await response.text();
+        console.log('ElevenLabs API error:', response.status, response.statusText, errorText);
+        throw new Error(`ElevenLabs API error: ${response.status}`);
       }
     } catch (elevenLabsError) {
-      console.log('ElevenLabs API error, falling back to browser TTS:', elevenLabsError);
+      console.log('ElevenLabs API failed:', elevenLabsError.message);
       
       // Fallback to browser TTS
       res.json({ 
@@ -318,7 +339,8 @@ app.post('/api/text-to-speech', async (req, res) => {
         useBrowserTTS: true,
         text: text,
         voice: voice,
-        message: 'Using browser text-to-speech'
+        message: 'ElevenLabs failed - using browser text-to-speech',
+        error: elevenLabsError.message
       });
     }
 
