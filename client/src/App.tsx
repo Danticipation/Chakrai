@@ -295,104 +295,65 @@ const AppLayout = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             text: botResponse,
-            voiceId: selectedReflectionVoice
+            voice: 'james',
+            emotionalContext: 'calming'
           })
         });
         
         console.log('Audio response status:', audioResponse.status);
-        console.log('Audio response headers:', Object.fromEntries(audioResponse.headers.entries()));
         
         if (audioResponse.ok) {
-          const audioBlob = await audioResponse.blob();
-          console.log('Audio blob size:', audioBlob.size);
-          console.log('Audio blob type:', audioBlob.type);
+          const audioData = await audioResponse.json();
+          console.log('Audio data received:', audioData);
           
-          if (audioBlob.size > 0) {
-            const audioUrl = URL.createObjectURL(audioBlob);
-            console.log('Audio URL created:', audioUrl);
-            setLastBotAudio(audioUrl);
-            
-            const audio = new Audio(audioUrl);
-            audio.volume = 1.0;
-            
-            // Force audio to load and play immediately
-            audio.preload = 'auto';
-            audio.autoplay = false;
-            
-            // Add detailed audio event listeners
-            audio.addEventListener('loadstart', () => console.log('Audio loadstart'));
-            audio.addEventListener('loadeddata', () => console.log('Audio loaded data'));
-            audio.addEventListener('canplay', () => console.log('Audio can play'));
-            audio.addEventListener('playing', () => console.log('Audio started playing'));
-            audio.addEventListener('ended', () => console.log('Audio playback ended'));
-            audio.addEventListener('error', (e) => {
-              console.log('Audio error event:', e);
-              console.log('Audio error code:', audio.error?.code);
-              console.log('Audio error message:', audio.error?.message);
-            });
-            
-            // Try to load the audio first
-            audio.load();
-            
-            // Try Web Audio API approach for better browser compatibility
-            setTimeout(async () => {
-              try {
-                // First try standard HTML audio
-                const playPromise = audio.play();
-                await playPromise;
-                console.log('ElevenLabs audio playing successfully');
-                setAudioEnabled(true);
-              } catch (error) {
-                console.log('HTML audio blocked, trying Web Audio API');
-                
-                try {
-                  // Use Web Audio API for better control
-                  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-                  const arrayBuffer = await audioBlob.arrayBuffer();
-                  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                  
-                  const source = audioContext.createBufferSource();
-                  source.buffer = audioBuffer;
-                  source.connect(audioContext.destination);
-                  source.start(0);
-                  
-                  console.log('Web Audio API playback started');
-                  setAudioEnabled(true);
-                } catch (webAudioError) {
-                  console.log('Both audio methods blocked - using fallback TTS');
-                  
-                  // Fallback to browser TTS if ElevenLabs is blocked
-                  try {
-                    const utterance = new SpeechSynthesisUtterance(botResponse);
-                    utterance.rate = 0.9;
-                    utterance.pitch = 1.0;
-                    utterance.volume = 0.8;
-                    speechSynthesis.speak(utterance);
-                    console.log('Browser TTS fallback used');
-                    setAudioEnabled(true);
-                  } catch (fallbackError) {
-                    console.log('All audio methods failed');
-                  }
-                }
-              }
-            }, 100);
-          } else {
-            console.log('Empty audio blob received');
+          if (audioData.useBrowserTTS) {
+            // Use browser TTS as instructed by server
+            try {
+              const utterance = new SpeechSynthesisUtterance(botResponse);
+              utterance.rate = 0.9;
+              utterance.pitch = 1.0;
+              utterance.volume = 0.8;
+              speechSynthesis.speak(utterance);
+              console.log('Browser TTS used');
+              setAudioEnabled(true);
+            } catch (fallbackError) {
+              console.log('Browser TTS failed:', fallbackError);
+            }
+          } else if (audioData.audioUrl) {
+            // Use ElevenLabs audio data
+            try {
+              const audio = new Audio(audioData.audioUrl);
+              audio.volume = 1.0;
+              
+              audio.addEventListener('canplay', () => {
+                console.log('ElevenLabs audio ready to play');
+              });
+              
+              audio.addEventListener('error', (e) => {
+                console.log('ElevenLabs audio error:', e);
+                // Fallback to browser TTS
+                const utterance = new SpeechSynthesisUtterance(botResponse);
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+              });
+              
+              await audio.play();
+              console.log('ElevenLabs audio playing successfully');
+              setAudioEnabled(true);
+            } catch (error) {
+              console.log('ElevenLabs audio failed, using browser TTS');
+              const utterance = new SpeechSynthesisUtterance(botResponse);
+              utterance.rate = 0.9;
+              speechSynthesis.speak(utterance);
+              setAudioEnabled(true);
+            }
           }
         } else {
-          console.log('ElevenLabs API unavailable, using browser TTS fallback');
-          // Fallback to browser TTS when ElevenLabs API is unavailable
-          try {
-            const utterance = new SpeechSynthesisUtterance(botResponse);
-            utterance.rate = 0.9;
-            utterance.pitch = 1.0;
-            utterance.volume = 0.8;
-            speechSynthesis.speak(utterance);
-            console.log('Browser TTS fallback used successfully');
-            setAudioEnabled(true);
-          } catch (fallbackError) {
-            console.log('Browser TTS fallback failed:', fallbackError);
-          }
+          console.log('TTS API failed, using browser fallback');
+          const utterance = new SpeechSynthesisUtterance(botResponse);
+          utterance.rate = 0.9;
+          speechSynthesis.speak(utterance);
+          setAudioEnabled(true);
         }
         console.log('=== CHAT AUDIO DEBUG END ===');
       } catch (voiceError) {
