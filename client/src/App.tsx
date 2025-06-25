@@ -317,19 +317,22 @@ const AppLayout = () => {
           const audioData = await audioResponse.json();
           console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length, useBrowserTTS: audioData.useBrowserTTS });
           
-          // Use ElevenLabs if server sent valid audio data (check for substantial base64 length)
-          if (audioData.audioUrl && audioData.audioUrl.length > 1000) {
+          // Use ElevenLabs if server sent valid audio data (base64 should be >10k for real audio)
+          if (audioData.audioUrl && audioData.audioUrl.length > 10000) {
+            console.log('DETECTED ELEVENLABS AUDIO - Length:', audioData.audioUrl.length);
             console.log('PLAYING ELEVENLABS VOICE:', selectedReflectionVoice);
             speechSynthesis.cancel();
             
             const audio = new Audio(audioData.audioUrl);
             audio.volume = 1.0;
+            
+            // Force audio to play immediately
             audio.play().then(() => {
               console.log('ElevenLabs audio playing successfully');
               setAudioEnabled(true);
             }).catch(err => {
               console.log('ElevenLabs audio failed to play:', err);
-              // Fallback to browser TTS if audio fails to play
+              // Only fallback if audio actually fails to play
               speechSynthesis.cancel();
               const utterance = new SpeechSynthesisUtterance(botResponse);
               utterance.rate = 0.9;

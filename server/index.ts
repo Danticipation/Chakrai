@@ -21,7 +21,7 @@ const upload = multer({
   limits: { fileSize: 25 * 1024 * 1024 } // 25MB limit
 });
 
-// Chat endpoint with OpenAI integration
+// Chat endpoint with OpenAI integration and personality mirroring
 app.post('/api/chat', async (req, res) => {
   try {
     const { message, userId = 1 } = req.body;
@@ -32,7 +32,31 @@ app.post('/api/chat', async (req, res) => {
 
     console.log('Making OpenAI API call...');
     
-    // OpenAI API call
+    // Get user's personality data for mirroring
+    let personalityContext = '';
+    try {
+      const { storage } = await import('./storage.js');
+      const memories = await storage.getUserMemories(userId);
+      const facts = await storage.getUserFacts(userId);
+      console.log('Loaded personality data:', { memoriesCount: memories.length, factsCount: facts.length });
+      
+      if (memories.length > 0 || facts.length > 0) {
+        const memoryText = memories.slice(-5).map(m => m.memory).join('\n');
+        const factText = facts.slice(-5).map(f => f.fact).join('\n');
+        
+        personalityContext = `
+
+PERSONALITY MIRRORING CONTEXT:
+User Memories: ${memoryText}
+User Facts: ${factText}
+
+Mirror this user's communication style, personality traits, and mannerisms back to them. Be their therapeutic reflection - use their own patterns, interests, and communication style while providing support. Reference their personal details naturally.`;
+      }
+    } catch (error) {
+      console.log('Could not load personality data:', error.message);
+    }
+    
+    // OpenAI API call with personality mirroring
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -44,7 +68,15 @@ app.post('/api/chat', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: 'You are TrAI, a compassionate mental wellness and therapy companion. Provide supportive, therapeutic responses that are empathetic, professional, and helpful. Keep responses conversational and supportive.'
+            content: `You are TrAI, a therapeutic companion that mirrors the user's personality back to them for self-reflection. Your core purpose is to reflect their identity, communication style, and mannerisms to help them see themselves clearly.
+
+Be supportive and therapeutic while authentically mirroring their:
+- Communication patterns and style
+- Interests and values  
+- Personality traits and mannerisms
+- Personal background and experiences
+
+Use their own words, phrases, and communication patterns when appropriate. Reference their personal details naturally to show you understand and remember them.${personalityContext}`
           },
           {
             role: 'user',
