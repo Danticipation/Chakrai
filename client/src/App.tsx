@@ -289,6 +289,7 @@ const AppLayout = () => {
         console.log('=== CHAT AUDIO DEBUG START ===');
         console.log('Selected voice ID:', selectedReflectionVoice);
         console.log('Bot response text:', botResponse.substring(0, 50) + '...');
+        console.log('Will request voice:', selectedReflectionVoice);
         
         const audioResponse = await fetch('/api/text-to-speech', {
           method: 'POST',
@@ -304,55 +305,66 @@ const AppLayout = () => {
         
         if (audioResponse.ok) {
           const audioData = await audioResponse.json();
-          console.log('Audio data received:', audioData);
+          console.log('=== FULL AUDIO RESPONSE ===');
+          console.log('Complete audio data:', JSON.stringify(audioData, null, 2));
           console.log('useBrowserTTS:', audioData.useBrowserTTS);
           console.log('audioUrl exists:', !!audioData.audioUrl);
+          console.log('audioUrl length:', audioData.audioUrl ? audioData.audioUrl.length : 0);
           
           if (!audioData.useBrowserTTS && audioData.audioUrl) {
-            // Use ElevenLabs audio data
+            // Use ElevenLabs audio data - force it to work
+            console.log('ElevenLabs audio detected, forcing playback...');
+            
+            // Stop any existing speech synthesis completely
+            speechSynthesis.cancel();
+            
             try {
-              console.log('Playing ElevenLabs audio...');
+              // Create blob from base64 for better browser compatibility
+              const base64Data = audioData.audioUrl.split(',')[1];
+              const binaryData = atob(base64Data);
+              const arrayBuffer = new ArrayBuffer(binaryData.length);
+              const view = new Uint8Array(arrayBuffer);
+              for (let i = 0; i < binaryData.length; i++) {
+                view[i] = binaryData.charCodeAt(i);
+              }
+              const audioBlob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+              const audioUrl = URL.createObjectURL(audioBlob);
               
-              // Stop any existing speech synthesis first
-              speechSynthesis.cancel();
-              
-              const audio = new Audio(audioData.audioUrl);
+              const audio = new Audio(audioUrl);
               audio.volume = 1.0;
-              audio.preload = 'auto';
               
-              // Enable audio context if suspended
-              if (typeof window !== 'undefined' && 'AudioContext' in window) {
-                const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-                if (audioContext.state === 'suspended') {
-                  await audioContext.resume();
-                }
-              }
+              // Immediately try to play without waiting
+              const playAttempt = () => {
+                audio.play()
+                  .then(() => {
+                    console.log('SUCCESS: ElevenLabs audio playing with voice:', selectedReflectionVoice);
+                    setAudioEnabled(true);
+                  })
+                  .catch(err => {
+                    console.log('ElevenLabs playback blocked:', err.message);
+                    console.log('FALLING BACK to browser TTS due to audio policy');
+                    fallbackToBrowserTTS();
+                  });
+              };
               
-              // Force immediate playback with better error handling
-              try {
-                await audio.play();
-                console.log('ElevenLabs audio playing successfully with voice:', selectedReflectionVoice);
+              const fallbackToBrowserTTS = () => {
+                const utterance = new SpeechSynthesisUtterance(botResponse);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                utterance.volume = 0.8;
+                speechSynthesis.speak(utterance);
+                console.log('Browser TTS used as fallback');
                 setAudioEnabled(true);
-                return; // Exit early, don't fall back to browser TTS
-              } catch (playError) {
-                console.log('Audio play() failed:', playError);
-                // Try alternative approach with user gesture
-                if (document.body) {
-                  const playButton = document.createElement('button');
-                  playButton.style.display = 'none';
-                  playButton.onclick = () => {
-                    audio.play();
-                    document.body.removeChild(playButton);
-                  };
-                  document.body.appendChild(playButton);
-                  playButton.click();
-                  console.log('ElevenLabs audio triggered via user gesture');
-                  setAudioEnabled(true);
-                  return;
-                }
-              }
+              };
+              
+              // Try immediate playback
+              playAttempt();
+              
+              // Don't fall through to browser TTS immediately
+              return;
+              
             } catch (error) {
-              console.log('ElevenLabs audio setup failed:', error);
+              console.log('ElevenLabs audio processing failed:', error);
             }
           }
           
