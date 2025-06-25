@@ -315,30 +315,38 @@ const AppLayout = () => {
         
         if (audioResponse.ok) {
           const audioData = await audioResponse.json();
+          console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length, useBrowserTTS: audioData.useBrowserTTS });
           
-          // Always use ElevenLabs if server sent audio data
-          if (audioData.success && audioData.audioUrl) {
+          // Use ElevenLabs if server sent valid audio data (check for substantial base64 length)
+          if (audioData.audioUrl && audioData.audioUrl.length > 1000) {
             console.log('PLAYING ELEVENLABS VOICE:', selectedReflectionVoice);
             speechSynthesis.cancel();
             
             const audio = new Audio(audioData.audioUrl);
             audio.volume = 1.0;
-            audio.play();
-            
-            setAudioEnabled(true);
+            audio.play().then(() => {
+              console.log('ElevenLabs audio playing successfully');
+              setAudioEnabled(true);
+            }).catch(err => {
+              console.log('ElevenLabs audio failed to play:', err);
+              // Fallback to browser TTS if audio fails to play
+              speechSynthesis.cancel();
+              const utterance = new SpeechSynthesisUtterance(botResponse);
+              utterance.rate = 0.9;
+              speechSynthesis.speak(utterance);
+              setAudioEnabled(true);
+            });
             return;
           }
           
-          // Only use browser TTS if explicitly requested
-          if (audioData.useBrowserTTS) {
-            console.log('Server requested browser TTS');
-            speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(botResponse);
-            utterance.rate = 0.9;
-            speechSynthesis.speak(utterance);
-            setAudioEnabled(true);
-            return;
-          }
+          // Use browser TTS as fallback
+          console.log('Using browser TTS fallback');
+          speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(botResponse);
+          utterance.rate = 0.9;
+          speechSynthesis.speak(utterance);
+          setAudioEnabled(true);
+          return;
 
         } else {
           // API failed - use browser TTS
