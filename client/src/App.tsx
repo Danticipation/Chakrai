@@ -319,54 +319,52 @@ const AppLayout = () => {
           const audioData = await audioResponse.json();
           console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length });
           
-          // Check for valid ElevenLabs audio data
-          if (audioData.audioUrl && audioData.audioUrl.length > 1000 && audioData.audioUrl.includes('data:audio/mpeg;base64,')) {
-            console.log('ELEVENLABS DETECTED - FORCING CARLA VOICE');
-            console.log('Voice selected:', selectedReflectionVoice);
-            console.log('Audio URL starts with:', audioData.audioUrl.substring(0, 50));
+          // FORCE ELEVENLABS ONLY - NO BROWSER TTS EVER
+          if (audioData.audioUrl && audioData.audioUrl.length > 1000) {
+            console.log('ELEVENLABS AUDIO DETECTED - BLOCKING ALL BROWSER TTS');
             
-            // Stop any browser TTS
+            // Completely disable browser TTS
             speechSynthesis.cancel();
+            speechSynthesis.pause();
             
-            // Play ElevenLabs audio with user interaction
-            const audio = new Audio(audioData.audioUrl);
-            audio.volume = 1.0;
+            // Create and immediately play ElevenLabs audio
+            const audioElement = document.createElement('audio');
+            audioElement.src = audioData.audioUrl;
+            audioElement.volume = 1.0;
+            audioElement.preload = 'auto';
+            audioElement.autoplay = true;
             
-            // Force user interaction to enable autoplay
-            document.addEventListener('click', () => {
-              audio.play().then(() => {
-                console.log('CARLA VOICE PLAYING');
-                setAudioEnabled(true);
-              }).catch(e => console.log('Audio play failed:', e));
-            }, { once: true });
+            document.body.appendChild(audioElement);
             
-            // Try immediate play (may fail without user interaction)
-            audio.play().then(() => {
-              console.log('CARLA VOICE PLAYING IMMEDIATELY');
-              setAudioEnabled(true);
+            audioElement.play().then(() => {
+              console.log('CARLA ELEVENLABS VOICE PLAYING');
             }).catch(() => {
-              console.log('Need user interaction for audio');
+              // Force play with mute trick
+              audioElement.muted = true;
+              audioElement.play().then(() => {
+                audioElement.muted = false;
+                console.log('CARLA VOICE PLAYING (UNMUTED)');
+              });
             });
             
-            console.log('=== ELEVENLABS ONLY - EXIT ===');
+            // Clean up after playing
+            audioElement.addEventListener('ended', () => {
+              document.body.removeChild(audioElement);
+            });
+            
+            setAudioEnabled(true);
+            console.log('=== ELEVENLABS FORCED - NO BROWSER TTS ALLOWED ===');
             return;
           }
         }
         
-        // Only use browser TTS if ElevenLabs completely failed
-        console.log('ElevenLabs failed - using browser TTS');
-        const utterance = new SpeechSynthesisUtterance(botResponse);
-        utterance.rate = 0.9;
-        speechSynthesis.speak(utterance);
-        setAudioEnabled(true);
+        // NO BROWSER TTS - ELEVENLABS ONLY
+        console.log('ElevenLabs not available - NO AUDIO');
+        setAudioEnabled(false);
         
       } catch (voiceError) {
-        console.log('Voice generation error, using browser TTS:', voiceError);
-        speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(botResponse);
-        utterance.rate = 0.9;
-        speechSynthesis.speak(utterance);
-        setAudioEnabled(true);
+        console.log('Voice generation error - NO FALLBACK AUDIO');
+        setAudioEnabled(false);
       }
       
       setBotStats(prev => prev ? {
