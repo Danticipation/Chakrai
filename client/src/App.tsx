@@ -247,6 +247,16 @@ const AppLayout = () => {
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
     
+    // Enable audio context immediately on user interaction
+    try {
+      if (typeof window !== 'undefined' && 'AudioContext' in window) {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume();
+        }
+      }
+    } catch (e) {}
+    
     const userMessageText = input.trim();
     const newMessage: Message = {
       sender: 'user',
@@ -333,41 +343,27 @@ const AppLayout = () => {
               const audio = new Audio(audioUrl);
               audio.volume = 1.0;
               
-              // Immediately try to play without waiting
+              // Force immediate playback since we have user interaction context
               const playAttempt = () => {
-                console.log('Attempting to play ElevenLabs audio for voice:', selectedReflectionVoice);
-                
-                // Force user interaction context
-                audio.muted = false;
-                audio.loop = false;
-                audio.currentTime = 0;
-                
-                const playPromise = audio.play();
-                
-                if (playPromise !== undefined) {
-                  playPromise
-                    .then(() => {
-                      console.log('SUCCESS: ElevenLabs audio playing with voice:', selectedReflectionVoice);
-                      setAudioEnabled(true);
-                    })
-                    .catch(err => {
-                      console.log('ElevenLabs playback failed:', err.name, err.message);
-                      console.log('Audio blocked by browser - using text-to-speech fallback');
-                      fallbackToBrowserTTS();
-                    });
-                } else {
-                  console.log('Audio play() returned undefined - browser compatibility issue');
-                  fallbackToBrowserTTS();
-                }
+                // Immediately play the ElevenLabs audio
+                audio.play()
+                  .then(() => {
+                    console.log('ElevenLabs audio playing successfully');
+                    setAudioEnabled(true);
+                  })
+                  .catch(() => {
+                    // If ElevenLabs fails, use browser TTS silently
+                    fallbackToBrowserTTS();
+                  });
               };
               
               const fallbackToBrowserTTS = () => {
+                speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(botResponse);
                 utterance.rate = 0.9;
                 utterance.pitch = 1.0;
                 utterance.volume = 0.8;
                 speechSynthesis.speak(utterance);
-                console.log('Browser TTS used as fallback');
                 setAudioEnabled(true);
               };
               
@@ -385,19 +381,14 @@ const AppLayout = () => {
             }
           }
           
-          // Only use browser TTS if ElevenLabs failed or server requested it
-          console.log('Falling back to browser TTS');
-          try {
-            const utterance = new SpeechSynthesisUtterance(botResponse);
-            utterance.rate = 0.9;
-            utterance.pitch = 1.0;
-            utterance.volume = 0.8;
-            speechSynthesis.speak(utterance);
-            console.log('Browser TTS used as fallback');
-            setAudioEnabled(true);
-          } catch (fallbackError) {
-            console.log('Browser TTS also failed:', fallbackError);
-          }
+          // Server instructed browser TTS or ElevenLabs failed
+          speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(botResponse);
+          utterance.rate = 0.9;
+          utterance.pitch = 1.0;
+          utterance.volume = 0.8;
+          speechSynthesis.speak(utterance);
+          setAudioEnabled(true);
         } else {
           console.log('TTS API request failed');
           const utterance = new SpeechSynthesisUtterance(botResponse);
