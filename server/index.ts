@@ -333,6 +333,9 @@ if (process.env.NODE_ENV === "production") {
 
 server.listen(PORT, "0.0.0.0", () => {
   log(`Server running on port ${PORT}`);
+  console.log(`Server accessible at http://0.0.0.0:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Replit domain: ${process.env.REPLIT_DEV_DOMAIN || 'localhost'}`);
 });
 
 export default app;
