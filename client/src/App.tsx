@@ -1917,14 +1917,9 @@ function GoalEditor({ goal, onSave, onCancel, onDelete }: GoalEditorProps) {
 }
 
 function AppWithOnboarding() {
-  const { data: onboardingStatus, isLoading: onboardingLoading } = useQuery({
-    queryKey: ['/api/onboarding-status'],
-    queryFn: async () => {
-      const response = await fetch('/api/onboarding-status?userId=1');
-      if (!response.ok) throw new Error('Failed to check onboarding status');
-      return response.json();
-    }
-  });
+  // Skip onboarding for now and go directly to main app
+  const onboardingStatus = { isComplete: true };
+  const onboardingLoading = false;
 
   const [onboardingComplete, setOnboardingComplete] = useState(false);
 
