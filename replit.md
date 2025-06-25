@@ -22,6 +22,8 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **All Endpoints Operational**: Confirmed /api/chat, /api/daily-affirmation, /api/transcribe, /api/text-to-speech all functioning
 - **Full Medical Interface Restored**: TraI now displays complete therapeutic interface with chat, mood tracking, voice capabilities
 - **ElevenLabs Voice Integration**: Implemented proper text-to-speech with authentic therapeutic voices instead of robotic browser fallback
+- **Voice Selection Fix**: Connected voice selector to actual TTS calls so users can switch between James, Brian, Alexandra, and Carla voices
+- **Audio Playback Enhancement**: Added audio context management and user gesture handling to ensure ElevenLabs voices play instead of browser fallback
 - **Production-Ready Configuration**: Server setup works correctly in both development (Vite) and production (static) modes
 
 ### June 23, 2025 - Complete Mobile Microphone System & Chat Response Fix Completed

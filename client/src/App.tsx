@@ -305,51 +305,72 @@ const AppLayout = () => {
         if (audioResponse.ok) {
           const audioData = await audioResponse.json();
           console.log('Audio data received:', audioData);
+          console.log('useBrowserTTS:', audioData.useBrowserTTS);
+          console.log('audioUrl exists:', !!audioData.audioUrl);
           
-          if (audioData.useBrowserTTS) {
-            // Use browser TTS as instructed by server
-            try {
-              const utterance = new SpeechSynthesisUtterance(botResponse);
-              utterance.rate = 0.9;
-              utterance.pitch = 1.0;
-              utterance.volume = 0.8;
-              speechSynthesis.speak(utterance);
-              console.log('Browser TTS used');
-              setAudioEnabled(true);
-            } catch (fallbackError) {
-              console.log('Browser TTS failed:', fallbackError);
-            }
-          } else if (audioData.audioUrl) {
+          if (!audioData.useBrowserTTS && audioData.audioUrl) {
             // Use ElevenLabs audio data
             try {
+              console.log('Playing ElevenLabs audio...');
+              
+              // Stop any existing speech synthesis first
+              speechSynthesis.cancel();
+              
               const audio = new Audio(audioData.audioUrl);
               audio.volume = 1.0;
+              audio.preload = 'auto';
               
-              audio.addEventListener('canplay', () => {
-                console.log('ElevenLabs audio ready to play');
-              });
+              // Enable audio context if suspended
+              if (typeof window !== 'undefined' && 'AudioContext' in window) {
+                const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                if (audioContext.state === 'suspended') {
+                  await audioContext.resume();
+                }
+              }
               
-              audio.addEventListener('error', (e) => {
-                console.log('ElevenLabs audio error:', e);
-                // Fallback to browser TTS
-                const utterance = new SpeechSynthesisUtterance(botResponse);
-                utterance.rate = 0.9;
-                speechSynthesis.speak(utterance);
-              });
-              
-              await audio.play();
-              console.log('ElevenLabs audio playing successfully');
-              setAudioEnabled(true);
+              // Force immediate playback with better error handling
+              try {
+                await audio.play();
+                console.log('ElevenLabs audio playing successfully with voice:', selectedReflectionVoice);
+                setAudioEnabled(true);
+                return; // Exit early, don't fall back to browser TTS
+              } catch (playError) {
+                console.log('Audio play() failed:', playError);
+                // Try alternative approach with user gesture
+                if (document.body) {
+                  const playButton = document.createElement('button');
+                  playButton.style.display = 'none';
+                  playButton.onclick = () => {
+                    audio.play();
+                    document.body.removeChild(playButton);
+                  };
+                  document.body.appendChild(playButton);
+                  playButton.click();
+                  console.log('ElevenLabs audio triggered via user gesture');
+                  setAudioEnabled(true);
+                  return;
+                }
+              }
             } catch (error) {
-              console.log('ElevenLabs audio failed, using browser TTS');
-              const utterance = new SpeechSynthesisUtterance(botResponse);
-              utterance.rate = 0.9;
-              speechSynthesis.speak(utterance);
-              setAudioEnabled(true);
+              console.log('ElevenLabs audio setup failed:', error);
             }
           }
+          
+          // Only use browser TTS if ElevenLabs failed or server requested it
+          console.log('Falling back to browser TTS');
+          try {
+            const utterance = new SpeechSynthesisUtterance(botResponse);
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = 0.8;
+            speechSynthesis.speak(utterance);
+            console.log('Browser TTS used as fallback');
+            setAudioEnabled(true);
+          } catch (fallbackError) {
+            console.log('Browser TTS also failed:', fallbackError);
+          }
         } else {
-          console.log('TTS API failed, using browser fallback');
+          console.log('TTS API request failed');
           const utterance = new SpeechSynthesisUtterance(botResponse);
           utterance.rate = 0.9;
           speechSynthesis.speak(utterance);
