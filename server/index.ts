@@ -279,7 +279,7 @@ app.post('/api/text-to-speech', async (req, res) => {
   }
 });
 
-// Setup development or production serving
+// Setup development or production serving AFTER all API routes
 if (process.env.NODE_ENV === "production") {
   serveStatic(app);
 } else {
@@ -289,3 +289,5 @@ if (process.env.NODE_ENV === "production") {
 server.listen(PORT, "0.0.0.0", () => {
   log(`Server running on port ${PORT}`);
 });
+
+export default app;
