@@ -260,18 +260,67 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
 // Text-to-speech endpoint
 app.post('/api/text-to-speech', async (req, res) => {
   try {
-    const { text, voiceId = 'EkK5I93UQWFDigLMpZcX' } = req.body;
+    const { text, voice = 'james', emotionalContext = 'neutral' } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    // For now, return a fallback response since ElevenLabs requires specific setup
-    // In production, this would connect to ElevenLabs API
-    res.status(503).json({ 
-      error: 'Voice synthesis temporarily unavailable. Please enable browser text-to-speech.',
-      fallback: true
-    });
+    // Map voice names to ElevenLabs voice IDs
+    const voiceMap: Record<string, string> = {
+      'james': 'TxGEqnHWrfWFTfGW9XjX',
+      'brian': 'nPczCjzI2devNBz1zQrb', 
+      'alexandra': 'Xb7hH8MSUJpSbSDYk0k2',
+      'carla': 'XB0fDUnXU5powFXDhCwa'
+    };
+
+    const voiceId = voiceMap[voice] || voiceMap['james'];
+    
+    try {
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'xi-api-key': process.env.ELEVENLABS_API_KEY
+        },
+        body: JSON.stringify({
+          text: text,
+          model_id: 'eleven_monolingual_v1',
+          voice_settings: {
+            stability: emotionalContext === 'calming' ? 0.8 : 0.6,
+            similarity_boost: 0.7,
+            style: emotionalContext === 'energizing' ? 0.3 : 0.1,
+            use_speaker_boost: true
+          }
+        })
+      });
+
+      if (response.ok) {
+        const audioBuffer = await response.arrayBuffer();
+        const base64Audio = Buffer.from(audioBuffer).toString('base64');
+        
+        return res.json({
+          audioUrl: `data:audio/mpeg;base64,${base64Audio}`,
+          useBrowserTTS: false,
+          voice: voice
+        });
+      } else {
+        console.log('ElevenLabs API error:', response.status, response.statusText);
+        throw new Error('ElevenLabs API request failed');
+      }
+    } catch (elevenLabsError) {
+      console.log('ElevenLabs API error, falling back to browser TTS:', elevenLabsError);
+      
+      // Fallback to browser TTS
+      res.json({ 
+        audioUrl: null,
+        useBrowserTTS: true,
+        text: text,
+        voice: voice,
+        message: 'Using browser text-to-speech'
+      });
+    }
 
   } catch (error) {
     console.error('Text-to-speech error:', error);
