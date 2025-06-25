@@ -328,11 +328,25 @@ const AppLayout = () => {
             // Stop any browser TTS
             speechSynthesis.cancel();
             
-            // Play ElevenLabs audio directly
+            // Play ElevenLabs audio with user interaction
             const audio = new Audio(audioData.audioUrl);
             audio.volume = 1.0;
-            audio.play();
-            console.log('CARLA VOICE FROM ELEVENLABS PLAYING');
+            
+            // Force user interaction to enable autoplay
+            document.addEventListener('click', () => {
+              audio.play().then(() => {
+                console.log('CARLA VOICE PLAYING');
+                setAudioEnabled(true);
+              }).catch(e => console.log('Audio play failed:', e));
+            }, { once: true });
+            
+            // Try immediate play (may fail without user interaction)
+            audio.play().then(() => {
+              console.log('CARLA VOICE PLAYING IMMEDIATELY');
+              setAudioEnabled(true);
+            }).catch(() => {
+              console.log('Need user interaction for audio');
+            });
             
             console.log('=== ELEVENLABS ONLY - EXIT ===');
             return;
