@@ -323,6 +323,7 @@ app.get('/api/stats/:userId', async (req, res) => {
   }
 });
 
+
 // Setup development or production serving AFTER all API routes
 if (process.env.NODE_ENV === "production") {
   serveStatic(app);
