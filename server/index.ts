@@ -280,8 +280,15 @@ app.post('/api/text-to-speech', async (req, res) => {
 // Serve static files from the built React app
 app.use(express.static(path.join(__dirname, '../dist/public')));
 
-// Handle all other routes - serve React app
+// Handle API routes first before catch-all
+// (API routes are already defined above)
+
+// Handle all non-API routes - serve React app
 app.get('*', (req, res) => {
+  // Skip API routes
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
   res.sendFile(path.join(__dirname, '../dist/public/index.html'));
 });
 
