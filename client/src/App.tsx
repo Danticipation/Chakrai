@@ -56,7 +56,7 @@ const AppLayout = () => {
   const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
   const [pendingAudio, setPendingAudio] = useState<string | null>(null);
   const [lastBotAudio, setLastBotAudio] = useState<string | null>(null);
-  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('EkK5I93UQWFDigLMpZcX'); // James - default voice
+  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState<string>('james'); // James - default voice
   const [dailyAffirmation, setDailyAffirmation] = useState<string>('');
   const [dailyHoroscope, setDailyHoroscope] = useState<string>('');
   const [zodiacSign, setZodiacSign] = useState<string>('');
@@ -86,10 +86,10 @@ const AppLayout = () => {
   ];
 
   const voiceOptions = [
-    { id: 'EkK5I93UQWFDigLMpZcX', name: 'James', description: 'Professional male voice', gender: 'Male', default: true },
-    { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian', description: 'Deep, resonant male voice', gender: 'Male' },
-    { id: 'kdmDKE6EkgrWrrykO9Qt', name: 'Alexandra', description: 'Clear female voice', gender: 'Female' },
-    { id: 'l32B8XDoylOsZKiSdfhE', name: 'Carla', description: 'Warm female voice', gender: 'Female' }
+    { id: 'james', name: 'James', description: 'Professional male voice', gender: 'Male', default: true },
+    { id: 'brian', name: 'Brian', description: 'Deep, resonant male voice', gender: 'Male' },
+    { id: 'alexandra', name: 'Alexandra', description: 'Clear female voice', gender: 'Female' },
+    { id: 'carla', name: 'Carla', description: 'Warm female voice', gender: 'Female' }
   ];
 
   const personalityModes = [
@@ -295,7 +295,7 @@ const AppLayout = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             text: botResponse,
-            voice: 'james',
+            voice: selectedReflectionVoice,
             emotionalContext: 'calming'
           })
         });
