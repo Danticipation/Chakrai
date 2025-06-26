@@ -359,9 +359,9 @@ const AppLayout = () => {
       
       setBotStats(prev => prev ? {
         ...prev,
-        wordsLearned: data.wordsLearned || prev.wordsLearned,
-        stage: data.stage || prev.stage,
-        level: data.stage === 'Infant' ? 1 : data.stage === 'Toddler' ? 2 : data.stage === 'Child' ? 3 : data.stage === 'Adolescent' ? 4 : 5
+        wordsLearned: res.data.wordsLearned || prev.wordsLearned,
+        stage: res.data.stage || prev.stage,
+        level: res.data.stage === 'Infant' ? 1 : res.data.stage === 'Toddler' ? 2 : res.data.stage === 'Child' ? 3 : res.data.stage === 'Adolescent' ? 4 : 5
       } : null);
       
     } catch (error) {
@@ -369,7 +369,7 @@ const AppLayout = () => {
       const errorMessage: Message = {
         sender: 'bot',
         text: 'Sorry, I encountered an issue. Please try again.',
-        time: getCurrentTime()
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -1911,7 +1911,7 @@ function AppWithOnboarding() {
   }
 
   // Show main application for users who completed onboarding
-  return <AppLayout />;
+  return <MainApp />;
 }
 
 export default function App() {
