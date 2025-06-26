@@ -138,23 +138,27 @@ const WellnessRewards: React.FC = () => {
         <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
           <h3 className="text-lg font-semibold text-white mb-4">Recent Achievements</h3>
           <div className="space-y-3">
-            {achievements?.slice(0, 3).map((achievement) => {
-              const IconComponent = getCategoryIcon(achievement.category);
-              return (
-                <div key={achievement.id} className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-full bg-white/20">
-                      <IconComponent className="w-4 h-4 text-white" />
+            {Array.isArray(achievements) && achievements.length > 0 ? (
+              achievements.slice(0, 3).map((achievement) => {
+                const IconComponent = getCategoryIcon(achievement.category);
+                return (
+                  <div key={achievement.id} className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 rounded-full bg-white/20">
+                        <IconComponent className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-white">{achievement.name}</p>
+                        <p className="text-sm text-white/60">{achievement.description}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-white">{achievement.name}</p>
-                      <p className="text-sm text-white/60">{achievement.description}</p>
-                    </div>
+                    <div className="text-sm text-white font-medium">+{achievement.points_reward}</div>
                   </div>
-                  <div className="text-sm text-white font-medium">+{achievement.points_reward}</div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <p className="text-white/60">No achievements available</p>
+            )}
           </div>
         </div>
 
@@ -162,20 +166,24 @@ const WellnessRewards: React.FC = () => {
         <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
           <h3 className="text-lg font-semibold text-white mb-4">Active Streaks</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {streaks?.map((streak) => (
-              <div key={streak.id} className="p-4 bg-white/10 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium capitalize">{streak.streak_type.replace('_', ' ')}</span>
-                  <span className="text-white font-bold">{streak.current_streak} days</span>
+            {Array.isArray(streaks) && streaks.length > 0 ? (
+              streaks.map((streak) => (
+                <div key={streak.id} className="p-4 bg-white/10 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white font-medium capitalize">{streak.streak_type.replace('_', ' ')}</span>
+                    <span className="text-white font-bold">{streak.current_streak} days</span>
+                  </div>
+                  <div className="mt-2 w-full bg-white/20 rounded-full h-2">
+                    <div 
+                      className="bg-white h-2 rounded-full"
+                      style={{ width: `${Math.min((streak.current_streak / streak.longest_streak) * 100, 100)}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="mt-2 w-full bg-white/20 rounded-full h-2">
-                  <div 
-                    className="bg-white h-2 rounded-full"
-                    style={{ width: `${Math.min((streak.current_streak / streak.longest_streak) * 100, 100)}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-white/60">No active streaks</p>
+            )}
           </div>
         </div>
       </div>
