@@ -684,6 +684,53 @@ app.post('/api/complete-onboarding', async (req, res) => {
   }
 });
 
+// Horoscope endpoint
+app.post('/api/horoscope', async (req, res) => {
+  try {
+    const { sign } = req.body;
+    
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ error: 'OpenAI API key not configured' });
+    }
+
+    // Generate horoscope using OpenAI
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert astrologer providing thoughtful, therapeutic horoscope guidance. Create inspiring and supportive daily horoscopes that promote wellness and personal growth.'
+          },
+          {
+            role: 'user',
+            content: `Generate a therapeutic daily horoscope for ${sign}. Keep it positive, supportive, and focused on personal growth and wellness. Make it 2-3 sentences and inspiring.`
+          }
+        ],
+        max_tokens: 150,
+        temperature: 0.8
+      })
+    });
+
+    if (!openaiResponse.ok) {
+      throw new Error('OpenAI API request failed');
+    }
+
+    const openaiData = await openaiResponse.json();
+    const horoscope = openaiData.choices[0].message.content;
+
+    res.json({ horoscope });
+  } catch (error) {
+    console.error('Horoscope generation error:', error);
+    res.status(500).json({ error: 'Failed to generate horoscope' });
+  }
+});
+
 // Bot stats endpoint
 app.get('/api/stats/:userId', async (req, res) => {
   try {

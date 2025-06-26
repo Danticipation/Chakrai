@@ -62,6 +62,8 @@ const AppLayout = () => {
   const [selectedReflectionVoice, setSelectedReflectionVoice] = useState('carla');
   const [isLoading, setIsLoading] = useState(false);
   const [dailyAffirmation, setDailyAffirmation] = useState('Today is a new opportunity for growth and healing.');
+  const [horoscopeText, setHoroscopeText] = useState<string>('');
+  const [userZodiacSign, setUserZodiacSign] = useState<string>('aries');
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -78,6 +80,7 @@ const AppLayout = () => {
   useEffect(() => {
     fetchBotStats();
     fetchDailyAffirmation();
+    fetchHoroscope();
     fetchWeeklySummary();
     loadZodiacData();
     
@@ -110,6 +113,40 @@ const AppLayout = () => {
     } catch (error) {
       console.error('Failed to fetch daily affirmation:', error);
       setDailyAffirmation('Today is a new opportunity to grow and learn.');
+    }
+  };
+
+  const fetchHoroscope = async (sign: string = userZodiacSign) => {
+    try {
+      // Try external horoscope API first
+      const response = await fetch(`https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${sign}&day=today`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setHoroscopeText(data.data.horoscope_data);
+      } else {
+        throw new Error('External API failed');
+      }
+    } catch (apiError) {
+      // Fallback to OpenAI-generated horoscope
+      try {
+        const fallbackResponse = await fetch('/api/horoscope', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ sign })
+        });
+
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          setHoroscopeText(fallbackData.horoscope);
+        } else {
+          setHoroscopeText('Your stars are aligning for a day of growth and positive energy.');
+        }
+      } catch (fallbackError) {
+        setHoroscopeText('Today brings opportunities for reflection and personal development.');
+      }
     }
   };
 
@@ -321,10 +358,10 @@ const AppLayout = () => {
 
       case 'chat':
         return (
-          <div className="h-full flex flex-col bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
+          <div className="h-full flex flex-col bg-gradient-to-br from-[#000000] to-[#232323]">
             <div className="p-4">
-              <h2 className="text-xl font-bold text-gray-800 mb-2">Welcome to Your Safe Space</h2>
-              <p className="text-gray-600 text-sm">Share your thoughts and feelings in a supportive environment</p>
+              <h2 className="text-xl font-bold text-gray-200 mb-2">Welcome to TrAI</h2>
+              <p className="text-gray-400 text-sm">Share your thoughts and feelings in a supportive environment</p>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -382,14 +419,14 @@ const AppLayout = () => {
                   }`}
                   disabled={loading}
                 >
-                  {isRecording ? <Square size={24} /> : <Mic size={24} />}
+                  {isRecording ? <Square size={24} /> : <Mic size={36} />}
                 </button>
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 rounded-lg text-white transition-colors"
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-100 rounded-lg text-white transition-colors"
                 >
-                  <Send size={20} />
+                  <Send size={36} />
                 </button>
               </div>
             </div>
@@ -484,7 +521,7 @@ const AppLayout = () => {
     <div className="h-screen bg-black flex flex-col">
       {/* Header - Level 1 Box (Dark Blue) */}
       <div className="bg-[#1a237e] backdrop-blur-sm p-4 shadow-sm border border-[#3949ab]/30">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <img src={traiLogo} alt="TrAI" className="w-8 h-8" />
             <h1 className="text-xl font-bold text-white">TrAI</h1>
@@ -501,6 +538,31 @@ const AppLayout = () => {
             >
               <User size={20} className="text-white" />
             </button>
+          </div>
+        </div>
+        
+        {/* Daily Features Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Daily Affirmation */}
+          <div className="bg-[#3949ab]/30 rounded-lg p-3 border border-[#5c6bc0]/30">
+            <div className="flex items-center space-x-2 mb-2">
+              <Heart className="text-green-400" size={16} />
+              <span className="text-sm font-semibold text-white">Daily Affirmation</span>
+            </div>
+            <p className="text-xs text-white/90 italic">
+              "{dailyAffirmation}"
+            </p>
+          </div>
+          
+          {/* Today's Horoscope */}
+          <div className="bg-[#3949ab]/30 rounded-lg p-3 border border-[#5c6bc0]/30">
+            <div className="flex items-center space-x-2 mb-2">
+              <Star className="text-purple-400" size={16} />
+              <span className="text-sm font-semibold text-white">Horoscope</span>
+            </div>
+            <p className="text-xs text-white/90">
+              {horoscopeText || "Loading your cosmic guidance..."}
+            </p>
           </div>
         </div>
       </div>
