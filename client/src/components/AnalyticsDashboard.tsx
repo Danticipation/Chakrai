@@ -505,7 +505,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 mb-6 bg-white/30 rounded-xl p-1">
+        <div className="flex space-x-1 mb-6 bg-[#1a237e]/20 rounded-xl p-1 border border-[#1a237e]/30">
           {[
             { id: 'overview', label: 'Overview', icon: BarChart3 },
             { id: 'reports', label: 'Monthly Reports', icon: Calendar },
@@ -516,8 +516,8 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-white text-purple-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'bg-[#1a237e] text-white shadow-sm'
+                  : 'text-white hover:bg-[#1a237e]/40'
               }`}
             >
               <tab.icon className="w-4 h-4" />

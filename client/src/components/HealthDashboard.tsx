@@ -179,8 +179,8 @@ export default function HealthDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-[#1a237e]/20 rounded-2xl shadow-sm border border-[#1a237e]/30">
+        <div className="border-b border-[#1a237e]/30">
           <nav className="flex space-x-8 px-6">
             {['overview', 'devices', 'correlations', 'insights'].map((tab) => (
               <button
@@ -188,8 +188,8 @@ export default function HealthDashboard() {
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-[#1a237e] text-white'
+                    : 'border-transparent text-white/70 hover:text-white hover:border-[#1a237e]/50'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
