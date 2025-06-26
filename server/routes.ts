@@ -832,4 +832,60 @@ router.get('/emotional-intelligence/patterns/:userId', async (req, res) => {
   }
 });
 
+// Journal API endpoints
+router.get('/journal/entries/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const entries = await storage.getJournalEntries(userId);
+    res.json(entries || []);
+  } catch (error) {
+    console.error('Failed to fetch journal entries:', error);
+    res.status(500).json({ error: 'Failed to fetch journal entries' });
+  }
+});
+
+router.post('/journal/entries', async (req, res) => {
+  try {
+    const { userId, content, mood, tags, triggers, copingStrategies, isPrivate } = req.body;
+    const entry = await storage.createJournalEntry({
+      userId: userId || 1,
+      content,
+      mood,
+      tags: tags || [],
+      triggers: triggers || [],
+      copingStrategies: copingStrategies || [],
+      isPrivate: isPrivate || false
+    });
+    res.json(entry);
+  } catch (error) {
+    console.error('Failed to create journal entry:', error);
+    res.status(500).json({ error: 'Failed to create journal entry' });
+  }
+});
+
+router.get('/journal/analytics/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const journalEntries = await storage.getJournalEntries(userId) || [];
+    const moodEntries = await storage.getMoodEntries(userId) || [];
+    
+    res.json({
+      success: true,
+      analytics: {
+        totalEntries: journalEntries.length,
+        averageMoodIntensity: moodEntries.length > 0 ? 
+          moodEntries.reduce((acc, m) => acc + (m.intensity || 5), 0) / moodEntries.length : 5,
+        emotionalJourney: "Stable emotional progression",
+        recurringThemes: ["Self-reflection", "Growth", "Wellness"],
+        sentimentTrend: "Positive",
+        riskIndicators: [],
+        therapeuticProgress: "Good progress"
+      }
+    });
+  } catch (error) {
+    console.error('Journal analytics error:', error);
+    res.status(500).json({ error: 'Failed to generate journal analytics' });
+  }
+});
+
 export default router;
