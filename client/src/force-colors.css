@@ -41,7 +41,7 @@ button:hover {
 /* Input fields */
 input, select, textarea {
   background: linear-gradient(180, #70a7ff 0%, #000000 100%) !important;
-  border: 2px solid rgb(251, 255, 0, 0.3) !important;
+  border: 2px solid rgb(4, 2, 110, 0.3) !important;
   transition: all 0.3s ease !important;
 }
 
@@ -68,7 +68,7 @@ div[style*="backgroundColor: 'var(--gentle-lavender')"] {
 
 /* Add personality to goal progress bars */
 div[style*="width:"] {
-  background: linear-gradient(90deg, #772737 0%, #279029 50%, #000000 100%) !important;
+  background: linear-gradient(90deg, #f9011e 33%, #fff700 66%, #2bff00 100%) !important;
   border-radius: 25px !important;
   position: relative !important;
   overflow: hidden !important;
@@ -81,8 +81,8 @@ div[style*="width:"]:before {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #000000, rgb(117, 15, 15), #000000);
-  animation: shimmer 2s infinite;
+  background: linear-gradient(90deg, #f9011e, rgb(255, 247, 0), #2bff00);
+  animation: shimmer 30s infinite;
 }
 
 @keyframes shimmer  {

@@ -365,7 +365,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
           <p className="text-white/70">Express your thoughts and feelings in a safe, private space</p>
           
           {/* Navigation Tabs */}
-          <div className="flex space-x-1 mt-4 bg-[#1a237e]/40 rounded-xl p-1">
+          <div className="flex space-x-1 mt-4 bg-[#000000]/100 rounded-xl p-1">
             {[
               { id: 'write', label: 'Write Entry', icon: FileText },
               { id: 'analytics', label: 'Analytics', icon: BarChart3 },
@@ -390,7 +390,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* Tab Content */}
         {activeTab === 'write' && (
-          <div className="bg-[#1a237e]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+          <div className="bg-[#000000]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
           {/* Title Input */}
           <div className="mb-4">
             <input
@@ -398,7 +398,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
               placeholder="Give your entry a title (optional)"
               value={entry.title}
               onChange={(e) => setEntry(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full px-4 py-3 rounded-xl border-2 border-[#7986cb]/30 focus:border-blue-400 focus:outline-none text-lg font-medium"
+              className="w-full px-4 py-3 rounded-xl border-2 border-[#000000]/30 focus:border-blue-400 focus:outline-none text-lg font-medium"
             />
           </div>
 
@@ -415,7 +415,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   e.target.style.height = 'auto';
                   e.target.style.height = e.target.scrollHeight + 'px';
                 }}
-                className="w-full min-h-[200px] px-4 py-3 pr-16 rounded-xl border-2 border-[#7986cb]/30 focus:border-blue-400 focus:outline-none resize-none text-base leading-relaxed"
+                className="w-full min-h-[200px] px-4 py-3 pr-16 rounded-xl border-2 border-[#000000]/30 focus:border-blue-400 focus:outline-none resize-none text-base leading-relaxed"
                 style={{ maxHeight: '400px' }}
               />
               
@@ -465,8 +465,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   onClick={() => setEntry(prev => ({ ...prev, mood: mood.value }))}
                   className={`p-3 rounded-xl border-2 transition-all text-center relative ${
                     entry.mood === mood.value
-                      ? 'border-[#7986cb] bg-[#5c6bc0]/50 shadow-lg ring-2 ring-[#7986cb]/50 scale-105'
-                      : 'border-[#3949ab]/50 bg-[#1a237e]/30 hover:border-[#5c6bc0] hover:bg-[#3949ab]/40'
+                      ? 'border-[#000000] bg-[#000000]/100 shadow-lg ring-2 ring-[#7986cb]/50 scale-105'
+                      : 'border-[#000000]/100 bg-[#000000]/100 hover:border-[#5c6bc0] hover:bg-[#000000]/100'
                   }`}
                 >
                   {entry.mood === mood.value && (
@@ -482,7 +482,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
           </div>
 
           {/* Mood Intensity */}
-          <div className="mb-6 bg-[#7986cb]/100 rounded-xl p-4">
+          <div className="mb-6 bg-[#000000]/100 rounded-xl p-4">
             <label className="block text-white font-medium mb-3">
               Intensity: {entry.moodIntensity}/10
             </label>
@@ -502,7 +502,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
           </div>
 
           {/* Tags */}
-          <div className="mb-6 bg-[#7986cb]/100 rounded-xl p-4">
+          <div className="mb-6 bg-[#000000]/100 rounded-xl p-4">
             <label className="block text-white font-medium mb-3">Tags (help categorize your thoughts)</label>
             
             {/* Current Tags */}
@@ -534,8 +534,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   disabled={entry.tags.includes(tag)}
                   className={`px-3 py-1 rounded-full text-sm transition-all ${
                     entry.tags.includes(tag)
-                      ? 'bg-[#5c6bc0]/50 text-white/50 cursor-not-allowed'
-                      : 'bg-[#1a237e] text-white hover:bg-[#3949ab]'
+                      ? 'bg-[#000000]/100 text-white/50 cursor-not-allowed'
+                      : 'bg-[#000000] text-white hover:bg-[#3949ab]'
                   }`}
                 >
                   {tag}
@@ -602,14 +602,14 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* Recent Entries (shown only on write tab) */}
         {activeTab === 'write' && recentEntries.length > 0 && (
-          <div className="bg-[#7986cb]/0 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+          <div className="bg-[#000000]/0 backdrop-blur-sm rounded-2xl shadow-lg p-6">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
               <Calendar className="w-5 h-5 mr-2" />
               Recent Entries
             </h3>
             <div className="space-y-3">
               {recentEntries.map((recentEntry, index) => (
-                <div key={index} className="bg-[#3949ab]/30 rounded-lg p-4 border border-[#7986cb]/30">
+                <div key={index} className="bg-[#000000]/30 rounded-lg p-4 border border-[#000000]/30">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium text-white">
                       {recentEntry.title || `Entry ${index + 1}`}
@@ -623,7 +623,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   </p>
                   <div className="flex items-center mt-2 text-xs">
                     <span className={`px-2 py-1 rounded-full ${
-                      moodOptions.find(m => m.value === recentEntry.mood)?.color || 'bg-[#5c6bc0] text-white'
+                      moodOptions.find(m => m.value === recentEntry.mood)?.color || 'bg-[#ffffff] text-white'
                     }`}>
                       {moodOptions.find(m => m.value === recentEntry.mood)?.label || 'Unknown'}
                     </span>
@@ -641,7 +641,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
-          <div className="bg-[#1a237e]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+          <div className="bg-[#000000]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <BarChart3 className="w-5 h-5 mr-2" />
               Journal Analytics
@@ -650,46 +650,56 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
             {analytics ? (
               <div className="space-y-6">
                 {/* Emotional Journey Chart */}
-                <div className="bg-[#3949ab]/30 rounded-xl p-4">
+                <div className="bg-[#000000]/30 rounded-xl p-4">
                   <h4 className="font-medium text-white mb-3">Emotional Journey (Last 30 Days)</h4>
-                  <div className="h-40 bg-gradient-to-r from-[#1a237e]/40 to-[#3949ab]/40 rounded-lg flex items-end justify-around p-4">
-                    {analytics.emotionalJourney.slice(0, 7).map((day, index) => (
+                  <div className="h-40 bg-gradient-to-r from-[#000000]/40 to-[#000000]/40 rounded-lg flex items-end justify-around p-4">
+                    {Array.isArray(analytics.emotionalJourney) ? analytics.emotionalJourney.slice(0, 7).map((day, index) => (
                       <div key={index} className="flex flex-col items-center">
                         <div 
-                          className="w-6 bg-[#5c6bc0] rounded-t mb-2"
+                          className="w-6 bg-[#000000] rounded-t mb-2"
                           style={{ height: `${Math.max(10, (day.sentiment + 1) * 50)}px` }}
                         />
                         <span className="text-xs text-white/70">
                           {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}
                         </span>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="w-full text-center text-white/60">
+                        No emotional journey data available
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Recurring Themes */}
-                <div className="bg-[#3949ab]/30 rounded-xl p-4">
+                <div className="bg-[#000000]/30 rounded-xl p-4">
                   <h4 className="font-medium text-white mb-3">Recurring Themes</h4>
                   <div className="space-y-2">
-                    {analytics.recurringThemes.map((theme, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <span className="text-white/90">{theme.theme}</span>
-                        <div className="flex items-center">
-                          <div className="w-20 bg-[#1a237e]/50 rounded-full h-2 mr-2">
-                            <div 
-                              className="bg-[#5c6bc0] h-2 rounded-full"
-                              style={{ width: `${(theme.frequency / 20) * 100}%` }}
-                            />
+                    {Array.isArray(analytics.recurringThemes) && analytics.recurringThemes.length > 0 ? (
+                      analytics.recurringThemes.map((theme, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <span className="text-white/90">{theme.theme}</span>
+                          <div className="flex items-center">
+                            <div className="w-20 bg-[#1a237e]/50 rounded-full h-2 mr-2">
+                              <div 
+                                className="bg-[#000000] h-2 rounded-full"
+                                style={{ width: `${(theme.frequency / 20) * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-sm text-white/70">{theme.frequency}</span>
                           </div>
-                          <span className="text-sm text-white/70">{theme.frequency}</span>
                         </div>
+                      ))
+                    ) : (
+                      <div className="w-full text-center text-white/60">
+                        No recurring themes data available
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
 
                 {/* Therapeutic Progress */}
-                <div className="bg-[#3949ab]/30 rounded-xl p-4">
+                <div className="bg-[#000000]/30 rounded-xl p-4">
                   <h4 className="font-medium text-white mb-2">Therapeutic Progress</h4>
                   <p className="text-white/90 text-sm leading-relaxed">
                     {analytics.therapeuticProgress}
@@ -711,7 +721,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* AI Insights Tab */}
         {activeTab === 'insights' && (
-          <div className="bg-[#1a237e]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+          <div className="bg-[#000000]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Brain className="w-5 h-5 mr-2" />
               AI Insights
@@ -719,13 +729,13 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
             
             {isAnalyzing && (
               <div className="flex items-center justify-center py-8">
-                <div className="w-8 h-8 border-2 border-[#5c6bc0] border-t-transparent rounded-full animate-spin mr-3" />
+                <div className="w-8 h-8 border-2 border-[#000000] border-t-transparent rounded-full animate-spin mr-3" />
                 <span className="text-white/70">Analyzing your entries...</span>
               </div>
             )}
             
             {aiInsights && !isAnalyzing && (
-              <div className="bg-[#3949ab]/30 rounded-xl p-6">
+              <div className="bg-[#000000]/30 rounded-xl p-6">
                 <h4 className="font-medium text-white mb-3">Latest Analysis</h4>
                 <div className="prose prose-sm text-white/90">
                   {aiInsights.split('\n').map((paragraph, index) => (
@@ -751,7 +761,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* Export Reports Tab */}
         {activeTab === 'export' && (
-          <div className="bg-[#1a237e]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+          <div className="bg-[#000000]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Download className="w-5 h-5 mr-2" />
               Export Reports
@@ -759,7 +769,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
             
             <div className="grid md:grid-cols-2 gap-6">
               {/* Therapist Report */}
-              <div className="bg-[#3949ab]/30 rounded-xl p-6">
+              <div className="bg-[#000000]/30 rounded-xl p-6">
                 <h4 className="font-medium text-white mb-2 flex items-center">
                   <FileText className="w-4 h-4 mr-2" />
                   Therapist Report
@@ -777,7 +787,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
               </div>
 
               {/* Personal Insights */}
-              <div className="bg-[#3949ab]/30 rounded-xl p-6">
+              <div className="bg-[#000000]/30 rounded-xl p-6">
                 <h4 className="font-medium text-white mb-2 flex items-center">
                   <Heart className="w-4 h-4 mr-2" />
                   Personal Insights
@@ -796,7 +806,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
             </div>
 
             {/* Export Information */}
-            <div className="mt-6 bg-[#5c6bc0]/30 border border-[#7986cb]/50 rounded-xl p-4">
+            <div className="mt-6 bg-[#000000]/30 border border-[#000000]/50 rounded-xl p-4">
               <h5 className="font-medium text-white mb-2">About Your Reports</h5>
               <ul className="text-sm text-white/80 space-y-1">
                 <li>• Reports are generated using AI analysis of your journal entries and mood data</li>
