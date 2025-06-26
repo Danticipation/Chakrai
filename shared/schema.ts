@@ -165,6 +165,81 @@ export const emotionalPatterns = pgTable("emotional_patterns", {
   generatedAt: timestamp("generated_at").defaultNow(),
 });
 
+// Advanced Emotional Intelligence Tables
+export const moodForecasts = pgTable("mood_forecasts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  forecastDate: timestamp("forecast_date").defaultNow(),
+  predictedMood: text("predicted_mood").notNull(),
+  confidenceScore: decimal("confidence_score", { precision: 3, scale: 2 }).notNull(),
+  riskLevel: text("risk_level").notNull(), // 'low', 'medium', 'high', 'critical'
+  triggerFactors: text("trigger_factors").array(),
+  preventiveRecommendations: text("preventive_recommendations").array(),
+  historicalPatterns: jsonb("historical_patterns"),
+  actualMood: text("actual_mood"),
+  forecastAccuracy: decimal("forecast_accuracy", { precision: 3, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const emotionalContexts = pgTable("emotional_contexts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  sessionId: text("session_id"),
+  currentMood: text("current_mood").notNull(),
+  intensity: integer("intensity").notNull(),
+  volatility: decimal("volatility", { precision: 3, scale: 2 }).notNull(),
+  urgency: text("urgency").notNull(), // 'low', 'medium', 'high', 'critical'
+  recentTriggers: text("recent_triggers").array(),
+  supportNeeds: text("support_needs").array(),
+  contextData: jsonb("context_data"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const predictiveInsights = pgTable("predictive_insights", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  insight: text("insight").notNull(),
+  probability: decimal("probability", { precision: 3, scale: 2 }).notNull(),
+  timeframe: text("timeframe").notNull(),
+  preventiveActions: text("preventive_actions").array(),
+  riskMitigation: text("risk_mitigation").array(),
+  isActive: boolean("is_active").default(true),
+  wasAccurate: boolean("was_accurate"),
+  userFeedback: text("user_feedback"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const emotionalResponseAdaptations = pgTable("emotional_response_adaptations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  originalMessage: text("original_message").notNull(),
+  adaptedResponse: text("adapted_response").notNull(),
+  tone: text("tone").notNull(),
+  intensity: text("intensity").notNull(),
+  responseLength: text("response_length").notNull(),
+  communicationStyle: text("communication_style"),
+  priorityFocus: text("priority_focus").array(),
+  effectiveness: text("effectiveness"),
+  userResponse: text("user_response"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const crisisDetectionLogs = pgTable("crisis_detection_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  messageContent: text("message_content").notNull(),
+  riskLevel: text("risk_level").notNull(),
+  crisisIndicators: text("crisis_indicators").array(),
+  confidenceScore: decimal("confidence_score", { precision: 3, scale: 2 }).notNull(),
+  interventionTriggered: boolean("intervention_triggered").default(false),
+  interventionType: text("intervention_type"),
+  followUpScheduled: boolean("follow_up_scheduled").default(false),
+  resolutionStatus: text("resolution_status"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -243,6 +318,33 @@ export const insertEmotionalPatternSchema = createInsertSchema(emotionalPatterns
   generatedAt: true,
 });
 
+export const insertMoodForecastSchema = createInsertSchema(moodForecasts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertEmotionalContextSchema = createInsertSchema(emotionalContexts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPredictiveInsightSchema = createInsertSchema(predictiveInsights).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertEmotionalResponseAdaptationSchema = createInsertSchema(emotionalResponseAdaptations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCrisisDetectionLogSchema = createInsertSchema(crisisDetectionLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type Bot = typeof bots.$inferSelect;
@@ -259,6 +361,11 @@ export type ForumPost = typeof forumPosts.$inferSelect;
 export type UserAchievement = typeof userAchievements.$inferSelect;
 export type WellnessStreak = typeof wellnessStreaks.$inferSelect;
 export type EmotionalPattern = typeof emotionalPatterns.$inferSelect;
+export type MoodForecast = typeof moodForecasts.$inferSelect;
+export type EmotionalContext = typeof emotionalContexts.$inferSelect;
+export type PredictiveInsight = typeof predictiveInsights.$inferSelect;
+export type EmotionalResponseAdaptation = typeof emotionalResponseAdaptations.$inferSelect;
+export type CrisisDetectionLog = typeof crisisDetectionLogs.$inferSelect;
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertBot = z.infer<typeof insertBotSchema>;
@@ -275,3 +382,8 @@ export type InsertForumPost = z.infer<typeof insertForumPostSchema>;
 export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
 export type InsertWellnessStreak = z.infer<typeof insertWellnessStreakSchema>;
 export type InsertEmotionalPattern = z.infer<typeof insertEmotionalPatternSchema>;
+export type InsertMoodForecast = z.infer<typeof insertMoodForecastSchema>;
+export type InsertEmotionalContext = z.infer<typeof insertEmotionalContextSchema>;
+export type InsertPredictiveInsight = z.infer<typeof insertPredictiveInsightSchema>;
+export type InsertEmotionalResponseAdaptation = z.infer<typeof insertEmotionalResponseAdaptationSchema>;
+export type InsertCrisisDetectionLog = z.infer<typeof insertCrisisDetectionLogSchema>;
