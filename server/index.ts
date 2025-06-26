@@ -931,7 +931,7 @@ app.post('/api/emotional-intelligence/crisis-detection', async (req, res) => {
       confidenceScore: crisisAnalysis.confidence,
       interventionTriggered: crisisAnalysis.riskLevel === 'critical',
       interventionType: crisisAnalysis.riskLevel === 'critical' ? 'immediate' : null,
-      followUpScheduled: crisisAnalysis.riskLevel !== 'low'
+      followUpScheduled: crisisAnalysis.riskLevel !== 'low' ? new Date() : null
     });
     
     res.json({
