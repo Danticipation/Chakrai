@@ -211,15 +211,15 @@ const AppLayout = () => {
             console.log('CLICK ANYWHERE TO HEAR AUTHENTIC CARLA VOICE');
             
             // Store audio for immediate click playback
-            window.pendingCarlaAudio = carlaAudio;
+            (window as any).pendingCarlaAudio = carlaAudio;
             
             // Global click handler for immediate audio permission
             const playCarlaOnClick = () => {
-              if (window.pendingCarlaAudio) {
-                window.pendingCarlaAudio.play().then(() => {
+              if ((window as any).pendingCarlaAudio) {
+                (window as any).pendingCarlaAudio.play().then(() => {
                   console.log('AUTHENTIC CARLA VOICE NOW PLAYING!');
-                  window.pendingCarlaAudio = null;
-                }).catch(err => {
+                  (window as any).pendingCarlaAudio = null;
+                }).catch((err: any) => {
                   console.error('Final Carla playback failed:', err);
                 });
               }
@@ -420,8 +420,15 @@ const AppLayout = () => {
           console.log('No speech detected in audio');
         }
       } else {
-        console.error('Transcription failed:', response.status);
-        alert('Voice transcription failed. Please try again.');
+        const errorData = await response.json();
+        console.error('Transcription failed:', response.status, errorData);
+        if (response.status === 401) {
+          alert('OpenAI API key required for voice transcription. Please configure your API key.');
+        } else if (response.status === 429) {
+          alert('Voice transcription temporarily unavailable due to high demand. Please try again later.');
+        } else {
+          alert('Voice transcription failed. Please try again.');
+        }
       }
     } catch (error) {
       console.error('Transcription error:', error);
@@ -512,8 +519,9 @@ const AppLayout = () => {
                     isRecording 
                       ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
                       : 'bg-blue-500 hover:bg-blue-600'
-                  } text-white shadow-lg`}
-                  title={isRecording ? 'Stop recording' : 'Start voice recording'}
+                  } text-white shadow-lg disabled:opacity-50`}
+                  title={isRecording ? 'Stop recording (auto-stops in 30s)' : 'Start voice recording'}
+                  disabled={loading}
                 >
                   {isRecording ? <Square size={24} /> : <Mic size={24} />}
                 </button>
