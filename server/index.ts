@@ -1640,6 +1640,214 @@ app.post('/api/privacy/generate-anonymized-report', async (req, res) => {
   }
 });
 
+// Health Integration API endpoints
+app.get('/api/wearable-devices/:userId', async (req, res) => {
+  try {
+    const devices = [
+      {
+        id: 1,
+        deviceType: 'apple_watch',
+        deviceName: 'Apple Watch Series 8',
+        syncStatus: 'connected',
+        lastSyncTime: new Date().toISOString(),
+        consentGranted: true,
+        privacyLevel: 'high'
+      },
+      {
+        id: 2,
+        deviceType: 'fitbit',
+        deviceName: 'Fitbit Versa 4',
+        syncStatus: 'disconnected',
+        lastSyncTime: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        consentGranted: true,
+        privacyLevel: 'medium'
+      },
+      {
+        id: 3,
+        deviceType: 'garmin',
+        deviceName: 'Garmin Vivosmart 5',
+        syncStatus: 'pending',
+        lastSyncTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        consentGranted: false,
+        privacyLevel: 'low'
+      }
+    ];
+    res.json(devices);
+  } catch (error) {
+    console.error('Error fetching wearable devices:', error);
+    res.status(500).json({ error: 'Failed to fetch wearable devices' });
+  }
+});
+
+app.get('/api/health-metrics/:userId', async (req, res) => {
+  try {
+    const metrics = [
+      {
+        id: 1,
+        metricType: 'heart_rate',
+        metricValue: 72,
+        unit: 'bpm',
+        recordedAt: new Date().toISOString(),
+        dataQuality: 'high',
+        contextTags: ['resting', 'morning']
+      },
+      {
+        id: 2,
+        metricType: 'sleep_quality',
+        metricValue: 8.2,
+        unit: 'hours',
+        recordedAt: new Date().toISOString(),
+        dataQuality: 'high',
+        contextTags: ['deep_sleep', 'rem_sleep']
+      },
+      {
+        id: 3,
+        metricType: 'steps',
+        metricValue: 8945,
+        unit: 'steps',
+        recordedAt: new Date().toISOString(),
+        dataQuality: 'medium',
+        contextTags: ['daily_activity', 'walking']
+      }
+    ];
+    res.json(metrics);
+  } catch (error) {
+    console.error('Error fetching health metrics:', error);
+    res.status(500).json({ error: 'Failed to fetch health metrics' });
+  }
+});
+
+app.get('/api/health-correlations/:userId', async (req, res) => {
+  try {
+    const correlations = [
+      {
+        id: 1,
+        correlationType: 'positive',
+        healthMetric: 'sleep_quality',
+        emotionalMetric: 'mood_stability',
+        correlationCoefficient: 0.78,
+        confidenceLevel: 0.89,
+        insights: 'Better sleep quality strongly correlates with improved mood stability and emotional regulation.',
+        recommendations: ['Maintain consistent sleep schedule', 'Optimize sleep environment', 'Practice relaxation techniques before bed']
+      },
+      {
+        id: 2,
+        correlationType: 'negative',
+        healthMetric: 'stress_level',
+        emotionalMetric: 'anxiety_level',
+        correlationCoefficient: -0.65,
+        confidenceLevel: 0.92,
+        insights: 'Higher physiological stress markers correspond with increased anxiety episodes.',
+        recommendations: ['Regular mindfulness practice', 'Physical exercise routine', 'Stress management techniques']
+      }
+    ];
+    res.json(correlations);
+  } catch (error) {
+    console.error('Error fetching health correlations:', error);
+    res.status(500).json({ error: 'Failed to fetch health correlations' });
+  }
+});
+
+app.get('/api/health-insights/:userId', async (req, res) => {
+  try {
+    const insights = [
+      {
+        id: 1,
+        insightType: 'correlation',
+        insightTitle: 'Sleep-Mood Connection Detected',
+        insightDescription: 'Your sleep patterns show strong correlation with next-day emotional wellness. Prioritizing 7-8 hours of quality sleep significantly improves mood stability.',
+        healthDataSources: ['sleep_tracking', 'heart_rate_variability'],
+        emotionalDataSources: ['mood_journal', 'daily_check_ins'],
+        confidenceScore: 0.87,
+        priorityLevel: 'high',
+        actionableRecommendations: ['Set consistent bedtime routine', 'Limit screen time before sleep', 'Create optimal sleep environment'],
+        isRead: false
+      },
+      {
+        id: 2,
+        insightType: 'trend',
+        insightTitle: 'Exercise Boosts Mental Clarity',
+        insightDescription: 'Regular physical activity correlates with improved focus and reduced anxiety levels in your therapeutic sessions.',
+        healthDataSources: ['step_count', 'active_minutes'],
+        emotionalDataSources: ['session_notes', 'anxiety_tracking'],
+        confidenceScore: 0.73,
+        priorityLevel: 'medium',
+        actionableRecommendations: ['Schedule 30-minute daily walks', 'Try mindful movement exercises', 'Track mood before and after exercise'],
+        isRead: true
+      }
+    ];
+    res.json(insights);
+  } catch (error) {
+    console.error('Error fetching health insights:', error);
+    res.status(500).json({ error: 'Failed to fetch health insights' });
+  }
+});
+
+app.get('/api/device-sync-logs/:userId', async (req, res) => {
+  try {
+    const syncLogs = [
+      {
+        id: 1,
+        deviceId: 1,
+        syncTime: new Date().toISOString(),
+        syncStatus: 'success',
+        recordsProcessed: 1440,
+        errorMessage: null,
+        syncDuration: 2.3
+      },
+      {
+        id: 2,
+        deviceId: 2,
+        syncTime: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+        syncStatus: 'failed',
+        recordsProcessed: 0,
+        errorMessage: 'Device authentication failed',
+        syncDuration: 0.5
+      }
+    ];
+    res.json(syncLogs);
+  } catch (error) {
+    console.error('Error fetching sync logs:', error);
+    res.status(500).json({ error: 'Failed to fetch sync logs' });
+  }
+});
+
+app.get('/api/health-privacy/:userId', async (req, res) => {
+  try {
+    const privacySettings = {
+      shareHeartRate: true,
+      shareSleepData: true,
+      shareActivityData: true,
+      shareStressData: false,
+      anonymizeData: true,
+      dataRetentionDays: 90,
+      thirdPartySharing: false,
+      researchParticipation: true
+    };
+    res.json(privacySettings);
+  } catch (error) {
+    console.error('Error fetching privacy settings:', error);
+    res.status(500).json({ error: 'Failed to fetch privacy settings' });
+  }
+});
+
+app.post('/api/sync-device', async (req, res) => {
+  try {
+    const { deviceId, userId } = req.body;
+    const syncResult = {
+      success: true,
+      deviceId,
+      syncTime: new Date().toISOString(),
+      recordsProcessed: Math.floor(Math.random() * 1000) + 500,
+      syncDuration: Math.random() * 3 + 1
+    };
+    res.json(syncResult);
+  } catch (error) {
+    console.error('Error syncing device:', error);
+    res.status(500).json({ error: 'Failed to sync device' });
+  }
+});
+
 // Journal Analytics Dashboard
 app.get('/api/journal/analytics/:userId', async (req, res) => {
   try {
