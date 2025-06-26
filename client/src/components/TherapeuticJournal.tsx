@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Save, Plus, Calendar, Tag, Heart, Smile, Meh, Frown, AlertCircle, Send, Brain, BarChart3, Download, FileText, TrendingUp } from 'lucide-react';
+import { Mic, MicOff, Save, Plus, Calendar, Tag, Heart, Smile, Meh, Frown, AlertCircle, Send, Brain, BarChart3, Download, FileText } from 'lucide-react';
 
 interface JournalEntry {
   id?: number;
@@ -359,14 +359,38 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
       )}
 
       <div className="flex-1 overflow-y-auto">
-        {/* Header */}
+        {/* Header with Navigation Tabs */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Therapeutic Journal</h2>
           <p className="text-gray-600">Express your thoughts and feelings in a safe, private space</p>
+          
+          {/* Navigation Tabs */}
+          <div className="flex space-x-1 mt-4 bg-white/30 rounded-xl p-1">
+            {[
+              { id: 'write', label: 'Write Entry', icon: FileText },
+              { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+              { id: 'insights', label: 'AI Insights', icon: Brain },
+              { id: 'export', label: 'Export Reports', icon: Download }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-white text-purple-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                <span className="font-medium">{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Journal Entry Form */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+        {/* Tab Content */}
+        {activeTab === 'write' && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
           {/* Title Input */}
           <div className="mb-4">
             <input
@@ -569,9 +593,10 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
             )}
           </button>
         </div>
+        )}
 
-        {/* Recent Entries */}
-        {recentEntries.length > 0 && (
+        {/* Recent Entries (shown only on write tab) */}
+        {activeTab === 'write' && recentEntries.length > 0 && (
           <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
               <Calendar className="w-5 h-5 mr-2" />
@@ -605,6 +630,175 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+              <BarChart3 className="w-5 h-5 mr-2" />
+              Journal Analytics
+            </h3>
+            
+            {analytics ? (
+              <div className="space-y-6">
+                {/* Emotional Journey Chart */}
+                <div className="bg-white/60 rounded-xl p-4">
+                  <h4 className="font-medium text-gray-800 mb-3">Emotional Journey (Last 30 Days)</h4>
+                  <div className="h-40 bg-gradient-to-r from-blue-100 to-green-100 rounded-lg flex items-end justify-around p-4">
+                    {analytics.emotionalJourney.slice(0, 7).map((day, index) => (
+                      <div key={index} className="flex flex-col items-center">
+                        <div 
+                          className="w-6 bg-blue-500 rounded-t mb-2"
+                          style={{ height: `${Math.max(10, (day.sentiment + 1) * 50)}px` }}
+                        />
+                        <span className="text-xs text-gray-600">
+                          {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Recurring Themes */}
+                <div className="bg-white/60 rounded-xl p-4">
+                  <h4 className="font-medium text-gray-800 mb-3">Recurring Themes</h4>
+                  <div className="space-y-2">
+                    {analytics.recurringThemes.map((theme, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <span className="text-gray-700">{theme.theme}</span>
+                        <div className="flex items-center">
+                          <div className="w-20 bg-gray-200 rounded-full h-2 mr-2">
+                            <div 
+                              className="bg-blue-500 h-2 rounded-full"
+                              style={{ width: `${(theme.frequency / 20) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-sm text-gray-600">{theme.frequency}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Therapeutic Progress */}
+                <div className="bg-white/60 rounded-xl p-4">
+                  <h4 className="font-medium text-gray-800 mb-2">Therapeutic Progress</h4>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {analytics.therapeuticProgress}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-12">
+                <button
+                  onClick={fetchAnalytics}
+                  className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
+                >
+                  Generate Analytics
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* AI Insights Tab */}
+        {activeTab === 'insights' && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+              <Brain className="w-5 h-5 mr-2" />
+              AI Insights
+            </h3>
+            
+            {isAnalyzing && (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-3" />
+                <span className="text-gray-600">Analyzing your entries...</span>
+              </div>
+            )}
+            
+            {aiInsights && !isAnalyzing && (
+              <div className="bg-white/60 rounded-xl p-6">
+                <h4 className="font-medium text-gray-800 mb-3">Latest Analysis</h4>
+                <div className="prose prose-sm text-gray-700">
+                  {aiInsights.split('\n').map((paragraph, index) => (
+                    <p key={index} className="mb-3">{paragraph}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {!aiInsights && !isAnalyzing && (
+              <div className="text-center py-12">
+                <Brain className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">
+                  AI insights will appear here after you save a journal entry
+                </p>
+                <p className="text-sm text-gray-500">
+                  Our AI analyzes your entries for emotional patterns, themes, and provides therapeutic insights
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Export Reports Tab */}
+        {activeTab === 'export' && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+              <Download className="w-5 h-5 mr-2" />
+              Export Reports
+            </h3>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Therapist Report */}
+              <div className="bg-white/60 rounded-xl p-6">
+                <h4 className="font-medium text-gray-800 mb-2 flex items-center">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Therapist Report
+                </h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  Professional clinical summary with mood patterns, risk assessment, and therapeutic recommendations
+                </p>
+                <button
+                  onClick={exportTherapistReport}
+                  className="w-full px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Therapist Report
+                </button>
+              </div>
+
+              {/* Personal Insights */}
+              <div className="bg-white/60 rounded-xl p-6">
+                <h4 className="font-medium text-gray-800 mb-2 flex items-center">
+                  <Heart className="w-4 h-4 mr-2" />
+                  Personal Insights
+                </h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  Personal wellness report focusing on growth, patterns, and positive reinforcement
+                </p>
+                <button
+                  onClick={exportPersonalInsights}
+                  className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Personal Report
+                </button>
+              </div>
+            </div>
+
+            {/* Export Information */}
+            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <h5 className="font-medium text-blue-800 mb-2">About Your Reports</h5>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Reports are generated using AI analysis of your journal entries and mood data</li>
+                <li>• Therapist reports include clinical insights suitable for healthcare providers</li>
+                <li>• Personal reports focus on your growth journey and positive patterns</li>
+                <li>• All reports respect your privacy settings and only include data you've chosen to share</li>
+              </ul>
             </div>
           </div>
         )}
