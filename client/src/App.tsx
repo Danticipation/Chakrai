@@ -432,12 +432,9 @@ const AppLayout = () => {
         const audioData = await response.json();
         console.log('ElevenLabs test response:', audioData.audioUrl ? 'SUCCESS' : 'FAILED');
         
-        if (audioBlob.size > 0) {
-          const audioUrl = URL.createObjectURL(audioBlob);
-          const audio = new Audio(audioUrl);
-          
+        if (audioData.audioUrl) {
+          const audio = new Audio(audioData.audioUrl);
           audio.volume = 1.0;
-          audio.muted = false;
           
           audio.play().then(() => {
             console.log('ElevenLabs TTS test successful');
@@ -931,7 +928,7 @@ const AppLayout = () => {
             {/* Voice Selection - Mobile optimized */}
             <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
               <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Voice Selection</h3>
-              <VoiceSelector userId={1} onVoiceChange={() => {}} />
+              <VoiceSelector selectedVoice={selectedReflectionVoice} onVoiceChange={setSelectedReflectionVoice} />
             </div>
           </div>
         );
@@ -1500,8 +1497,10 @@ const AppLayout = () => {
       {showOnboarding && (
         <div className="fixed inset-0 z-50">
           <OnboardingQuiz 
-            userId={1} 
-            onComplete={() => setShowOnboarding(false)} 
+            onComplete={(responses) => {
+              console.log('Onboarding completed:', responses);
+              setShowOnboarding(false);
+            }} 
           />
         </div>
       )}
