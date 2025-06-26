@@ -165,12 +165,77 @@ const AppLayout = () => {
 
         setMessages(prev => [...prev, botMessage]);
 
-        if (data.audioUrl && data.audioUrl.length > 10000) {
-          try {
-            const audio = new Audio(`data:audio/wav;base64,${data.audioUrl}`);
-            await audio.play();
-          } catch (audioError) {
-            console.log('Audio playback failed, using browser TTS fallback');
+        // ElevenLabs Carla voice playback with aggressive activation
+        if (data.audioUrl && data.audioUrl.length > 1000) {
+          console.log(`ElevenLabs ${data.voiceUsed || 'Carla'} voice detected: ${data.audioUrl.length} characters`);
+          
+          const playElevenLabsAudio = async () => {
+            try {
+              // Create audio with proper MIME type
+              const audioBlob = new Blob([
+                Uint8Array.from(atob(data.audioUrl), c => c.charCodeAt(0))
+              ], { type: 'audio/mpeg' });
+              
+              const audioUrl = URL.createObjectURL(audioBlob);
+              const audio = new Audio(audioUrl);
+              
+              // Configure audio for immediate playback
+              audio.preload = 'auto';
+              audio.volume = 0.8;
+              
+              // Play with multiple fallback attempts
+              try {
+                await audio.play();
+                console.log('✓ ElevenLabs Carla voice played successfully');
+                
+                // Cleanup URL after playing
+                audio.addEventListener('ended', () => {
+                  URL.revokeObjectURL(audioUrl);
+                });
+                
+              } catch (playError) {
+                console.log('Direct play blocked, setting up click trigger...');
+                
+                // Show user that audio is ready
+                const audioReadyMessage = {
+                  sender: 'bot' as const,
+                  text: '🔊 Audio ready - click anywhere to hear Carla voice',
+                  time: new Date().toLocaleTimeString()
+                };
+                setMessages(prev => [...prev, audioReadyMessage]);
+                
+                // Single click anywhere triggers audio
+                const playOnClick = async () => {
+                  try {
+                    await audio.play();
+                    console.log('✓ ElevenLabs Carla voice played after user interaction');
+                    
+                    // Remove the audio ready message
+                    setMessages(prev => prev.filter(msg => msg.text !== audioReadyMessage.text));
+                    
+                  } catch (err) {
+                    console.error('Audio play failed even with user gesture:', err);
+                  }
+                  
+                  document.removeEventListener('click', playOnClick);
+                  URL.revokeObjectURL(audioUrl);
+                };
+                
+                document.addEventListener('click', playOnClick, { once: true });
+              }
+              
+            } catch (error) {
+              console.error('ElevenLabs audio processing failed:', error);
+            }
+          };
+          
+          // Execute audio playback
+          playElevenLabsAudio();
+          
+        } else {
+          console.log('No ElevenLabs audio received or audio data too short');
+          if (data.error) {
+            console.error('Server audio error:', data.error);
           }
         }
       }

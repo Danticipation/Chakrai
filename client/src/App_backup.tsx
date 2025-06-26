@@ -165,13 +165,38 @@ const AppLayout = () => {
 
         setMessages(prev => [...prev, botMessage]);
 
+        // Force ElevenLabs audio playback
         if (data.audioUrl && data.audioUrl.length > 10000) {
+          console.log(`ElevenLabs audio detected: ${data.audioUrl.length} characters`);
           try {
-            const audio = new Audio(`data:audio/wav;base64,${data.audioUrl}`);
-            await audio.play();
+            // Multiple fallback strategies for audio playback
+            const audio = new Audio(`data:audio/mp3;base64,${data.audioUrl}`);
+            audio.preload = 'auto';
+            
+            // First attempt: direct play
+            try {
+              await audio.play();
+              console.log('ElevenLabs audio played successfully');
+            } catch (playError) {
+              console.log('Direct play failed, trying user interaction method');
+              
+              // Second attempt: user interaction trigger
+              const playWithUserGesture = () => {
+                audio.play().then(() => {
+                  console.log('ElevenLabs audio played with user gesture');
+                  document.removeEventListener('click', playWithUserGesture);
+                }).catch(console.error);
+              };
+              document.addEventListener('click', playWithUserGesture, { once: true });
+              
+              // Show audio ready indicator
+              console.log('Audio ready - click anywhere to play Carla voice');
+            }
           } catch (audioError) {
-            console.log('Audio playback failed, using browser TTS fallback');
+            console.error('ElevenLabs audio failed:', audioError);
           }
+        } else {
+          console.log('No ElevenLabs audio detected or audio too short');
         }
       }
     } catch (error) {
