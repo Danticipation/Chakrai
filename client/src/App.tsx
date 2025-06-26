@@ -513,8 +513,8 @@ const AppLayout = () => {
                 {/* Chat Messages Area */}
                 <div className="absolute top-16 left-4 right-4 bottom-20 overflow-y-auto">
                   {messages.length === 0 ? (
-                    <div className="text-center text-white/70 py-8">
-                      <MessageCircle size={32} className="mx-auto mb-3 opacity-70" />
+                    <div className="text-center text-white py-8">
+                      <MessageCircle size={32} className="mx-auto mb-3" />
                       <p className="text-sm">Start a conversation with TraI</p>
                     </div>
                   ) : (
