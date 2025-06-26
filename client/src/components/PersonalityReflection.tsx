@@ -38,19 +38,19 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
 
   if (isLoading) {
     return (
-      <div className="p-6 h-full bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
+      <div className="p-6 h-full bg-[#7986cb]">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <Brain className="w-6 h-6 text-purple-600" />
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Brain className="w-6 h-6 text-[#9fa8da]" />
             Personality Reflection
           </h2>
         </div>
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6">
+        <div className="bg-[#9fa8da]/30 backdrop-blur-sm rounded-xl p-6 border border-[#9fa8da]/50">
           <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-            <div className="h-4 bg-gray-300 rounded w-5/6"></div>
-            <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+            <div className="h-4 bg-white/30 rounded w-3/4"></div>
+            <div className="h-4 bg-white/30 rounded w-1/2"></div>
+            <div className="h-4 bg-white/30 rounded w-5/6"></div>
+            <div className="h-4 bg-white/30 rounded w-2/3"></div>
           </div>
         </div>
       </div>
@@ -59,21 +59,21 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
 
   if (error) {
     return (
-      <div className="p-6 h-full bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
+      <div className="p-6 h-full bg-[#7986cb]">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <Brain className="w-6 h-6 text-purple-600" />
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Brain className="w-6 h-6 text-[#9fa8da]" />
             Personality Reflection
           </h2>
           <button
             onClick={handleRefresh}
-            className="p-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+            className="p-2 bg-[#9fa8da] text-white rounded-lg hover:bg-[#BBDEFB] transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-          <p className="text-red-700">Unable to generate your personality reflection. Please try refreshing or continue engaging with the platform to build more data for analysis.</p>
+        <div className="bg-red-900/30 border border-red-600/50 rounded-xl p-6">
+          <p className="text-red-200">Unable to generate your personality reflection. Please try refreshing or continue engaging with the platform to build more data for analysis.</p>
         </div>
       </div>
     );
@@ -97,19 +97,19 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
         const cleanTitle = title.replace(/^\d+\.\s+/, '').replace(':', '');
         return (
           <div key={index} className="mb-4">
-            <h3 className="font-semibold text-purple-700 mb-2 flex items-center gap-2">
+            <h3 className="font-semibold text-[#9fa8da] mb-2 flex items-center gap-2">
               {cleanTitle.includes('TRAIT') && <User className="w-4 h-4" />}
               {cleanTitle.includes('POSITIVE') && <TrendingUp className="w-4 h-4" />}
               {cleanTitle.includes('GROWTH') && <RotateCcw className="w-4 h-4" />}
               {cleanTitle.includes('EMOTIONAL') && <Brain className="w-4 h-4" />}
               {cleanTitle}
             </h3>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{content}</p>
+            <p className="text-white/90 leading-relaxed whitespace-pre-wrap">{content}</p>
           </div>
         );
       } else {
         return (
-          <p key={index} className="text-gray-700 leading-relaxed whitespace-pre-wrap mb-4">
+          <p key={index} className="text-white/90 leading-relaxed whitespace-pre-wrap mb-4">
             {section.trim()}
           </p>
         );
@@ -118,15 +118,15 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
   };
 
   return (
-    <div className="p-6 h-full bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6] overflow-y-auto">
+    <div className="p-6 h-full bg-[#7986cb] overflow-y-auto">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <Brain className="w-6 h-6 text-purple-600" />
+        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+          <Brain className="w-6 h-6 text-[#9fa8da]" />
           Personality Reflection
         </h2>
         <button
           onClick={handleRefresh}
-          className="p-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2"
+          className="p-2 bg-[#9fa8da] text-white rounded-lg hover:bg-[#BBDEFB] transition-colors flex items-center gap-2"
           title="Refresh Analysis"
         >
           <RefreshCw className="w-4 h-4" />
@@ -135,8 +135,8 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
       </div>
 
       {/* Data Points Summary */}
-      <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 mb-4">
-        <div className="flex justify-between items-center text-sm text-gray-600">
+      <div className="bg-[#9fa8da]/30 backdrop-blur-sm rounded-xl p-4 mb-4 border border-[#9fa8da]/50">
+        <div className="flex justify-between items-center text-sm text-white/80">
           <span>Analysis based on:</span>
           <div className="flex gap-4">
             <span>{data?.dataPoints.conversations || 0} conversations</span>
@@ -144,23 +144,23 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
             <span>{data?.dataPoints.moodEntries || 0} mood entries</span>
           </div>
         </div>
-        <div className="text-xs text-gray-500 mt-1">
+        <div className="text-xs text-white/60 mt-1">
           Last updated: {data?.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : 'Unknown'}
         </div>
       </div>
 
       {/* AI Personality Analysis */}
-      <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 space-y-4">
+      <div className="bg-[#9fa8da]/30 backdrop-blur-sm rounded-xl p-6 space-y-4 border border-[#9fa8da]/50">
         <div className="flex items-center gap-2 mb-4">
-          <Brain className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold text-gray-800">AI Personality Analysis</h3>
+          <Brain className="w-5 h-5 text-[#BBDEFB]" />
+          <h3 className="text-lg font-semibold text-white">AI Personality Analysis</h3>
         </div>
         
         <div className="space-y-4">
           {data?.reflection ? (
             formatReflectionText(data.reflection)
           ) : (
-            <p className="text-gray-600 italic">
+            <p className="text-white/70 italic">
               Continue engaging with TraI through conversations and journaling to build a more detailed personality profile. 
               Your reflection will become more insightful as you share more about yourself.
             </p>
