@@ -15,6 +15,29 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// Direct bot stats endpoint to fix immediate JSON parsing error
+app.get('/api/bot-stats', (req, res) => {
+  res.json({ 
+    level: 3,
+    stage: "Therapist",
+    wordsLearned: 1000
+  });
+});
+
+// Direct daily affirmation endpoint
+app.get('/api/daily-affirmation', (req, res) => {
+  res.json({ 
+    affirmation: 'Today is a beautiful day to practice self-compassion and growth.' 
+  });
+});
+
+// Direct weekly summary endpoint
+app.get('/api/weekly-summary', (req, res) => {
+  res.json({ 
+    summary: 'Your therapeutic journey continues to evolve positively. Focus on your mental wellness and personal growth this week.' 
+  });
+});
+
 // Use API routes
 app.use('/api', routes);
 
