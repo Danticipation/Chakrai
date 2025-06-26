@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, BarChart3, Gift } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, BarChart3, Gift, Headphones } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
@@ -11,6 +11,7 @@ import AnalyticsDashboard from './components/AnalyticsDashboard';
 import WellnessRewards from './components/WellnessRewards';
 import CommunitySupport from './components/CommunitySupport';
 import AdaptiveLearning from './components/AdaptiveLearning';
+import VRTherapy from './components/VRTherapy';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -415,6 +416,9 @@ const AppLayout = () => {
       case 'adaptive':
         return <AdaptiveLearning />;
 
+      case 'vr':
+        return <VRTherapy />;
+
       case 'goals':
         return (
           <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
@@ -514,6 +518,7 @@ const AppLayout = () => {
             { id: 'rewards', icon: Gift, label: 'Rewards' },
             { id: 'community', icon: User, label: 'Community' },
             { id: 'adaptive', icon: Star, label: 'AI Learning' },
+            { id: 'vr', icon: Headphones, label: 'VR Therapy' },
             { id: 'goals', icon: Target, label: 'Goals' }
           ].map((tab) => (
             <button
