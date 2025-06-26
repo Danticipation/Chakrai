@@ -170,7 +170,7 @@ const AppLayout = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           text: botResponse,
-          voice: 'carla',
+          voice: selectedReflectionVoice,
           emotionalContext: 'calming'
         })
       });
@@ -304,13 +304,13 @@ const AppLayout = () => {
         speechSynthesis.pause();
       }
       
-      // Test ElevenLabs API only
+      // Test ElevenLabs API with selected voice
       const response = await fetch('/api/text-to-speech', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          text: 'ElevenLabs Carla voice test',
-          voice: 'carla'
+          text: `Testing ${selectedReflectionVoice} voice from ElevenLabs`,
+          voice: selectedReflectionVoice
         })
       });
       
@@ -463,6 +463,12 @@ const AppLayout = () => {
       case 'chat':
         return (
           <div className="h-full flex flex-col">
+            {/* Welcome Header */}
+            <div className="bg-gray-800/50 backdrop-blur border-b border-gray-700 p-4">
+              <h2 className="text-lg font-semibold text-white">Welcome to TraI</h2>
+              <p className="text-gray-400 text-sm">Your therapeutic AI companion</p>
+            </div>
+            
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message, index) => (
                 <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -537,54 +543,322 @@ const AppLayout = () => {
           </div>
         );
 
+      case 'journal':
+        return (
+          <div className="p-4 h-full overflow-y-auto">
+            <h2 className="text-xl font-bold text-white mb-4">Therapeutic Journal</h2>
+            
+            {/* New Entry Button */}
+            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-4 mb-4 flex items-center justify-center space-x-2">
+              <span>✍️</span>
+              <span>New Journal Entry</span>
+            </button>
+
+            {/* Quick Mood Check */}
+            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-3">How are you feeling?</h3>
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { emoji: '😊', label: 'Happy', color: 'bg-green-500' },
+                  { emoji: '😐', label: 'Neutral', color: 'bg-gray-500' },
+                  { emoji: '😔', label: 'Sad', color: 'bg-blue-500' },
+                  { emoji: '😰', label: 'Anxious', color: 'bg-red-500' }
+                ].map((mood, index) => (
+                  <button key={index} className={`${mood.color} hover:opacity-80 text-white rounded-lg p-3 text-center transition-colors`}>
+                    <div className="text-2xl mb-1">{mood.emoji}</div>
+                    <div className="text-xs">{mood.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Entries */}
+            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Recent Entries</h3>
+              <div className="space-y-3">
+                {[
+                  { date: 'Today', preview: 'Feeling more optimistic about my progress...', mood: '😊' },
+                  { date: 'Yesterday', preview: 'Had a challenging day but used breathing techniques...', mood: '😐' },
+                  { date: '2 days ago', preview: 'Grateful for small victories and support...', mood: '😊' }
+                ].map((entry, index) => (
+                  <div key={index} className="border-l-4 border-blue-500 pl-4 py-2 bg-gray-700 rounded-r-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-gray-400">{entry.date}</span>
+                      <span className="text-lg">{entry.mood}</span>
+                    </div>
+                    <p className="text-gray-300 text-sm">{entry.preview}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* AI Insights */}
+            <div className="bg-gray-800 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-white mb-3">AI Insights</h3>
+              <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3">
+                <p className="text-blue-200 text-sm">
+                  Your recent entries show improved emotional regulation. Consider exploring the mindfulness exercises when feeling overwhelmed.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'community':
+        return (
+          <div className="p-4 h-full overflow-y-auto">
+            <h2 className="text-xl font-bold text-white mb-4">Community Support</h2>
+            
+            {/* Support Groups */}
+            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Support Groups</h3>
+              <div className="space-y-3">
+                {[
+                  { name: 'Anxiety Support', members: 234, active: true },
+                  { name: 'Depression Recovery', members: 156, active: false },
+                  { name: 'Mindfulness Practice', members: 89, active: true },
+                  { name: 'Crisis Support', members: 67, active: true, priority: true }
+                ].map((group, index) => (
+                  <div key={index} className={`p-3 rounded-lg ${group.priority ? 'bg-red-900/30 border border-red-700' : 'bg-gray-700'}`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-white font-medium">{group.name}</h4>
+                        <p className="text-sm text-gray-400">{group.members} members</p>
+                      </div>
+                      <div className={`w-3 h-3 rounded-full ${group.active ? 'bg-green-500' : 'bg-gray-500'}`}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Peer Check-ins */}
+            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Peer Check-ins</h3>
+              <button className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg p-3 mb-3">
+                Send Daily Check-in
+              </button>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-300">SafeSpace22 checked in</span>
+                  <span className="text-gray-400">2h ago</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-300">HopeSeeker sent support</span>
+                  <span className="text-gray-400">4h ago</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Anonymous Forum */}
+            <div className="bg-gray-800 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Anonymous Forum</h3>
+              <div className="space-y-3">
+                <div className="bg-gray-700 p-3 rounded-lg">
+                  <p className="text-gray-300 text-sm mb-2">"Finally had a breakthrough with my therapist today..."</p>
+                  <div className="flex items-center space-x-4 text-xs text-gray-400">
+                    <span>KindHeart123</span>
+                    <span>💙 12</span>
+                    <span>3 replies</span>
+                  </div>
+                </div>
+                <div className="bg-gray-700 p-3 rounded-lg">
+                  <p className="text-gray-300 text-sm mb-2">"Looking for advice on managing work stress..."</p>
+                  <div className="flex items-center space-x-4 text-xs text-gray-400">
+                    <span>StrongTree45</span>
+                    <span>💙 8</span>
+                    <span>7 replies</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'insights':
+        return (
+          <div className="p-4 h-full overflow-y-auto">
+            <h2 className="text-xl font-bold text-white mb-4">AI Insights & Analytics</h2>
+            
+            {/* Emotional Patterns */}
+            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Emotional Patterns</h3>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-400">Mon</div>
+                  <div className="text-sm text-gray-400">Most Positive</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-red-400">Thu</div>
+                  <div className="text-sm text-gray-400">Needs Support</div>
+                </div>
+              </div>
+              <div className="bg-gray-700 rounded-lg p-3">
+                <p className="text-gray-300 text-sm">
+                  Your mood tends to improve after mindfulness sessions. Consider scheduling them on challenging days.
+                </p>
+              </div>
+            </div>
+
+            {/* Coping Strategies */}
+            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Effective Coping Strategies</h3>
+              <div className="space-y-3">
+                {[
+                  { strategy: 'Deep Breathing', effectiveness: 89, usage: 'High' },
+                  { strategy: 'Journaling', effectiveness: 76, usage: 'Medium' },
+                  { strategy: 'Exercise', effectiveness: 82, usage: 'Low' }
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div>
+                      <span className="text-white">{item.strategy}</span>
+                      <span className="text-sm text-gray-400 ml-2">({item.usage} usage)</span>
+                    </div>
+                    <div className="text-green-400 font-bold">{item.effectiveness}%</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Monthly Report */}
+            <div className="bg-gray-800 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Monthly Wellness Report</h3>
+              <button className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg p-3 mb-3">
+                Generate Full Report
+              </button>
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <div className="text-xl font-bold text-green-400">+23%</div>
+                  <div className="text-sm text-gray-400">Mood Improvement</div>
+                </div>
+                <div>
+                  <div className="text-xl font-bold text-blue-400">18</div>
+                  <div className="text-sm text-gray-400">Active Days</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       case 'daily':
         return (
           <div className="p-4 h-full">
             <h2 className="text-xl font-bold text-white mb-4">Daily Reflection</h2>
-            <div className="bg-gray-800 rounded-lg p-4">
+            
+            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-2">Daily Affirmation</h3>
               <p className="text-gray-300 mb-4">{dailyAffirmation}</p>
               <button
                 onClick={() => testAudio()}
                 className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg"
               >
-                🔊 Read Affirmation
+                🔊 Read Aloud
               </button>
+            </div>
+
+            <div className="bg-gray-800 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-white mb-2">Voice Selection</h3>
+              <select
+                value={selectedReflectionVoice}
+                onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                className="w-full px-3 py-2 border rounded bg-gray-700 text-white border-gray-600"
+              >
+                <option value="james">James (Male American)</option>
+                <option value="brian">Brian (Deep Male American)</option>
+                <option value="alexandra">Alexandra (Female American)</option>
+                <option value="carla">Carla (Warm Female American)</option>
+              </select>
             </div>
           </div>
         );
 
       case 'progress':
         return (
-          <div className="p-4 h-full">
-            <h2 className="text-xl font-bold text-white mb-4">Progress Tracking</h2>
+          <div className="p-4 h-full overflow-y-auto">
+            <h2 className="text-xl font-bold text-white mb-4">Progress & Analytics</h2>
             
-            {botStats && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-blue-400">{botStats.level}</div>
-                  <div className="text-sm text-gray-400">Level</div>
-                </div>
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="text-lg font-bold text-green-400">{botStats.stage}</div>
-                  <div className="text-sm text-gray-400">Stage</div>
-                </div>
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="text-xl font-bold text-purple-400">{botStats.wordsLearned}</div>
-                  <div className="text-sm text-gray-400">Words Learned</div>
+            {/* Wellness Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg p-4">
+                <div className="text-2xl font-bold text-white">78%</div>
+                <div className="text-sm text-blue-200">Wellness Score</div>
+                <div className="text-xs text-blue-300 mt-1">↗ +5% this week</div>
+              </div>
+              <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-lg p-4">
+                <div className="text-2xl font-bold text-white">12</div>
+                <div className="text-sm text-green-200">Day Streak</div>
+                <div className="text-xs text-green-300 mt-1">Daily check-ins</div>
+              </div>
+              <div className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg p-4">
+                <div className="text-2xl font-bold text-white">8</div>
+                <div className="text-sm text-purple-200">Goals Active</div>
+                <div className="text-xs text-purple-300 mt-1">3 completed this month</div>
+              </div>
+            </div>
+
+            {/* Mood Tracking */}
+            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Mood Tracking</h3>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-gray-300">Today's Mood</span>
+                <div className="flex space-x-2">
+                  {['😢', '😕', '😐', '🙂', '😊'].map((emoji, index) => (
+                    <button key={index} className="text-2xl p-2 rounded-lg hover:bg-gray-700 transition-colors">
+                      {emoji}
+                    </button>
+                  ))}
                 </div>
               </div>
-            )}
+              <div className="bg-gray-700 rounded-lg p-3">
+                <div className="text-sm text-gray-400 mb-1">Weekly Trend</div>
+                <div className="h-8 bg-gradient-to-r from-blue-500 via-green-500 to-yellow-500 rounded opacity-60"></div>
+              </div>
+            </div>
 
+            {/* Therapeutic Goals */}
+            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Active Goals</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">Daily Mindfulness (10 min)</span>
+                  <div className="w-24 bg-gray-700 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{width: '70%'}}></div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">Anxiety Management Skills</span>
+                  <div className="w-24 bg-gray-700 rounded-full h-2">
+                    <div className="bg-blue-500 h-2 rounded-full" style={{width: '45%'}}></div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">Social Connection</span>
+                  <div className="w-24 bg-gray-700 rounded-full h-2">
+                    <div className="bg-purple-500 h-2 rounded-full" style={{width: '30%'}}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Achievement Badges */}
             <div className="bg-gray-800 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-white mb-2">Chat Statistics</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Recent Achievements</h3>
+              <div className="grid grid-cols-4 gap-3">
                 <div className="text-center">
-                  <div className="text-xl font-bold text-blue-400">{messages.length}</div>
-                  <div className="text-sm text-gray-400">Messages</div>
+                  <div className="text-3xl mb-1">🎯</div>
+                  <div className="text-xs text-gray-400">First Goal</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm font-bold text-blue-400">{personalityMode}</div>
-                  <div className="text-sm text-gray-400">Mode</div>
+                  <div className="text-3xl mb-1">💚</div>
+                  <div className="text-xs text-gray-400">Weekly Streak</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl mb-1">🧘</div>
+                  <div className="text-xs text-gray-400">Mindful</div>
+                </div>
+                <div className="text-center opacity-50">
+                  <div className="text-3xl mb-1">🌟</div>
+                  <div className="text-xs text-gray-400">Next Goal</div>
                 </div>
               </div>
             </div>
@@ -597,38 +871,34 @@ const AppLayout = () => {
             <h2 className="text-xl font-bold text-white mb-4">Voice Settings</h2>
             
             <div className="bg-gray-800 rounded-lg p-4 mb-4">
-              <h3 className="text-lg font-semibold text-white mb-3">Audio Status</h3>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-white">Audio Enabled</span>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium text-white ${
-                  audioEnabled ? 'bg-green-500' : 'bg-red-500'
-                }`}>
-                  {audioEnabled ? 'Active' : 'Disabled'}
-                </span>
-              </div>
-              {!audioEnabled && (
-                <button
-                  onClick={enableAudio}
-                  className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
-                >
-                  🔊 Enable Audio
-                </button>
-              )}
-            </div>
-
-            <div className="bg-gray-800 rounded-lg p-4 mb-4">
               <h3 className="text-lg font-semibold text-white mb-3">Voice Selection</h3>
-              <VoiceSelector selectedVoice={selectedReflectionVoice} onVoiceChange={setSelectedReflectionVoice} />
-            </div>
-
-            <div className="bg-gray-800 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-white mb-3">Test Audio</h3>
+              <select
+                value={selectedReflectionVoice}
+                onChange={(e) => setSelectedReflectionVoice(e.target.value)}
+                className="w-full px-3 py-2 border rounded bg-gray-700 text-white border-gray-600 mb-3"
+              >
+                <option value="james">James (Male American)</option>
+                <option value="brian">Brian (Deep Male American)</option>
+                <option value="alexandra">Alexandra (Female American)</option>
+                <option value="carla">Carla (Warm Female American)</option>
+              </select>
+              
               <button
                 onClick={testAudio}
                 className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
               >
-                🔊 Test Carla Voice
+                🔊 Test Selected Voice
               </button>
+            </div>
+
+            <div className="bg-gray-800 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-white mb-3">Audio Status</h3>
+              <div className="flex items-center justify-between">
+                <span className="text-white">ElevenLabs Audio</span>
+                <span className="px-3 py-1 rounded-full text-sm font-medium text-white bg-green-500">
+                  Active
+                </span>
+              </div>
             </div>
           </div>
         );
@@ -715,9 +985,11 @@ const AppLayout = () => {
         <div className="flex justify-around">
           {[
             { id: 'chat', icon: MessageCircle, label: 'Chat' },
-            { id: 'daily', icon: Heart, label: 'Daily' },
-            { id: 'voice', icon: Mic, label: 'Voice' },
+            { id: 'journal', icon: BookOpen, label: 'Journal' },
             { id: 'progress', icon: Target, label: 'Progress' },
+            { id: 'community', icon: Heart, label: 'Community' },
+            { id: 'insights', icon: Brain, label: 'Insights' },
+            { id: 'voice', icon: Mic, label: 'Voice' },
             { id: 'settings', icon: User, label: 'Settings' }
           ].map(({ id, icon: Icon, label }) => (
             <button
@@ -734,17 +1006,7 @@ const AppLayout = () => {
         </div>
       </div>
 
-      {/* Audio Enable Button */}
-      {!audioEnabled && (
-        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50">
-          <button 
-            onClick={enableAudio}
-            className="bg-green-600 text-white px-8 py-4 rounded-xl shadow-lg hover:bg-green-700 transition-colors flex items-center gap-2 animate-pulse text-lg font-bold"
-          >
-            🔊 ACTIVATE AUTHENTIC CARLA VOICE
-          </button>
-        </div>
-      )}
+
 
       {/* Onboarding Overlay */}
       {showOnboarding && (
