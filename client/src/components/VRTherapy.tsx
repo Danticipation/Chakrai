@@ -1,498 +1,382 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Headphones, Play, Pause, Settings, TrendingUp, Eye, Volume2, Shield, Star, Clock, Target, Brain, Activity } from 'lucide-react';
+import { Headphones, Play, Pause, SkipForward, RotateCcw, Zap, Stethoscope, Star, Eye } from 'lucide-react';
 
 interface VREnvironment {
   id: number;
   name: string;
-  category: string;
   description: string;
-  therapeuticFocus: string[];
-  difficulty: string;
-  duration: number;
-  accessibilityFeatures: string[];
-  imageUrl?: string;
-  isAvailable: boolean;
+  environment_type: string;
+  therapeutic_focus: string;
+  difficulty_level: string;
+  duration_minutes: number;
+  trigger_warnings: string[];
+  is_available: boolean;
 }
 
 interface VRSession {
   id: number;
-  userId: number;
-  environmentId: number;
-  environmentName: string;
-  startTime: string;
-  endTime: string;
-  durationMinutes: number;
-  completionStatus: string;
-  effectivenessRating: number;
-  stressLevelBefore: number;
-  stressLevelAfter: number;
-  therapeuticNotes: string;
-  skillsDeveloped: string[];
+  environment_name: string;
+  duration_minutes: number;
+  effectiveness_rating: number;
+  stress_reduction: number;
+  session_notes: string;
+  session_date: string;
+  completion_status: string;
 }
 
 interface VRProgress {
-  userId: number;
-  totalSessions: number;
-  totalMinutes: number;
-  averageEffectiveness: number;
-  averageStressReduction: number;
-  skillLevels: {
-    mindfulness: number;
-    relaxation: number;
-    exposure_therapy: number;
-    emotional_processing: number;
-  };
-  milestones: Array<{
-    id: number;
-    name: string;
-    description: string;
-    achievedDate: string;
-    category: string;
-  }>;
-  nextRecommendations: Array<{
-    environmentId: number;
-    environmentName: string;
-    reason: string;
-    difficulty: string;
-  }>;
+  id: number;
+  total_sessions: number;
+  total_duration: number;
+  average_effectiveness: number;
+  stress_reduction_average: number;
+  skill_development_level: string;
+  milestones_achieved: string[];
 }
 
 const VRTherapy: React.FC = () => {
   const [activeTab, setActiveTab] = useState('environments');
-  const [selectedEnvironment, setSelectedEnvironment] = useState<number | null>(null);
-  const [sessionInProgress, setSessionInProgress] = useState(false);
-  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
 
-  const { data: environments, isLoading: isLoadingEnvironments } = useQuery<VREnvironment[]>({
-    queryKey: ['/api/vr-environments/1'],
-    queryFn: async () => {
-      const response = await fetch('/api/vr-environments/1');
-      return response.json();
-    }
+  const { data: environments } = useQuery<VREnvironment[]>({
+    queryKey: ['/api/vr-environments'],
+    queryFn: () => fetch('/api/vr-environments').then(res => res.json()),
   });
 
-  const { data: sessions, isLoading: isLoadingSessions } = useQuery<VRSession[]>({
+  const { data: sessions } = useQuery<VRSession[]>({
     queryKey: ['/api/vr-sessions/1'],
-    queryFn: async () => {
-      const response = await fetch('/api/vr-sessions/1');
-      return response.json();
-    }
+    queryFn: () => fetch('/api/vr-sessions/1').then(res => res.json()),
   });
 
-  const { data: progress, isLoading: isLoadingProgress } = useQuery<VRProgress>({
+  const { data: progress } = useQuery<VRProgress>({
     queryKey: ['/api/vr-progress/1'],
-    queryFn: async () => {
-      const response = await fetch('/api/vr-progress/1');
-      return response.json();
-    }
+    queryFn: () => fetch('/api/vr-progress/1').then(res => res.json()),
   });
 
-  const getEnvironmentIcon = (category: string) => {
-    switch (category) {
-      case 'mindfulness': return Brain;
-      case 'relaxation': return Volume2;
-      case 'counseling': return Shield;
-      case 'exposure_therapy': return Target;
-      default: return Eye;
-    }
+  const renderEnvironmentsTab = () => {
+    return (
+      <div className="space-y-6">
+        {/* Environment Gallery */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {environments?.map((env) => (
+            <div key={env.id} className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold text-white">{env.name}</h3>
+                <div className="flex items-center space-x-1">
+                  {env.difficulty_level === 'beginner' && <span className="text-green-400">●</span>}
+                  {env.difficulty_level === 'intermediate' && <span className="text-yellow-400">●</span>}
+                  {env.difficulty_level === 'advanced' && <span className="text-red-400">●</span>}
+                  <span className="text-white/60 text-xs capitalize">{env.difficulty_level}</span>
+                </div>
+              </div>
+              
+              <p className="text-white/80 text-sm mb-4">{env.description}</p>
+              
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/60">Focus:</span>
+                  <span className="text-white capitalize">{env.therapeutic_focus}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/60">Duration:</span>
+                  <span className="text-white">{env.duration_minutes} min</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/60">Type:</span>
+                  <span className="text-white capitalize">{env.environment_type}</span>
+                </div>
+              </div>
+
+              {env.trigger_warnings?.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-white/60 text-xs mb-1">Trigger Warnings:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {env.trigger_warnings.map((warning, index) => (
+                      <span key={index} className="px-2 py-1 bg-red-500/20 text-red-200 text-xs rounded">
+                        {warning}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <button 
+                className={`w-full py-2 rounded-lg text-white font-medium ${
+                  env.is_available 
+                    ? 'bg-white/20 hover:bg-white/30' 
+                    : 'bg-gray-500/20 cursor-not-allowed'
+                }`}
+                disabled={!env.is_available}
+              >
+                {env.is_available ? 'Start Experience' : 'Coming Soon'}
+              </button>
+            </div>
+          )) || <p className="text-white/60">No VR environments available</p>}
+        </div>
+      </div>
+    );
   };
 
-  const startVRSession = (environmentId: number) => {
-    setSelectedEnvironment(environmentId);
-    setSessionInProgress(true);
-    setSessionStartTime(new Date());
-  };
+  const renderSessionsTab = () => {
+    return (
+      <div className="space-y-6">
+        {/* Session History */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Recent Sessions</h3>
+          <div className="space-y-4">
+            {sessions?.map((session) => (
+              <div key={session.id} className="p-4 bg-white/10 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-white font-medium">{session.environment_name}</h4>
+                  <span className="text-white/60 text-sm">{session.duration_minutes} min</span>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                  <div className="text-center">
+                    <p className="text-white/60 text-xs">Effectiveness</p>
+                    <div className="flex items-center justify-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-3 h-3 ${i < session.effectiveness_rating ? 'text-yellow-400 fill-current' : 'text-white/30'}`} />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white/60 text-xs">Stress Reduction</p>
+                    <p className="text-white font-bold">{session.stress_reduction}%</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white/60 text-xs">Status</p>
+                    <p className="text-white capitalize">{session.completion_status}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white/60 text-xs">Date</p>
+                    <p className="text-white">{new Date(session.session_date).toLocaleDateString()}</p>
+                  </div>
+                </div>
 
-  const endVRSession = () => {
-    setSessionInProgress(false);
-    setSelectedEnvironment(null);
-    setSessionStartTime(null);
-  };
-
-  const tabs = [
-    { id: 'environments', label: 'VR Environments', icon: Eye },
-    { id: 'sessions', label: 'Session History', icon: Clock },
-    { id: 'progress', label: 'Progress Tracking', icon: TrendingUp },
-    { id: 'settings', label: 'Accessibility', icon: Settings }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Headphones className="text-purple-600" size={48} />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              VR Therapy Studio
-            </h1>
+                {session.session_notes && (
+                  <div className="p-3 bg-white/10 rounded-lg">
+                    <p className="text-white/60 text-xs mb-1">Session Notes:</p>
+                    <p className="text-white/80 text-sm">{session.session_notes}</p>
+                  </div>
+                )}
+              </div>
+            )) || <p className="text-white/60">No sessions recorded</p>}
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Immersive Virtual Reality experiences designed for therapeutic healing, mindfulness practice, and emotional wellness
-          </p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderProgressTab = () => {
+    return (
+      <div className="space-y-6">
+        {/* Progress Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/80">Total Sessions</p>
+                <p className="text-2xl font-bold text-white">{progress?.total_sessions || 0}</p>
+              </div>
+              <div className="p-3 rounded-full bg-white/20">
+                <Headphones className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/80">Total Duration</p>
+                <p className="text-2xl font-bold text-white">{progress?.total_duration || 0}</p>
+                <p className="text-xs text-white/60">minutes</p>
+              </div>
+              <div className="p-3 rounded-full bg-white/20">
+                <Play className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/80">Avg Effectiveness</p>
+                <p className="text-2xl font-bold text-white">{progress?.average_effectiveness || 0}</p>
+                <p className="text-xs text-white/60">out of 5</p>
+              </div>
+              <div className="p-3 rounded-full bg-white/20">
+                <Star className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/80">Stress Reduction</p>
+                <p className="text-2xl font-bold text-white">{progress?.stress_reduction_average || 0}%</p>
+              </div>
+              <div className="p-3 rounded-full bg-white/20">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Progress Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-            <div className="flex items-center gap-3 mb-2">
-              <Clock className="text-blue-600" size={24} />
-              <span className="text-sm font-medium text-gray-600">Total Sessions</span>
+        {/* Skill Development */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Skill Development</h3>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-white/80">Current Level</span>
+            <span className="text-white font-bold capitalize">{progress?.skill_development_level || 'Beginner'}</span>
+          </div>
+          <div className="w-full bg-white/20 rounded-full h-3 mb-4">
+            <div 
+              className="bg-white h-3 rounded-full transition-all duration-300"
+              style={{ 
+                width: `${
+                  progress?.skill_development_level === 'beginner' ? 25 :
+                  progress?.skill_development_level === 'intermediate' ? 50 :
+                  progress?.skill_development_level === 'advanced' ? 75 :
+                  progress?.skill_development_level === 'expert' ? 100 : 0
+                }%` 
+              }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Milestones */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Milestones Achieved</h3>
+          <div className="space-y-2">
+            {progress?.milestones_achieved?.map((milestone, index) => (
+              <div key={index} className="flex items-center space-x-3 p-3 bg-white/10 rounded-lg">
+                <div className="p-2 rounded-full bg-green-500/20">
+                  <Star className="w-4 h-4 text-green-400" />
+                </div>
+                <span className="text-white">{milestone}</span>
+              </div>
+            )) || <p className="text-white/60">No milestones achieved yet</p>}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAccessibilityTab = () => {
+    return (
+      <div className="space-y-6">
+        {/* Accessibility Settings */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Accessibility Features</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Audio Descriptions</p>
+                <p className="text-white/60 text-sm">Narrated guidance for visual elements</p>
+              </div>
+              <div className="w-12 h-6 bg-white/20 rounded-full relative">
+                <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-6 transition-all"></div>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-gray-800">
-              {progress?.totalSessions || 0}
+
+            <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Simplified Controls</p>
+                <p className="text-white/60 text-sm">Reduced complexity for motor limitations</p>
+              </div>
+              <div className="w-12 h-6 bg-white/20 rounded-full relative">
+                <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-all"></div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Motion Sensitivity</p>
+                <p className="text-white/60 text-sm">Reduced motion for comfort</p>
+              </div>
+              <div className="w-12 h-6 bg-white/20 rounded-full relative">
+                <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-all"></div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Trigger Warnings</p>
+                <p className="text-white/60 text-sm">Content warnings before sessions</p>
+              </div>
+              <div className="w-12 h-6 bg-white/20 rounded-full relative">
+                <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-6 transition-all"></div>
+              </div>
             </div>
           </div>
-          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-            <div className="flex items-center gap-3 mb-2">
-              <Activity className="text-green-600" size={24} />
-              <span className="text-sm font-medium text-gray-600">Minutes Practiced</span>
-            </div>
-            <div className="text-2xl font-bold text-gray-800">
-              {sessions?.reduce((total, session) => total + session.durationMinutes, 0) || 0}
-            </div>
+        </div>
+
+        {/* Emergency Features */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Emergency Features</h3>
+          <div className="space-y-3">
+            <button className="w-full p-4 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 rounded-lg text-white">
+              <div className="flex items-center justify-center space-x-2">
+                <Eye className="w-5 h-5" />
+                <span className="font-medium">Panic Exit</span>
+              </div>
+              <p className="text-red-200 text-sm mt-1">Instantly return to safe environment</p>
+            </button>
+
+            <button className="w-full p-4 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/40 rounded-lg text-white">
+              <div className="flex items-center justify-center space-x-2">
+                <Stethoscope className="w-5 h-5" />
+                <span className="font-medium">Grounding Exercise</span>
+              </div>
+              <p className="text-yellow-200 text-sm mt-1">Quick calming technique</p>
+            </button>
           </div>
-          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-            <div className="flex items-center gap-3 mb-2">
-              <Star className="text-yellow-600" size={24} />
-              <span className="text-sm font-medium text-gray-600">Avg Effectiveness</span>
-            </div>
-            <div className="text-2xl font-bold text-gray-800">
-              {sessions?.length ? (sessions.reduce((sum, s) => sum + s.effectivenessRating, 0) / sessions.length).toFixed(1) : '0.0'}
-            </div>
-          </div>
-          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-            <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="text-purple-600" size={24} />
-              <span className="text-sm font-medium text-gray-600">Stress Reduction</span>
-            </div>
-            <div className="text-2xl font-bold text-gray-800">
-              {progress?.averageStressReduction ? `${(progress.averageStressReduction * 10).toFixed(0)}%` : '0%'}
-            </div>
-          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-[#1a237e] p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-white mb-2">VR Therapy Studio</h1>
+          <p className="text-white/80">Immersive therapeutic experiences for mindfulness and healing</p>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-white/20 mb-8">
-          <div className="flex flex-wrap gap-1 p-2">
-            {tabs.map((tab) => {
-              const IconComponent = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-purple-500 text-white shadow-lg'
-                      : 'text-gray-600 hover:bg-white/50'
-                  }`}
-                >
-                  <IconComponent size={20} />
-                  {tab.label}
-                </button>
-              );
-            })}
+        <div className="bg-[#3f51b5] rounded-xl p-1 mb-6 border border-white/20">
+          <div className="flex space-x-1">
+            {[
+              { id: 'environments', label: 'VR Environments', icon: Headphones },
+              { id: 'sessions', label: 'Session History', icon: Play },
+              { id: 'progress', label: 'Progress Tracking', icon: Star },
+              { id: 'accessibility', label: 'Accessibility', icon: Eye },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-[#1a237e] text-white shadow-sm'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                <span className="font-medium">{tab.label}</span>
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'environments' && (
-          <div className="space-y-6">
-            {isLoadingEnvironments ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading VR environments...</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {environments && environments.length > 0 ? environments.map((env) => {
-                  const IconComponent = getEnvironmentIcon(env.category);
-                  return (
-                    <div key={env.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <IconComponent className="text-purple-600" size={24} />
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-800">{env.name}</h3>
-                            <p className="text-sm text-gray-600 capitalize">{env.category.replace('_', ' ')}</p>
-                          </div>
-                        </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          env.difficulty === 'beginner' ? 'bg-green-100 text-green-700' :
-                          env.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'
-                        }`}>
-                          {env.difficulty}
-                        </span>
-                      </div>
-                      
-                      <p className="text-gray-700 mb-4">{env.description}</p>
-                      
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {env.therapeuticFocus.slice(0, 3).map((focus, index) => (
-                          <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
-                            {focus.replace('_', ' ')}
-                          </span>
-                        ))}
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Clock size={16} />
-                          <span>{env.duration} minutes</span>
-                        </div>
-                        <button
-                          onClick={() => startVRSession(env.id)}
-                          disabled={sessionInProgress}
-                          className="px-4 py-2 bg-purple-500 text-white rounded-lg text-sm hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                        >
-                          <Play size={16} />
-                          {sessionInProgress && selectedEnvironment === env.id ? 'In Session' : 'Start Session'}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                }) : (
-                  <div className="text-center py-8 col-span-2">
-                    <p className="text-gray-600">No VR environments available</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'sessions' && (
-          <div className="space-y-6">
-            {isLoadingSessions ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading session history...</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {sessions && sessions.length > 0 ? sessions.map((session) => (
-                  <div key={session.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800">{session.environmentName}</h3>
-                        <p className="text-sm text-gray-600">{new Date(session.startTime).toLocaleDateString()}</p>
-                      </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        session.completionStatus === 'completed' ? 'bg-green-100 text-green-700' :
-                        session.completionStatus === 'in_progress' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {session.completionStatus.replace('_', ' ')}
-                      </span>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-gray-800">{session.durationMinutes}m</div>
-                        <div className="text-xs text-gray-600">Duration</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-gray-800">{session.effectivenessRating}/5</div>
-                        <div className="text-xs text-gray-600">Effectiveness</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-gray-800">
-                          {((session.stressLevelBefore - session.stressLevelAfter) / session.stressLevelBefore * 100).toFixed(0)}%
-                        </div>
-                        <div className="text-xs text-gray-600">Stress Reduction</div>
-                      </div>
-                    </div>
-                    
-                    <p className="text-gray-700 text-sm">{session.therapeuticNotes}</p>
-                  </div>
-                )) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-600">No session history available</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'progress' && (
-          <div className="space-y-6">
-            {isLoadingProgress ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading progress data...</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Skill Development</h3>
-                  {progress?.skillLevels && Object.entries(progress.skillLevels).map(([skill, level]) => (
-                    <div key={skill} className="mb-3">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-700 capitalize">{skill.replace('_', ' ')}</span>
-                        <span className="text-gray-600">{level.toFixed(1)}/10</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-purple-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${(level / 10) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Milestones</h3>
-                  <div className="space-y-3">
-                    {progress?.milestones?.slice(0, 5).map((milestone) => (
-                      <div key={milestone.id} className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Star className="text-purple-600" size={16} />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-gray-800">{milestone.name}</h4>
-                          <p className="text-sm text-gray-600">{milestone.description}</p>
-                          <p className="text-xs text-gray-500">{new Date(milestone.achievedDate).toLocaleDateString()}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'settings' && (
-          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-            <h3 className="text-lg font-semibold text-gray-800 mb-6">Accessibility Settings</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-800">Audio Descriptions</h4>
-                    <p className="text-sm text-gray-600">Detailed voice descriptions of visual elements</p>
-                  </div>
-                  <button className="w-12 h-6 bg-purple-500 rounded-full relative">
-                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1"></div>
-                  </button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-800">Simplified Controls</h4>
-                    <p className="text-sm text-gray-600">Reduced complexity for easier navigation</p>
-                  </div>
-                  <button className="w-12 h-6 bg-gray-300 rounded-full relative">
-                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 left-1"></div>
-                  </button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-800">Motion Sensitivity</h4>
-                    <p className="text-sm text-gray-600">Reduce motion for comfort</p>
-                  </div>
-                  <select className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                    <option>Low</option>
-                    <option>Medium</option>
-                    <option>High</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-800">Trigger Warnings</h4>
-                    <p className="text-sm text-gray-600">Alert before potentially triggering content</p>
-                  </div>
-                  <button className="w-12 h-6 bg-purple-500 rounded-full relative">
-                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1"></div>
-                  </button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-800">Voice Guidance</h4>
-                    <p className="text-sm text-gray-600">Spoken instructions during sessions</p>
-                  </div>
-                  <button className="w-12 h-6 bg-purple-500 rounded-full relative">
-                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1"></div>
-                  </button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-gray-800">High Contrast</h4>
-                    <p className="text-sm text-gray-600">Enhanced visual contrast for clarity</p>
-                  </div>
-                  <button className="w-12 h-6 bg-gray-300 rounded-full relative">
-                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 left-1"></div>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Session in Progress Modal */}
-        {sessionInProgress && selectedEnvironment && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">VR Session in Progress</h3>
-              <p className="text-gray-600 mb-4">
-                You are currently in a therapeutic VR session. When you're ready to end the session, please provide feedback below.
-              </p>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Session Effectiveness (1-5)
-                  </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                    <option value="">Select rating</option>
-                    <option value="1">1 - Not effective</option>
-                    <option value="2">2 - Slightly effective</option>
-                    <option value="3">3 - Moderately effective</option>
-                    <option value="4">4 - Very effective</option>
-                    <option value="5">5 - Extremely effective</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Session Notes
-                  </label>
-                  <textarea 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none"
-                    rows={3}
-                    placeholder="How did this session help you?"
-                  ></textarea>
-                </div>
-              </div>
-              
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={endVRSession}
-                  className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-                >
-                  End Session
-                </button>
-                <button
-                  onClick={() => setSessionInProgress(false)}
-                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-                >
-                  Continue Session
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === 'environments' && renderEnvironmentsTab()}
+        {activeTab === 'sessions' && renderSessionsTab()}
+        {activeTab === 'progress' && renderProgressTab()}
+        {activeTab === 'accessibility' && renderAccessibilityTab()}
       </div>
     </div>
   );

@@ -1,359 +1,399 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Calendar, Video, Phone, MapPin, Plus, Share2, Settings, User, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import axios from 'axios';
-import type { Therapist, TherapistSession, TherapistSharedInsight, CollaborationSettings } from '@shared/schema';
-import { format } from 'date-fns';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { UserCheck, Calendar, FileText, Settings, Video, Phone, MapPin, Clock, Star, MessageSquare } from 'lucide-react';
 
-interface TherapistPortalProps {
-  userId: string;
+interface Therapist {
+  id: number;
+  name: string;
+  license_number: string;
+  specialization: string[];
+  contact_email: string;
+  contact_phone: string;
+  location: string;
+  is_verified: boolean;
+  rating: number;
+  bio: string;
 }
 
-export default function TherapistPortal({ userId }: TherapistPortalProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'sessions' | 'insights' | 'settings'>('overview');
-  const [showAddTherapist, setShowAddTherapist] = useState(false);
-  const [showScheduleSession, setShowScheduleSession] = useState(false);
-  const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
+interface TherapistSession {
+  id: number;
+  therapist_name: string;
+  session_type: string;
+  scheduled_time: string;
+  duration_minutes: number;
+  session_status: string;
+  meeting_link: string;
+  preparation_notes: string;
+}
 
-  const queryClient = useQueryClient();
+interface SharedInsight {
+  id: number;
+  therapist_name: string;
+  insight_type: string;
+  content: string;
+  shared_date: string;
+  user_consent: boolean;
+}
 
-  // Fetch therapists
-  const { data: therapists, isLoading: therapistsLoading } = useQuery({
-    queryKey: ['/api/therapists', userId],
-    queryFn: async () => {
-      const response = await axios.get(`/api/therapists?userId=${userId}`);
-      return response.data as Therapist[];
-    },
+interface CollaborationSettings {
+  id: number;
+  auto_share_journal: boolean;
+  share_mood_patterns: boolean;
+  share_progress_metrics: boolean;
+  share_crisis_alerts: boolean;
+  sharing_frequency: string;
+}
+
+const TherapistPortal: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const { data: therapists } = useQuery<Therapist[]>({
+    queryKey: ['/api/therapists'],
+    queryFn: () => fetch('/api/therapists').then(res => res.json()),
   });
 
-  // Fetch upcoming sessions
-  const { data: sessions, isLoading: sessionsLoading } = useQuery({
-    queryKey: ['/api/therapist-sessions', userId],
-    queryFn: async () => {
-      const response = await axios.get(`/api/therapist-sessions?userId=${userId}`);
-      return response.data as TherapistSession[];
-    },
+  const { data: sessions } = useQuery<TherapistSession[]>({
+    queryKey: ['/api/therapist-sessions/1'],
+    queryFn: () => fetch('/api/therapist-sessions/1').then(res => res.json()),
   });
 
-  // Fetch shared insights
-  const { data: insights, isLoading: insightsLoading } = useQuery({
-    queryKey: ['/api/therapist-insights', userId],
-    queryFn: async () => {
-      const response = await axios.get(`/api/therapist-insights?userId=${userId}`);
-      return response.data as TherapistSharedInsight[];
-    },
+  const { data: insights } = useQuery<SharedInsight[]>({
+    queryKey: ['/api/therapist-shared-insights/1'],
+    queryFn: () => fetch('/api/therapist-shared-insights/1').then(res => res.json()),
   });
 
-  // Fetch collaboration settings
-  const { data: settings, isLoading: settingsLoading } = useQuery({
-    queryKey: ['/api/collaboration-settings', userId],
-    queryFn: async () => {
-      const response = await axios.get(`/api/collaboration-settings?userId=${userId}`);
-      return response.data as CollaborationSettings;
-    },
+  const { data: settings } = useQuery<CollaborationSettings>({
+    queryKey: ['/api/collaboration-settings/1'],
+    queryFn: () => fetch('/api/collaboration-settings/1').then(res => res.json()),
   });
 
-  // Add therapist mutation
-  const addTherapistMutation = useMutation({
-    mutationFn: async (therapistData: any) => {
-      const response = await axios.post('/api/therapists', therapistData);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/therapists', userId] });
-      setShowAddTherapist(false);
-    },
-  });
-
-  // Schedule session mutation
-  const scheduleSessionMutation = useMutation({
-    mutationFn: async (sessionData: any) => {
-      const response = await axios.post('/api/therapist-sessions', sessionData);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/therapist-sessions', userId] });
-      setShowScheduleSession(false);
-    },
-  });
-
-  // Share insight mutation
-  const shareInsightMutation = useMutation({
-    mutationFn: async (insightData: any) => {
-      const response = await axios.post('/api/therapist-insights', insightData);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/therapist-insights', userId] });
-    },
-  });
-
-  const upcomingSessions = sessions?.filter(s => 
-    s.status === 'scheduled' && new Date(s.scheduledAt) > new Date()
-  ).sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()) || [];
-
-  const recentInsights = insights?.slice(0, 3) || [];
-
-  if (therapistsLoading || sessionsLoading) {
+  const renderOverviewTab = () => {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: 'var(--soft-blue)' }}></div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="p-4 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-          Therapist Collaboration Portal
-        </h1>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          Connect with professional therapists and share insights from your mental wellness journey
-        </p>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="flex space-x-1 mb-6 rounded-xl p-1" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-        {[
-          { id: 'overview', label: 'Overview', icon: User },
-          { id: 'sessions', label: 'Sessions', icon: Calendar },
-          { id: 'insights', label: 'Shared Insights', icon: Share2 },
-          { id: 'settings', label: 'Settings', icon: Settings },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === tab.id
-                  ? 'text-white shadow-sm'
-                  : 'text-white hover:text-gray-200'
-              }`}
-              style={{
-                backgroundColor: activeTab === tab.id ? 'var(--soft-blue)' : 'transparent',
-              }}
-            >
-              <Icon size={16} />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Overview Tab */}
-      {activeTab === 'overview' && (
-        <div className="space-y-6">
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Connected Therapists</p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{therapists?.length || 0}</p>
-                </div>
-                <User className="h-8 w-8" style={{ color: 'var(--soft-blue)' }} />
-              </div>
-            </div>
-            
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Upcoming Sessions</p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{upcomingSessions.length}</p>
-                </div>
-                <Calendar className="h-8 w-8" style={{ color: 'var(--pale-green)' }} />
-              </div>
-            </div>
-            
-            <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Shared Insights</p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{insights?.length || 0}</p>
-                </div>
-                <Share2 className="h-8 w-8" style={{ color: 'var(--gentle-lavender)' }} />
-              </div>
-            </div>
-          </div>
-
-          {/* Connected Therapists */}
-          <div className="rounded-2xl p-6 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Your Therapists</h3>
-              <button
-                onClick={() => setShowAddTherapist(true)}
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-white shadow-sm hover:shadow-md transition-all"
-                style={{ backgroundColor: 'var(--soft-blue)' }}
-              >
-                <Plus size={16} />
-                <span>Add Therapist</span>
-              </button>
-            </div>
-
-            {therapists?.length === 0 ? (
-              <div className="text-center py-8">
-                <User className="h-12 w-12 mx-auto mb-4 opacity-50" style={{ color: 'var(--text-secondary)' }} />
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  No therapists connected yet. Add your first therapist to start collaborating.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {therapists?.map((therapist) => (
-                  <div key={therapist.id} className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--soft-blue-light)' }}>
-                        <User size={20} style={{ color: 'var(--soft-blue)' }} />
-                      </div>
-                      <div>
-                        <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{therapist.name}</p>
-                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{therapist.email}</p>
-                        {therapist.specialization && (
-                          <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                            {therapist.specialization.join(', ')}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {therapist.isVerified && (
-                        <CheckCircle size={16} style={{ color: 'var(--pale-green)' }} />
-                      )}
-                      <button
-                        onClick={() => {
-                          setSelectedTherapist(therapist);
-                          setShowScheduleSession(true);
-                        }}
-                        className="px-3 py-1 rounded-lg text-sm font-medium text-white"
-                        style={{ backgroundColor: 'var(--soft-blue)' }}
-                      >
-                        Schedule Session
-                      </button>
+      <div className="space-y-6">
+        {/* Connected Therapists */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Connected Therapists</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {therapists?.map((therapist) => (
+              <div key={therapist.id} className="p-4 bg-white/10 rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h4 className="text-white font-medium">{therapist.name}</h4>
+                    <p className="text-white/60 text-sm">License: {therapist.license_number}</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {therapist.is_verified && <UserCheck className="w-4 h-4 text-green-400" />}
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                      <span className="text-white text-sm">{therapist.rating}</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
 
-          {/* Upcoming Sessions */}
-          {upcomingSessions.length > 0 && (
-            <div className="rounded-2xl p-6 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Upcoming Sessions</h3>
-              <div className="space-y-3">
-                {upcomingSessions.slice(0, 3).map((session) => {
-                  const therapist = therapists?.find(t => t.id === session.therapistId);
-                  const sessionDate = new Date(session.scheduledAt);
-                  const Icon = session.sessionType === 'video' ? Video : session.sessionType === 'phone' ? Phone : MapPin;
-                  
-                  return (
-                    <div key={session.id} className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
-                      <div className="flex items-center space-x-3">
-                        <Icon size={20} style={{ color: 'var(--soft-blue)' }} />
-                        <div>
-                          <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{therapist?.name}</p>
-                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            {format(sessionDate, 'MMM d, yyyy')} at {format(sessionDate, 'h:mm a')}
-                          </p>
-                          <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                            {session.duration} minutes • {session.sessionType}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Clock size={16} style={{ color: 'var(--text-secondary)' }} />
-                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          {Math.round((sessionDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                <div className="space-y-2 mb-3">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <MapPin className="w-3 h-3 text-white/60" />
+                    <span className="text-white/80">{therapist.location}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {therapist.specialization?.map((spec, index) => (
+                      <span key={index} className="px-2 py-1 bg-white/20 text-white text-xs rounded">
+                        {spec}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="text-white/70 text-sm mb-3 line-clamp-2">{therapist.bio}</p>
+
+                <div className="flex space-x-2">
+                  <button className="flex-1 bg-white/20 hover:bg-white/30 text-white py-2 px-3 rounded text-sm flex items-center justify-center space-x-1">
+                    <Calendar className="w-3 h-3" />
+                    <span>Schedule</span>
+                  </button>
+                  <button className="flex-1 bg-white/20 hover:bg-white/30 text-white py-2 px-3 rounded text-sm flex items-center justify-center space-x-1">
+                    <MessageSquare className="w-3 h-3" />
+                    <span>Message</span>
+                  </button>
+                </div>
+              </div>
+            )) || <p className="text-white/60">No therapists connected</p>}
+          </div>
+        </div>
+
+        {/* Upcoming Sessions */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Upcoming Sessions</h3>
+          <div className="space-y-3">
+            {sessions?.slice(0, 3).map((session) => (
+              <div key={session.id} className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-full bg-white/20">
+                    {session.session_type === 'video' && <Video className="w-4 h-4 text-white" />}
+                    {session.session_type === 'phone' && <Phone className="w-4 h-4 text-white" />}
+                    {session.session_type === 'in_person' && <MapPin className="w-4 h-4 text-white" />}
+                  </div>
+                  <div>
+                    <p className="font-medium text-white">{session.therapist_name}</p>
+                    <p className="text-sm text-white/60 capitalize">{session.session_type} session</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-white font-medium">
+                    {new Date(session.scheduled_time).toLocaleDateString()}
+                  </p>
+                  <p className="text-xs text-white/60">{session.duration_minutes} min</p>
+                </div>
+              </div>
+            )) || <p className="text-white/60">No upcoming sessions</p>}
+          </div>
+        </div>
+
+        {/* Recent Insights */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Recent Shared Insights</h3>
+          <div className="space-y-3">
+            {insights?.slice(0, 3).map((insight) => (
+              <div key={insight.id} className="p-4 bg-white/10 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white font-medium">{insight.therapist_name}</span>
+                  <span className="text-white/60 text-sm">{new Date(insight.shared_date).toLocaleDateString()}</span>
+                </div>
+                <p className="text-white/80 text-sm mb-2 capitalize">{insight.insight_type}</p>
+                <p className="text-white/70 text-sm line-clamp-2">{insight.content}</p>
+              </div>
+            )) || <p className="text-white/60">No insights shared yet</p>}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSessionsTab = () => {
+    return (
+      <div className="space-y-6">
+        {/* Session Management */}
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-white">Session Management</h3>
+          <button className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+            <Calendar className="w-4 h-4" />
+            <span>Schedule Session</span>
+          </button>
+        </div>
+
+        {/* Sessions List */}
+        <div className="space-y-4">
+          {sessions?.map((session) => (
+            <div key={session.id} className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-white font-semibold">{session.therapist_name}</h4>
+                  <p className="text-white/60 text-sm capitalize">{session.session_type} session</p>
+                </div>
+                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  session.session_status === 'scheduled' ? 'bg-blue-500/20 text-blue-200' :
+                  session.session_status === 'completed' ? 'bg-green-500/20 text-green-200' :
+                  session.session_status === 'cancelled' ? 'bg-red-500/20 text-red-200' :
+                  'bg-white/20 text-white'
+                }`}>
+                  {session.session_status}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                  <p className="text-white/60 text-xs">Date & Time</p>
+                  <p className="text-white font-medium">{new Date(session.scheduled_time).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-white/60 text-xs">Duration</p>
+                  <p className="text-white font-medium">{session.duration_minutes} minutes</p>
+                </div>
+                <div>
+                  <p className="text-white/60 text-xs">Type</p>
+                  <p className="text-white font-medium capitalize">{session.session_type}</p>
+                </div>
+                <div>
+                  <p className="text-white/60 text-xs">Status</p>
+                  <p className="text-white font-medium capitalize">{session.session_status}</p>
+                </div>
+              </div>
+
+              {session.preparation_notes && (
+                <div className="p-3 bg-white/10 rounded-lg mb-4">
+                  <p className="text-white/60 text-xs mb-1">Session Preparation:</p>
+                  <p className="text-white/80 text-sm">{session.preparation_notes}</p>
+                </div>
+              )}
+
+              <div className="flex space-x-2">
+                {session.meeting_link && session.session_status === 'scheduled' && (
+                  <button className="bg-green-500/20 hover:bg-green-500/30 text-green-200 py-2 px-4 rounded text-sm flex items-center space-x-1">
+                    <Video className="w-3 h-3" />
+                    <span>Join Session</span>
+                  </button>
+                )}
+                <button className="bg-white/20 hover:bg-white/30 text-white py-2 px-4 rounded text-sm">
+                  Reschedule
+                </button>
+                <button className="bg-red-500/20 hover:bg-red-500/30 text-white py-2 px-4 rounded text-sm">
+                  Cancel
+                </button>
               </div>
             </div>
-          )}
+          )) || <p className="text-white/60">No sessions scheduled</p>}
+        </div>
+      </div>
+    );
+  };
 
-          {/* Recent Shared Insights */}
-          {recentInsights.length > 0 && (
-            <div className="rounded-2xl p-6 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Recent Shared Insights</h3>
-              <div className="space-y-3">
-                {recentInsights.map((insight) => {
-                  const therapist = therapists?.find(t => t.id === insight.therapistId);
-                  
-                  return (
-                    <div key={insight.id} className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
-                      <div className="flex items-center space-x-3">
-                        <Share2 size={20} style={{ color: 'var(--gentle-lavender)' }} />
-                        <div>
-                          <p className="font-medium" style={{ color: 'var(--text-primary)' }}>
-                            {insight.insightType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                          </p>
-                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            Shared with {therapist?.name} • {format(new Date(insight.sharedAt), 'MMM d, yyyy')}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {insight.therapistViewed ? (
-                          <CheckCircle size={16} style={{ color: 'var(--pale-green)' }} />
-                        ) : (
-                          <AlertCircle size={16} style={{ color: 'var(--text-secondary)' }} />
-                        )}
-                        <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          {insight.therapistViewed ? 'Viewed' : 'Pending'}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+  const renderCollaborationTab = () => {
+    return (
+      <div className="space-y-6">
+        {/* Collaboration Settings */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Data Sharing Preferences</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Auto-Share Journal Summaries</p>
+                <p className="text-white/60 text-sm">Weekly therapeutic insights from journal entries</p>
+              </div>
+              <div className={`w-12 h-6 rounded-full relative ${settings?.auto_share_journal ? 'bg-green-500' : 'bg-white/20'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${settings?.auto_share_journal ? 'left-6' : 'left-0.5'}`}></div>
               </div>
             </div>
-          )}
-        </div>
-      )}
 
-      {/* Sessions Tab */}
-      {activeTab === 'sessions' && (
-        <div className="space-y-6">
-          {/* Session scheduling interface will be implemented here */}
-          <div className="rounded-2xl p-6 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Session Management</h3>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Schedule and manage your therapy sessions with connected professionals.
-            </p>
+            <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Share Mood Patterns</p>
+                <p className="text-white/60 text-sm">Emotional trends and pattern analysis</p>
+              </div>
+              <div className={`w-12 h-6 rounded-full relative ${settings?.share_mood_patterns ? 'bg-green-500' : 'bg-white/20'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${settings?.share_mood_patterns ? 'left-6' : 'left-0.5'}`}></div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Progress Metrics</p>
+                <p className="text-white/60 text-sm">Goal completion and wellness tracking</p>
+              </div>
+              <div className={`w-12 h-6 rounded-full relative ${settings?.share_progress_metrics ? 'bg-green-500' : 'bg-white/20'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${settings?.share_progress_metrics ? 'left-6' : 'left-0.5'}`}></div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Crisis Alerts</p>
+                <p className="text-white/60 text-sm">Immediate notifications for high-risk indicators</p>
+              </div>
+              <div className={`w-12 h-6 rounded-full relative ${settings?.share_crisis_alerts ? 'bg-green-500' : 'bg-white/20'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${settings?.share_crisis_alerts ? 'left-6' : 'left-0.5'}`}></div>
+              </div>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Insights Tab */}
-      {activeTab === 'insights' && (
-        <div className="space-y-6">
-          {/* Insight sharing interface will be implemented here */}
-          <div className="rounded-2xl p-6 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Shared Insights</h3>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              View and manage insights shared with your therapists.
-            </p>
+        {/* Sharing Frequency */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Sharing Frequency</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {['daily', 'weekly', 'monthly'].map((freq) => (
+              <button
+                key={freq}
+                className={`p-4 rounded-lg border transition-all ${
+                  settings?.sharing_frequency === freq
+                    ? 'bg-white/20 border-white/40 text-white'
+                    : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/15'
+                }`}
+              >
+                <div className="text-center">
+                  <Clock className="w-6 h-6 mx-auto mb-2" />
+                  <p className="font-medium capitalize">{freq}</p>
+                  <p className="text-sm opacity-80">
+                    {freq === 'daily' && 'Real-time updates'}
+                    {freq === 'weekly' && 'Weekly summaries'}
+                    {freq === 'monthly' && 'Monthly reports'}
+                  </p>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
-      )}
 
-      {/* Settings Tab */}
-      {activeTab === 'settings' && (
-        <div className="space-y-6">
-          {/* Collaboration settings interface will be implemented here */}
-          <div className="rounded-2xl p-6 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Collaboration Settings</h3>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Configure how your data is shared with therapists.
-            </p>
+        {/* Privacy Notice */}
+        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4">Privacy & Consent</h3>
+          <div className="space-y-3">
+            <div className="flex items-start space-x-3 p-3 bg-white/10 rounded-lg">
+              <UserCheck className="w-5 h-5 text-green-400 mt-0.5" />
+              <div>
+                <p className="text-white font-medium">Encrypted Sharing</p>
+                <p className="text-white/70 text-sm">All shared data is encrypted end-to-end</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3 p-3 bg-white/10 rounded-lg">
+              <UserCheck className="w-5 h-5 text-green-400 mt-0.5" />
+              <div>
+                <p className="text-white font-medium">Revocable Consent</p>
+                <p className="text-white/70 text-sm">You can revoke sharing permissions at any time</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3 p-3 bg-white/10 rounded-lg">
+              <UserCheck className="w-5 h-5 text-green-400 mt-0.5" />
+              <div>
+                <p className="text-white font-medium">Professional Ethics</p>
+                <p className="text-white/70 text-sm">All therapists bound by professional confidentiality</p>
+              </div>
+            </div>
           </div>
         </div>
-      )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-[#1a237e] p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-white mb-2">Therapist Collaboration</h1>
+          <p className="text-white/80">Professional integration for hybrid therapy support</p>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="bg-[#3f51b5] rounded-xl p-1 mb-6 border border-white/20">
+          <div className="flex space-x-1">
+            {[
+              { id: 'overview', label: 'Overview', icon: UserCheck },
+              { id: 'sessions', label: 'Sessions', icon: Calendar },
+              { id: 'collaboration', label: 'Collaboration', icon: Settings },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-[#1a237e] text-white shadow-sm'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                <span className="font-medium">{tab.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && renderOverviewTab()}
+        {activeTab === 'sessions' && renderSessionsTab()}
+        {activeTab === 'collaboration' && renderCollaborationTab()}
+      </div>
     </div>
   );
-}
+};
+
+export default TherapistPortal;
