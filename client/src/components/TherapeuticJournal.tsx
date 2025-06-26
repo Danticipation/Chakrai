@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Save, Plus, Calendar, Tag, Heart, Smile, Meh, Frown, AlertCircle, Send } from 'lucide-react';
+import { Mic, MicOff, Save, Plus, Calendar, Tag, Heart, Smile, Meh, Frown, AlertCircle, Send, Brain, BarChart3, Download, FileText, TrendingUp } from 'lucide-react';
 
 interface JournalEntry {
   id?: number;
@@ -10,6 +10,21 @@ interface JournalEntry {
   tags: string[];
   isPrivate: boolean;
   createdAt?: string;
+  aiAnalysis?: {
+    sentiment: number;
+    emotionalPatterns: string[];
+    themes: string[];
+    riskLevel: string;
+    insights: string;
+  };
+}
+
+interface JournalAnalytics {
+  emotionalJourney: Array<{ date: string; sentiment: number; mood: string }>;
+  recurringThemes: Array<{ theme: string; frequency: number }>;
+  sentimentTrend: number;
+  riskIndicators: string[];
+  therapeuticProgress: string;
 }
 
 interface TherapeuticJournalProps {
@@ -33,6 +48,10 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   const [recentEntries, setRecentEntries] = useState<JournalEntry[]>([]);
   const [newTag, setNewTag] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState('write');
+  const [analytics, setAnalytics] = useState<JournalAnalytics | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInsights, setAiInsights] = useState<string>('');
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -218,6 +237,9 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
         // Refresh recent entries
         fetchRecentEntries();
         
+        // Trigger AI analysis for the saved entry
+        analyzeEntry(savedEntry);
+        
         if (onEntryCreated) {
           onEntryCreated(savedEntry);
         }
@@ -231,6 +253,98 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
       setIsSaving(false);
     }
   };
+
+  const analyzeEntry = async (savedEntry: JournalEntry) => {
+    setIsAnalyzing(true);
+    try {
+      const response = await fetch('/api/journal/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId,
+          entryId: savedEntry.id,
+          content: savedEntry.content,
+          mood: savedEntry.mood,
+          moodIntensity: savedEntry.moodIntensity
+        })
+      });
+
+      if (response.ok) {
+        const analysis = await response.json();
+        setAiInsights(analysis.insights || 'Analysis completed successfully');
+        
+        // Check for crisis indicators
+        if (analysis.riskLevel === 'high' || analysis.riskLevel === 'critical') {
+          alert(`Important: We've detected you may be going through a difficult time. Please consider reaching out for support. Crisis Hotline: 988`);
+        }
+      }
+    } catch (error) {
+      console.error('Error analyzing entry:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      const response = await fetch(`/api/journal/analytics/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setAnalytics(data.analytics);
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    }
+  };
+
+  const exportTherapistReport = async () => {
+    try {
+      const response = await fetch(`/api/journal/export/therapist/${userId}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `therapist-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch (error) {
+      console.error('Error exporting therapist report:', error);
+      alert('Failed to export therapist report. Please try again.');
+    }
+  };
+
+  const exportPersonalInsights = async () => {
+    try {
+      const response = await fetch(`/api/journal/export/insights/${userId}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `personal-insights-${new Date().toISOString().slice(0, 10)}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch (error) {
+      console.error('Error exporting personal insights:', error);
+      alert('Failed to export personal insights. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    fetchRecentEntries();
+    if (activeTab === 'analytics') {
+      fetchAnalytics();
+    }
+  }, [userId, activeTab]);
 
   const selectedMood = moodOptions.find(mood => mood.value === entry.mood) || moodOptions[2];
 
