@@ -1848,6 +1848,201 @@ app.post('/api/sync-device', async (req, res) => {
   }
 });
 
+// VR Therapy API endpoints
+app.get('/api/vr-environments/:userId', async (req, res) => {
+  try {
+    const environments = [
+      {
+        id: 1,
+        name: 'Peaceful Beach Meditation',
+        description: 'A serene beach setting with gentle waves and calming ocean sounds for mindfulness practice.',
+        category: 'mindfulness',
+        difficulty: 'beginner',
+        duration: 15,
+        therapeuticFocus: ['anxiety_reduction', 'relaxation', 'mindfulness'],
+        accessibilityFeatures: ['audio_descriptions', 'simplified_controls', 'motion_sensitivity_low'],
+        imageUrl: '/vr-beach.jpg',
+        isAvailable: true
+      },
+      {
+        id: 2,
+        name: 'Mountain Forest Relaxation',
+        description: 'Immersive forest environment with nature sounds for stress reduction and grounding exercises.',
+        category: 'relaxation',
+        difficulty: 'beginner',
+        duration: 20,
+        therapeuticFocus: ['stress_reduction', 'grounding', 'nature_therapy'],
+        accessibilityFeatures: ['audio_descriptions', 'trigger_warnings', 'motion_sensitivity_medium'],
+        imageUrl: '/vr-forest.jpg',
+        isAvailable: true
+      },
+      {
+        id: 3,
+        name: 'Safe Space Therapy Room',
+        description: 'A comfortable, customizable therapy room for guided counseling sessions and emotional processing.',
+        category: 'counseling',
+        difficulty: 'intermediate',
+        duration: 30,
+        therapeuticFocus: ['emotional_processing', 'trauma_recovery', 'safe_space'],
+        accessibilityFeatures: ['full_audio_support', 'customizable_lighting', 'motion_sensitivity_low'],
+        imageUrl: '/vr-therapy-room.jpg',
+        isAvailable: true
+      },
+      {
+        id: 4,
+        name: 'Anxiety Exposure Training',
+        description: 'Controlled exposure therapy environment for gradually building confidence in challenging situations.',
+        category: 'exposure_therapy',
+        difficulty: 'advanced',
+        duration: 25,
+        therapeuticFocus: ['anxiety_management', 'exposure_therapy', 'confidence_building'],
+        accessibilityFeatures: ['panic_button', 'intensity_controls', 'therapist_guidance'],
+        imageUrl: '/vr-exposure.jpg',
+        isAvailable: true
+      }
+    ];
+    res.json(environments);
+  } catch (error) {
+    console.error('Error fetching VR environments:', error);
+    res.status(500).json({ error: 'Failed to fetch VR environments' });
+  }
+});
+
+app.get('/api/vr-sessions/:userId', async (req, res) => {
+  try {
+    const sessions = [
+      {
+        id: 1,
+        userId: parseInt(req.params.userId),
+        environmentId: 1,
+        environmentName: 'Peaceful Beach Meditation',
+        startTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        endTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 15 * 60 * 1000).toISOString(),
+        durationMinutes: 15,
+        completionStatus: 'completed',
+        effectivenessRating: 4.2,
+        stressLevelBefore: 7.5,
+        stressLevelAfter: 3.2,
+        therapeuticNotes: 'Excellent progress with breathing exercises. User reported feeling much calmer.',
+        skillsDeveloped: ['deep_breathing', 'mindfulness', 'present_moment_awareness']
+      },
+      {
+        id: 2,
+        userId: parseInt(req.params.userId),
+        environmentId: 2,
+        environmentName: 'Mountain Forest Relaxation',
+        startTime: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        endTime: new Date(Date.now() - 24 * 60 * 60 * 1000 + 20 * 60 * 1000).toISOString(),
+        durationMinutes: 20,
+        completionStatus: 'completed',
+        effectivenessRating: 4.6,
+        stressLevelBefore: 6.8,
+        stressLevelAfter: 2.9,
+        therapeuticNotes: 'Strong connection with nature environment. User showed improved grounding skills.',
+        skillsDeveloped: ['grounding_techniques', 'nature_connection', 'stress_reduction']
+      },
+      {
+        id: 3,
+        userId: parseInt(req.params.userId),
+        environmentId: 3,
+        environmentName: 'Safe Space Therapy Room',
+        startTime: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+        endTime: new Date(Date.now() - 4 * 60 * 60 * 1000 + 25 * 60 * 1000).toISOString(),
+        durationMinutes: 25,
+        completionStatus: 'in_progress',
+        effectivenessRating: 4.1,
+        stressLevelBefore: 8.2,
+        stressLevelAfter: 4.5,
+        therapeuticNotes: 'Working through emotional processing. Good progress with self-reflection.',
+        skillsDeveloped: ['emotional_awareness', 'self_reflection', 'coping_strategies']
+      }
+    ];
+    res.json(sessions);
+  } catch (error) {
+    console.error('Error fetching VR sessions:', error);
+    res.status(500).json({ error: 'Failed to fetch VR sessions' });
+  }
+});
+
+app.get('/api/vr-progress/:userId', async (req, res) => {
+  try {
+    const progress = {
+      userId: parseInt(req.params.userId),
+      totalSessions: 15,
+      totalMinutes: 320,
+      averageEffectiveness: 4.3,
+      averageStressReduction: 4.2,
+      skillLevels: {
+        mindfulness: 7.2,
+        relaxation: 8.1,
+        exposure_therapy: 5.8,
+        emotional_processing: 6.9
+      },
+      milestones: [
+        {
+          id: 1,
+          name: 'First VR Session',
+          description: 'Completed your first virtual reality therapy session',
+          achievedDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          category: 'engagement'
+        },
+        {
+          id: 2,
+          name: 'Mindfulness Master',
+          description: 'Completed 10 mindfulness VR sessions',
+          achievedDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          category: 'skill_development'
+        },
+        {
+          id: 3,
+          name: 'Stress Warrior',
+          description: 'Achieved consistent stress reduction of 50% or more',
+          achievedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          category: 'therapeutic_progress'
+        }
+      ],
+      nextRecommendations: [
+        {
+          environmentId: 4,
+          environmentName: 'Anxiety Exposure Training',
+          reason: 'Ready to tackle more challenging scenarios based on your progress',
+          difficulty: 'advanced'
+        }
+      ]
+    };
+    res.json(progress);
+  } catch (error) {
+    console.error('Error fetching VR progress:', error);
+    res.status(500).json({ error: 'Failed to fetch VR progress' });
+  }
+});
+
+app.post('/api/vr-sessions', async (req, res) => {
+  try {
+    const { userId, environmentId, durationMinutes, effectivenessRating, stressLevelBefore, stressLevelAfter, notes } = req.body;
+    
+    const newSession = {
+      id: Date.now(),
+      userId,
+      environmentId,
+      startTime: new Date().toISOString(),
+      endTime: new Date(Date.now() + durationMinutes * 60 * 1000).toISOString(),
+      durationMinutes,
+      completionStatus: 'completed',
+      effectivenessRating,
+      stressLevelBefore,
+      stressLevelAfter,
+      therapeuticNotes: notes || 'VR therapy session completed successfully.',
+      skillsDeveloped: ['mindfulness', 'relaxation']
+    };
+    
+    res.json({ success: true, session: newSession });
+  } catch (error) {
+    console.error('Error creating VR session:', error);
+    res.status(500).json({ error: 'Failed to create VR session' });
+  }
+});
+
 // Journal Analytics Dashboard
 app.get('/api/journal/analytics/:userId', async (req, res) => {
   try {
