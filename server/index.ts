@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import multer from 'multer';
 import { setupVite, serveStatic, log } from "./vite.js";
 import { storage } from './storage.js';
+import { analyzeEmotionalState } from './emotionalAnalysis.js';
+import { openai } from './openaiRetry.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -728,6 +730,180 @@ app.get('/api/achievements/:userId', async (req, res) => {
   } catch (error) {
     console.error('Achievements fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch achievements' });
+  }
+});
+
+// Advanced Emotional Intelligence API Endpoints
+
+// 1. Real-time Emotional Detection
+app.post('/api/emotional-intelligence/analyze', async (req, res) => {
+  try {
+    const { message, userId = 1 } = req.body;
+    
+    const emotionalAnalysis = await analyzeEmotionalState(message, [], userId);
+    
+    // Store emotional context for pattern analysis
+    await storage.createEmotionalContext({
+      userId,
+      sessionId: `session_${Date.now()}`,
+      currentMood: emotionalAnalysis.primaryEmotion,
+      intensity: Math.round(emotionalAnalysis.intensity * 10),
+      volatility: emotionalAnalysis.arousal,
+      urgency: emotionalAnalysis.riskLevel,
+      recentTriggers: [],
+      supportNeeds: emotionalAnalysis.recommendedActions || [],
+      contextData: emotionalAnalysis
+    });
+    
+    res.json({
+      success: true,
+      analysis: emotionalAnalysis,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Emotional analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze emotional state' });
+  }
+});
+
+// 2. Mood Forecasting
+app.post('/api/emotional-intelligence/mood-forecast/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    // Generate mood forecast using recent mood data
+    const recentMoods = await storage.getMoodEntries(userId, 14);
+    const forecast = await generateMoodForecast(userId, recentMoods);
+    
+    res.json({
+      success: true,
+      forecast,
+      generatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Mood forecast error:', error);
+    res.status(500).json({ error: 'Failed to generate mood forecast' });
+  }
+});
+
+// 3. Contextual Response Adaptation
+app.post('/api/emotional-intelligence/adapt-response', async (req, res) => {
+  try {
+    const { originalMessage, userMessage, userId = 1, emotionalState } = req.body;
+    
+    const adaptedResponse = await generateContextualResponse(
+      originalMessage, 
+      emotionalState, 
+      userId
+    );
+    
+    // Store adaptation for learning
+    await storage.createEmotionalResponseAdaptation({
+      userId,
+      originalMessage: userMessage,
+      adaptedResponse: adaptedResponse.response,
+      tone: adaptedResponse.tone,
+      intensity: adaptedResponse.intensity,
+      responseLength: adaptedResponse.responseLength,
+      communicationStyle: adaptedResponse.communicationStyle,
+      priorityFocus: adaptedResponse.priorityFocus || []
+    });
+    
+    res.json({
+      success: true,
+      adaptedResponse,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Response adaptation error:', error);
+    res.status(500).json({ error: 'Failed to adapt response' });
+  }
+});
+
+// 4. Crisis Detection and Response
+app.post('/api/emotional-intelligence/crisis-detection', async (req, res) => {
+  try {
+    const { message, userId = 1 } = req.body;
+    
+    const crisisAnalysis = await detectCrisisSignals(message, userId);
+    
+    // Log crisis detection attempt
+    await storage.createCrisisDetectionLog({
+      userId,
+      messageContent: message,
+      riskLevel: crisisAnalysis.riskLevel,
+      crisisIndicators: crisisAnalysis.indicators || [],
+      confidenceScore: crisisAnalysis.confidence,
+      interventionTriggered: crisisAnalysis.riskLevel === 'critical',
+      interventionType: crisisAnalysis.riskLevel === 'critical' ? 'immediate' : null,
+      followUpScheduled: crisisAnalysis.riskLevel !== 'low'
+    });
+    
+    res.json({
+      success: true,
+      crisisDetected: crisisAnalysis.riskLevel !== 'low',
+      riskLevel: crisisAnalysis.riskLevel,
+      interventionRequired: crisisAnalysis.riskLevel === 'critical',
+      supportResources: crisisAnalysis.supportResources || [],
+      analysis: crisisAnalysis
+    });
+  } catch (error) {
+    console.error('Crisis detection error:', error);
+    res.status(500).json({ error: 'Failed to perform crisis detection' });
+  }
+});
+
+// 5. Emotional Pattern Analysis
+app.get('/api/emotional-intelligence/patterns/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const timeframe = req.query.timeframe || '30';
+    
+    const patterns = await analyzeEmotionalPatterns(userId, parseInt(timeframe));
+    
+    res.json({
+      success: true,
+      patterns,
+      timeframeDays: parseInt(timeframe),
+      generatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Pattern analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze emotional patterns' });
+  }
+});
+
+// Dashboard overview for emotional intelligence
+app.get('/api/emotional-intelligence/dashboard/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    const [forecasts, insights, adaptations, crisisLogs] = await Promise.all([
+      storage.getMoodForecasts ? storage.getMoodForecasts(userId, 5) : [],
+      storage.getPredictiveInsights ? storage.getPredictiveInsights(userId, 5) : [],
+      storage.getEmotionalResponseAdaptations ? storage.getEmotionalResponseAdaptations(userId, 5) : [],
+      storage.getCrisisDetectionLogs ? storage.getCrisisDetectionLogs(userId, 10) : []
+    ]);
+    
+    res.json({
+      success: true,
+      overview: {
+        totalForecasts: forecasts.length,
+        averageAccuracy: 0.75, // Placeholder - would calculate from actual data
+        activeInsights: insights.filter(i => i.isActive).length,
+        adaptationEffectiveness: 0.82, // Placeholder
+        emotionalStability: 0.68 // Placeholder
+      },
+      recentActivity: {
+        forecasts: forecasts.slice(0, 3),
+        insights: insights.slice(0, 3),
+        adaptations: adaptations.slice(0, 3),
+        crisisEvents: crisisLogs.filter(log => log.riskLevel !== 'low').slice(0, 3)
+      }
+    });
+  } catch (error) {
+    console.error('Dashboard error:', error);
+    res.status(500).json({ error: 'Failed to load dashboard data' });
   }
 });
 
