@@ -10,6 +10,7 @@ import PersonalityReflection from './components/PersonalityReflection';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import WellnessRewards from './components/WellnessRewards';
 import CommunitySupport from './components/CommunitySupport';
+import AdaptiveLearning from './components/AdaptiveLearning';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -411,6 +412,9 @@ const AppLayout = () => {
       case 'community':
         return <CommunitySupport />;
 
+      case 'adaptive':
+        return <AdaptiveLearning />;
+
       case 'goals':
         return (
           <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
@@ -509,6 +513,7 @@ const AppLayout = () => {
             { id: 'analytics', icon: BarChart3, label: 'Analytics' },
             { id: 'rewards', icon: Gift, label: 'Rewards' },
             { id: 'community', icon: User, label: 'Community' },
+            { id: 'adaptive', icon: Star, label: 'AI Learning' },
             { id: 'goals', icon: Target, label: 'Goals' }
           ].map((tab) => (
             <button
