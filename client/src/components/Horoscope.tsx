@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Sparkles, RefreshCw } from 'lucide-react';
+import { Star, Sparkles, RefreshCw, Volume2, VolumeX } from 'lucide-react';
 
 interface HoroscopeData {
   sign: string;
@@ -17,6 +17,8 @@ export default function Horoscope() {
   const [horoscopeData, setHoroscopeData] = useState<HoroscopeData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
 
   const fetchHoroscope = async (sign: string) => {
     setLoading(true);
@@ -54,6 +56,68 @@ export default function Horoscope() {
 
   const handleRefresh = () => {
     fetchHoroscope(selectedSign);
+  };
+
+  const handleVoiceToggle = async () => {
+    if (!horoscopeData) return;
+
+    if (isPlaying && currentAudio) {
+      // Stop current audio
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentAudio(null);
+      return;
+    }
+
+    try {
+      setIsPlaying(true);
+      
+      // Call the text-to-speech API
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: horoscopeData.horoscope,
+          voice: 'carla',
+          emotionalContext: 'calming'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Voice synthesis failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.audioUrl && data.audioUrl.length > 10000) {
+        // ElevenLabs audio detected
+        const audio = new Audio(data.audioUrl);
+        setCurrentAudio(audio);
+        
+        audio.onended = () => {
+          setIsPlaying(false);
+          setCurrentAudio(null);
+        };
+        
+        audio.onerror = () => {
+          setIsPlaying(false);
+          setCurrentAudio(null);
+          setError('Audio playback failed');
+        };
+        
+        await audio.play();
+      } else {
+        throw new Error('No audio data received');
+      }
+    } catch (error) {
+      console.error('Voice synthesis error:', error);
+      setIsPlaying(false);
+      setCurrentAudio(null);
+      setError('Voice reading failed. Please try again.');
+    }
   };
 
   return (
@@ -115,11 +179,28 @@ export default function Horoscope() {
               </div>
             ) : horoscopeData ? (
               <div>
-                <div className="flex items-center space-x-2 mb-4">
-                  <Sparkles className="text-purple-300" size={20} />
-                  <h2 className="text-xl font-bold text-white">
-                    {horoscopeData.sign} - {horoscopeData.date}
-                  </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <Sparkles className="text-purple-300" size={20} />
+                    <h2 className="text-xl font-bold text-white">
+                      {horoscopeData.sign} - {horoscopeData.date}
+                    </h2>
+                  </div>
+                  <button
+                    onClick={handleVoiceToggle}
+                    disabled={loading}
+                    className="p-2 rounded-lg bg-[#7986cb]/50 hover:bg-[#7986cb]/70 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                    title={isPlaying ? "Stop reading" : "Read aloud"}
+                  >
+                    {isPlaying ? (
+                      <VolumeX className="text-white" size={20} />
+                    ) : (
+                      <Volume2 className="text-white" size={20} />
+                    )}
+                    <span className="text-sm text-white hidden sm:inline">
+                      {isPlaying ? "Stop" : "Listen"}
+                    </span>
+                  </button>
                 </div>
                 <p className="text-white/90 leading-relaxed text-lg">
                   {horoscopeData.horoscope}
