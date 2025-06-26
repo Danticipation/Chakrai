@@ -494,26 +494,26 @@ const AppLayout = () => {
   }
 
   return (
-    <div className="h-screen bg-[#1a237e] flex flex-col">
+    <div className="h-screen bg-[#0a0e1a] flex flex-col">
       {/* Top Header - Three Sections */}
-      <div className="bg-[#1a237e] p-4 grid grid-cols-3 gap-4 h-24">
+      <div className="bg-[#0a0e1a] p-4 grid grid-cols-3 gap-4 h-24">
         {/* Horoscope Section */}
-        <div className="bg-[#3949ab] rounded-lg p-3 flex flex-col">
+        <div className="bg-purple-700 rounded-lg p-3 flex flex-col">
           <h3 className="text-sm font-bold text-white mb-1 underline">Horoscope</h3>
-          <p className="text-xs text-white/90 line-clamp-2">
+          <p className="text-xs text-white line-clamp-2">
             {horoscopeText ? horoscopeText.substring(0, 80) + '...' : "Your cosmic guidance awaits..."}
           </p>
         </div>
         
         {/* Logo Section */}
-        <div className="bg-white rounded-lg p-3 flex items-center justify-center">
+        <div className="bg-[#0a0e1a] rounded-lg p-3 flex items-center justify-center border border-white">
           <img src={traiLogo} alt="TrAI" className="h-12 w-auto" />
         </div>
         
         {/* Affirmation Section */}
-        <div className="bg-[#3949ab] rounded-lg p-3 flex flex-col">
+        <div className="bg-purple-700 rounded-lg p-3 flex flex-col">
           <h3 className="text-sm font-bold text-white mb-1 underline">Affirmation</h3>
-          <p className="text-xs text-white/90 line-clamp-2">
+          <p className="text-xs text-white line-clamp-2">
             {dailyAffirmation.substring(0, 80)}...
           </p>
         </div>
@@ -527,7 +527,7 @@ const AppLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex">
         {/* Left Sidebar Navigation - Evenly spaced */}
-        <div className="w-32 bg-[#2d3748] flex flex-col justify-center py-8 space-y-3">
+        <div className="w-32 bg-[#0a0e1a] flex flex-col justify-center py-8 space-y-3">
           {[
             { id: 'chat', label: 'Chat' },
             { id: 'daily', label: 'Reflection' },
@@ -544,7 +544,7 @@ const AppLayout = () => {
               className={`mx-2 h-10 px-2 text-sm font-bold transition-colors rounded ${
                 activeSection === tab.id
                   ? 'bg-red-600 text-white'
-                  : 'bg-[#4a5568] text-white hover:bg-red-500'
+                  : 'bg-red-600 text-white hover:bg-red-500'
               }`}
             >
               {tab.label}
@@ -553,10 +553,10 @@ const AppLayout = () => {
         </div>
 
         {/* Center Chat Area - Fixed size, centered with empty space */}
-        <div className="flex-1 flex justify-center items-center">
-          <div className="w-96 h-80 bg-[#2d3748] rounded-lg relative">
-            <div className="absolute inset-4 bg-[#1a202c] rounded">
-              <div className="text-center text-red-500 text-xl font-bold pt-6">Chat Box</div>
+        <div className="flex-1 flex justify-center items-center bg-[#0a0e1a]">
+          <div className="w-96 h-80 bg-[#0a0e1a] rounded-lg relative border border-white">
+            <div className="absolute inset-4 bg-[#0a0e1a] rounded">
+              <div className="text-center text-white text-xl font-bold pt-6">Chat Box</div>
               {renderActiveSection()}
               
               {/* Chat Input at Bottom */}
@@ -567,7 +567,7 @@ const AppLayout = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                   placeholder="Share your thoughts"
-                  className="flex-1 px-3 py-2 bg-[#2d3748] text-white border border-[#4a5568] rounded text-sm"
+                  className="flex-1 px-3 py-2 bg-blue-600 text-white border border-blue-500 rounded text-sm placeholder-white/70"
                 />
                 <button
                   onClick={isRecording ? stopRecording : startRecording}
@@ -593,49 +593,49 @@ const AppLayout = () => {
         </div>
 
         {/* Right Stats Sidebar - Real progress tracking */}
-        <div className="w-48 bg-[#5c85d6] py-4 px-3">
+        <div className="w-48 bg-[#0a0e1a] py-4 px-3">
           <div className="text-white text-base font-bold mb-4 text-center underline">Stats or goal tracking</div>
           
           {/* Real Progress Tracking */}
           <div className="space-y-3">
             {/* Daily Journaling Progress */}
-            <div className="bg-white/20 rounded p-2">
+            <div className="bg-purple-700 rounded p-2">
               <div className="text-white text-xs font-bold mb-1">Daily Journaling</div>
-              <div className="bg-white/30 rounded-full h-2 mb-1">
+              <div className="bg-[#0a0e1a] rounded-full h-2 mb-1">
                 <div className="bg-green-400 h-2 rounded-full" style={{width: '75%'}}></div>
               </div>
               <div className="text-white text-xs">15/20 days this month</div>
             </div>
 
             {/* Weekly Chat Sessions */}
-            <div className="bg-white/20 rounded p-2">
+            <div className="bg-purple-700 rounded p-2">
               <div className="text-white text-xs font-bold mb-1">Weekly Chat Goal</div>
-              <div className="bg-white/30 rounded-full h-2 mb-1">
+              <div className="bg-[#0a0e1a] rounded-full h-2 mb-1">
                 <div className="bg-blue-400 h-2 rounded-full" style={{width: '60%'}}></div>
               </div>
               <div className="text-white text-xs">3/5 sessions this week</div>
             </div>
 
             {/* Mood Tracking Consistency */}
-            <div className="bg-white/20 rounded p-2">
+            <div className="bg-purple-700 rounded p-2">
               <div className="text-white text-xs font-bold mb-1">Mood Tracking</div>
-              <div className="bg-white/30 rounded-full h-2 mb-1">
+              <div className="bg-[#0a0e1a] rounded-full h-2 mb-1">
                 <div className="bg-yellow-400 h-2 rounded-full" style={{width: '90%'}}></div>
               </div>
               <div className="text-white text-xs">27/30 days tracked</div>
             </div>
 
             {/* App Usage Streak */}
-            <div className="bg-white/20 rounded p-2">
+            <div className="bg-purple-700 rounded p-2">
               <div className="text-white text-xs font-bold mb-1">App Usage Streak</div>
-              <div className="bg-white/30 rounded-full h-2 mb-1">
+              <div className="bg-[#0a0e1a] rounded-full h-2 mb-1">
                 <div className="bg-purple-400 h-2 rounded-full" style={{width: '85%'}}></div>
               </div>
               <div className="text-white text-xs">17 consecutive days</div>
             </div>
 
             {/* Overall Wellness Score */}
-            <div className="bg-white/20 rounded p-2 text-center">
+            <div className="bg-purple-700 rounded p-2 text-center">
               <div className="text-white text-xs font-bold mb-1">Overall Wellness</div>
               <div className="text-white text-lg font-bold">85%</div>
               <div className="text-white text-xs">This month</div>
