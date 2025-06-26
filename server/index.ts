@@ -25,7 +25,7 @@ const upload = multer({
 // Chat endpoint with OpenAI integration and personality mirroring
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, userId = 1 } = req.body;
+    const { message, voice = 'carla', userId = 1 } = req.body;
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -109,13 +109,13 @@ Use their own words, phrases, and communication patterns when appropriate. Refer
       'carla': 'l32B8XDoylOsZKiSdfhE'
     };
 
-    const requestedVoice = voice || 'carla';
-    const voiceId = voiceMap[requestedVoice] || voiceMap['carla'];
+    const selectedVoice = voice || 'carla';
+    const voiceId = voiceMap[selectedVoice] || voiceMap['carla'];
     let audioUrl = null;
 
     if (process.env.ELEVENLABS_API_KEY) {
       try {
-        console.log(`Making ElevenLabs request for voice: ${requestedVoice} (ID: ${voiceId})`);
+        console.log(`Making ElevenLabs request for voice: ${voice} (ID: ${voiceId})`);
         console.log(`Text to synthesize: "${aiResponse.substring(0, 50)}..."`);
         
         const elevenLabsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
@@ -162,7 +162,7 @@ Use their own words, phrases, and communication patterns when appropriate. Refer
       message: aiResponse,
       response: aiResponse,
       audioUrl: audioUrl,
-      voiceUsed: requestedVoice,
+      voiceUsed: voice,
       wordsLearned: 1000,
       stage: "Therapist",
       crisisDetected: false,
