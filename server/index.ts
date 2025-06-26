@@ -15,6 +15,14 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// ALL API ROUTES MUST BE REGISTERED BEFORE VITE MIDDLEWARE
+// to prevent Vite's catch-all from intercepting API calls
+
+// Use API routes from routes.js
+console.log('Loading routes module...');
+app.use('/api', routes);
+console.log('Routes module loaded successfully');
+
 // Direct bot stats endpoint to fix immediate JSON parsing error
 app.get('/api/bot-stats', (req, res) => {
   res.json({ 
@@ -38,8 +46,16 @@ app.get('/api/weekly-summary', (req, res) => {
   });
 });
 
-// Use API routes
-app.use('/api', routes);
+// TEMPORARY: Direct user endpoint to fix frontend loading issue
+app.get('/api/user/current', (req, res) => {
+  res.json({
+    id: 1,
+    username: 'user',
+    displayName: 'User',
+    hasCompletedOnboarding: true,
+    createdAt: new Date().toISOString()
+  });
+});
 
 // Setup Vite in development or serve static files in production
 async function setupServer() {
