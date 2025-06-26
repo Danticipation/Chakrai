@@ -571,16 +571,16 @@ const AppLayout = () => {
           </button>
         </div>
 
-        {/* Chat Area - Smaller */}
-        <div className="flex-1 bg-[#2d3748] m-4 mr-2 rounded-lg relative max-w-2xl">
+        {/* Chat Area - Much Smaller */}
+        <div className="w-52 bg-[#2d3748] m-4 mr-2 rounded-lg relative">
           <div className="absolute inset-4 bg-[#1a202c] rounded border-2 border-[#4a5568]">
             <div className="text-center text-white text-base font-medium pt-4 pb-2">Chat box</div>
             {renderActiveSection()}
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        <div className="w-64 bg-[#3949ab] m-4 ml-2 rounded-lg p-4 relative">
+        {/* Right Sidebar - Takes Most Space */}
+        <div className="flex-1 bg-[#3949ab] m-4 ml-2 rounded-lg p-4 relative">
           <div className="bg-white rounded p-3 mb-4">
             <div className="text-[#1a237e] font-bold text-sm mb-2">Goals & Stats</div>
             {botStats && (
