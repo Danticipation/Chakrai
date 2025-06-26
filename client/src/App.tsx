@@ -591,15 +591,15 @@ const AppLayout = () => {
           </div>
         </div>
 
-        {/* Right Stats Sidebar - Narrower */}
-        <div className="w-64 bg-[#5c85d6] m-2 rounded-lg p-3">
-          <div className="text-white text-lg font-bold mb-4 text-center underline">Stats or goal tracking</div>
+        {/* Right Stats Sidebar - Much Narrower */}
+        <div className="w-32 bg-[#5c85d6] m-2 rounded-lg p-2">
+          <div className="text-white text-sm font-bold mb-3 text-center underline">Stats or goal tracking</div>
           
-          {/* Mock Chart Circles - Smaller */}
-          <div className="space-y-4">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+          {/* Mock Chart Circles - Much Smaller */}
+          <div className="space-y-3">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
           </div>
         </div>
       </div>
