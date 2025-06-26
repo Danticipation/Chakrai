@@ -122,7 +122,7 @@ const upload = multer({
 // Chat endpoint with OpenAI integration and personality mirroring
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, voice = 'carla', userId = 1 } = req.body;
+    const { message, voice = 'carla', userId = 1, personalityMode = 'friend' } = req.body;
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -154,6 +154,19 @@ Mirror this user's communication style, personality traits, and mannerisms back 
       console.log('Could not load personality data:', error.message);
     }
     
+    // Personality mode configurations
+    const personalityModes = {
+      friend: `Act as a supportive friend - warm, understanding, and conversational. Use casual language and show genuine care for their wellbeing.`,
+      council: `Act as a wise counselor - provide thoughtful guidance, ask reflective questions, and offer therapeutic insights with professional warmth.`,
+      study: `Act as a study companion - focused on learning, productivity, and academic goals. Help organize thoughts and provide educational support.`,
+      diary: `Act as a reflective diary companion - encourage deep self-reflection, journaling, and processing emotions through writing and introspection.`,
+      'goal-setting': `Act as a goal-setting coach - motivational, structured, and action-oriented. Help break down objectives and track progress systematically.`,
+      wellness: `Act as a wellness guide - focus on physical and mental health, self-care practices, mindfulness, and overall wellbeing strategies.`,
+      creative: `Act as a creative collaborator - imaginative, inspiring, and artistic. Encourage creative expression, brainstorming, and innovative thinking.`
+    };
+    
+    const modeInstruction = personalityModes[personalityMode] || personalityModes.friend;
+    
     // OpenAI API call with personality mirroring
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -167,6 +180,8 @@ Mirror this user's communication style, personality traits, and mannerisms back 
           {
             role: 'system',
             content: `You are TrAI, a therapeutic companion that mirrors the user's personality back to them for self-reflection. Your core purpose is to reflect their identity, communication style, and mannerisms to help them see themselves clearly.
+
+${modeInstruction}
 
 Be supportive and therapeutic while authentically mirroring their:
 - Communication patterns and style

@@ -57,6 +57,10 @@ export interface IStorage {
   getUserFactsByUserId(userId: number): Promise<UserFact[]>;
   createUserFact(data: InsertUserFact): Promise<UserFact>;
   
+  // Personality mirroring methods
+  getUserMemories(userId: number): Promise<UserMemory[]>;
+  getUserFacts(userId: number): Promise<UserFact[]>;
+  
   // Journal Entries
   createJournalEntry(data: InsertJournalEntry): Promise<JournalEntry>;
   getJournalEntries(userId: number): Promise<JournalEntry[]>;
@@ -355,6 +359,19 @@ export class DbStorage implements IStorage {
       .where(eq(emotionalContexts.userId, userId))
       .orderBy(desc(emotionalContexts.createdAt))
       .limit(limit);
+  }
+
+  // Personality mirroring implementation
+  async getUserMemories(userId: number): Promise<UserMemory[]> {
+    return await this.db.select().from(userMemories)
+      .where(eq(userMemories.userId, userId))
+      .orderBy(desc(userMemories.createdAt));
+  }
+
+  async getUserFacts(userId: number): Promise<UserFact[]> {
+    return await this.db.select().from(userFacts)
+      .where(eq(userFacts.userId, userId))
+      .orderBy(desc(userFacts.createdAt));
   }
 }
 
