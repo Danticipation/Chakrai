@@ -101,9 +101,68 @@ Use their own words, phrases, and communication patterns when appropriate. Refer
     const aiResponse = openaiData.choices[0].message.content;
     console.log('OpenAI response received:', aiResponse.substring(0, 50) + '...');
 
+    // Generate ElevenLabs voice synthesis
+    const voiceMap: Record<string, string> = {
+      'james': 'EkK5I93UQWFDigLMpZcX',
+      'brian': 'nPczCjzI2devNBz1zQrb', 
+      'alexandra': 'kdmDKE6EkgrWrrykO9Qt',
+      'carla': 'l32B8XDoylOsZKiSdfhE'
+    };
+
+    const requestedVoice = voice || 'carla';
+    const voiceId = voiceMap[requestedVoice] || voiceMap['carla'];
+    let audioUrl = null;
+
+    if (process.env.ELEVENLABS_API_KEY) {
+      try {
+        console.log(`Making ElevenLabs request for voice: ${requestedVoice} (ID: ${voiceId})`);
+        console.log(`Text to synthesize: "${aiResponse.substring(0, 50)}..."`);
+        
+        const elevenLabsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'audio/mpeg',
+            'Content-Type': 'application/json',
+            'xi-api-key': process.env.ELEVENLABS_API_KEY
+          } as HeadersInit,
+          body: JSON.stringify({
+            text: aiResponse,
+            model_id: 'eleven_monolingual_v1',
+            voice_settings: {
+              stability: 0.6,
+              similarity_boost: 0.8,
+              style: 0.2,
+              use_speaker_boost: true
+            }
+          })
+        });
+
+        console.log('ElevenLabs response status:', elevenLabsResponse.status);
+
+        if (elevenLabsResponse.ok) {
+          const audioBuffer = await elevenLabsResponse.arrayBuffer();
+          const base64Audio = Buffer.from(audioBuffer).toString('base64');
+          
+          console.log(`Audio buffer size: ${audioBuffer.byteLength}`);
+          console.log(`Base64 audio length: ${base64Audio.length}`);
+          
+          audioUrl = base64Audio;
+        } else {
+          const errorText = await elevenLabsResponse.text();
+          console.error('ElevenLabs API error:', elevenLabsResponse.status, errorText);
+        }
+      } catch (elevenLabsError: any) {
+        console.error('ElevenLabs request failed:', elevenLabsError);
+      }
+    } else {
+      console.error('ELEVENLABS_API_KEY not configured');
+    }
+
     res.json({
       message: aiResponse,
       response: aiResponse,
+      audioUrl: audioUrl,
+      voiceUsed: requestedVoice,
       wordsLearned: 1000,
       stage: "Therapist",
       crisisDetected: false,
