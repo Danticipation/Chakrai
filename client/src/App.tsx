@@ -505,8 +505,8 @@ const AppLayout = () => {
         {/* Center Content Area - Different layouts based on active section */}
         <div className="flex-1 flex justify-center items-center">
           {activeSection === 'chat' ? (
-            /* Chat Panel - Light blue background as requested */
-            <div className="w-[576px] h-[480px] bg-[#3f51b5] rounded-lg relative">
+            /* Chat Panel - Light blue background as requested - DOUBLED SIZE */
+            <div className="w-[1152px] h-[960px] bg-[#3f51b5] rounded-lg relative">
               <div className="absolute inset-4 bg-[#3f51b5] rounded">
                 <div className="text-center text-white text-xl font-bold pt-6">Chat Box</div>
                 
