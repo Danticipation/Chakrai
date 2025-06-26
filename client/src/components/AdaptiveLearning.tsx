@@ -393,7 +393,7 @@ const AdaptiveLearning: React.FC = () => {
         {activeTab === 'exercises' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {cbtExercises?.map((exercise) => {
+              {Array.isArray(cbtExercises) ? cbtExercises.map((exercise) => {
                 const IconComponent = getExerciseIcon(exercise.exerciseType);
                 return (
                   <div key={exercise.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
@@ -457,7 +457,11 @@ const AdaptiveLearning: React.FC = () => {
                     </div>
                   </div>
                 );
-              })}
+              }) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No CBT exercises available</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -465,7 +469,7 @@ const AdaptiveLearning: React.FC = () => {
         {activeTab === 'recommendations' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {wellnessRecommendations?.map((rec) => {
+              {Array.isArray(wellnessRecommendations) ? wellnessRecommendations.map((rec) => {
                 const IconComponent = getRecommendationIcon(rec.recommendationType);
                 return (
                   <div key={rec.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
@@ -515,7 +519,11 @@ const AdaptiveLearning: React.FC = () => {
                     </div>
                   </div>
                 );
-              })}
+              }) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No wellness recommendations available</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -523,7 +531,7 @@ const AdaptiveLearning: React.FC = () => {
         {activeTab === 'insights' && (
           <div className="space-y-6">
             <div className="space-y-4">
-              {adaptationInsights?.map((insight) => (
+              {Array.isArray(adaptationInsights) ? adaptationInsights.map((insight) => (
                 <div key={insight.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                   <div className="flex items-start justify-between mb-4">
                     <div>
@@ -563,7 +571,11 @@ const AdaptiveLearning: React.FC = () => {
                     </span>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No adaptation insights available</p>
+                </div>
+              )}
             </div>
           </div>
         )}
