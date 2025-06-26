@@ -528,7 +528,7 @@ const AppLayout = () => {
             onClick={() => setActiveSection('logo')}
             className="bg-[#0a0e1a] rounded-lg p-6 flex flex-col items-center justify-center border-2 border-white hover:border-purple-400 transition-colors cursor-pointer"
           >
-            <img src={traiLogo} alt="TrAI" className="h-48 w-auto mb-4 -mt-1" />
+            <img src={traiLogo} alt="TrAI" className="h-48 w-auto mb-4 -mt-2.5" />
             <p className="text-lg text-white/70 font-bold">TraI Mental Wellness</p>
             <p className="text-sm text-white/50 mt-2">Click for more info</p>
           </button>
