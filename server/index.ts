@@ -1100,7 +1100,7 @@ app.post('/api/analytics/monthly-report', async (req, res) => {
       milestonesAchieved: [
         metrics.wellnessScore >= 75 ? 'Strong emotional stability achieved' : null,
         engagement >= 60 ? 'Excellent therapeutic engagement' : null
-      ].filter(Boolean)
+      ].filter(Boolean) as string[]
     });
 
     res.json({
@@ -1162,7 +1162,7 @@ app.get('/api/analytics/dashboard/:userId', async (req, res) => {
     const moodTrend = recentMoods.slice(0, 30).map(mood => ({
       date: mood.createdAt,
       value: mood.intensity || 5,
-      emotion: mood.primaryEmotion
+      emotion: mood.mood || 'neutral'
     }));
 
     const wellnessTrend = wellnessMetrics.map(metric => ({
@@ -1186,7 +1186,7 @@ app.get('/api/analytics/dashboard/:userId', async (req, res) => {
           moodTrend: moodTrend,
           wellnessTrend: wellnessTrend,
           emotionDistribution: recentMoods.reduce((acc, mood) => {
-            const emotion = mood.primaryEmotion || 'neutral';
+            const emotion = mood.mood || 'neutral';
             acc[emotion] = (acc[emotion] || 0) + 1;
             return acc;
           }, {} as Record<string, number>),
@@ -1257,7 +1257,7 @@ app.post('/api/analytics/risk-assessment', async (req, res) => {
       userId,
       assessmentDate: new Date(),
       riskLevel,
-      riskScore,
+      riskScore: parseFloat(riskScore.toFixed(2)),
       riskFactors,
       protectiveFactors,
       recommendations: [
@@ -1336,7 +1336,7 @@ app.get('/api/analytics/trends/:userId', async (req, res) => {
       trendType: trendType || 'wellness',
       timeframe,
       trendDirection: currentMetrics.wellnessScore >= 70 ? 'improving' : currentMetrics.wellnessScore >= 50 ? 'stable' : 'declining',
-      trendStrength: Math.abs(currentVolatility - 2.0),
+      trendStrength: parseFloat(Math.abs(currentVolatility - 2.0).toFixed(2)),
       dataPoints: {
         currentWellness: currentMetrics.wellnessScore,
         currentVolatility: currentVolatility,

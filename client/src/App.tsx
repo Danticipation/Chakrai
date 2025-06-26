@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart } from 'lucide-react';
+import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, BarChart3 } from 'lucide-react';
 import axios from 'axios';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import OnboardingQuiz from './components/OnboardingQuiz';
 import TherapeuticJournal from './components/TherapeuticJournal';
 import PersonalityReflection from './components/PersonalityReflection';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -494,6 +495,7 @@ const AppLayout = () => {
             { id: 'daily', icon: Brain, label: 'Reflection' },
             { id: 'chat', icon: MessageCircle, label: 'Chat' },
             { id: 'journal', icon: BookOpen, label: 'Journal' },
+            { id: 'analytics', icon: BarChart3, label: 'Analytics' },
             { id: 'goals', icon: Target, label: 'Goals' }
           ].map((tab) => (
             <button
