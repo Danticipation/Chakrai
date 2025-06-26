@@ -7,6 +7,7 @@ import {
   monthlyWellnessReports, analyticsMetrics, progressTracking, riskAssessments, longitudinalTrends,
   userWellnessPoints, pointsTransactions, rewardsShop, userPurchases, achievements,
   dailyActivities, communityChallenges, userChallengeProgress, userLevels,
+  conversationSummaries, semanticMemories, memoryConnections, memoryInsights,
   type User, type InsertUser,
   type Bot, type InsertBot,
   type Message, type InsertMessage,
@@ -32,6 +33,10 @@ import {
   type ProgressTracking, type InsertProgressTracking,
   type RiskAssessment, type InsertRiskAssessment,
   type LongitudinalTrend, type InsertLongitudinalTrend,
+  type ConversationSummary, type InsertConversationSummary,
+  type SemanticMemory, type InsertSemanticMemory,
+  type MemoryConnection, type InsertMemoryConnection,
+  type MemoryInsight, type InsertMemoryInsight,
 } from "@shared/schema";
 import { eq, desc, and } from "drizzle-orm";
 
@@ -154,6 +159,23 @@ export interface IStorage {
   updateChallengeProgress(userId: number, challengeId: number, progressIncrement: number): Promise<any>;
   
   getTodayActivity(userId: number): Promise<any>;
+  
+  // Semantic Memory System
+  createConversationSummary(data: InsertConversationSummary): Promise<ConversationSummary>;
+  getConversationSummary(userId: number, sessionId: string): Promise<ConversationSummary | null>;
+  updateConversationSummary(id: number, data: Partial<InsertConversationSummary>): Promise<ConversationSummary>;
+  
+  createSemanticMemory(data: InsertSemanticMemory): Promise<SemanticMemory>;
+  getRecentSemanticMemories(userId: number, limit?: number): Promise<SemanticMemory[]>;
+  searchSemanticMemories(userId: number, searchTerms: string[], limit?: number): Promise<SemanticMemory[]>;
+  updateMemoryAccessCount(memoryId: number): Promise<void>;
+  
+  createMemoryConnection(data: InsertMemoryConnection): Promise<MemoryConnection>;
+  getMemoryConnections(memoryId: number): Promise<MemoryConnection[]>;
+  getAllUserMemoryConnections(userId: number): Promise<MemoryConnection[]>;
+  
+  createMemoryInsight(data: InsertMemoryInsight): Promise<MemoryInsight>;
+  getMemoryInsights(userId: number): Promise<MemoryInsight[]>;
 }
 
 export class DbStorage implements IStorage {
@@ -929,6 +951,86 @@ export class DbStorage implements IStorage {
       activitiesCompleted: 0,
       pointsEarned: 0
     };
+  }
+
+  // Semantic Memory System Implementation
+  async createConversationSummary(data: InsertConversationSummary): Promise<ConversationSummary> {
+    const [summary] = await this.db.insert(conversationSummaries).values(data).returning();
+    return summary;
+  }
+
+  async getConversationSummary(userId: number, sessionId: string): Promise<ConversationSummary | null> {
+    const [summary] = await this.db.select().from(conversationSummaries)
+      .where(and(eq(conversationSummaries.userId, userId), eq(conversationSummaries.sessionId, sessionId)));
+    return summary || null;
+  }
+
+  async updateConversationSummary(id: number, data: Partial<InsertConversationSummary>): Promise<ConversationSummary> {
+    const [summary] = await this.db.update(conversationSummaries).set(data)
+      .where(eq(conversationSummaries.id, id)).returning();
+    return summary;
+  }
+
+  async createSemanticMemory(data: InsertSemanticMemory): Promise<SemanticMemory> {
+    const [memory] = await this.db.insert(semanticMemories).values(data).returning();
+    return memory;
+  }
+
+  async getRecentSemanticMemories(userId: number, limit: number = 10): Promise<SemanticMemory[]> {
+    return await this.db.select().from(semanticMemories)
+      .where(and(eq(semanticMemories.userId, userId), eq(semanticMemories.isActiveMemory, true)))
+      .orderBy(desc(semanticMemories.createdAt))
+      .limit(limit);
+  }
+
+  async searchSemanticMemories(userId: number, searchTerms: string[], limit: number = 5): Promise<SemanticMemory[]> {
+    if (searchTerms.length === 0) return [];
+    
+    // Simple array overlap search - in production would use vector similarity
+    return await this.db.select().from(semanticMemories)
+      .where(and(
+        eq(semanticMemories.userId, userId),
+        eq(semanticMemories.isActiveMemory, true)
+      ))
+      .orderBy(desc(semanticMemories.accessCount), desc(semanticMemories.createdAt))
+      .limit(limit);
+  }
+
+  async updateMemoryAccessCount(memoryId: number): Promise<void> {
+    await this.db.update(semanticMemories)
+      .set({ 
+        accessCount: semanticMemories.accessCount + 1,
+        lastAccessedAt: new Date()
+      })
+      .where(eq(semanticMemories.id, memoryId));
+  }
+
+  async createMemoryConnection(data: InsertMemoryConnection): Promise<MemoryConnection> {
+    const [connection] = await this.db.insert(memoryConnections).values(data).returning();
+    return connection;
+  }
+
+  async getMemoryConnections(memoryId: number): Promise<MemoryConnection[]> {
+    return await this.db.select().from(memoryConnections)
+      .where(eq(memoryConnections.fromMemoryId, memoryId))
+      .orderBy(desc(memoryConnections.strength));
+  }
+
+  async getAllUserMemoryConnections(userId: number): Promise<MemoryConnection[]> {
+    return await this.db.select().from(memoryConnections)
+      .where(eq(memoryConnections.userId, userId))
+      .orderBy(desc(memoryConnections.createdAt));
+  }
+
+  async createMemoryInsight(data: InsertMemoryInsight): Promise<MemoryInsight> {
+    const [insight] = await this.db.insert(memoryInsights).values(data).returning();
+    return insight;
+  }
+
+  async getMemoryInsights(userId: number): Promise<MemoryInsight[]> {
+    return await this.db.select().from(memoryInsights)
+      .where(eq(memoryInsights.userId, userId))
+      .orderBy(desc(memoryInsights.generatedAt));
   }
 }
 

@@ -68,6 +68,62 @@ export const userFacts = pgTable("user_facts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Enhanced Memory System with Semantic Recall
+export const conversationSummaries = pgTable("conversation_summaries", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  sessionId: text("session_id"), // Groups related conversations
+  summary: text("summary").notNull(),
+  keyTopics: text("key_topics").array(), // ["work_stress", "anxiety", "relationships"]
+  emotionalTone: text("emotional_tone"), // "overwhelmed", "hopeful", "frustrated"
+  importance: integer("importance").default(5), // 1-10 scale
+  messageCount: integer("message_count").default(0),
+  startedAt: timestamp("started_at").defaultNow(),
+  lastUpdatedAt: timestamp("last_updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const semanticMemories = pgTable("semantic_memories", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  memoryType: text("memory_type").notNull(), // "conversation", "insight", "pattern", "milestone"
+  content: text("content").notNull(),
+  semanticTags: text("semantic_tags").array(), // ["work", "stress", "improvement", "coping"]
+  emotionalContext: text("emotional_context"), // "feeling overwhelmed about deadlines"
+  temporalContext: text("temporal_context"), // "last week", "three days ago", "this morning"
+  relatedTopics: text("related_topics").array(), // ["anxiety", "work_life_balance", "productivity"]
+  confidence: decimal("confidence", { precision: 3, scale: 2 }).default("0.85"), // AI confidence in memory accuracy
+  accessCount: integer("access_count").default(0), // How often this memory is referenced
+  lastAccessedAt: timestamp("last_accessed_at"),
+  sourceConversationId: integer("source_conversation_id"), // Links to conversationSummaries
+  isActiveMemory: boolean("is_active_memory").default(true), // Whether to include in active recall
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const memoryConnections = pgTable("memory_connections", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  fromMemoryId: integer("from_memory_id").notNull(),
+  toMemoryId: integer("to_memory_id").notNull(),
+  connectionType: text("connection_type").notNull(), // "follows_up", "contradicts", "reinforces", "relates_to"
+  strength: decimal("strength", { precision: 3, scale: 2 }).default("0.50"), // Connection strength 0-1
+  automaticConnection: boolean("automatic_connection").default(true), // AI-detected vs manual
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const memoryInsights = pgTable("memory_insights", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  insightType: text("insight_type").notNull(), // "pattern", "growth", "concern", "progress"
+  insight: text("insight").notNull(),
+  supportingMemories: text("supporting_memories").array(), // Array of memory IDs
+  confidence: decimal("confidence", { precision: 3, scale: 2 }).default("0.75"),
+  isSharedWithUser: boolean("is_shared_with_user").default(false),
+  userFeedback: text("user_feedback"), // "helpful", "inaccurate", "too_personal"
+  generatedAt: timestamp("generated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Therapeutic features - Journal
 export const journalEntries = pgTable("journal_entries", {
   id: serial("id").primaryKey(),
@@ -618,3 +674,34 @@ export type InsertAnalyticsMetric = z.infer<typeof insertAnalyticsMetricSchema>;
 export type InsertProgressTracking = z.infer<typeof insertProgressTrackingSchema>;
 export type InsertRiskAssessment = z.infer<typeof insertRiskAssessmentSchema>;
 export type InsertLongitudinalTrend = z.infer<typeof insertLongitudinalTrendSchema>;
+
+// Semantic Memory System Types
+export const insertConversationSummarySchema = createInsertSchema(conversationSummaries).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSemanticMemorySchema = createInsertSchema(semanticMemories).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMemoryConnectionSchema = createInsertSchema(memoryConnections).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMemoryInsightSchema = createInsertSchema(memoryInsights).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ConversationSummary = typeof conversationSummaries.$inferSelect;
+export type SemanticMemory = typeof semanticMemories.$inferSelect;
+export type MemoryConnection = typeof memoryConnections.$inferSelect;
+export type MemoryInsight = typeof memoryInsights.$inferSelect;
+
+export type InsertConversationSummary = z.infer<typeof insertConversationSummarySchema>;
+export type InsertSemanticMemory = z.infer<typeof insertSemanticMemorySchema>;
+export type InsertMemoryConnection = z.infer<typeof insertMemoryConnectionSchema>;
+export type InsertMemoryInsight = z.infer<typeof insertMemoryInsightSchema>;
