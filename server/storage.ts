@@ -78,7 +78,11 @@ export interface IStorage {
 }
 
 export class DbStorage implements IStorage {
-  constructor(private db = db) {}
+  private db: typeof db;
+  
+  constructor() {
+    this.db = db;
+  }
 
   // Users
   async createUser(data: InsertUser): Promise<User> {
