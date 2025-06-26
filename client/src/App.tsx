@@ -14,6 +14,7 @@ import AdaptiveLearning from './components/AdaptiveLearning';
 import VRTherapy from './components/VRTherapy';
 import HealthIntegration from './components/HealthIntegration';
 import PrivacyCompliance from './components/PrivacyCompliance';
+import TherapistPortal from './components/TherapistPortal';
 import Horoscope from './components/Horoscope';
 import DailyAffirmation from './components/DailyAffirmation';
 
@@ -384,6 +385,9 @@ const AppLayout = () => {
       case 'privacy':
         return <PrivacyCompliance />;
 
+      case 'therapist':
+        return <TherapistPortal />;
+
       case 'horoscope':
         return <Horoscope />;
 
@@ -561,7 +565,8 @@ const AppLayout = () => {
             { id: 'community', label: 'Community' },
             { id: 'adaptive', label: 'AI Learning' },
             { id: 'vr', label: 'VR Therapy' },
-            { id: 'health', label: 'Wearables' }
+            { id: 'health', label: 'Wearables' },
+            { id: 'therapist', label: 'Therapist Portal' }
           ].map((tab) => (
             <button
               key={tab.id}
