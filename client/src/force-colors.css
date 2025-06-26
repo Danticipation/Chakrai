@@ -7,7 +7,7 @@
 
 /* Therapeutic background */
 body, html, #root {
-  background: linear-gradient(to bottom right, #f0f8ff, #f5f0ff, #fff0f5) !important;
+  background: linear-gradient(to bottom right, #000000, #000000, #000000) !important;
   min-height: 100vh;
 }
 

@@ -453,40 +453,42 @@ const AppLayout = () => {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6] flex flex-col">
-      {/* Header */}
-      <div className="bg-white/60 backdrop-blur-sm p-4 shadow-sm">
+    <div className="h-screen bg-black flex flex-col">
+      {/* Header - Level 1 Box (Dark Blue) */}
+      <div className="bg-[#1a237e] backdrop-blur-sm p-4 shadow-sm border border-[#3949ab]/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <img src={traiLogo} alt="TrAI" className="w-8 h-8" />
-            <h1 className="text-xl font-bold text-gray-800">TrAI</h1>
+            <h1 className="text-xl font-bold text-white">TrAI</h1>
           </div>
           <div className="flex items-center space-x-2">
             {botStats && (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-white/80">
                 {botStats.stage} • Level {botStats.level}
               </div>
             )}
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 rounded-lg hover:bg-gray-200/50 transition-colors"
+              className="p-2 rounded-lg hover:bg-[#3949ab]/30 transition-colors"
             >
-              <User size={20} className="text-gray-600" />
+              <User size={20} className="text-white" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex">
-        {/* Content Area */}
-        <div className="flex-1">
-          {renderActiveSection()}
+      {/* Main Content - Level 2 Box (Medium Blue) */}
+      <div className="flex-1 flex p-2">
+        {/* Content Area - Level 3 Box (Light Blue) */}
+        <div className="flex-1 bg-[#3949ab] rounded-lg border border-[#5c6bc0]/30 p-3">
+          <div className="bg-[#5c6bc0] rounded-lg h-full p-3 border border-[#7986cb]/30">
+            {renderActiveSection()}
+          </div>
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="bg-white/80 backdrop-blur-sm p-4">
+      {/* Bottom Navigation - Level 1 Box (Dark Blue) */}
+      <div className="bg-[#1a237e] backdrop-blur-sm p-4 border-t border-[#3949ab]/30">
         <div className="flex justify-center space-x-8">
           {[
             { id: 'daily', icon: Brain, label: 'Reflection' },
@@ -499,8 +501,8 @@ const AppLayout = () => {
               onClick={() => setActiveSection(tab.id)}
               className={`flex flex-col items-center space-y-1 p-2 rounded-lg transition-colors ${
                 activeSection === tab.id
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'bg-[#7986cb] text-white'
+                  : 'text-white/70 hover:text-white hover:bg-[#3949ab]/30'
               }`}
             >
               <tab.icon size={24} />
@@ -512,9 +514,9 @@ const AppLayout = () => {
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Settings</h3>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-md border border-[#3949ab]/30">
+            <h3 className="text-lg font-semibold mb-4 text-white">Settings</h3>
             <VoiceSelector selectedVoice={selectedVoice} onVoiceChange={setSelectedVoice} />
             <div className="flex justify-end mt-6">
               <button
