@@ -476,8 +476,8 @@ const AppLayout = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex bg-[#0a0e1a]">
-        {/* Left Sidebar Navigation - Larger and blended */}
-        <div className="w-48 flex flex-col justify-center py-8 space-y-6">
+        {/* Left Sidebar Navigation - Seamless blended buttons */}
+        <div className="w-48 flex flex-col justify-center py-8">
           {[
             { id: 'chat', label: 'Chat' },
             { id: 'daily', label: 'Reflection' },
@@ -491,7 +491,7 @@ const AppLayout = () => {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id)}
-              className={`mx-3 h-14 px-4 text-base font-bold transition-colors rounded ${
+              className={`w-full h-14 px-4 text-base font-bold transition-colors ${
                 activeSection === tab.id
                   ? 'bg-red-600 text-white'
                   : 'bg-red-600 text-white hover:bg-red-500'
