@@ -115,7 +115,7 @@ Use their own words, phrases, and communication patterns when appropriate. Refer
 
     if (process.env.ELEVENLABS_API_KEY) {
       try {
-        console.log(`Making ElevenLabs request for voice: ${voice} (ID: ${voiceId})`);
+        console.log(`Making ElevenLabs request for voice: ${selectedVoice} (ID: ${voiceId})`);
         console.log(`Text to synthesize: "${aiResponse.substring(0, 50)}..."`);
         
         const elevenLabsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
@@ -162,7 +162,7 @@ Use their own words, phrases, and communication patterns when appropriate. Refer
       message: aiResponse,
       response: aiResponse,
       audioUrl: audioUrl,
-      voiceUsed: voice,
+      voiceUsed: selectedVoice,
       wordsLearned: 1000,
       stage: "Therapist",
       crisisDetected: false,
