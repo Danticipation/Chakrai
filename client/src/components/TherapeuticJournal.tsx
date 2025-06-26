@@ -1,0 +1,502 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Mic, MicOff, Save, Plus, Calendar, Tag, Heart, Smile, Meh, Frown, AlertCircle, Send } from 'lucide-react';
+
+interface JournalEntry {
+  id?: number;
+  title: string;
+  content: string;
+  mood: string;
+  moodIntensity: number;
+  tags: string[];
+  isPrivate: boolean;
+  createdAt?: string;
+}
+
+interface TherapeuticJournalProps {
+  userId: number;
+  onEntryCreated?: (entry: JournalEntry) => void;
+}
+
+const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntryCreated }) => {
+  const [entry, setEntry] = useState<JournalEntry>({
+    title: '',
+    content: '',
+    mood: 'neutral',
+    moodIntensity: 5,
+    tags: [],
+    isPrivate: true
+  });
+  
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [recentEntries, setRecentEntries] = useState<JournalEntry[]>([]);
+  const [newTag, setNewTag] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const moodOptions = [
+    { value: 'very_happy', label: 'Very Happy', icon: '😊', color: 'bg-green-100 text-green-800' },
+    { value: 'happy', label: 'Happy', icon: '🙂', color: 'bg-green-50 text-green-700' },
+    { value: 'neutral', label: 'Neutral', icon: '😐', color: 'bg-gray-100 text-gray-700' },
+    { value: 'sad', label: 'Sad', icon: '🙁', color: 'bg-blue-100 text-blue-700' },
+    { value: 'very_sad', label: 'Very Sad', icon: '😢', color: 'bg-blue-200 text-blue-800' },
+    { value: 'anxious', label: 'Anxious', icon: '😰', color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'angry', label: 'Angry', icon: '😠', color: 'bg-red-100 text-red-800' },
+    { value: 'grateful', label: 'Grateful', icon: '🙏', color: 'bg-purple-100 text-purple-800' }
+  ];
+
+  const commonTags = [
+    'therapy', 'gratitude', 'anxiety', 'depression', 'progress', 'goals', 
+    'relationships', 'work', 'family', 'mindfulness', 'breakthrough', 'challenge'
+  ];
+
+  useEffect(() => {
+    fetchRecentEntries();
+  }, [userId]);
+
+  const fetchRecentEntries = async () => {
+    try {
+      const response = await fetch(`/api/journal/entries/${userId}`);
+      if (response.ok) {
+        const entries = await response.json();
+        setRecentEntries(entries.slice(0, 5)); // Show 5 most recent
+      }
+    } catch (error) {
+      console.error('Failed to fetch recent entries:', error);
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100
+        } 
+      });
+      
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await transcribeAudio(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      // Auto-stop after 2 minutes
+      setTimeout(() => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          stopRecording();
+        }
+      }, 120000);
+      
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      alert('Could not access microphone. Please check permissions.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      setIsTranscribing(true);
+    }
+  };
+
+  const transcribeAudio = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const transcription = data.text || '';
+        
+        setEntry(prev => ({
+          ...prev,
+          content: prev.content + (prev.content ? ' ' : '') + transcription
+        }));
+        
+        // Auto-resize textarea
+        if (textareaRef.current) {
+          textareaRef.current.style.height = 'auto';
+          textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+        }
+      } else {
+        console.error('Transcription failed:', response.statusText);
+        alert('Voice transcription is temporarily unavailable. Please try typing instead.');
+      }
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+      alert('Voice transcription failed. Please try again.');
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
+  const addTag = (tag: string) => {
+    if (tag && !entry.tags.includes(tag)) {
+      setEntry(prev => ({
+        ...prev,
+        tags: [...prev.tags, tag]
+      }));
+    }
+    setNewTag('');
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setEntry(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
+  const saveEntry = async () => {
+    if (!entry.content.trim()) {
+      alert('Please write something before saving your journal entry.');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/journal/entries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId,
+          title: entry.title || `Entry - ${new Date().toLocaleDateString()}`,
+          content: entry.content,
+          mood: entry.mood,
+          moodIntensity: entry.moodIntensity,
+          tags: entry.tags,
+          isPrivate: entry.isPrivate
+        })
+      });
+
+      if (response.ok) {
+        const savedEntry = await response.json();
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        
+        // Reset form
+        setEntry({
+          title: '',
+          content: '',
+          mood: 'neutral',
+          moodIntensity: 5,
+          tags: [],
+          isPrivate: true
+        });
+        
+        // Refresh recent entries
+        fetchRecentEntries();
+        
+        if (onEntryCreated) {
+          onEntryCreated(savedEntry);
+        }
+      } else {
+        throw new Error('Failed to save entry');
+      }
+    } catch (error) {
+      console.error('Error saving entry:', error);
+      alert('Failed to save your journal entry. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const selectedMood = moodOptions.find(mood => mood.value === entry.mood) || moodOptions[2];
+
+  return (
+    <div className="h-full flex flex-col bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6] p-4">
+      {/* Success Message */}
+      {showSuccess && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center">
+          <Heart className="w-5 h-5 mr-2" />
+          Journal entry saved successfully!
+        </div>
+      )}
+
+      <div className="flex-1 overflow-y-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Therapeutic Journal</h2>
+          <p className="text-gray-600">Express your thoughts and feelings in a safe, private space</p>
+        </div>
+
+        {/* Journal Entry Form */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+          {/* Title Input */}
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Give your entry a title (optional)"
+              value={entry.title}
+              onChange={(e) => setEntry(prev => ({ ...prev, title: e.target.value }))}
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-400 focus:outline-none text-lg font-medium"
+            />
+          </div>
+
+          {/* Content Area with Voice Recording */}
+          <div className="mb-6">
+            <div className="relative">
+              <textarea
+                ref={textareaRef}
+                placeholder="What's on your mind today? Share your thoughts, feelings, experiences, or anything that feels important to you..."
+                value={entry.content}
+                onChange={(e) => {
+                  setEntry(prev => ({ ...prev, content: e.target.value }));
+                  // Auto-resize
+                  e.target.style.height = 'auto';
+                  e.target.style.height = e.target.scrollHeight + 'px';
+                }}
+                className="w-full min-h-[200px] px-4 py-3 pr-16 rounded-xl border-2 border-gray-200 focus:border-blue-400 focus:outline-none resize-none text-base leading-relaxed"
+                style={{ maxHeight: '400px' }}
+              />
+              
+              {/* Voice Recording Button */}
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={isTranscribing}
+                className={`absolute bottom-4 right-4 p-3 rounded-full shadow-lg transition-all ${
+                  isRecording 
+                    ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' 
+                    : isTranscribing
+                    ? 'bg-yellow-500 text-white'
+                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                }`}
+              >
+                {isTranscribing ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : isRecording ? (
+                  <MicOff className="w-5 h-5" />
+                ) : (
+                  <Mic className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+            
+            {isRecording && (
+              <p className="text-red-600 text-sm mt-2 flex items-center">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></div>
+                Recording... Speak naturally and take your time
+              </p>
+            )}
+            
+            {isTranscribing && (
+              <p className="text-yellow-600 text-sm mt-2">
+                Converting your voice to text...
+              </p>
+            )}
+          </div>
+
+          {/* Mood Selection */}
+          <div className="mb-6">
+            <label className="block text-gray-700 font-medium mb-3">How are you feeling?</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {moodOptions.map((mood) => (
+                <button
+                  key={mood.value}
+                  onClick={() => setEntry(prev => ({ ...prev, mood: mood.value }))}
+                  className={`p-3 rounded-xl border-2 transition-all text-center ${
+                    entry.mood === mood.value
+                      ? 'border-blue-400 bg-blue-50 shadow-md'
+                      : 'border-gray-200 hover:border-gray-300 bg-white'
+                  }`}
+                >
+                  <div className="text-2xl mb-1">{mood.icon}</div>
+                  <div className="text-xs font-medium">{mood.label}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Mood Intensity */}
+          <div className="mb-6">
+            <label className="block text-gray-700 font-medium mb-3">
+              Intensity: {entry.moodIntensity}/10
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="10"
+              value={entry.moodIntensity}
+              onChange={(e) => setEntry(prev => ({ ...prev, moodIntensity: parseInt(e.target.value) }))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>Mild</span>
+              <span>Moderate</span>
+              <span>Intense</span>
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div className="mb-6">
+            <label className="block text-gray-700 font-medium mb-3">Tags (help categorize your thoughts)</label>
+            
+            {/* Current Tags */}
+            {entry.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {entry.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center"
+                  >
+                    {tag}
+                    <button
+                      onClick={() => removeTag(tag)}
+                      className="ml-2 text-blue-600 hover:text-blue-800"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Common Tags */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {commonTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => addTag(tag)}
+                  disabled={entry.tags.includes(tag)}
+                  className={`px-3 py-1 rounded-full text-sm transition-all ${
+                    entry.tags.includes(tag)
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+
+            {/* Custom Tag Input */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Add custom tag..."
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && addTag(newTag)}
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-blue-400 focus:outline-none text-sm"
+              />
+              <button
+                onClick={() => addTag(newTag)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Privacy Toggle */}
+          <div className="mb-6">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={entry.isPrivate}
+                onChange={(e) => setEntry(prev => ({ ...prev, isPrivate: e.target.checked }))}
+                className="mr-3 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              />
+              <span className="text-gray-700">Keep this entry private</span>
+            </label>
+          </div>
+
+          {/* Save Button */}
+          <button
+            onClick={saveEntry}
+            disabled={isSaving || !entry.content.trim()}
+            className={`w-full py-4 rounded-xl font-medium transition-all flex items-center justify-center ${
+              isSaving || !entry.content.trim()
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg hover:shadow-xl'
+            }`}
+          >
+            {isSaving ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-5 h-5 mr-2" />
+                Save Journal Entry
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Recent Entries */}
+        {recentEntries.length > 0 && (
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <Calendar className="w-5 h-5 mr-2" />
+              Recent Entries
+            </h3>
+            <div className="space-y-3">
+              {recentEntries.map((recentEntry, index) => (
+                <div key={index} className="bg-white/80 rounded-lg p-4 border border-gray-200">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-medium text-gray-800">
+                      {recentEntry.title || `Entry ${index + 1}`}
+                    </h4>
+                    <span className="text-xs text-gray-500">
+                      {new Date(recentEntry.createdAt || '').toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm line-clamp-2">
+                    {recentEntry.content.substring(0, 100)}...
+                  </p>
+                  <div className="flex items-center mt-2 text-xs">
+                    <span className={`px-2 py-1 rounded-full ${
+                      moodOptions.find(m => m.value === recentEntry.mood)?.color || 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {moodOptions.find(m => m.value === recentEntry.mood)?.label || 'Unknown'}
+                    </span>
+                    {recentEntry.tags.length > 0 && (
+                      <span className="ml-2 text-gray-500">
+                        +{recentEntry.tags.length} tags
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TherapeuticJournal;

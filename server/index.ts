@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from 'url';
 import multer from 'multer';
 import { setupVite, serveStatic, log } from "./vite.js";
+import { storage } from './storage.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
