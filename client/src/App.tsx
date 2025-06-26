@@ -542,50 +542,119 @@ const AppLayout = () => {
   }
 
   return (
-    <div className="h-screen bg-[#0a0e1a] flex flex-col">
-      {/* Top Header - Expanded to Chat Box */}
-      <div className="bg-[#0a0e1a] p-4 flex justify-center">
-        <div className="grid grid-cols-3 gap-4 w-[1152px] h-[200px] -ml-[88px]">
-          {/* Horoscope Section - Expanded */}
-          <button 
-            onClick={() => setActiveSection('horoscope')}
-            className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
-          >
-            <h3 className="text-2xl font-bold text-white mb-4 underline">Horoscope</h3>
-            <p className="text-base text-white text-left leading-relaxed flex-1">
-              {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
-            </p>
-            <p className="text-sm text-white/70 mt-4 font-semibold">Click to expand</p>
-          </button>
+    <div className="min-h-screen bg-[#0a0e1a] flex flex-col">
+      {/* Mobile-Optimized Header */}
+      <div className="bg-[#0a0e1a] p-3 md:p-4">
+        {/* Mobile: Compact Header Row */}
+        <div className="block md:hidden">
+          <div className="flex gap-2 mb-3">
+            <button 
+              onClick={() => setActiveSection('horoscope')}
+              className="flex-1 bg-purple-700 rounded-lg p-3 hover:bg-purple-600 transition-colors"
+            >
+              <h3 className="text-sm font-bold text-white mb-1">Daily Horoscope</h3>
+              <p className="text-xs text-white/80 truncate">
+                {horoscopeText ? horoscopeText.substring(0, 50) + '...' : "Today brings growth opportunities..."}
+              </p>
+            </button>
+            
+            <button 
+              onClick={() => setActiveSection('affirmation')}
+              className="flex-1 bg-purple-700 rounded-lg p-3 hover:bg-purple-600 transition-colors"
+            >
+              <h3 className="text-sm font-bold text-white mb-1">Daily Affirmation</h3>
+              <p className="text-xs text-white/80 truncate">
+                {dailyAffirmation.substring(0, 50)}...
+              </p>
+            </button>
+          </div>
           
-          {/* Logo Section - Center */}
+          {/* Mobile Logo Section */}
           <button 
             onClick={() => setActiveSection('logo')}
-            className="bg-[#0a0e1a] rounded-lg p-6 flex flex-col items-center justify-center border-2 border-white hover:border-purple-400 transition-colors cursor-pointer"
+            className="w-full bg-[#0a0e1a] rounded-lg p-4 flex items-center justify-center border border-white/30 hover:border-purple-400 transition-colors"
           >
-            <img src={traiLogo} alt="TrAI" className="h-48 w-auto mb-4 -mt-2.5" />
-            <p className="text-lg text-white/70 font-bold">TraI Mental Wellness</p>
-            <p className="text-sm text-white/50 mt-2">Click for more info</p>
+            <img src={traiLogo} alt="TrAI" className="h-16 w-auto mr-3" />
+            <div className="text-left">
+              <p className="text-base text-white font-bold">TraI Mental Wellness</p>
+              <p className="text-xs text-white/70">Your AI Companion</p>
+            </div>
           </button>
-          
-          {/* Affirmation Section - Expanded */}
-          <button 
-            onClick={() => setActiveSection('affirmation')}
-            className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
-          >
-            <h3 className="text-2xl font-bold text-white mb-4 underline">Affirmation</h3>
-            <p className="text-base text-white text-left leading-relaxed flex-1">
-              {dailyAffirmation.substring(0, 200)}...
-            </p>
-            <p className="text-sm text-white/70 mt-4 font-semibold">Click to here</p>
-          </button>
+        </div>
+
+        {/* Desktop: Original Layout */}
+        <div className="hidden md:flex justify-center">
+          <div className="grid grid-cols-3 gap-4 w-[1152px] h-[200px] -ml-[88px]">
+            {/* Horoscope Section - Expanded */}
+            <button 
+              onClick={() => setActiveSection('horoscope')}
+              className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+            >
+              <h3 className="text-2xl font-bold text-white mb-4 underline">Horoscope</h3>
+              <p className="text-base text-white text-left leading-relaxed flex-1">
+                {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
+              </p>
+              <p className="text-sm text-white/70 mt-4 font-semibold">Click to expand</p>
+            </button>
+            
+            {/* Logo Section - Center */}
+            <button 
+              onClick={() => setActiveSection('logo')}
+              className="bg-[#0a0e1a] rounded-lg p-6 flex flex-col items-center justify-center border-2 border-white hover:border-purple-400 transition-colors cursor-pointer"
+            >
+              <img src={traiLogo} alt="TrAI" className="h-48 w-auto mb-4 -mt-2.5" />
+              <p className="text-lg text-white/70 font-bold">TraI Mental Wellness</p>
+              <p className="text-sm text-white/50 mt-2">Click for more info</p>
+            </button>
+            
+            {/* Affirmation Section - Expanded */}
+            <button 
+              onClick={() => setActiveSection('affirmation')}
+              className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+            >
+              <h3 className="text-2xl font-bold text-white mb-4 underline">Affirmation</h3>
+              <p className="text-base text-white text-left leading-relaxed flex-1">
+                {dailyAffirmation.substring(0, 200)}...
+              </p>
+              <p className="text-sm text-white/70 mt-4 font-semibold">Click to here</p>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex bg-[#0a0e1a]">
-        {/* Left Sidebar Navigation - Enlarged seamless blended buttons */}
-        <div className="w-72 flex flex-col justify-center py-8">
+      {/* Main Content Area - Mobile Responsive */}
+      <div className="flex-1 flex flex-col md:flex-row bg-[#0a0e1a]">
+        {/* Mobile Navigation - Horizontal scrolling */}
+        <div className="md:hidden flex overflow-x-auto px-4 py-2 space-x-2 border-b border-white/20">
+          {[
+            { id: 'chat', label: 'Chat' },
+            { id: 'daily', label: 'Reflection' },
+            { id: 'journal', label: 'Journal' },
+            { id: 'memory', label: 'Memory' },
+            { id: 'analytics', label: 'Analytics' },
+            { id: 'rewards', label: 'Rewards' },
+            { id: 'community', label: 'Community' },
+            { id: 'adaptive', label: 'AI Learning' },
+            { id: 'vr', label: 'VR Therapy' },
+            { id: 'health', label: 'Wearables' },
+            { id: 'therapist', label: 'Therapist Portal' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveSection(tab.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors ${
+                activeSection === tab.id
+                  ? 'bg-red-600 text-white'
+                  : 'bg-red-600/80 text-white hover:bg-red-500'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Desktop Left Sidebar Navigation */}
+        <div className="hidden md:flex w-72 flex-col justify-center py-8">
           {[
             { id: 'chat', label: 'Chat' },
             { id: 'daily', label: 'Reflection' },
@@ -613,11 +682,11 @@ const AppLayout = () => {
           ))}
         </div>
 
-        {/* Center Content Area - Different layouts based on active section */}
-        <div className="flex-1 flex justify-center items-center">
+        {/* Center Content Area - Mobile Responsive */}
+        <div className="flex-1 flex justify-center items-center p-4 md:p-0">
           {activeSection === 'chat' ? (
-            /* Chat Panel - Light blue background as requested - DOUBLED SIZE */
-            <div className="w-[1152px] h-[960px] bg-[#3f51b5] rounded-lg relative">
+            /* Chat Panel - Mobile responsive sizing */
+            <div className="w-full max-w-[1152px] h-[70vh] md:h-[960px] bg-[#3f51b5] rounded-lg relative">
               <div className="absolute inset-4 bg-[#3f51b5] rounded">
                 <div className="text-center text-white text-xl font-bold pt-6">Chat Box</div>
                 
