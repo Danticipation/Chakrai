@@ -272,7 +272,7 @@ const AdaptiveLearning: React.FC = () => {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Today's Wellness Actions</h3>
               <div className="space-y-3">
-                {wellnessRecommendations?.slice(0, 3).map((rec) => {
+                {Array.isArray(wellnessRecommendations) ? wellnessRecommendations.slice(0, 3).map((rec) => {
                   const IconComponent = getRecommendationIcon(rec.recommendationType);
                   return (
                     <div key={rec.id} className="flex items-center gap-4 bg-white/40 rounded-lg p-3">
@@ -292,7 +292,11 @@ const AdaptiveLearning: React.FC = () => {
                       </div>
                     </div>
                   );
-                })}
+                }) : (
+                  <div className="text-center py-4">
+                    <p className="text-gray-600">No wellness recommendations available</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -300,7 +304,7 @@ const AdaptiveLearning: React.FC = () => {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Latest Insights</h3>
               <div className="space-y-3">
-                {adaptationInsights?.slice(0, 2).map((insight) => (
+                {Array.isArray(adaptationInsights) ? adaptationInsights.slice(0, 2).map((insight) => (
                   <div key={insight.id} className="bg-white/40 rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-gray-800">{insight.insightTitle}</h4>
@@ -311,7 +315,11 @@ const AdaptiveLearning: React.FC = () => {
                       Based on: {insight.dataSources.join(', ')}
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-4">
+                    <p className="text-gray-600">No insights available</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -320,7 +328,7 @@ const AdaptiveLearning: React.FC = () => {
         {activeTab === 'plans' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {therapyPlans?.map((plan) => (
+              {Array.isArray(therapyPlans) ? therapyPlans.map((plan) => (
                 <div key={plan.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                   <div className="flex justify-between items-start mb-4">
                     <div>
@@ -373,7 +381,11 @@ const AdaptiveLearning: React.FC = () => {
                     </button>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No therapy plans available</p>
+                </div>
+              )}
             </div>
           </div>
         )}
