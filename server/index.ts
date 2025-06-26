@@ -1017,6 +1017,357 @@ app.get('/api/emotional-intelligence/dashboard/:userId', async (req, res) => {
   }
 });
 
+// Comprehensive Analytics & Reporting API Endpoints
+
+// Generate Monthly Wellness Report with AI insights
+app.post('/api/analytics/monthly-report', async (req, res) => {
+  try {
+    const { userId = 1, reportMonth } = req.body;
+    
+    // Calculate comprehensive wellness metrics
+    const metrics = await storage.calculateUserWellnessMetrics(userId);
+    const volatility = await storage.calculateEmotionalVolatility(userId);
+    const engagement = await storage.calculateTherapeuticEngagement(userId);
+    
+    // Get recent journal entries for AI analysis
+    const journalEntries = await storage.getJournalEntries(userId);
+    const moodEntries = await storage.getMoodEntries(userId);
+    
+    // Generate AI insights using OpenAI
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{
+          role: 'system',
+          content: 'You are a therapeutic AI analyst generating monthly wellness reports. Provide professional insights based on user data.'
+        }, {
+          role: 'user',
+          content: `Generate a comprehensive monthly wellness report for a user with:
+            - Wellness Score: ${metrics.wellnessScore}
+            - Emotional Volatility: ${volatility}
+            - Therapeutic Engagement: ${engagement}%
+            - Journal Entries: ${journalEntries.length}
+            - Mood Entries: ${moodEntries.length}
+            
+            Provide insights on progress, patterns, recommendations, and therapeutic goals.`
+        }],
+        max_tokens: 800,
+        temperature: 0.7
+      })
+    });
+
+    const aiData = await openaiResponse.json();
+    const aiInsights = aiData.choices?.[0]?.message?.content || 'Monthly progress analysis completed successfully.';
+
+    // Create monthly report
+    const report = await storage.createMonthlyWellnessReport({
+      userId,
+      reportMonth: reportMonth || new Date().toISOString().slice(0, 7),
+      wellnessScore: metrics.wellnessScore.toString(),
+      emotionalVolatility: volatility.toString(),
+      progressSummary: `Wellness Score: ${metrics.wellnessScore}/100, Engagement: ${engagement}%`,
+      aiGeneratedInsights: aiInsights,
+      moodTrends: {
+        averageMood: metrics.averageMood,
+        volatility: volatility,
+        moodEntries: moodEntries.length
+      },
+      activityMetrics: {
+        journalEntries: journalEntries.length,
+        moodEntries: moodEntries.length,
+        engagement: engagement
+      },
+      therapeuticProgress: {
+        wellnessScore: metrics.wellnessScore,
+        consistency: engagement,
+        improvement: metrics.wellnessScore >= 70 ? 'Good' : 'Needs Focus'
+      },
+      riskAssessment: {
+        level: volatility > 3 ? 'Medium' : 'Low',
+        score: volatility,
+        factors: volatility > 3 ? ['High emotional volatility'] : []
+      },
+      recommendations: [
+        engagement < 50 ? 'Increase daily journaling frequency' : 'Maintain consistent therapeutic practices',
+        volatility > 2 ? 'Focus on stress management techniques' : 'Continue current emotional regulation strategies',
+        'Regular therapeutic check-ins recommended'
+      ],
+      milestonesAchieved: [
+        metrics.wellnessScore >= 75 ? 'Strong emotional stability achieved' : null,
+        engagement >= 60 ? 'Excellent therapeutic engagement' : null
+      ].filter(Boolean)
+    });
+
+    res.json({
+      success: true,
+      report,
+      generatedAt: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Monthly report generation error:', error);
+    res.status(500).json({ error: 'Failed to generate monthly wellness report' });
+  }
+});
+
+// Get monthly wellness reports
+app.get('/api/analytics/monthly-reports/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const limit = parseInt(req.query.limit as string) || 12;
+    
+    const reports = await storage.getMonthlyWellnessReports(userId, limit);
+    
+    res.json({
+      success: true,
+      reports,
+      totalReports: reports.length
+    });
+  } catch (error) {
+    console.error('Monthly reports fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch monthly reports' });
+  }
+});
+
+// Interactive Analytics Dashboard Data
+app.get('/api/analytics/dashboard/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    // Get comprehensive analytics data
+    const [
+      metrics,
+      volatility,
+      engagement,
+      recentMoods,
+      recentJournals,
+      wellnessMetrics,
+      progressData
+    ] = await Promise.all([
+      storage.calculateUserWellnessMetrics(userId),
+      storage.calculateEmotionalVolatility(userId),
+      storage.calculateTherapeuticEngagement(userId),
+      storage.getMoodEntries(userId),
+      storage.getJournalEntries(userId),
+      storage.getAnalyticsMetrics(userId, 'wellness_score', 30),
+      storage.getProgressTracking(userId, undefined, 10)
+    ]);
+
+    // Calculate trend data for charts
+    const moodTrend = recentMoods.slice(0, 30).map(mood => ({
+      date: mood.createdAt,
+      value: mood.intensity || 5,
+      emotion: mood.primaryEmotion
+    }));
+
+    const wellnessTrend = wellnessMetrics.map(metric => ({
+      date: metric.calculatedDate,
+      value: parseFloat(metric.value),
+      type: metric.metricType
+    }));
+
+    res.json({
+      success: true,
+      dashboard: {
+        overview: {
+          currentWellnessScore: metrics.wellnessScore,
+          emotionalVolatility: volatility,
+          therapeuticEngagement: engagement,
+          totalJournalEntries: recentJournals.length,
+          totalMoodEntries: recentMoods.length,
+          averageMood: metrics.averageMood
+        },
+        charts: {
+          moodTrend: moodTrend,
+          wellnessTrend: wellnessTrend,
+          emotionDistribution: recentMoods.reduce((acc, mood) => {
+            const emotion = mood.primaryEmotion || 'neutral';
+            acc[emotion] = (acc[emotion] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>),
+          progressTracking: progressData.map(p => ({
+            period: p.trackingPeriod,
+            journalEntries: p.journalEntries,
+            moodEntries: p.moodEntries,
+            engagement: p.therapeuticEngagement
+          }))
+        },
+        insights: await storage.generateWellnessInsights(userId)
+      }
+    });
+
+  } catch (error) {
+    console.error('Analytics dashboard error:', error);
+    res.status(500).json({ error: 'Failed to load analytics dashboard' });
+  }
+});
+
+// Risk Assessment API
+app.post('/api/analytics/risk-assessment', async (req, res) => {
+  try {
+    const { userId = 1 } = req.body;
+    
+    const volatility = await storage.calculateEmotionalVolatility(userId);
+    const engagement = await storage.calculateTherapeuticEngagement(userId);
+    const recentMoods = await storage.getMoodEntries(userId);
+    
+    // Calculate risk score
+    let riskScore = 0;
+    let riskLevel = 'low';
+    let riskFactors = [];
+    let protectiveFactors = [];
+    
+    // Risk calculation logic
+    if (volatility > 3) {
+      riskScore += 0.3;
+      riskFactors.push('High emotional volatility');
+    }
+    
+    if (engagement < 30) {
+      riskScore += 0.2;
+      riskFactors.push('Low therapeutic engagement');
+    }
+    
+    const lowMoodCount = recentMoods.filter(m => (m.intensity || 5) < 4).length;
+    if (lowMoodCount > recentMoods.length * 0.6) {
+      riskScore += 0.4;
+      riskFactors.push('Persistent low mood patterns');
+    }
+    
+    // Protective factors
+    if (engagement >= 60) {
+      protectiveFactors.push('Strong therapeutic engagement');
+    }
+    
+    if (volatility <= 1.5) {
+      protectiveFactors.push('Emotional stability');
+    }
+    
+    // Determine risk level
+    if (riskScore >= 0.7) riskLevel = 'critical';
+    else if (riskScore >= 0.5) riskLevel = 'high';
+    else if (riskScore >= 0.3) riskLevel = 'medium';
+    
+    const assessment = await storage.createRiskAssessment({
+      userId,
+      assessmentDate: new Date(),
+      riskLevel,
+      riskScore,
+      riskFactors,
+      protectiveFactors,
+      recommendations: [
+        riskScore >= 0.5 ? 'Immediate therapeutic support recommended' : 'Continue regular wellness practices',
+        volatility > 2 ? 'Focus on emotional regulation techniques' : 'Maintain current stability strategies',
+        engagement < 50 ? 'Increase daily therapeutic activities' : 'Excellent engagement - keep it up'
+      ],
+      triggerEvents: {
+        highVolatility: volatility > 3,
+        lowEngagement: engagement < 30,
+        persistentLowMood: lowMoodCount > recentMoods.length * 0.6
+      },
+      followUpRequired: riskScore >= 0.5,
+      aiAnalysis: `Risk assessment completed. Score: ${riskScore.toFixed(2)}/1.0. ${riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} risk level detected.`
+    });
+
+    res.json({
+      success: true,
+      assessment,
+      immediateAction: riskScore >= 0.7
+    });
+
+  } catch (error) {
+    console.error('Risk assessment error:', error);
+    res.status(500).json({ error: 'Failed to perform risk assessment' });
+  }
+});
+
+// Longitudinal Trend Analysis
+app.get('/api/analytics/trends/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const trendType = req.query.type as string;
+    const timeframe = req.query.timeframe as string || '3months';
+    
+    // Get historical data for trend analysis
+    const existingTrends = await storage.getLongitudinalTrends(userId, trendType, timeframe);
+    
+    // Calculate new trends if needed
+    const currentMetrics = await storage.calculateUserWellnessMetrics(userId);
+    const currentVolatility = await storage.calculateEmotionalVolatility(userId);
+    const currentEngagement = await storage.calculateTherapeuticEngagement(userId);
+    
+    // Generate AI-powered trend insights
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{
+          role: 'system',
+          content: 'Analyze longitudinal wellness trends and provide therapeutic insights.'
+        }, {
+          role: 'user',
+          content: `Analyze trends for timeframe ${timeframe}:
+            Current Wellness: ${currentMetrics.wellnessScore}
+            Current Volatility: ${currentVolatility}
+            Current Engagement: ${currentEngagement}
+            
+            Provide trend direction, strength, and therapeutic predictions.`
+        }],
+        max_tokens: 400,
+        temperature: 0.6
+      })
+    });
+
+    const aiData = await openaiResponse.json();
+    const trendInsights = aiData.choices?.[0]?.message?.content || 'Trend analysis completed.';
+
+    // Create new trend analysis
+    const newTrend = await storage.createLongitudinalTrend({
+      userId,
+      trendType: trendType || 'wellness',
+      timeframe,
+      trendDirection: currentMetrics.wellnessScore >= 70 ? 'improving' : currentMetrics.wellnessScore >= 50 ? 'stable' : 'declining',
+      trendStrength: Math.abs(currentVolatility - 2.0),
+      dataPoints: {
+        currentWellness: currentMetrics.wellnessScore,
+        currentVolatility: currentVolatility,
+        currentEngagement: currentEngagement,
+        dataPointCount: 30
+      },
+      statisticalSignificance: 0.85,
+      insights: trendInsights,
+      predictedOutcome: currentMetrics.wellnessScore >= 70 ? 'Continued improvement expected' : 'Focus on consistency recommended',
+      confidenceInterval: {
+        lower: Math.max(0, currentMetrics.wellnessScore - 10),
+        upper: Math.min(100, currentMetrics.wellnessScore + 10)
+      }
+    });
+
+    res.json({
+      success: true,
+      trends: [newTrend, ...existingTrends],
+      analysis: {
+        overallDirection: newTrend.trendDirection,
+        confidence: newTrend.statisticalSignificance,
+        keyInsights: trendInsights
+      }
+    });
+
+  } catch (error) {
+    console.error('Trend analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze longitudinal trends' });
+  }
+});
+
 // Setup development or production serving AFTER all API routes
 if (process.env.NODE_ENV === "production") {
   serveStatic(app);

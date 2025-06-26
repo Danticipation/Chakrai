@@ -103,6 +103,30 @@ export interface IStorage {
   getEmotionalResponseAdaptations(userId: number, limit?: number): Promise<EmotionalResponseAdaptation[]>;
   getCrisisDetectionLogs(userId: number, limit?: number): Promise<CrisisDetectionLog[]>;
   getEmotionalContexts(userId: number, limit?: number): Promise<EmotionalContext[]>;
+  
+  // Comprehensive Analytics & Reporting
+  createMonthlyWellnessReport(data: InsertMonthlyWellnessReport): Promise<MonthlyWellnessReport>;
+  getMonthlyWellnessReports(userId: number, limit?: number): Promise<MonthlyWellnessReport[]>;
+  getMonthlyWellnessReport(userId: number, reportMonth: string): Promise<MonthlyWellnessReport | null>;
+  
+  createAnalyticsMetric(data: InsertAnalyticsMetric): Promise<AnalyticsMetric>;
+  getAnalyticsMetrics(userId: number, metricType?: string, limit?: number): Promise<AnalyticsMetric[]>;
+  
+  createProgressTracking(data: InsertProgressTracking): Promise<ProgressTracking>;
+  getProgressTracking(userId: number, period?: string, limit?: number): Promise<ProgressTracking[]>;
+  
+  createRiskAssessment(data: InsertRiskAssessment): Promise<RiskAssessment>;
+  getRiskAssessments(userId: number, limit?: number): Promise<RiskAssessment[]>;
+  getLatestRiskAssessment(userId: number): Promise<RiskAssessment | null>;
+  
+  createLongitudinalTrend(data: InsertLongitudinalTrend): Promise<LongitudinalTrend>;
+  getLongitudinalTrends(userId: number, trendType?: string, timeframe?: string): Promise<LongitudinalTrend[]>;
+  
+  // Analytics calculation methods
+  calculateUserWellnessMetrics(userId: number): Promise<any>;
+  calculateEmotionalVolatility(userId: number, days?: number): Promise<number>;
+  calculateTherapeuticEngagement(userId: number, days?: number): Promise<number>;
+  generateWellnessInsights(userId: number): Promise<string>;
 }
 
 export class DbStorage implements IStorage {
@@ -378,6 +402,243 @@ export class DbStorage implements IStorage {
     return await this.db.select().from(userFacts)
       .where(eq(userFacts.userId, userId))
       .orderBy(desc(userFacts.createdAt));
+  }
+
+  // Comprehensive Analytics & Reporting Implementation
+  async createMonthlyWellnessReport(data: InsertMonthlyWellnessReport): Promise<MonthlyWellnessReport> {
+    const [report] = await this.db.insert(monthlyWellnessReports).values(data).returning();
+    return report;
+  }
+
+  async getMonthlyWellnessReports(userId: number, limit: number = 12): Promise<MonthlyWellnessReport[]> {
+    return await this.db.select().from(monthlyWellnessReports)
+      .where(eq(monthlyWellnessReports.userId, userId))
+      .orderBy(desc(monthlyWellnessReports.reportMonth))
+      .limit(limit);
+  }
+
+  async getMonthlyWellnessReport(userId: number, reportMonth: string): Promise<MonthlyWellnessReport | null> {
+    const [report] = await this.db.select().from(monthlyWellnessReports)
+      .where(and(
+        eq(monthlyWellnessReports.userId, userId),
+        eq(monthlyWellnessReports.reportMonth, reportMonth)
+      ));
+    return report || null;
+  }
+
+  async createAnalyticsMetric(data: InsertAnalyticsMetric): Promise<AnalyticsMetric> {
+    const [metric] = await this.db.insert(analyticsMetrics).values(data).returning();
+    return metric;
+  }
+
+  async getAnalyticsMetrics(userId: number, metricType?: string, limit: number = 30): Promise<AnalyticsMetric[]> {
+    if (metricType) {
+      return await this.db.select().from(analyticsMetrics)
+        .where(and(
+          eq(analyticsMetrics.userId, userId),
+          eq(analyticsMetrics.metricType, metricType)
+        ))
+        .orderBy(desc(analyticsMetrics.calculatedDate))
+        .limit(limit);
+    }
+    
+    return await this.db.select().from(analyticsMetrics)
+      .where(eq(analyticsMetrics.userId, userId))
+      .orderBy(desc(analyticsMetrics.calculatedDate))
+      .limit(limit);
+  }
+
+  async createProgressTracking(data: InsertProgressTracking): Promise<ProgressTracking> {
+    const [tracking] = await this.db.insert(progressTracking).values(data).returning();
+    return tracking;
+  }
+
+  async getProgressTracking(userId: number, period?: string, limit: number = 20): Promise<ProgressTracking[]> {
+    if (period) {
+      return await this.db.select().from(progressTracking)
+        .where(and(
+          eq(progressTracking.userId, userId),
+          eq(progressTracking.trackingPeriod, period)
+        ))
+        .orderBy(desc(progressTracking.startDate))
+        .limit(limit);
+    }
+    
+    return await this.db.select().from(progressTracking)
+      .where(eq(progressTracking.userId, userId))
+      .orderBy(desc(progressTracking.startDate))
+      .limit(limit);
+  }
+
+  async createRiskAssessment(data: InsertRiskAssessment): Promise<RiskAssessment> {
+    const [assessment] = await this.db.insert(riskAssessments).values(data).returning();
+    return assessment;
+  }
+
+  async getRiskAssessments(userId: number, limit: number = 10): Promise<RiskAssessment[]> {
+    return await this.db.select().from(riskAssessments)
+      .where(eq(riskAssessments.userId, userId))
+      .orderBy(desc(riskAssessments.assessmentDate))
+      .limit(limit);
+  }
+
+  async getLatestRiskAssessment(userId: number): Promise<RiskAssessment | null> {
+    const [assessment] = await this.db.select().from(riskAssessments)
+      .where(eq(riskAssessments.userId, userId))
+      .orderBy(desc(riskAssessments.assessmentDate))
+      .limit(1);
+    return assessment || null;
+  }
+
+  async createLongitudinalTrend(data: InsertLongitudinalTrend): Promise<LongitudinalTrend> {
+    const [trend] = await this.db.insert(longitudinalTrends).values(data).returning();
+    return trend;
+  }
+
+  async getLongitudinalTrends(userId: number, trendType?: string, timeframe?: string): Promise<LongitudinalTrend[]> {
+    if (trendType && timeframe) {
+      return await this.db.select().from(longitudinalTrends)
+        .where(and(
+          eq(longitudinalTrends.userId, userId),
+          eq(longitudinalTrends.trendType, trendType),
+          eq(longitudinalTrends.timeframe, timeframe)
+        ))
+        .orderBy(desc(longitudinalTrends.lastCalculated));
+    } else if (trendType) {
+      return await this.db.select().from(longitudinalTrends)
+        .where(and(
+          eq(longitudinalTrends.userId, userId),
+          eq(longitudinalTrends.trendType, trendType)
+        ))
+        .orderBy(desc(longitudinalTrends.lastCalculated));
+    }
+    
+    return await this.db.select().from(longitudinalTrends)
+      .where(eq(longitudinalTrends.userId, userId))
+      .orderBy(desc(longitudinalTrends.lastCalculated));
+  }
+
+  async calculateUserWellnessMetrics(userId: number): Promise<any> {
+    // Calculate comprehensive wellness metrics
+    const currentDate = new Date();
+    const thirtyDaysAgo = new Date(currentDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+    
+    // Get recent mood entries
+    const recentMoods = await this.db.select().from(moodEntries)
+      .where(and(
+        eq(moodEntries.userId, userId),
+        eq(moodEntries.createdAt, thirtyDaysAgo)
+      ))
+      .orderBy(desc(moodEntries.createdAt));
+    
+    // Get journal entries
+    const journalCount = await this.db.select().from(journalEntries)
+      .where(and(
+        eq(journalEntries.userId, userId),
+        eq(journalEntries.createdAt, thirtyDaysAgo)
+      ));
+    
+    // Calculate averages and metrics
+    const averageMood = recentMoods.length > 0 
+      ? recentMoods.reduce((sum, mood) => sum + (mood.intensity || 5), 0) / recentMoods.length
+      : 5;
+    
+    const wellnessScore = Math.min(100, (averageMood / 10) * 100);
+    const engagement = Math.min(100, (journalCount.length / 30) * 100);
+    
+    return {
+      wellnessScore: Number(wellnessScore.toFixed(2)),
+      averageMood: Number(averageMood.toFixed(2)),
+      moodEntries: recentMoods.length,
+      journalEntries: journalCount.length,
+      engagement: Number(engagement.toFixed(2)),
+      calculatedAt: currentDate
+    };
+  }
+
+  async calculateEmotionalVolatility(userId: number, days: number = 30): Promise<number> {
+    const cutoffDate = new Date(Date.now() - (days * 24 * 60 * 60 * 1000));
+    
+    const moods = await this.db.select().from(moodEntries)
+      .where(and(
+        eq(moodEntries.userId, userId),
+        eq(moodEntries.createdAt, cutoffDate)
+      ))
+      .orderBy(desc(moodEntries.createdAt));
+    
+    if (moods.length < 2) return 0;
+    
+    // Calculate standard deviation of mood intensities
+    const intensities = moods.map(mood => mood.intensity || 5);
+    const mean = intensities.reduce((sum, val) => sum + val, 0) / intensities.length;
+    const variance = intensities.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / intensities.length;
+    const volatility = Math.sqrt(variance);
+    
+    return Number(volatility.toFixed(2));
+  }
+
+  async calculateTherapeuticEngagement(userId: number, days: number = 30): Promise<number> {
+    const cutoffDate = new Date(Date.now() - (days * 24 * 60 * 60 * 1000));
+    
+    // Count therapeutic activities
+    const journalCount = await this.db.select().from(journalEntries)
+      .where(and(
+        eq(journalEntries.userId, userId),
+        eq(journalEntries.createdAt, cutoffDate)
+      ));
+    
+    const moodCount = await this.db.select().from(moodEntries)
+      .where(and(
+        eq(moodEntries.userId, userId),
+        eq(moodEntries.createdAt, cutoffDate)
+      ));
+    
+    const messageCount = await this.db.select().from(messages)
+      .where(and(
+        eq(messages.userId, userId),
+        eq(messages.timestamp, cutoffDate)
+      ));
+    
+    // Calculate engagement score (0-100)
+    const totalActivities = journalCount.length + moodCount.length + (messageCount.length / 5);
+    const maxPossibleActivities = days * 3; // 3 activities per day max
+    const engagement = Math.min(100, (totalActivities / maxPossibleActivities) * 100);
+    
+    return Number(engagement.toFixed(2));
+  }
+
+  async generateWellnessInsights(userId: number): Promise<string> {
+    const metrics = await this.calculateUserWellnessMetrics(userId);
+    const volatility = await this.calculateEmotionalVolatility(userId);
+    const engagement = await this.calculateTherapeuticEngagement(userId);
+    
+    let insights = "Based on your recent therapeutic data:\n\n";
+    
+    if (metrics.wellnessScore >= 75) {
+      insights += "• Your wellness score shows strong emotional stability\n";
+    } else if (metrics.wellnessScore >= 50) {
+      insights += "• Your wellness score indicates moderate emotional balance with room for improvement\n";
+    } else {
+      insights += "• Your wellness score suggests focusing on emotional support strategies\n";
+    }
+    
+    if (volatility <= 1.5) {
+      insights += "• Your emotional patterns show good stability\n";
+    } else if (volatility <= 3.0) {
+      insights += "• Some emotional fluctuation detected - consider stress management techniques\n";
+    } else {
+      insights += "• Higher emotional volatility observed - regular therapeutic check-ins recommended\n";
+    }
+    
+    if (engagement >= 60) {
+      insights += "• Excellent therapeutic engagement - keep up the consistent practice\n";
+    } else if (engagement >= 30) {
+      insights += "• Moderate engagement - consider increasing journaling frequency\n";
+    } else {
+      insights += "• Low engagement detected - daily mindfulness practice recommended\n";
+    }
+    
+    return insights;
   }
 }
 
