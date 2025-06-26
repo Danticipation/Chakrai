@@ -476,8 +476,8 @@ const AppLayout = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex bg-[#0a0e1a]">
-        {/* Left Sidebar Navigation - Seamless blended buttons */}
-        <div className="w-48 flex flex-col justify-center py-8">
+        {/* Left Sidebar Navigation - Enlarged seamless blended buttons */}
+        <div className="w-72 flex flex-col justify-center py-8">
           {[
             { id: 'chat', label: 'Chat' },
             { id: 'daily', label: 'Reflection' },
