@@ -14,6 +14,8 @@ import AdaptiveLearning from './components/AdaptiveLearning';
 import VRTherapy from './components/VRTherapy';
 import HealthIntegration from './components/HealthIntegration';
 import PrivacyCompliance from './components/PrivacyCompliance';
+import Horoscope from './components/Horoscope';
+import DailyAffirmation from './components/DailyAffirmation';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -464,6 +466,12 @@ const AppLayout = () => {
       case 'privacy':
         return <PrivacyCompliance />;
 
+      case 'horoscope':
+        return <Horoscope />;
+
+      case 'affirmation':
+        return <DailyAffirmation />;
+
       case 'goals':
         return (
           <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
@@ -544,7 +552,10 @@ const AppLayout = () => {
         {/* Daily Features Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Daily Affirmation */}
-          <div className="bg-[#3949ab]/30 rounded-lg p-3 border border-[#5c6bc0]/30">
+          <button 
+            onClick={() => setActiveSection('affirmation')}
+            className="bg-[#3949ab]/30 rounded-lg p-3 border border-[#5c6bc0]/30 hover:bg-[#3949ab]/50 transition-colors text-left w-full"
+          >
             <div className="flex items-center space-x-2 mb-2">
               <Heart className="text-green-400" size={16} />
               <span className="text-sm font-semibold text-white">Daily Affirmation</span>
@@ -552,10 +563,13 @@ const AppLayout = () => {
             <p className="text-xs text-white/90 italic">
               "{dailyAffirmation}"
             </p>
-          </div>
+          </button>
           
           {/* Today's Horoscope */}
-          <div className="bg-[#3949ab]/30 rounded-lg p-3 border border-[#5c6bc0]/30">
+          <button 
+            onClick={() => setActiveSection('horoscope')}
+            className="bg-[#3949ab]/30 rounded-lg p-3 border border-[#5c6bc0]/30 hover:bg-[#3949ab]/50 transition-colors text-left w-full"
+          >
             <div className="flex items-center space-x-2 mb-2">
               <Star className="text-purple-400" size={16} />
               <span className="text-sm font-semibold text-white">Horoscope</span>
@@ -563,7 +577,7 @@ const AppLayout = () => {
             <p className="text-xs text-white/90">
               {horoscopeText || "Loading your cosmic guidance..."}
             </p>
-          </div>
+          </button>
         </div>
       </div>
 
