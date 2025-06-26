@@ -414,9 +414,11 @@ const AppLayout = () => {
     try {
       console.log('=== ELEVENLABS AUDIO TEST ===');
       
-      // Kill all browser TTS immediately
-      speechSynthesis.cancel();
-      speechSynthesis.pause();
+      // Disable browser TTS completely
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        speechSynthesis.pause();
+      }
       
       // Test ElevenLabs API only
       const response = await fetch('/api/text-to-speech', {
