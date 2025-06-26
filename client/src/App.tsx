@@ -553,8 +553,8 @@ const AppLayout = () => {
           ))}
         </div>
 
-        {/* Center Chat Area - Smaller */}
-        <div className="w-96 bg-[#2d3748] m-4 rounded-lg relative">
+        {/* Center Chat Area - MUCH LARGER */}
+        <div className="flex-1 bg-[#2d3748] m-4 rounded-lg relative">
           <div className="absolute inset-4 bg-[#1a202c] rounded">
             <div className="text-center text-red-500 text-2xl font-bold pt-16">Chat Box</div>
             {renderActiveSection()}
@@ -591,15 +591,30 @@ const AppLayout = () => {
           </div>
         </div>
 
-        {/* Right Stats Sidebar */}
-        <div className="flex-1 bg-[#5c85d6] m-4 rounded-lg p-6">
-          <div className="text-white text-2xl font-bold mb-6 text-center underline">Stats or goal tracking</div>
+        {/* Right Stats Sidebar - MUCH SMALLER */}
+        <div className="w-48 bg-[#5c85d6] m-4 rounded-lg p-4">
+          <div className="text-white text-base font-bold mb-4 text-center underline">Stats or goal tracking</div>
           
-          {/* Mock Chart Circles */}
-          <div className="space-y-8">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-32 h-32 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-32 h-32 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+          {/* Real Chart Data */}
+          <div className="space-y-4">
+            {botStats && (
+              <div className="bg-white rounded p-2">
+                <div className="text-[#1a237e] text-xs font-bold mb-1">Bot Level</div>
+                <div className="text-[#1a237e] text-xs">Level {botStats.level}</div>
+                <div className="text-[#1a237e] text-xs">{botStats.stage}</div>
+                <div className="text-[#1a237e] text-xs">{botStats.wordsLearned} words</div>
+              </div>
+            )}
+            <div className="bg-white rounded p-2">
+              <div className="text-[#1a237e] text-xs font-bold mb-1">Daily Progress</div>
+              <div className="text-[#1a237e] text-xs">Messages: {messages.length}</div>
+              <div className="text-[#1a237e] text-xs">Session: Active</div>
+            </div>
+            <div className="bg-white rounded p-2">
+              <div className="text-[#1a237e] text-xs font-bold mb-1">Wellness Score</div>
+              <div className="text-[#1a237e] text-xs">Today: 85%</div>
+              <div className="text-[#1a237e] text-xs">Week: 78%</div>
+            </div>
           </div>
         </div>
       </div>
