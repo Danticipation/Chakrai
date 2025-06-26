@@ -433,6 +433,9 @@ const AppLayout = () => {
           />
         );
 
+      case 'memory':
+        return <MemoryDashboard />;
+
       case 'analytics':
         return <AnalyticsDashboard userId={1} />;
 
@@ -586,14 +589,14 @@ const AppLayout = () => {
             { id: 'daily', icon: Brain, label: 'Reflection' },
             { id: 'chat', icon: MessageCircle, label: 'Chat' },
             { id: 'journal', icon: BookOpen, label: 'Journal' },
+            { id: 'memory', icon: Brain, label: 'Memory' },
             { id: 'analytics', icon: BarChart3, label: 'Analytics' },
             { id: 'rewards', icon: Gift, label: 'Rewards' },
             { id: 'community', icon: User, label: 'Community' },
             { id: 'adaptive', icon: Star, label: 'AI Learning' },
             { id: 'vr', icon: Headphones, label: 'VR Therapy' },
             { id: 'health', icon: Heart, label: 'Health' },
-            { id: 'privacy', icon: Shield, label: 'Privacy' },
-            { id: 'goals', icon: Target, label: 'Goals' }
+            { id: 'privacy', icon: Shield, label: 'Privacy' }
           ].map((tab) => (
             <button
               key={tab.id}
