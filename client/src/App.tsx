@@ -489,7 +489,7 @@ const AppLayout = () => {
       <div className="bg-white/80 backdrop-blur-sm p-4">
         <div className="flex justify-center space-x-8">
           {[
-            { id: 'daily', icon: Sun, label: 'Daily' },
+            { id: 'daily', icon: Brain, label: 'Reflection' },
             { id: 'chat', icon: MessageCircle, label: 'Chat' },
             { id: 'journal', icon: BookOpen, label: 'Journal' },
             { id: 'goals', icon: Target, label: 'Goals' }
