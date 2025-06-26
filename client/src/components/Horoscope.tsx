@@ -81,26 +81,26 @@ export default function Horoscope() {
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6] p-6 overflow-y-auto">
+    <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 border border-white/30 shadow-lg">
+        <div className="bg-[#5c6bc0]/30 backdrop-blur-sm rounded-2xl p-6 border border-[#7986cb]/30 shadow-lg">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
-              <Star className="text-purple-600" size={32} />
-              <h1 className="text-2xl font-bold text-purple-800">Daily Horoscope</h1>
+              <Star className="text-purple-300" size={32} />
+              <h1 className="text-2xl font-bold text-white">Daily Horoscope</h1>
             </div>
             <button
               onClick={handleRefresh}
               disabled={loading}
-              className="p-2 rounded-lg bg-purple-100 hover:bg-purple-200 transition-colors disabled:opacity-50"
+              className="p-2 rounded-lg bg-[#7986cb]/50 hover:bg-[#7986cb]/70 transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={`text-purple-600 ${loading ? 'animate-spin' : ''}`} size={20} />
+              <RefreshCw className={`text-white ${loading ? 'animate-spin' : ''}`} size={20} />
             </button>
           </div>
 
           {/* Zodiac Sign Selector */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-purple-800 mb-3">Select Your Sign</h3>
+            <h3 className="text-lg font-semibold text-white mb-3">Select Your Sign</h3>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
               {zodiacSigns.map((sign) => (
                 <button
@@ -108,8 +108,8 @@ export default function Horoscope() {
                   onClick={() => handleSignChange(sign)}
                   className={`p-2 rounded-lg text-sm font-medium transition-all ${
                     selectedSign === sign
-                      ? 'bg-purple-500 text-white shadow-lg'
-                      : 'bg-white/30 text-purple-700 hover:bg-white/50'
+                      ? 'bg-[#1a237e] text-white shadow-lg border border-purple-400'
+                      : 'bg-[#7986cb]/30 text-white hover:bg-[#7986cb]/50'
                   }`}
                 >
                   {sign.charAt(0).toUpperCase() + sign.slice(1)}
@@ -119,20 +119,20 @@ export default function Horoscope() {
           </div>
 
           {/* Horoscope Display */}
-          <div className="bg-white/30 rounded-xl p-6">
+          <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="flex items-center space-x-3">
-                  <Sparkles className="text-purple-600 animate-pulse" size={24} />
-                  <span className="text-purple-700">Reading the stars...</span>
+                  <Sparkles className="text-purple-300 animate-pulse" size={24} />
+                  <span className="text-white">Reading the stars...</span>
                 </div>
               </div>
             ) : error ? (
               <div className="text-center py-8">
-                <p className="text-red-600 mb-4">{error}</p>
+                <p className="text-red-300 mb-4">{error}</p>
                 <button
                   onClick={handleRefresh}
-                  className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                  className="px-4 py-2 bg-[#1a237e] text-white rounded-lg hover:bg-[#3949ab] transition-colors"
                 >
                   Try Again
                 </button>
@@ -140,12 +140,12 @@ export default function Horoscope() {
             ) : horoscopeData ? (
               <div>
                 <div className="flex items-center space-x-2 mb-4">
-                  <Sparkles className="text-purple-600" size={20} />
-                  <h2 className="text-xl font-bold text-purple-800">
+                  <Sparkles className="text-purple-300" size={20} />
+                  <h2 className="text-xl font-bold text-white">
                     {horoscopeData.sign} - {horoscopeData.date}
                   </h2>
                 </div>
-                <p className="text-purple-700 leading-relaxed text-lg">
+                <p className="text-white/90 leading-relaxed text-lg">
                   {horoscopeData.horoscope}
                 </p>
               </div>
@@ -153,7 +153,7 @@ export default function Horoscope() {
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-purple-600/80">
+            <p className="text-sm text-white/60">
               Your daily cosmic guidance for wellness and reflection
             </p>
           </div>
