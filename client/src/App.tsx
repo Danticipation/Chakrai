@@ -527,7 +527,7 @@ const AppLayout = () => {
                               : 'bg-purple-700 text-white'
                           }`}>
                             <p>{message.text}</p>
-                            <p className="text-xs mt-1 opacity-70">{message.time}</p>
+                            <p className="text-xs mt-1">{message.time}</p>
                           </div>
                         </div>
                       ))}
@@ -537,9 +537,9 @@ const AppLayout = () => {
                     <div className="flex justify-start mt-4">
                       <div className="bg-purple-700 text-white max-w-xs px-3 py-2 rounded-lg">
                         <div className="flex space-x-1">
-                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce"></div>
-                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
                       </div>
                     </div>

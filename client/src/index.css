@@ -59,6 +59,32 @@ html, body, #root {
   background-color: #0a0e1a !important;
 }
 
+/* Remove ALL opacity and transparency */
+* {
+  opacity: 1 !important;
+}
+
+/* Force solid colors - no transparency */
+.opacity-70,
+.opacity-60,
+.opacity-50,
+.opacity-80,
+.opacity-90,
+[class*="opacity-"] {
+  opacity: 1 !important;
+}
+
+/* Remove alpha values from colors */
+.bg-white\/70,
+.bg-white\/60,
+.bg-white\/50,
+.text-white\/70,
+.text-white\/60,
+.text-white\/50,
+[class*="\/"] {
+  opacity: 1 !important;
+}
+
 /* Eliminate ALL white backgrounds - force dark blue theme */
 div, section, article, main, aside, header, footer, nav {
   background-color: #0a0e1a !important;
