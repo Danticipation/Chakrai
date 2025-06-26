@@ -508,57 +508,41 @@ const AppLayout = () => {
 
   return (
     <div className="h-screen bg-[#0a0e1a] flex flex-col">
-      {/* Top Header - Expanded Three Sections */}
-      <div className="bg-[#0a0e1a] p-4 grid grid-cols-4 gap-4 h-32">
-        {/* Horoscope Section - Expanded */}
+      {/* Top Header - Expanded Sections */}
+      <div className="bg-[#0a0e1a] p-4 grid grid-cols-3 gap-4 h-48">
+        {/* Horoscope Section - Large Expanded */}
         <button 
           onClick={() => setActiveSection('horoscope')}
-          className="bg-purple-700 rounded-lg p-4 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+          className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
         >
-          <h3 className="text-lg font-bold text-white mb-2 underline">Horoscope</h3>
-          <p className="text-sm text-white line-clamp-3 text-left">
-            {horoscopeText ? horoscopeText.substring(0, 120) + '...' : "Today brings opportunities for reflection and personal development..."}
+          <h3 className="text-2xl font-bold text-white mb-4 underline">Horoscope</h3>
+          <p className="text-base text-white text-left leading-relaxed flex-1">
+            {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
           </p>
-          <p className="text-xs text-white/70 mt-2">Click to view full reading</p>
+          <p className="text-sm text-white/70 mt-4 font-semibold">Click to expand</p>
         </button>
         
-        {/* Logo Section - Expanded */}
+        {/* Logo Section - Center */}
         <button 
           onClick={() => setActiveSection('logo')}
-          className="bg-[#0a0e1a] rounded-lg p-4 flex flex-col items-center justify-center border border-white hover:border-purple-400 transition-colors cursor-pointer"
+          className="bg-[#0a0e1a] rounded-lg p-6 flex flex-col items-center justify-center border-2 border-white hover:border-purple-400 transition-colors cursor-pointer"
         >
-          <img src={traiLogo} alt="TrAI" className="h-16 w-auto mb-2" />
-          <p className="text-xs text-white/70">TraI Mental Wellness</p>
-          <p className="text-xs text-white/50">Click for more info</p>
+          <img src={traiLogo} alt="TrAI" className="h-24 w-auto mb-4" />
+          <p className="text-lg text-white/70 font-bold">TraI Mental Wellness</p>
+          <p className="text-sm text-white/50 mt-2">Click for more info</p>
         </button>
         
-        {/* Affirmation Section - Expanded */}
+        {/* Affirmation Section - Large Expanded */}
         <button 
           onClick={() => setActiveSection('affirmation')}
-          className="bg-purple-700 rounded-lg p-4 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+          className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
         >
-          <h3 className="text-lg font-bold text-white mb-2 underline">Affirmation</h3>
-          <p className="text-sm text-white line-clamp-3 text-left">
-            {dailyAffirmation.substring(0, 120)}...
+          <h3 className="text-2xl font-bold text-white mb-4 underline">Affirmation</h3>
+          <p className="text-base text-white text-left leading-relaxed flex-1">
+            {dailyAffirmation.substring(0, 200)}...
           </p>
-          <p className="text-xs text-white/70 mt-2">Click to view full message</p>
+          <p className="text-sm text-white/70 mt-4 font-semibold">Click to here</p>
         </button>
-        
-        {/* Stats/Goals Section - Compact */}
-        <div className="bg-[#3f51b5] rounded-lg p-3 flex flex-col">
-          <h3 className="text-sm font-bold text-white mb-2 underline">Stats & Goals</h3>
-          <div className="space-y-1">
-            <div className="text-xs text-white/80">
-              {botStats && `${botStats.stage} • Level ${botStats.level}`}
-            </div>
-            <div className="text-xs text-white/80">
-              Goal Progress: 75%
-            </div>
-            <div className="text-xs text-white/80">
-              Daily Streak: 5 days
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Main Content Area */}
