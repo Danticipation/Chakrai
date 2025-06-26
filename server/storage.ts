@@ -81,6 +81,18 @@ export interface IStorage {
   getWellnessStreaks(userId: number): Promise<WellnessStreak[]>;
   createUserAchievement(data: InsertUserAchievement): Promise<UserAchievement>;
   updateWellnessStreak(userId: number, streakType: string): Promise<WellnessStreak>;
+  
+  // Advanced Emotional Intelligence
+  createEmotionalContext(data: InsertEmotionalContext): Promise<EmotionalContext>;
+  createMoodForecast(data: InsertMoodForecast): Promise<MoodForecast>;
+  createPredictiveInsight(data: InsertPredictiveInsight): Promise<PredictiveInsight>;
+  createEmotionalResponseAdaptation(data: InsertEmotionalResponseAdaptation): Promise<EmotionalResponseAdaptation>;
+  createCrisisDetectionLog(data: InsertCrisisDetectionLog): Promise<CrisisDetectionLog>;
+  getMoodForecasts(userId: number, limit?: number): Promise<MoodForecast[]>;
+  getPredictiveInsights(userId: number, limit?: number): Promise<PredictiveInsight[]>;
+  getEmotionalResponseAdaptations(userId: number, limit?: number): Promise<EmotionalResponseAdaptation[]>;
+  getCrisisDetectionLogs(userId: number, limit?: number): Promise<CrisisDetectionLog[]>;
+  getEmotionalContexts(userId: number, limit?: number): Promise<EmotionalContext[]>;
 }
 
 export class DbStorage implements IStorage {
