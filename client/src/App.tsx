@@ -119,36 +119,24 @@ const AppLayout = () => {
   };
 
   const fetchHoroscope = async (sign: string = userZodiacSign) => {
+    // Skip external API due to CORS restrictions, use OpenAI-generated horoscope directly
     try {
-      // Try external horoscope API first
-      const response = await fetch(`https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${sign}&day=today`);
-      
+      const response = await fetch('/api/horoscope', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sign })
+      });
+
       if (response.ok) {
         const data = await response.json();
-        setHoroscopeText(data.data.horoscope_data);
+        setHoroscopeText(data.horoscope);
       } else {
-        throw new Error('External API failed');
+        setHoroscopeText('Your stars are aligning for a day of growth and positive energy.');
       }
-    } catch (apiError) {
-      // Fallback to OpenAI-generated horoscope
-      try {
-        const fallbackResponse = await fetch('/api/horoscope', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sign })
-        });
-
-        if (fallbackResponse.ok) {
-          const fallbackData = await fallbackResponse.json();
-          setHoroscopeText(fallbackData.horoscope);
-        } else {
-          setHoroscopeText('Your stars are aligning for a day of growth and positive energy.');
-        }
-      } catch (fallbackError) {
-        setHoroscopeText('Today brings opportunities for reflection and personal development.');
-      }
+    } catch (error) {
+      setHoroscopeText('Today brings opportunities for reflection and personal development.');
     }
   };
 

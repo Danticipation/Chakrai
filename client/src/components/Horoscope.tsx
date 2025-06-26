@@ -23,46 +23,28 @@ export default function Horoscope() {
     setError(null);
     
     try {
-      // Try external horoscope API first
-      const response = await fetch(`https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${sign}&day=today`);
-      
+      // Use OpenAI-generated horoscope directly (external API blocked by CORS)
+      const response = await fetch('/api/horoscope', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sign })
+      });
+
       if (response.ok) {
         const data = await response.json();
         setHoroscopeData({
           sign: sign.charAt(0).toUpperCase() + sign.slice(1),
-          horoscope: data.data.horoscope_data,
+          horoscope: data.horoscope,
           date: new Date().toLocaleDateString()
         });
       } else {
-        throw new Error('External API failed');
+        throw new Error('API failed');
       }
-    } catch (apiError) {
-      console.log('External horoscope API failed, using fallback...');
-      
-      // Fallback to OpenAI-generated horoscope
-      try {
-        const fallbackResponse = await fetch('/api/horoscope', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sign })
-        });
-
-        if (fallbackResponse.ok) {
-          const fallbackData = await fallbackResponse.json();
-          setHoroscopeData({
-            sign: sign.charAt(0).toUpperCase() + sign.slice(1),
-            horoscope: fallbackData.horoscope,
-            date: new Date().toLocaleDateString()
-          });
-        } else {
-          throw new Error('Fallback API failed');
-        }
-      } catch (fallbackError) {
-        console.error('Both horoscope APIs failed:', fallbackError);
-        setError('Unable to fetch horoscope. Please try again later.');
-      }
+    } catch (error) {
+      console.error('Horoscope API failed:', error);
+      setError('Unable to fetch horoscope. Please try again later.');
     } finally {
       setLoading(false);
     }

@@ -654,6 +654,110 @@ app.post('/api/text-to-speech', async (req, res) => {
   }
 });
 
+// Bot stats endpoint
+app.get('/api/bot-stats', async (req, res) => {
+  try {
+    res.json({ 
+      level: 3,
+      stage: "Therapist",
+      wordsLearned: 1000
+    });
+  } catch (error) {
+    console.error('Bot stats error:', error);
+    res.status(500).json({ error: 'Failed to get bot stats' });
+  }
+});
+
+// Daily affirmation endpoint
+app.get('/api/daily-affirmation', async (req, res) => {
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      return res.json({ affirmation: 'Today is a beautiful day to practice self-compassion and growth.' });
+    }
+
+    // Generate daily affirmation using OpenAI
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a therapeutic wellness coach providing daily affirmations. Create positive, supportive daily affirmations that promote mental wellness and self-compassion.'
+          },
+          {
+            role: 'user',
+            content: 'Generate a therapeutic daily affirmation focused on personal growth, self-compassion, and mental wellness. Keep it 1-2 sentences and inspiring.'
+          }
+        ],
+        max_tokens: 100,
+        temperature: 0.8
+      })
+    });
+
+    if (!openaiResponse.ok) {
+      throw new Error('OpenAI API request failed');
+    }
+
+    const openaiData = await openaiResponse.json();
+    const affirmation = openaiData.choices[0].message.content;
+
+    res.json({ affirmation });
+  } catch (error) {
+    console.error('Daily affirmation generation error:', error);
+    res.json({ affirmation: 'Today is a beautiful day to practice self-compassion and growth.' });
+  }
+});
+
+// Weekly summary endpoint
+app.get('/api/weekly-summary', async (req, res) => {
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      return res.json({ summary: 'Your therapeutic journey continues to evolve positively this week.' });
+    }
+
+    // Generate weekly summary using OpenAI
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a therapeutic wellness coach providing weekly reflections. Create supportive weekly summaries that promote mental wellness and personal growth.'
+          },
+          {
+            role: 'user',
+            content: 'Generate a therapeutic weekly summary focused on personal growth, mindfulness, and mental wellness progress. Keep it 2-3 sentences and encouraging.'
+          }
+        ],
+        max_tokens: 150,
+        temperature: 0.7
+      })
+    });
+
+    if (!openaiResponse.ok) {
+      throw new Error('OpenAI API request failed');
+    }
+
+    const openaiData = await openaiResponse.json();
+    const summary = openaiData.choices[0].message.content;
+
+    res.json({ summary });
+  } catch (error) {
+    console.error('Weekly summary generation error:', error);
+    res.json({ summary: 'Your therapeutic journey continues to evolve positively this week.' });
+  }
+});
+
 // Onboarding status endpoint
 app.get('/api/onboarding-status/:userId', async (req, res) => {
   try {
