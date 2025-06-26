@@ -75,11 +75,11 @@ export default function MemoryDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+      <div className="min-h-screen bg-[#1a237e] p-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-blue-600">Loading memory dashboard...</span>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            <span className="ml-3 text-white">Loading memory dashboard...</span>
           </div>
         </div>
       </div>
@@ -87,21 +87,21 @@ export default function MemoryDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+    <div className="min-h-screen bg-[#1a237e] p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Brain className="w-8 h-8 text-blue-600" />
+            <Brain className="w-8 h-8 text-white" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Memory Dashboard</h1>
-              <p className="text-gray-600">What TraI has learned about you</p>
+              <h1 className="text-2xl font-bold text-white">Memory Dashboard</h1>
+              <p className="text-white/80">What TraI has learned about you</p>
             </div>
           </div>
           <Button 
             onClick={handleRefresh}
             disabled={refreshing}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-[#3f51b5] hover:bg-[#303f9f] text-white"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
@@ -110,98 +110,96 @@ export default function MemoryDashboard() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
+          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+            <div className="p-4">
               <div className="flex items-center space-x-2">
-                <MessageCircle className="w-5 h-5 text-blue-600" />
+                <MessageCircle className="w-5 h-5 text-white" />
                 <div>
-                  <p className="text-sm text-gray-600">Total Memories</p>
-                  <p className="text-2xl font-bold">{dashboard?.summary.totalMemories || 0}</p>
+                  <p className="text-sm text-white/80">Total Memories</p>
+                  <p className="text-2xl font-bold text-white">{dashboard?.summary.totalMemories || 0}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className="p-4">
+          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+            <div className="p-4">
               <div className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+                <TrendingUp className="w-5 h-5 text-white" />
                 <div>
-                  <p className="text-sm text-gray-600">Active Memories</p>
-                  <p className="text-2xl font-bold">{dashboard?.summary.activeMemories || 0}</p>
+                  <p className="text-sm text-white/80">Active Memories</p>
+                  <p className="text-2xl font-bold text-white">{dashboard?.summary.activeMemories || 0}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className="p-4">
+          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+            <div className="p-4">
               <div className="flex items-center space-x-2">
-                <Users className="w-5 h-5 text-purple-600" />
+                <Users className="w-5 h-5 text-white" />
                 <div>
-                  <p className="text-sm text-gray-600">Conversations</p>
-                  <p className="text-2xl font-bold">{dashboard?.summary.conversationSessions || 0}</p>
+                  <p className="text-sm text-white/80">Conversations</p>
+                  <p className="text-2xl font-bold text-white">{dashboard?.summary.conversationSessions || 0}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className="p-4">
+          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+            <div className="p-4">
               <div className="flex items-center space-x-2">
-                <Clock className="w-5 h-5 text-orange-600" />
+                <Clock className="w-5 h-5 text-white" />
                 <div>
-                  <p className="text-sm text-gray-600">Last Memory</p>
-                  <p className="text-lg font-semibold">{formatDate(dashboard?.summary.lastMemoryDate || '')}</p>
+                  <p className="text-sm text-white/80">Last Memory</p>
+                  <p className="text-lg font-semibold text-white">{formatDate(dashboard?.summary.lastMemoryDate || '')}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Memories */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <MessageCircle className="w-5 h-5" />
-                <span>Recent Memories</span>
-              </CardTitle>
-              <CardDescription>Latest conversations and insights</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+            <div className="p-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <MessageCircle className="w-5 h-5 text-white" />
+                <span className="text-lg font-semibold text-white">Recent Memories</span>
+              </div>
+              <p className="text-white/80 mb-6">Latest conversations and insights</p>
               <div className="space-y-4">
                 {dashboard?.recentMemories?.slice(0, 5).map((memory) => (
-                  <div key={memory.id} className="border rounded-lg p-3 bg-white">
+                  <div key={memory.id} className="border border-white/30 rounded-lg p-3 bg-[#1a237e]">
                     <div className="flex items-start justify-between mb-2">
-                      <Badge className={getEmotionalColor(memory.emotionalContext)}>
+                      <Badge className="bg-white/20 text-white border-white/30">
                         {memory.emotionalContext}
                       </Badge>
-                      <span className="text-xs text-gray-500">{formatDate(memory.createdAt)}</span>
+                      <span className="text-xs text-white/60">{formatDate(memory.createdAt)}</span>
                     </div>
-                    <p className="text-sm text-gray-700 mb-2">{memory.content}</p>
+                    <p className="text-sm text-white mb-2">{memory.content}</p>
                     <div className="flex items-center justify-between">
                       <div className="flex flex-wrap gap-1">
                         {memory.topics?.slice(0, 3).map((topic, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
+                          <Badge key={index} className="bg-white/10 text-white/80 border-white/30 text-xs">
                             {topic}
                           </Badge>
                         ))}
                       </div>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-white/60">
                         Accessed {memory.accessCount} times
                       </span>
                     </div>
                   </div>
                 )) || (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-white/60">
                     <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No memories yet. Start a conversation to build your memory profile!</p>
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Top Topics */}
           <Card>
