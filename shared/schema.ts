@@ -283,15 +283,7 @@ export const insertForumPostSchema = createInsertSchema(forumPosts).omit({
   createdAt: true,
 });
 
-export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
-  id: true,
-  unlockedAt: true,
-});
-
-export const insertWellnessStreakSchema = createInsertSchema(wellnessStreaks).omit({
-  id: true,
-  createdAt: true,
-});
+// Schema declarations will be added after table definitions
 
 export const insertEmotionalPatternSchema = createInsertSchema(emotionalPatterns).omit({
   id: true,
