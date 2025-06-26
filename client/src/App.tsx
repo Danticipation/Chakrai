@@ -315,33 +315,83 @@ const AppLayout = () => {
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      // Enhanced mobile audio constraints
+      const constraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100,
+          channelCount: 1
+        }
+      };
+
+      console.log('Requesting microphone access...');
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log('Microphone access granted');
+
+      // Check for MediaRecorder support with different MIME types
+      let mimeType = 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        mimeType = 'audio/webm;codecs=opus';
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mimeType = 'audio/mp4';
+      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+        mimeType = 'audio/wav';
+      }
+
+      console.log('Using MIME type:', mimeType);
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
+        console.log('Audio data available:', event.data.size, 'bytes');
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        await sendAudioToWhisper(audioBlob);
+        console.log('Recording stopped, processing audio...');
+        if (audioChunksRef.current.length > 0) {
+          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+          console.log('Audio blob created:', audioBlob.size, 'bytes');
+          await sendAudioToWhisper(audioBlob);
+        } else {
+          console.log('No audio data recorded');
+          alert('No audio was recorded. Please try again.');
+        }
         stream.getTracks().forEach(track => track.stop());
       };
 
-      mediaRecorder.start();
+      mediaRecorder.onerror = (event) => {
+        console.error('MediaRecorder error:', event);
+        alert('Recording error occurred. Please try again.');
+      };
+
+      // Start recording with data collection interval
+      mediaRecorder.start(1000); // Collect data every second
       setIsRecording(true);
+      console.log('Recording started');
 
       setTimeout(() => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          console.log('Auto-stopping recording after 30 seconds');
           stopRecording();
         }
       }, 30000);
 
     } catch (error) {
       console.error('Error accessing microphone:', error);
-      alert('Could not access microphone. Please check permissions.');
+      const err = error as any;
+      if (err?.name === 'NotAllowedError') {
+        alert('Microphone permission denied. Please allow microphone access and try again.');
+      } else if (err?.name === 'NotFoundError') {
+        alert('No microphone found. Please check your device.');
+      } else {
+        alert('Could not access microphone: ' + (err?.message || 'Unknown error'));
+      }
     }
   };
 
@@ -354,22 +404,35 @@ const AppLayout = () => {
 
   const sendAudioToWhisper = async (audioBlob: Blob) => {
     try {
+      console.log('Sending audio to Whisper API...');
       const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.wav');
+      formData.append('audio', audioBlob, 'recording.webm');
 
       const response = await fetch('/api/transcribe', {
         method: 'POST',
         body: formData
       });
 
+      console.log('Transcription response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
-        setInput(data.text || '');
+        console.log('Transcription result:', data);
+        if (data.text && data.text.trim()) {
+          setInput(data.text.trim());
+          console.log('Input set to:', data.text.trim());
+        } else {
+          console.log('Empty transcription result');
+          alert('No speech detected. Please try speaking louder or closer to the microphone.');
+        }
       } else {
-        console.error('Transcription failed');
+        const errorData = await response.text();
+        console.error('Transcription failed:', response.status, errorData);
+        alert('Transcription service unavailable. Please try again later.');
       }
     } catch (error) {
       console.error('Error transcribing audio:', error);
+      alert('Failed to transcribe audio. Please check your internet connection and try again.');
     }
   };
 
@@ -727,33 +790,46 @@ const AppLayout = () => {
                 </div>
                 
                 {/* Chat Input at Bottom */}
-                <div className="absolute bottom-4 left-4 right-4 flex space-x-2">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    placeholder="Share your thoughts"
-                    className="flex-1 px-3 py-2 bg-blue-600 text-white border border-blue-500 rounded text-sm placeholder-white/70"
-                  />
-                  <button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    className={`w-9 h-9 rounded flex items-center justify-center transition-colors ${
-                      isRecording 
-                        ? 'bg-red-500 hover:bg-red-600 text-white' 
-                        : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
-                    }`}
-                    disabled={loading}
-                  >
-                    {isRecording ? <Square size={16} /> : <Mic size={16} />}
-                  </button>
-                  <button
-                    onClick={sendMessage}
-                    disabled={!input.trim() || loading}
-                    className="w-9 h-9 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
-                  >
-                    <Send size={16} />
-                  </button>
+                <div className="absolute bottom-4 left-4 right-4">
+                  {/* Recording Status Indicator */}
+                  {isRecording && (
+                    <div className="mb-2 flex items-center justify-center">
+                      <div className="bg-red-500/90 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse mr-2"></div>
+                        Recording... Tap the mic to stop
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      placeholder="Share your thoughts or tap mic to speak"
+                      className="flex-1 px-3 py-2 bg-blue-600 text-white border border-blue-500 rounded text-sm placeholder-white/70"
+                    />
+                    <button
+                      onClick={isRecording ? stopRecording : startRecording}
+                      className={`w-12 h-9 rounded flex items-center justify-center transition-all duration-200 ${
+                        isRecording 
+                          ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse scale-110' 
+                          : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white hover:scale-105'
+                      }`}
+                      disabled={loading}
+                      title={isRecording ? "Stop recording (tap to stop)" : "Start voice recording (tap and speak)"}
+                    >
+                      {isRecording ? <Square size={18} /> : <Mic size={18} />}
+                    </button>
+                    <button
+                      onClick={sendMessage}
+                      disabled={!input.trim() || loading}
+                      className="w-9 h-9 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
+                    >
+                      <Send size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
