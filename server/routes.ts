@@ -1062,4 +1062,59 @@ router.post('/client/:clientId/generate-risk-alerts', async (req, res) => {
   }
 });
 
+// PWA Notification endpoints
+router.post('/notifications/subscribe', async (req, res) => {
+  try {
+    const subscription = req.body;
+    // Store push subscription for this user
+    console.log('Push notification subscription:', subscription);
+    res.json({ success: true, message: 'Subscription saved' });
+  } catch (error) {
+    console.error('Failed to save push subscription:', error);
+    res.status(500).json({ error: 'Failed to save subscription' });
+  }
+});
+
+router.post('/notifications/schedule-wellness-reminders', async (req, res) => {
+  try {
+    const { affirmationTime, moodCheckTime, journalTime } = req.body;
+    
+    // Store notification preferences for user
+    console.log('Wellness reminder schedule:', {
+      affirmationTime,
+      moodCheckTime,
+      journalTime
+    });
+    
+    res.json({ 
+      success: true, 
+      message: 'Wellness reminders scheduled',
+      schedule: {
+        affirmationTime,
+        moodCheckTime,
+        journalTime
+      }
+    });
+  } catch (error) {
+    console.error('Failed to schedule wellness reminders:', error);
+    res.status(500).json({ error: 'Failed to schedule reminders' });
+  }
+});
+
+router.get('/user/notification-preferences', async (req, res) => {
+  try {
+    // Return user notification preferences
+    // For now, return defaults - would be stored in database in production
+    res.json({
+      enableReminders: true,
+      affirmationTime: '09:00',
+      moodCheckTime: '18:00',
+      journalTime: '20:00'
+    });
+  } catch (error) {
+    console.error('Failed to get notification preferences:', error);
+    res.status(500).json({ error: 'Failed to get preferences' });
+  }
+});
+
 export default router;

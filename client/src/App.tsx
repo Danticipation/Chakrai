@@ -97,6 +97,32 @@ const AppLayout = () => {
     } else {
       setShowOnboarding(true);
     }
+
+    // PWA notification event handlers
+    const handleMoodTracking = (event: any) => {
+      setMicroSessionType('mood');
+      setShowMicroSession(true);
+    };
+
+    const handleVoiceJournal = (event: any) => {
+      setMicroSessionType('journal');
+      setShowMicroSession(true);
+    };
+
+    const handleDailyAffirmation = (event: any) => {
+      fetchDailyAffirmation();
+      // Could also show affirmation modal here
+    };
+
+    window.addEventListener('openMoodTracking', handleMoodTracking);
+    window.addEventListener('openVoiceJournal', handleVoiceJournal);
+    window.addEventListener('showDailyAffirmation', handleDailyAffirmation);
+
+    return () => {
+      window.removeEventListener('openMoodTracking', handleMoodTracking);
+      window.removeEventListener('openVoiceJournal', handleVoiceJournal);
+      window.removeEventListener('showDailyAffirmation', handleDailyAffirmation);
+    };
   }, [user]);
 
   const fetchBotStats = async () => {
@@ -757,6 +783,20 @@ const AppLayout = () => {
           </div>
         </div>
       )}
+
+      {/* PWA Manager */}
+      <PWAManager onNotificationPermissionChange={setNotificationsEnabled} />
+
+      {/* Micro Session Modal */}
+      <MicroSession
+        isOpen={showMicroSession}
+        onClose={() => setShowMicroSession(false)}
+        sessionType={microSessionType}
+        onComplete={(data) => {
+          console.log('Micro session completed:', data);
+          setShowMicroSession(false);
+        }}
+      />
     </div>
   );
 };
