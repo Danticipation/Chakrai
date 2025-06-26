@@ -361,7 +361,7 @@ export class DbStorage implements IStorage {
         .set({ 
           currentStreak: currentStreak + 1,
           longestStreak: Math.max(longestStreak, currentStreak + 1),
-          lastActiveDate: new Date()
+          lastActivityDate: new Date()
         })
         .where(eq(wellnessStreaks.id, existing.id))
         .returning();

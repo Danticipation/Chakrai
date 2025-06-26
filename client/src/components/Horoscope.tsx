@@ -23,14 +23,8 @@ export default function Horoscope() {
     setError(null);
     
     try {
-      // Use OpenAI-generated horoscope directly (external API blocked by CORS)
-      const response = await fetch('/api/horoscope', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sign })
-      });
+      // Use the correct GET endpoint with sign as parameter
+      const response = await fetch(`/api/horoscope/${sign}`);
 
       if (response.ok) {
         const data = await response.json();
