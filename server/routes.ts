@@ -353,15 +353,17 @@ router.post('/text-to-speech', async (req, res) => {
 
       if (response.ok) {
         const audioBuffer = await response.arrayBuffer();
-        const base64Audio = Buffer.from(audioBuffer).toString('base64');
         
-        console.log(`Generated audio for voice ${voice}: ${base64Audio.length} characters`);
+        console.log(`Generated audio for voice ${voice}: ${audioBuffer.byteLength} bytes`);
         
-        res.json({
-          audioUrl: base64Audio,
-          voice: voice,
-          voiceId: voiceId
+        // Return audio as blob instead of JSON with base64
+        res.set({
+          'Content-Type': 'audio/mpeg',
+          'Content-Length': audioBuffer.byteLength.toString(),
+          'Cache-Control': 'no-cache'
         });
+        
+        res.send(Buffer.from(audioBuffer));
       } else {
         const errorText = await response.text();
         console.error('ElevenLabs API error:', response.status, errorText);

@@ -90,21 +90,25 @@ export default function Horoscope() {
         throw new Error('Voice synthesis failed');
       }
 
-      const data = await response.json();
+      // Handle audio blob directly instead of JSON
+      const audioBlob = await response.blob();
       
-      if (data.audioUrl && data.audioUrl.length > 10000) {
-        // ElevenLabs audio detected
-        const audio = new Audio(data.audioUrl);
+      if (audioBlob.size > 0) {
+        // Create audio from blob URL instead of base64 data URL
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
         setCurrentAudio(audio);
         
         audio.onended = () => {
           setIsPlaying(false);
           setCurrentAudio(null);
+          URL.revokeObjectURL(audioUrl);
         };
         
         audio.onerror = () => {
           setIsPlaying(false);
           setCurrentAudio(null);
+          URL.revokeObjectURL(audioUrl);
           setError('Audio playback failed');
         };
         
