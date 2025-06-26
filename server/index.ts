@@ -1680,6 +1680,336 @@ app.get('/api/journal/export/insights/:userId', async (req, res) => {
   }
 });
 
+// Enhanced Gamification & Rewards System API Endpoints
+
+// Wellness Points Management
+app.get('/api/wellness-points/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    // Get user wellness points or create if doesn't exist
+    let wellnessPoints = await storage.getUserWellnessPoints(userId);
+    if (!wellnessPoints) {
+      wellnessPoints = await storage.createUserWellnessPoints({
+        userId,
+        totalPoints: 0,
+        availablePoints: 0,
+        lifetimePoints: 0,
+        currentLevel: 1,
+        pointsToNextLevel: 100
+      });
+    }
+
+    // Get recent transactions
+    const recentTransactions = await storage.getPointsTransactions(userId, 10);
+
+    res.json({
+      success: true,
+      wellnessPoints,
+      recentTransactions
+    });
+
+  } catch (error) {
+    console.error('Wellness points error:', error);
+    res.status(500).json({ error: 'Failed to get wellness points' });
+  }
+});
+
+app.post('/api/wellness-points/award', async (req, res) => {
+  try {
+    const { userId, points, activity, description } = req.body;
+    
+    // Award points and create transaction
+    await storage.awardWellnessPoints(userId, points, activity, description);
+    
+    // Check for level up
+    const wellnessPoints = await storage.getUserWellnessPoints(userId);
+    let leveledUp = false;
+    
+    if (wellnessPoints && wellnessPoints.totalPoints >= wellnessPoints.pointsToNextLevel) {
+      leveledUp = true;
+      await storage.levelUpUser(userId);
+    }
+
+    res.json({
+      success: true,
+      pointsAwarded: points,
+      leveledUp,
+      newLevel: leveledUp ? wellnessPoints?.currentLevel + 1 : wellnessPoints?.currentLevel
+    });
+
+  } catch (error) {
+    console.error('Award points error:', error);
+    res.status(500).json({ error: 'Failed to award points' });
+  }
+});
+
+// Achievement System
+app.get('/api/achievements/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    // Get all achievements with user progress
+    const [allAchievements, userAchievements] = await Promise.all([
+      storage.getAllAchievements(),
+      storage.getUserAchievements(userId)
+    ]);
+
+    // Merge achievements with user progress
+    const achievementsWithProgress = allAchievements.map(achievement => {
+      const userProgress = userAchievements.find(ua => ua.achievementId === achievement.id);
+      return {
+        ...achievement,
+        progress: userProgress?.progress || 0,
+        isCompleted: userProgress?.isCompleted || false,
+        unlockedAt: userProgress?.unlockedAt || null
+      };
+    });
+
+    res.json({
+      success: true,
+      achievements: achievementsWithProgress,
+      totalUnlocked: userAchievements.filter(ua => ua.isCompleted).length,
+      totalPoints: userAchievements.reduce((sum, ua) => sum + (ua.isCompleted ? (allAchievements.find(a => a.id === ua.achievementId)?.pointsReward || 0) : 0), 0)
+    });
+
+  } catch (error) {
+    console.error('Achievements error:', error);
+    res.status(500).json({ error: 'Failed to get achievements' });
+  }
+});
+
+app.post('/api/achievements/check', async (req, res) => {
+  try {
+    const { userId, activity, metadata } = req.body;
+    
+    // Check for achievement unlocks based on activity
+    const newAchievements = await storage.checkAndUnlockAchievements(userId, activity, metadata);
+    
+    res.json({
+      success: true,
+      newAchievements,
+      hasNewAchievements: newAchievements.length > 0
+    });
+
+  } catch (error) {
+    console.error('Achievement check error:', error);
+    res.status(500).json({ error: 'Failed to check achievements' });
+  }
+});
+
+// Rewards Shop
+app.get('/api/rewards-shop', async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId as string) || 1;
+    
+    // Get available rewards and user purchases
+    const [rewards, userPurchases, userPoints] = await Promise.all([
+      storage.getAvailableRewards(),
+      storage.getUserPurchases(userId),
+      storage.getUserWellnessPoints(userId)
+    ]);
+
+    // Mark rewards as purchased
+    const rewardsWithStatus = rewards.map(reward => ({
+      ...reward,
+      isPurchased: userPurchases.some(up => up.rewardId === reward.id),
+      canAfford: userPoints ? userPoints.availablePoints >= reward.cost : false
+    }));
+
+    res.json({
+      success: true,
+      rewards: rewardsWithStatus,
+      userPoints: userPoints?.availablePoints || 0
+    });
+
+  } catch (error) {
+    console.error('Rewards shop error:', error);
+    res.status(500).json({ error: 'Failed to get rewards shop' });
+  }
+});
+
+app.post('/api/rewards-shop/purchase', async (req, res) => {
+  try {
+    const { userId, rewardId } = req.body;
+    
+    // Get reward and user points
+    const [reward, userPoints] = await Promise.all([
+      storage.getRewardById(rewardId),
+      storage.getUserWellnessPoints(userId)
+    ]);
+
+    if (!reward || !userPoints) {
+      return res.status(404).json({ error: 'Reward or user not found' });
+    }
+
+    if (userPoints.availablePoints < reward.cost) {
+      return res.status(400).json({ error: 'Insufficient points' });
+    }
+
+    // Process purchase
+    await storage.purchaseReward(userId, rewardId, reward.cost);
+
+    res.json({
+      success: true,
+      reward,
+      remainingPoints: userPoints.availablePoints - reward.cost
+    });
+
+  } catch (error) {
+    console.error('Purchase error:', error);
+    res.status(500).json({ error: 'Failed to purchase reward' });
+  }
+});
+
+// Wellness Streaks
+app.get('/api/streaks/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    const streaks = await storage.getUserStreaks(userId);
+    
+    res.json({
+      success: true,
+      streaks: streaks || [],
+      totalStreaks: streaks?.length || 0
+    });
+
+  } catch (error) {
+    console.error('Streaks error:', error);
+    res.status(500).json({ error: 'Failed to get streaks' });
+  }
+});
+
+app.post('/api/streaks/update', async (req, res) => {
+  try {
+    const { userId, streakType } = req.body;
+    
+    // Update streak for activity
+    const updatedStreak = await storage.updateStreak(userId, streakType);
+    
+    res.json({
+      success: true,
+      streak: updatedStreak,
+      milestone: updatedStreak.currentStreak > 0 && updatedStreak.currentStreak % 7 === 0
+    });
+
+  } catch (error) {
+    console.error('Update streak error:', error);
+    res.status(500).json({ error: 'Failed to update streak' });
+  }
+});
+
+// Community Challenges
+app.get('/api/community-challenges', async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId as string) || 1;
+    
+    // Get active challenges and user progress
+    const [challenges, userProgress] = await Promise.all([
+      storage.getActiveCommunityChallenes(),
+      storage.getUserChallengeProgress(userId)
+    ]);
+
+    // Merge challenges with user progress
+    const challengesWithProgress = challenges.map(challenge => {
+      const progress = userProgress.find(up => up.challengeId === challenge.id);
+      return {
+        ...challenge,
+        userProgress: progress?.currentProgress || 0,
+        isParticipating: !!progress,
+        isCompleted: progress?.isCompleted || false,
+        daysRemaining: Math.ceil((new Date(challenge.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      };
+    });
+
+    res.json({
+      success: true,
+      challenges: challengesWithProgress
+    });
+
+  } catch (error) {
+    console.error('Community challenges error:', error);
+    res.status(500).json({ error: 'Failed to get community challenges' });
+  }
+});
+
+app.post('/api/community-challenges/join', async (req, res) => {
+  try {
+    const { userId, challengeId } = req.body;
+    
+    // Join challenge
+    await storage.joinCommunityChallenge(userId, challengeId);
+    
+    res.json({
+      success: true,
+      message: 'Successfully joined challenge'
+    });
+
+  } catch (error) {
+    console.error('Join challenge error:', error);
+    res.status(500).json({ error: 'Failed to join challenge' });
+  }
+});
+
+app.post('/api/community-challenges/progress', async (req, res) => {
+  try {
+    const { userId, challengeId, progressIncrement } = req.body;
+    
+    // Update challenge progress
+    const updatedProgress = await storage.updateChallengeProgress(userId, challengeId, progressIncrement);
+    
+    res.json({
+      success: true,
+      progress: updatedProgress
+    });
+
+  } catch (error) {
+    console.error('Challenge progress error:', error);
+    res.status(500).json({ error: 'Failed to update challenge progress' });
+  }
+});
+
+// Gamification Dashboard Overview
+app.get('/api/gamification/overview/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    // Get comprehensive gamification data
+    const [wellnessPoints, achievements, streaks, challenges, dailyActivity] = await Promise.all([
+      storage.getUserWellnessPoints(userId),
+      storage.getUserAchievements(userId),
+      storage.getUserStreaks(userId),
+      storage.getUserChallengeProgress(userId),
+      storage.getTodayActivity(userId)
+    ]);
+
+    // Calculate statistics
+    const completedAchievements = achievements.filter(a => a.isCompleted).length;
+    const activeStreaks = streaks.filter(s => s.currentStreak > 0).length;
+    const activeChallenges = challenges.filter(c => !c.isCompleted).length;
+
+    res.json({
+      success: true,
+      overview: {
+        level: wellnessPoints?.currentLevel || 1,
+        totalPoints: wellnessPoints?.totalPoints || 0,
+        availablePoints: wellnessPoints?.availablePoints || 0,
+        pointsToNext: wellnessPoints?.pointsToNextLevel || 100,
+        completedAchievements,
+        activeStreaks,
+        activeChallenges,
+        todayActivities: dailyActivity?.activitiesCompleted || 0,
+        todayPoints: dailyActivity?.pointsEarned || 0
+      }
+    });
+
+  } catch (error) {
+    console.error('Gamification overview error:', error);
+    res.status(500).json({ error: 'Failed to get gamification overview' });
+  }
+});
+
 // Setup development or production serving AFTER all API routes
 if (process.env.NODE_ENV === "production") {
   serveStatic(app);

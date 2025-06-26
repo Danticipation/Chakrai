@@ -133,27 +133,7 @@ export const forumPosts = pgTable("forum_posts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Achievements and gamification
-export const userAchievements = pgTable("user_achievements", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  achievementType: text("achievement_type").notNull(),
-  title: text("title").notNull(),
-  description: text("description"),
-  icon: text("icon"),
-  rarity: text("rarity").default("common"),
-  unlockedAt: timestamp("unlocked_at").defaultNow(),
-});
-
-export const wellnessStreaks = pgTable("wellness_streaks", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  streakType: text("streak_type").notNull(),
-  currentStreak: integer("current_streak").default(0),
-  longestStreak: integer("longest_streak").default(0),
-  lastActiveDate: timestamp("last_active_date"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+// Original achievements and streaks tables (kept for compatibility)
 
 // Analytics and insights
 export const emotionalPatterns = pgTable("emotional_patterns", {
@@ -445,6 +425,151 @@ export const riskAssessments = pgTable("risk_assessments", {
   followUpRequired: boolean("follow_up_required").default(false),
   aiAnalysis: text("ai_analysis"),
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Enhanced Gamification & Rewards System Tables
+
+// Wellness Points Management
+export const userWellnessPoints = pgTable("user_wellness_points", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  totalPoints: integer("total_points").default(0),
+  availablePoints: integer("available_points").default(0),
+  lifetimePoints: integer("lifetime_points").default(0),
+  currentLevel: integer("current_level").default(1),
+  pointsToNextLevel: integer("points_to_next_level").default(100),
+  lastActivityDate: timestamp("last_activity_date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Points Transaction Log
+export const pointsTransactions = pgTable("points_transactions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  points: integer("points").notNull(),
+  transactionType: text("transaction_type").notNull(), // earned, spent, bonus
+  activity: text("activity").notNull(), // journal_entry, mood_check, achievement, purchase
+  description: text("description"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Rewards Shop Items
+export const rewardsShop = pgTable("rewards_shop", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category").notNull(), // avatar, theme, premium_content, virtual_item, therapeutic_tool
+  cost: integer("cost").notNull(),
+  rarity: text("rarity").default("common"), // common, rare, epic, legendary
+  isAvailable: boolean("is_available").default(true),
+  therapeuticValue: text("therapeutic_value"),
+  imageUrl: text("image_url"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User Purchased Items
+export const userPurchases = pgTable("user_purchases", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  rewardId: integer("reward_id").notNull(),
+  purchaseDate: timestamp("purchase_date").defaultNow(),
+  isActive: boolean("is_active").default(true),
+  metadata: jsonb("metadata"),
+});
+
+// Achievement System
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category").notNull(), // engagement, milestone, wellness, achievement, social
+  type: text("type").notNull(), // daily, weekly, milestone, special
+  rarity: text("rarity").default("common"), // common, rare, epic, legendary
+  icon: text("icon"),
+  pointsReward: integer("points_reward").default(0),
+  criteria: jsonb("criteria"), // Requirements to unlock
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User Achievements
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  achievementId: integer("achievement_id").notNull(),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  progress: integer("progress").default(0),
+  isCompleted: boolean("is_completed").default(false),
+  celebrationShown: boolean("celebration_shown").default(false),
+});
+
+// Wellness Streaks
+export const wellnessStreaks = pgTable("wellness_streaks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  streakType: text("streak_type").notNull(), // daily_checkin, journaling, mood_tracking, chat_session, goal_progress
+  currentStreak: integer("current_streak").default(0),
+  longestStreak: integer("longest_streak").default(0),
+  lastActivityDate: timestamp("last_activity_date"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Daily Activities Tracking
+export const dailyActivities = pgTable("daily_activities", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  activityDate: timestamp("activity_date").defaultNow(),
+  journalEntry: boolean("journal_entry").default(false),
+  moodTracking: boolean("mood_tracking").default(false),
+  chatSession: boolean("chat_session").default(false),
+  goalProgress: boolean("goal_progress").default(false),
+  dailyCheckin: boolean("daily_checkin").default(false),
+  pointsEarned: integer("points_earned").default(0),
+  activitiesCompleted: integer("activities_completed").default(0),
+});
+
+// Community Challenges
+export const communityChallenges = pgTable("community_challenges", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  challengeType: text("challenge_type").notNull(), // gratitude, mindfulness, mood_tracking, journaling
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  targetGoal: integer("target_goal").notNull(),
+  pointsReward: integer("points_reward").default(0),
+  participantCount: integer("participant_count").default(0),
+  isActive: boolean("is_active").default(true),
+  criteria: jsonb("criteria"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User Challenge Participation
+export const userChallengeProgress = pgTable("user_challenge_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  challengeId: integer("challenge_id").notNull(),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  currentProgress: integer("current_progress").default(0),
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  pointsEarned: integer("points_earned").default(0),
+});
+
+// User Levels and Rankings
+export const userLevels = pgTable("user_levels", {
+  id: serial("id").primaryKey(),
+  level: integer("level").notNull().unique(),
+  name: text("name").notNull(),
+  pointsRequired: integer("points_required").notNull(),
+  badge: text("badge"),
+  benefits: jsonb("benefits"),
+  description: text("description"),
 });
 
 export const longitudinalTrends = pgTable("longitudinal_trends", {

@@ -5,6 +5,8 @@ import {
   userAchievements, wellnessStreaks, emotionalPatterns,
   moodForecasts, emotionalContexts, predictiveInsights, emotionalResponseAdaptations, crisisDetectionLogs,
   monthlyWellnessReports, analyticsMetrics, progressTracking, riskAssessments, longitudinalTrends,
+  userWellnessPoints, pointsTransactions, rewardsShop, userPurchases, achievements,
+  dailyActivities, communityChallenges, userChallengeProgress, userLevels,
   type User, type InsertUser,
   type Bot, type InsertBot,
   type Message, type InsertMessage,
@@ -127,6 +129,31 @@ export interface IStorage {
   calculateEmotionalVolatility(userId: number, days?: number): Promise<number>;
   calculateTherapeuticEngagement(userId: number, days?: number): Promise<number>;
   generateWellnessInsights(userId: number): Promise<string>;
+
+  // Enhanced Gamification & Rewards System
+  getUserWellnessPoints(userId: number): Promise<any>;
+  createUserWellnessPoints(data: any): Promise<any>;
+  awardWellnessPoints(userId: number, points: number, activity: string, description: string): Promise<void>;
+  getPointsTransactions(userId: number, limit?: number): Promise<any[]>;
+  levelUpUser(userId: number): Promise<void>;
+  
+  getAllAchievements(): Promise<any[]>;
+  checkAndUnlockAchievements(userId: number, activity: string, metadata: any): Promise<any[]>;
+  
+  getAvailableRewards(): Promise<any[]>;
+  getUserPurchases(userId: number): Promise<any[]>;
+  getRewardById(rewardId: number): Promise<any>;
+  purchaseReward(userId: number, rewardId: number, cost: number): Promise<void>;
+  
+  getUserStreaks(userId: number): Promise<any[]>;
+  updateStreak(userId: number, streakType: string): Promise<any>;
+  
+  getActiveCommunityChallenes(): Promise<any[]>;
+  getUserChallengeProgress(userId: number): Promise<any[]>;
+  joinCommunityChallenge(userId: number, challengeId: number): Promise<void>;
+  updateChallengeProgress(userId: number, challengeId: number, progressIncrement: number): Promise<any>;
+  
+  getTodayActivity(userId: number): Promise<any>;
 }
 
 export class DbStorage implements IStorage {
@@ -639,6 +666,269 @@ export class DbStorage implements IStorage {
     }
     
     return insights;
+  }
+
+  // Enhanced Gamification & Rewards System Implementation
+
+  async getUserWellnessPoints(userId: number): Promise<any> {
+    const [result] = await this.db.select().from(userWellnessPoints).where(eq(userWellnessPoints.userId, userId));
+    return result || null;
+  }
+
+  async createUserWellnessPoints(data: any): Promise<any> {
+    const [result] = await this.db.insert(userWellnessPoints).values(data).returning();
+    return result;
+  }
+
+  async awardWellnessPoints(userId: number, points: number, activity: string, description: string): Promise<void> {
+    // Award points to user
+    await this.db
+      .update(userWellnessPoints)
+      .set({
+        totalPoints: userWellnessPoints.totalPoints + points,
+        availablePoints: userWellnessPoints.availablePoints + points,
+        lifetimePoints: userWellnessPoints.lifetimePoints + points,
+        lastActivityDate: new Date()
+      })
+      .where(eq(userWellnessPoints.userId, userId));
+
+    // Create transaction record
+    await this.db.insert(pointsTransactions).values({
+      userId,
+      points,
+      transactionType: 'earned',
+      activity,
+      description,
+      metadata: {}
+    });
+  }
+
+  async getPointsTransactions(userId: number, limit: number = 10): Promise<any[]> {
+    const results = await this.db
+      .select()
+      .from(pointsTransactions)
+      .where(eq(pointsTransactions.userId, userId))
+      .orderBy(desc(pointsTransactions.createdAt))
+      .limit(limit);
+    return results;
+  }
+
+  async levelUpUser(userId: number): Promise<void> {
+    await this.db
+      .update(userWellnessPoints)
+      .set({
+        currentLevel: userWellnessPoints.currentLevel + 1,
+        pointsToNextLevel: userWellnessPoints.pointsToNextLevel + 100
+      })
+      .where(eq(userWellnessPoints.userId, userId));
+  }
+
+  async getAllAchievements(): Promise<any[]> {
+    const results = await this.db.select().from(achievements).where(eq(achievements.isActive, true));
+    return results;
+  }
+
+  async checkAndUnlockAchievements(userId: number, activity: string, metadata: any): Promise<any[]> {
+    // Get user's current achievements
+    const userAchievs = await this.getUserAchievements(userId);
+    const completedIds = userAchievs.filter(ua => ua.isCompleted).map(ua => ua.achievementId);
+    
+    // Get available achievements for this activity
+    const availableAchievs = await this.db
+      .select()
+      .from(achievements)
+      .where(and(
+        eq(achievements.isActive, true),
+        // Achievement not already completed
+      ));
+
+    const newAchievements = [];
+    
+    // Check for "First Steps" achievement (first journal entry)
+    if (activity === 'journal_entry' && !completedIds.includes(1)) {
+      const firstSteps = {
+        id: 1,
+        name: "First Steps",
+        description: "Write your first journal entry",
+        category: "engagement",
+        pointsReward: 10
+      };
+      
+      await this.db.insert(userAchievements).values({
+        userId,
+        achievementId: 1,
+        progress: 1,
+        isCompleted: true
+      });
+      
+      newAchievements.push(firstSteps);
+    }
+
+    return newAchievements;
+  }
+
+  async getAvailableRewards(): Promise<any[]> {
+    const results = await this.db.select().from(rewardsShop).where(eq(rewardsShop.isAvailable, true));
+    return results;
+  }
+
+  async getUserPurchases(userId: number): Promise<any[]> {
+    const results = await this.db.select().from(userPurchases).where(eq(userPurchases.userId, userId));
+    return results;
+  }
+
+  async getRewardById(rewardId: number): Promise<any> {
+    const [result] = await this.db.select().from(rewardsShop).where(eq(rewardsShop.id, rewardId));
+    return result || null;
+  }
+
+  async purchaseReward(userId: number, rewardId: number, cost: number): Promise<void> {
+    // Deduct points
+    await this.db
+      .update(userWellnessPoints)
+      .set({
+        availablePoints: userWellnessPoints.availablePoints - cost
+      })
+      .where(eq(userWellnessPoints.userId, userId));
+
+    // Record purchase
+    await this.db.insert(userPurchases).values({
+      userId,
+      rewardId,
+      metadata: {}
+    });
+
+    // Create transaction
+    await this.db.insert(pointsTransactions).values({
+      userId,
+      points: -cost,
+      transactionType: 'spent',
+      activity: 'reward_purchase',
+      description: `Purchased reward ID ${rewardId}`,
+      metadata: { rewardId }
+    });
+  }
+
+  async getUserStreaks(userId: number): Promise<any[]> {
+    const results = await this.db
+      .select()
+      .from(wellnessStreaks)
+      .where(and(eq(wellnessStreaks.userId, userId), eq(wellnessStreaks.isActive, true)));
+    return results;
+  }
+
+  async updateStreak(userId: number, streakType: string): Promise<any> {
+    const today = new Date();
+    const [existing] = await this.db
+      .select()
+      .from(wellnessStreaks)
+      .where(and(
+        eq(wellnessStreaks.userId, userId),
+        eq(wellnessStreaks.streakType, streakType)
+      ));
+
+    if (existing) {
+      const lastActivity = existing.lastActivityDate ? new Date(existing.lastActivityDate) : null;
+      const isConsecutive = lastActivity && 
+        (today.getTime() - lastActivity.getTime()) <= (24 * 60 * 60 * 1000 + 60 * 60 * 1000); // Within 25 hours
+
+      const newStreak = isConsecutive ? (existing.currentStreak || 0) + 1 : 1;
+      const longestStreak = Math.max(existing.longestStreak || 0, newStreak);
+
+      await this.db
+        .update(wellnessStreaks)
+        .set({
+          currentStreak: newStreak,
+          longestStreak,
+          lastActivityDate: today,
+          updatedAt: today
+        })
+        .where(eq(wellnessStreaks.id, existing.id));
+
+      return { ...existing, currentStreak: newStreak, longestStreak };
+    } else {
+      const [newStreak] = await this.db.insert(wellnessStreaks).values({
+        userId,
+        streakType,
+        currentStreak: 1,
+        longestStreak: 1,
+        lastActivityDate: today,
+        isActive: true
+      }).returning();
+
+      return newStreak;
+    }
+  }
+
+  async getActiveCommunityChallenes(): Promise<any[]> {
+    const now = new Date();
+    const results = await this.db
+      .select()
+      .from(communityChallenges)
+      .where(and(
+        eq(communityChallenges.isActive, true),
+        // Active challenges (end date in future)
+      ));
+    return results;
+  }
+
+  async getUserChallengeProgress(userId: number): Promise<any[]> {
+    const results = await this.db
+      .select()
+      .from(userChallengeProgress)
+      .where(eq(userChallengeProgress.userId, userId));
+    return results;
+  }
+
+  async joinCommunityChallenge(userId: number, challengeId: number): Promise<void> {
+    await this.db.insert(userChallengeProgress).values({
+      userId,
+      challengeId,
+      currentProgress: 0,
+      isCompleted: false,
+      pointsEarned: 0
+    });
+
+    // Increment participant count
+    await this.db
+      .update(communityChallenges)
+      .set({
+        participantCount: communityChallenges.participantCount + 1
+      })
+      .where(eq(communityChallenges.id, challengeId));
+  }
+
+  async updateChallengeProgress(userId: number, challengeId: number, progressIncrement: number): Promise<any> {
+    const [updated] = await this.db
+      .update(userChallengeProgress)
+      .set({
+        currentProgress: userChallengeProgress.currentProgress + progressIncrement
+      })
+      .where(and(
+        eq(userChallengeProgress.userId, userId),
+        eq(userChallengeProgress.challengeId, challengeId)
+      ))
+      .returning();
+
+    return updated;
+  }
+
+  async getTodayActivity(userId: number): Promise<any> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const [result] = await this.db
+      .select()
+      .from(dailyActivities)
+      .where(and(
+        eq(dailyActivities.userId, userId),
+        eq(dailyActivities.activityDate, today)
+      ));
+
+    return result || {
+      activitiesCompleted: 0,
+      pointsEarned: 0
+    };
   }
 }
 
