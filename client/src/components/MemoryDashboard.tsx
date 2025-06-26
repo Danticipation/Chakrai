@@ -202,111 +202,105 @@ export default function MemoryDashboard() {
           </div>
 
           {/* Top Topics */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5" />
-                <span>Top Topics</span>
-              </CardTitle>
-              <CardDescription>Most discussed themes in our conversations</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+            <div className="p-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <TrendingUp className="w-5 h-5 text-white" />
+                <span className="text-lg font-semibold text-white">Top Topics</span>
+              </div>
+              <p className="text-white/80 mb-6">Most discussed themes in our conversations</p>
               <div className="space-y-3">
                 {dashboard?.topTopics?.slice(0, 6).map((topic, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-gray-900">{topic.topic}</span>
-                        <span className="text-sm text-gray-500">{topic.count} mentions</span>
+                        <span className="font-medium text-white">{topic.topic}</span>
+                        <span className="text-sm text-white/60">{topic.count} mentions</span>
                       </div>
                       <Progress value={(topic.count / (dashboard.topTopics[0]?.count || 1)) * 100} className="h-2" />
                     </div>
                   </div>
                 )) || (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-white/60">
                     <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>Topics will appear as we have more conversations</p>
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Memory Insights */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Lightbulb className="w-5 h-5" />
-                <span>AI Insights</span>
-              </CardTitle>
-              <CardDescription>Patterns and insights from your conversations</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+            <div className="p-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <Lightbulb className="w-5 h-5 text-white" />
+                <span className="text-lg font-semibold text-white">AI Insights</span>
+              </div>
+              <p className="text-white/80 mb-6">Patterns and insights from your conversations</p>
               <div className="space-y-4">
                 {dashboard?.memoryInsights?.slice(0, 4).map((insight, index) => (
-                  <div key={index} className="border rounded-lg p-3 bg-white">
+                  <div key={index} className="border border-white/30 rounded-lg p-3 bg-[#1a237e]">
                     <div className="flex items-start justify-between mb-2">
-                      <Badge variant="secondary">{insight.type}</Badge>
+                      <Badge className="bg-white/20 text-white border-white/30">{insight.type}</Badge>
                       <div className="flex items-center space-x-1">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        <span className="text-xs text-gray-500">{Math.round(insight.confidence * 100)}%</span>
+                        <div className="w-2 h-2 rounded-full bg-white"></div>
+                        <span className="text-xs text-white/60">{Math.round(insight.confidence * 100)}%</span>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-700">{insight.insight}</p>
+                    <p className="text-sm text-white">{insight.insight}</p>
                   </div>
                 )) || (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-white/60">
                     <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>AI insights will develop as we learn more about you</p>
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Emotional Patterns */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Calendar className="w-5 h-5" />
-                <span>Emotional Patterns</span>
-              </CardTitle>
-              <CardDescription>How your emotional state has evolved</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+            <div className="p-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <Calendar className="w-5 h-5 text-white" />
+                <span className="text-lg font-semibold text-white">Emotional Patterns</span>
+              </div>
+              <p className="text-white/80 mb-6">How your emotional state has evolved</p>
               <div className="space-y-4">
                 {dashboard?.emotionalPatterns?.map((pattern, index) => (
-                  <div key={index} className="border rounded-lg p-3 bg-white">
+                  <div key={index} className="border border-white/30 rounded-lg p-3 bg-[#1a237e]">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-900">{pattern.timeframe}</span>
-                      <Badge className={getEmotionalColor(pattern.dominantEmotion)}>
+                      <span className="font-medium text-white">{pattern.timeframe}</span>
+                      <Badge className="bg-white/20 text-white border-white/30">
                         {pattern.dominantEmotion}
                       </Badge>
                     </div>
                     <div className="flex items-center space-x-4">
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-gray-600">Intensity</span>
-                          <span className="text-sm font-medium">{Math.round(pattern.intensity * 100)}%</span>
+                          <span className="text-sm text-white/80">Intensity</span>
+                          <span className="text-sm font-medium text-white">{Math.round(pattern.intensity * 100)}%</span>
                         </div>
                         <Progress value={pattern.intensity * 100} className="h-2" />
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-white/60">
                         {pattern.memoryCount} memories
                       </div>
                     </div>
                   </div>
                 )) || (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-white/60">
                     <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>Emotional patterns will emerge from our conversations</p>
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
