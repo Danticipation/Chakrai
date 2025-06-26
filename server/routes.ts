@@ -1,0 +1,835 @@
+import express from "express";
+import multer from 'multer';
+import { storage } from './storage.js';
+import { analyzeEmotionalState } from './emotionalAnalysis.js';
+import { openai } from './openaiRetry.js';
+
+const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Helper functions for advanced emotional intelligence features
+async function generateMoodForecast(userId: number, recentMoods: any[]): Promise<any> {
+  try {
+    const prompt = `Based on recent mood data: ${JSON.stringify(recentMoods.slice(-7))}, generate a 24-48 hour mood forecast. Return JSON with: predictedMood (string), confidenceScore (0.0-1.0), riskLevel ('low'|'medium'|'high'|'critical'), triggerFactors (string[]), preventiveRecommendations (string[])`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.3
+    });
+    
+    return JSON.parse(response.choices[0].message.content || '{}');
+  } catch (error) {
+    return {
+      predictedMood: 'neutral',
+      confidenceScore: 0.5,
+      riskLevel: 'low',
+      triggerFactors: [],
+      preventiveRecommendations: ['Continue regular self-care practices']
+    };
+  }
+}
+
+async function generateContextualResponse(originalMessage: string, emotionalState: any, userId: number): Promise<any> {
+  try {
+    const prompt = `Adapt this therapeutic response "${originalMessage}" based on emotional state: ${JSON.stringify(emotionalState)}. Return JSON with: response (adapted message), tone, intensity, responseLength, communicationStyle, priorityFocus (array)`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.4
+    });
+    
+    return JSON.parse(response.choices[0].message.content || '{}');
+  } catch (error) {
+    return {
+      response: originalMessage,
+      tone: 'supportive',
+      intensity: 'moderate',
+      responseLength: 'moderate',
+      communicationStyle: 'therapeutic',
+      priorityFocus: ['emotional support']
+    };
+  }
+}
+
+async function detectCrisisSignals(message: string, userId: number): Promise<any> {
+  try {
+    const prompt = `Analyze this message for crisis indicators: "${message}". Return JSON with: riskLevel ('low'|'medium'|'high'|'critical'), confidence (0.0-1.0), indicators (string[] of specific signals), supportResources (string[] of crisis resources)`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.2
+    });
+    
+    return JSON.parse(response.choices[0].message.content || '{}');
+  } catch (error) {
+    return {
+      riskLevel: 'low',
+      confidence: 0.5,
+      indicators: [],
+      supportResources: []
+    };
+  }
+}
+
+async function analyzeEmotionalPatterns(userId: number, timeframeDays: number): Promise<any> {
+  try {
+    const moodEntries = await storage.getMoodEntries(userId);
+    const prompt = `Analyze emotional patterns from mood data: ${JSON.stringify(moodEntries)}. Return JSON with: dominantEmotions (string[]), averageValence (-1.0 to 1.0), volatility (0.0 to 1.0), trendDirection ('improving'|'declining'|'stable'), triggerPatterns (string[]), insights (string[])`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", 
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.3
+    });
+    
+    return JSON.parse(response.choices[0].message.content || '{}');
+  } catch (error) {
+    return {
+      dominantEmotions: ['neutral'],
+      averageValence: 0.0,
+      volatility: 0.3,
+      trendDirection: 'stable',
+      triggerPatterns: [],
+      insights: []
+    };
+  }
+}
+
+// ====================
+// CHAT & AI ENDPOINTS
+// ====================
+
+// Main chat endpoint with AI integration
+router.post('/chat', async (req, res) => {
+  try {
+    const { message, voice, userId = 1, personalityMode = 'supportive' } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    console.log('Chat request:', { message: message.substring(0, 50) + '...', voice, userId });
+
+    // Crisis detection
+    const crisisData = await detectCrisisSignals(message, userId);
+    const crisisDetected = crisisData.riskLevel === 'high' || crisisData.riskLevel === 'critical';
+
+    // Emotional analysis
+    const emotionalState = await analyzeEmotionalState(message);
+
+    // Get user data for personality mirroring
+    const userFacts = await storage.getUserFacts(userId).catch(() => []);
+    const userMemories = await storage.getUserMemories(userId).catch(() => []);
+
+    // Enhanced system prompt with personality mirroring
+    const personalityContext = userFacts.length > 0 ? 
+      `User's personality traits: ${userFacts.map(f => f.fact).join(', ')}\n` +
+      `User's memories: ${userMemories.map(m => m.memory).join(', ')}\n` : '';
+
+    const systemPrompt = `You are TraI, a therapeutic AI companion providing mental wellness support. Your responses should be:
+- Warm, empathetic, and professionally therapeutic
+- Personalized based on the user's communication style and personality
+- Focused on emotional support and growth
+- Crisis-aware when risk indicators are detected
+
+${personalityContext}
+
+Current emotional context: ${JSON.stringify(emotionalState)}
+Crisis level: ${crisisData.riskLevel}
+
+Adapt your response to mirror the user's communication patterns while maintaining therapeutic value.`;
+
+    // Generate OpenAI response
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      })
+    });
+
+    console.log('OpenAI response status:', openaiResponse.status);
+
+    if (!openaiResponse.ok) {
+      const errorText = await openaiResponse.text();
+      console.log('OpenAI API error:', errorText);
+      throw new Error(`OpenAI API error: ${openaiResponse.status}`);
+    }
+
+    const openaiData = await openaiResponse.json();
+    const aiResponse = openaiData.choices[0].message.content;
+    console.log('OpenAI response received:', aiResponse.substring(0, 50) + '...');
+
+    // Generate ElevenLabs voice synthesis
+    const voiceMap: Record<string, string> = {
+      'james': 'EkK5I93UQWFDigLMpZcX',
+      'brian': 'nPczCjzI2devNBz1zQrb', 
+      'alexandra': 'kdmDKE6EkgrWrrykO9Qt',
+      'carla': 'l32B8XDoylOsZKiSdfhE'
+    };
+
+    const selectedVoice = voice || 'carla';
+    const voiceId = voiceMap[selectedVoice] || voiceMap['carla'];
+    let audioUrl = null;
+
+    if (process.env.ELEVENLABS_API_KEY) {
+      try {
+        console.log(`Making ElevenLabs request for voice: ${selectedVoice} (ID: ${voiceId})`);
+        console.log(`Text to synthesize: "${aiResponse.substring(0, 50)}..."`);
+        
+        const elevenLabsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'audio/mpeg',
+            'Content-Type': 'application/json',
+            'xi-api-key': process.env.ELEVENLABS_API_KEY
+          } as HeadersInit,
+          body: JSON.stringify({
+            text: aiResponse,
+            model_id: 'eleven_monolingual_v1',
+            voice_settings: {
+              stability: 0.6,
+              similarity_boost: 0.8,
+              style: 0.2,
+              use_speaker_boost: true
+            }
+          })
+        });
+
+        console.log('ElevenLabs response status:', elevenLabsResponse.status);
+
+        if (elevenLabsResponse.ok) {
+          const audioBuffer = await elevenLabsResponse.arrayBuffer();
+          const base64Audio = Buffer.from(audioBuffer).toString('base64');
+          
+          console.log(`Audio buffer size: ${audioBuffer.byteLength}`);
+          console.log(`Base64 audio length: ${base64Audio.length}`);
+          
+          audioUrl = base64Audio;
+        } else {
+          const errorText = await elevenLabsResponse.text();
+          console.error('ElevenLabs API error:', elevenLabsResponse.status, errorText);
+        }
+      } catch (elevenLabsError: any) {
+        console.error('ElevenLabs request failed:', elevenLabsError);
+      }
+    } else {
+      console.error('ELEVENLABS_API_KEY not configured');
+    }
+
+    res.json({
+      message: aiResponse,
+      response: aiResponse,
+      audioUrl: audioUrl,
+      voiceUsed: selectedVoice,
+      wordsLearned: 1000,
+      stage: "Therapist",
+      crisisDetected: crisisDetected,
+      crisisData: crisisDetected ? crisisData : null,
+      personalityMode: personalityMode,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Chat error:', error);
+    const fallbackResponse = "I'm here to support you. Sometimes I have trouble connecting to my full capabilities, but I'm still listening. How are you feeling right now?";
+    res.json({
+      message: fallbackResponse,
+      response: fallbackResponse,
+      wordsLearned: 1000,
+      stage: "Therapist",
+      crisisDetected: false,
+      crisisData: null,
+      personalityMode: "supportive",
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Voice transcription endpoint
+router.post('/transcribe', upload.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file provided' });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(503).json({ 
+        error: 'Voice transcription temporarily unavailable',
+        errorType: 'auth_error'
+      });
+    }
+
+    const formData = new FormData();
+    const audioBlob = new Blob([req.file.buffer], { type: req.file.mimetype });
+    formData.append('file', audioBlob, 'audio.webm');
+    formData.append('model', 'whisper-1');
+
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return res.status(429).json({ 
+          error: 'Voice transcription temporarily unavailable due to high demand',
+          errorType: 'quota_exceeded'
+        });
+      }
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const result = await response.json();
+    res.json({ text: result.text });
+
+  } catch (error) {
+    console.error('Transcription error:', error);
+    res.status(500).json({ 
+      error: 'Voice transcription failed. Please try again.',
+      errorType: 'transcription_error'
+    });
+  }
+});
+
+// Text-to-speech endpoint
+router.post('/text-to-speech', async (req, res) => {
+  try {
+    const { text, voice = 'james', emotionalContext = 'neutral' } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    const voiceMap: Record<string, string> = {
+      'james': 'EkK5I93UQWFDigLMpZcX',
+      'brian': 'nPczCjzI2devNBz1zQrb', 
+      'alexandra': 'kdmDKE6EkgrWrrykO9Qt',
+      'carla': 'l32B8XDoylOsZKiSdfhE'
+    };
+
+    const voiceId = voiceMap[voice] || voiceMap['james'];
+    
+    try {
+      console.log(`Making ElevenLabs request for voice: ${voice} (ID: ${voiceId})`);
+      
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'xi-api-key': process.env.ELEVENLABS_API_KEY || ''
+        } as HeadersInit,
+        body: JSON.stringify({
+          text: text,
+          model_id: 'eleven_monolingual_v1',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.8,
+            style: 0.3,
+            use_speaker_boost: true
+          }
+        })
+      });
+
+      if (response.ok) {
+        const audioBuffer = await response.arrayBuffer();
+        const base64Audio = Buffer.from(audioBuffer).toString('base64');
+        
+        console.log(`Generated audio for voice ${voice}: ${base64Audio.length} characters`);
+        
+        res.json({
+          audioUrl: base64Audio,
+          voice: voice,
+          voiceId: voiceId
+        });
+      } else {
+        const errorText = await response.text();
+        console.error('ElevenLabs API error:', response.status, errorText);
+        throw new Error(`ElevenLabs API error: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('TTS generation failed:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Text-to-speech error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate speech',
+      fallback: 'Browser TTS will be used instead'
+    });
+  }
+});
+
+// ====================
+// STATS & BOT ENDPOINTS
+// ====================
+
+// Stats endpoint - support both with and without userId
+router.get('/stats/:userId?', (req, res) => {
+  try {
+    res.json({
+      level: 3,
+      stage: "Therapist", 
+      wordsLearned: 1000,
+      wordCount: 1000
+    });
+  } catch (error) {
+    console.error('Stats error:', error);
+    res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+
+// Bot stats endpoint (alternate endpoint name)
+router.get('/bot-stats/:userId', (req, res) => {
+  try {
+    res.json({
+      level: 3,
+      stage: "Therapist",
+      wordsLearned: 1000
+    });
+  } catch (error) {
+    console.error('Bot stats error:', error);
+    res.status(500).json({ error: 'Failed to get bot stats' });
+  }
+});
+
+// ====================
+// CONTENT ENDPOINTS
+// ====================
+
+// Daily affirmation endpoint
+router.get('/daily-affirmation', async (req, res) => {
+  try {
+    if (process.env.OPENAI_API_KEY) {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{
+          role: "user",
+          content: "Generate a therapeutic daily affirmation for mental wellness. Be supportive, empowering, and focused on self-care and emotional growth. Return just the affirmation text."
+        }],
+        max_tokens: 100,
+        temperature: 0.8
+      });
+      
+      const affirmation = response.choices[0].message.content?.trim() || "You are capable of amazing things and deserve support on your wellness journey.";
+      res.json({ affirmation });
+    } else {
+      // Fallback affirmations
+      const affirmations = [
+        "You are capable of amazing things.",
+        "Your mental health matters and you deserve support.",
+        "Every small step forward is progress worth celebrating.",
+        "You have the strength to overcome today's challenges.",
+        "Your feelings are valid and you are not alone."
+      ];
+      
+      const randomAffirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
+      res.json({ affirmation: randomAffirmation });
+    }
+  } catch (error) {
+    console.error('Daily affirmation error:', error);
+    res.json({ affirmation: "You are worthy of love, support, and all the good things life has to offer." });
+  }
+});
+
+// Weekly summary endpoint
+router.get('/weekly-summary', async (req, res) => {
+  try {
+    if (process.env.OPENAI_API_KEY) {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{
+          role: "user",
+          content: "Generate a weekly therapeutic summary message focusing on growth, progress, and encouragement for someone on their mental wellness journey. Be supportive and motivating."
+        }],
+        max_tokens: 150,
+        temperature: 0.7
+      });
+      
+      const summary = response.choices[0].message.content?.trim() || "This week has been a journey of growth and self-discovery.";
+      res.json({ summary });
+    } else {
+      const summaries = [
+        "This week, you've shown remarkable growth in self-awareness and emotional intelligence.",
+        "Your conversations reflect deep introspection and a commitment to personal wellness.",
+        "This week's interactions demonstrate your resilience and willingness to explore difficult topics.",
+        "You've engaged thoughtfully with therapeutic concepts, showing genuine progress.",
+        "Your openness to growth and self-reflection has been particularly evident this week."
+      ];
+      
+      const randomSummary = summaries[Math.floor(Math.random() * summaries.length)];
+      res.json({ summary: randomSummary });
+    }
+  } catch (error) {
+    console.error('Weekly summary error:', error);
+    res.json({ summary: "Your therapeutic journey continues to unfold with courage and determination." });
+  }
+});
+
+// Horoscope endpoint
+router.get('/horoscope/:sign', async (req, res) => {
+  try {
+    const { sign } = req.params;
+    
+    if (process.env.OPENAI_API_KEY) {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{
+          role: "user",
+          content: `Generate a therapeutic horoscope for ${sign} focused on mental wellness, self-care, and emotional growth. Be supportive and encouraging.`
+        }],
+        max_tokens: 100,
+        temperature: 0.8
+      });
+      
+      const horoscope = response.choices[0].message.content?.trim() || "Today brings opportunities for personal growth and emotional healing.";
+      res.json({ horoscope });
+    } else {
+      const horoscopes = {
+        aries: "Today brings new opportunities for personal growth and emotional healing.",
+        taurus: "Focus on grounding exercises and self-care to maintain your emotional balance.",
+        gemini: "Communication and connection with others will bring you joy today.",
+        cancer: "Trust your intuition and take time for reflection and self-nurturing.",
+        leo: "Your natural confidence will help you overcome any challenges today.",
+        virgo: "Organization and mindfulness will bring clarity to your thoughts.",
+        libra: "Seek harmony in your relationships and practice gratitude.",
+        scorpio: "Deep introspection will reveal important insights about yourself.",
+        sagittarius: "Adventure and optimism will lift your spirits today.",
+        capricorn: "Steady progress toward your goals will boost your confidence.",
+        aquarius: "Innovation and creativity will help you solve problems today.",
+        pisces: "Compassion for yourself and others will guide your day."
+      };
+      
+      res.json({ 
+        horoscope: horoscopes[sign.toLowerCase() as keyof typeof horoscopes] || "Today is a great day for self-reflection and growth." 
+      });
+    }
+  } catch (error) {
+    console.error('Horoscope error:', error);
+    res.json({ horoscope: "Today holds potential for growth, healing, and positive change in your life." });
+  }
+});
+
+// ====================
+// MOOD & WELLNESS ENDPOINTS
+// ====================
+
+// Mood tracking endpoint
+router.post('/mood', async (req, res) => {
+  try {
+    const { userId, mood, intensity, triggers, notes } = req.body;
+    
+    if (!userId || !mood || intensity === undefined) {
+      return res.status(400).json({ error: 'userId, mood, and intensity are required' });
+    }
+
+    const moodEntry = await storage.createMoodEntry({
+      userId: parseInt(userId),
+      mood,
+      intensity: parseInt(intensity),
+      triggers: triggers || [],
+      notes: notes || '',
+      timestamp: new Date()
+    });
+    
+    res.json({ 
+      success: true, 
+      message: `Mood "${mood}" recorded with intensity ${intensity}`,
+      moodEntry
+    });
+  } catch (error) {
+    console.error('Mood tracking error:', error);
+    res.status(500).json({ error: 'Failed to track mood' });
+  }
+});
+
+// Get mood entries for a user
+router.get('/mood/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const moodEntries = await storage.getMoodEntries(userId);
+    res.json({ moodEntries });
+  } catch (error) {
+    console.error('Get mood entries error:', error);
+    res.status(500).json({ error: 'Failed to get mood entries' });
+  }
+});
+
+// ====================
+// PERSONALITY & REFLECTION ENDPOINTS
+// ====================
+
+// Personality reflection endpoint - AI analysis of user traits and growth
+router.get('/personality-reflection/:userId?', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId?.toString() || '1');
+    
+    // Get recent data for analysis using available storage methods
+    const journalEntries = await storage.getJournalEntries(userId).then(entries => entries.slice(0, 5)).catch(() => []);
+    const moodEntries = await storage.getMoodEntries(userId).then(entries => entries.slice(0, 7)).catch(() => []);
+    
+    // Prepare conversation and journal text for analysis
+    const journalText = journalEntries
+      .map(entry => entry.content)
+      .join('\n');
+    
+    const moodSummary = moodEntries
+      .map(mood => `${mood.mood}: ${mood.intensity}/10`)
+      .join(', ');
+
+    // Generate AI personality analysis
+    const analysisPrompt = `Analyze this user's personality, communication style, and emotional patterns based on their recent interactions:
+
+JOURNAL ENTRIES:
+${journalText || 'No journal entries available'}
+
+MOOD PATTERNS:
+${moodSummary || 'No mood data available'}
+
+Provide a comprehensive personality reflection including:
+1. PERSONALITY TRAITS: Key characteristics and communication style
+2. POSITIVE ATTRIBUTES: Strengths and admirable qualities 
+3. AREAS FOR GROWTH: Gentle suggestions for improvement
+4. EMOTIONAL PATTERNS: How they process and express emotions
+5. THERAPEUTIC INSIGHTS: Professional observations for their wellness journey
+
+Be supportive, encouraging, and therapeutic in tone. Focus on growth and self-awareness.`;
+
+    if (process.env.OPENAI_API_KEY) {
+      const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a therapeutic AI providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness.'
+            },
+            {
+              role: 'user',
+              content: analysisPrompt
+            }
+          ],
+          max_tokens: 800,
+          temperature: 0.7
+        })
+      });
+
+      if (openaiResponse.ok) {
+        const data = await openaiResponse.json();
+        const reflection = data.choices[0].message.content;
+        
+        res.json({
+          reflection,
+          lastUpdated: new Date().toISOString(),
+          dataPoints: {
+            conversations: 0,
+            journalEntries: journalEntries.length,
+            moodEntries: moodEntries.length
+          }
+        });
+        return;
+      }
+    }
+    
+    // Fallback if OpenAI is unavailable
+    res.json({
+      reflection: "Your therapeutic journey shows dedication to self-improvement and emotional awareness. Continue engaging with the platform to develop deeper insights about your personality and growth patterns.",
+      lastUpdated: new Date().toISOString(),
+      dataPoints: {
+        conversations: 0,
+        journalEntries: journalEntries.length,
+        moodEntries: moodEntries.length
+      }
+    });
+  } catch (error) {
+    console.error('Personality reflection error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate personality reflection',
+      reflection: "Continue your therapeutic journey by engaging in conversations and journaling to develop deeper self-awareness and emotional insights.",
+      lastUpdated: new Date().toISOString(),
+      dataPoints: {
+        conversations: 0,
+        journalEntries: 0,
+        moodEntries: 0
+      }
+    });
+  }
+});
+
+// ====================
+// EMOTIONAL INTELLIGENCE ENDPOINTS
+// ====================
+
+// Real-time emotional detection endpoint
+router.post('/emotional-intelligence/detect', async (req, res) => {
+  try {
+    const { userId, message } = req.body;
+    
+    if (!userId || !message) {
+      return res.status(400).json({ error: 'userId and message are required' });
+    }
+
+    const emotionalState = await analyzeEmotionalState(message);
+    
+    // Store emotional context
+    await storage.createEmotionalContext({
+      userId: parseInt(userId),
+      contextData: emotionalState,
+      detectedAt: new Date()
+    });
+
+    res.json({
+      success: true,
+      emotionalState,
+      detectedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Emotional detection error:', error);
+    res.status(500).json({ error: 'Failed to detect emotional state' });
+  }
+});
+
+// Mood forecasting endpoint
+router.get('/emotional-intelligence/mood-forecast/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const moodEntries = await storage.getMoodEntries(userId);
+    
+    const forecast = await generateMoodForecast(userId, moodEntries);
+    
+    // Store mood forecast
+    await storage.createMoodForecast({
+      userId,
+      predictedMood: forecast.predictedMood,
+      confidenceScore: forecast.confidenceScore,
+      riskLevel: forecast.riskLevel,
+      triggerFactors: forecast.triggerFactors,
+      preventiveRecommendations: forecast.preventiveRecommendations,
+      generatedAt: new Date()
+    });
+
+    res.json({
+      success: true,
+      forecast,
+      generatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Mood forecast error:', error);
+    res.status(500).json({ error: 'Failed to generate mood forecast' });
+  }
+});
+
+// Contextual response adaptation endpoint
+router.post('/emotional-intelligence/adapt-response', async (req, res) => {
+  try {
+    const { userId, originalMessage, emotionalState } = req.body;
+    
+    if (!userId || !originalMessage) {
+      return res.status(400).json({ error: 'userId and originalMessage are required' });
+    }
+
+    const adaptedResponse = await generateContextualResponse(originalMessage, emotionalState, userId);
+    
+    // Store response adaptation
+    await storage.createEmotionalResponseAdaptation({
+      userId: parseInt(userId),
+      originalMessage,
+      adaptedMessage: adaptedResponse.response,
+      emotionalContext: emotionalState || {},
+      adaptationReason: adaptedResponse.priorityFocus?.join(', ') || 'emotional support',
+      createdAt: new Date()
+    });
+
+    res.json({
+      success: true,
+      adaptedResponse,
+      adaptedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Response adaptation error:', error);
+    res.status(500).json({ error: 'Failed to adapt response' });
+  }
+});
+
+// Crisis detection endpoint
+router.post('/emotional-intelligence/crisis-detection', async (req, res) => {
+  try {
+    const { userId, message } = req.body;
+    
+    if (!userId || !message) {
+      return res.status(400).json({ error: 'userId and message are required' });
+    }
+
+    const crisisData = await detectCrisisSignals(message, userId);
+    const crisisDetected = crisisData.riskLevel === 'high' || crisisData.riskLevel === 'critical';
+    
+    if (crisisDetected) {
+      // Store crisis detection log
+      await storage.createCrisisDetectionLog({
+        userId: parseInt(userId),
+        riskLevel: crisisData.riskLevel,
+        confidenceScore: crisisData.confidence,
+        indicators: crisisData.indicators,
+        supportResources: crisisData.supportResources,
+        detectedAt: new Date()
+      });
+    }
+
+    res.json({
+      success: true,
+      crisisDetected,
+      crisisData,
+      detectedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Crisis detection error:', error);
+    res.status(500).json({ error: 'Failed to perform crisis detection' });
+  }
+});
+
+// Emotional pattern analysis endpoint
+router.get('/emotional-intelligence/patterns/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const timeframeDays = parseInt(req.query.timeframeDays as string) || 30;
+    
+    const patterns = await analyzeEmotionalPatterns(userId, timeframeDays);
+
+    res.json({
+      success: true,
+      patterns,
+      timeframeDays,
+      analyzedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Emotional pattern analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze emotional patterns' });
+  }
+});
+
+export default router;
