@@ -74,7 +74,7 @@ const PrivacyCompliance: React.FC = () => {
 
   const { data: encryptionSettings } = useQuery<EncryptionSettings>({
     queryKey: ['/api/privacy/encryption-settings/1'],
-    queryFn: () => apiRequest('/api/privacy/encryption-settings/1').then(res => res.data || {
+    queryFn: () => axios.get('/api/privacy/encryption-settings/1').then(res => res.data || {
       userId: '1',
       encryptionEnabled: false,
       keyDerivationRounds: 100000,
@@ -87,7 +87,7 @@ const PrivacyCompliance: React.FC = () => {
 
   const { data: privacySettings } = useQuery<DifferentialPrivacySettings>({
     queryKey: ['/api/privacy/differential-settings/1'],
-    queryFn: () => apiRequest('/api/privacy/differential-settings/1').then(res => res.data || {
+    queryFn: () => axios.get('/api/privacy/differential-settings/1').then(res => res.data || {
       epsilon: 1.0,
       delta: 0.00001,
       mechanism: 'laplace' as const,
@@ -98,12 +98,12 @@ const PrivacyCompliance: React.FC = () => {
 
   const { data: backups } = useQuery<EncryptedBackup[]>({
     queryKey: ['/api/privacy/encrypted-backups/1'],
-    queryFn: () => apiRequest('/api/privacy/encrypted-backups/1').then(res => res.data || [])
+    queryFn: () => axios.get('/api/privacy/encrypted-backups/1').then(res => res.data || [])
   });
 
   const { data: complianceReport } = useQuery<ComplianceReport>({
     queryKey: ['/api/privacy/compliance-report/1'],
-    queryFn: () => apiRequest('/api/privacy/compliance-report/1').then(res => res.data || {
+    queryFn: () => axios.get('/api/privacy/compliance-report/1').then(res => res.data || {
       overallScore: 0.92,
       gdprCompliance: true,
       hipaaCompliance: true,
@@ -117,15 +117,12 @@ const PrivacyCompliance: React.FC = () => {
 
   const { data: anonymizedReports } = useQuery<AnonymizedReport[]>({
     queryKey: ['/api/privacy/anonymized-reports/1'],
-    queryFn: () => apiRequest('/api/privacy/anonymized-reports/1').then(res => res.data || [])
+    queryFn: () => axios.get('/api/privacy/anonymized-reports/1').then(res => res.data || [])
   });
 
   const encryptDataMutation = useMutation({
     mutationFn: async (data: { password: string; dataTypes: string[] }) => {
-      return apiRequest('/api/privacy/encrypt-data', {
-        method: 'POST',
-        body: { userId: 1, ...data }
-      });
+      return axios.post('/api/privacy/encrypt-data', { userId: 1, ...data });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/privacy/encryption-settings/1'] });
@@ -136,10 +133,7 @@ const PrivacyCompliance: React.FC = () => {
 
   const createBackupMutation = useMutation({
     mutationFn: async (password: string) => {
-      return apiRequest('/api/privacy/create-backup', {
-        method: 'POST',
-        body: { userId: 1, password }
-      });
+      return axios.post('/api/privacy/create-backup', { userId: 1, password });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/privacy/encrypted-backups/1'] });
@@ -148,10 +142,7 @@ const PrivacyCompliance: React.FC = () => {
 
   const generateReportMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/privacy/generate-anonymized-report', {
-        method: 'POST',
-        body: { userId: 1 }
-      });
+      return axios.post('/api/privacy/generate-anonymized-report', { userId: 1 });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/privacy/anonymized-reports/1'] });

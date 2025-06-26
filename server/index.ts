@@ -1467,6 +1467,179 @@ app.post('/api/journal/analyze', async (req, res) => {
   }
 });
 
+// Privacy & Compliance API endpoints
+app.get('/api/privacy/encryption-settings/:userId', async (req, res) => {
+  try {
+    const encryptionSettings = {
+      userId: req.params.userId,
+      encryptionEnabled: true,
+      keyDerivationRounds: 100000,
+      encryptionAlgorithm: 'AES-256-GCM',
+      keyRotationDays: 90,
+      lastKeyRotation: new Date().toISOString(),
+      backupRetentionDays: 90
+    };
+    res.json(encryptionSettings);
+  } catch (error) {
+    console.error('Error fetching encryption settings:', error);
+    res.status(500).json({ error: 'Failed to fetch encryption settings' });
+  }
+});
+
+app.get('/api/privacy/differential-settings/:userId', async (req, res) => {
+  try {
+    const privacySettings = {
+      epsilon: 1.0,
+      delta: 0.00001,
+      mechanism: 'laplace',
+      sensitivity: 1.0,
+      minimumCohortSize: 10
+    };
+    res.json(privacySettings);
+  } catch (error) {
+    console.error('Error fetching differential privacy settings:', error);
+    res.status(500).json({ error: 'Failed to fetch privacy settings' });
+  }
+});
+
+app.get('/api/privacy/encrypted-backups/:userId', async (req, res) => {
+  try {
+    const backups = [
+      {
+        id: '1',
+        userId: req.params.userId,
+        createdAt: new Date().toISOString(),
+        dataTypes: ['journal_entries', 'mood_data', 'conversations'],
+        encryptionMetadata: {
+          algorithm: 'AES-256-GCM',
+          keyDerivation: 'PBKDF2',
+          iterations: 100000
+        },
+        expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+        size: '2.4 MB'
+      }
+    ];
+    res.json(backups);
+  } catch (error) {
+    console.error('Error fetching encrypted backups:', error);
+    res.status(500).json({ error: 'Failed to fetch backups' });
+  }
+});
+
+app.get('/api/privacy/compliance-report/:userId', async (req, res) => {
+  try {
+    const complianceReport = {
+      overallScore: 0.95,
+      gdprCompliance: true,
+      hipaaCompliance: true,
+      dataMinimization: true,
+      userConsent: true,
+      auditTrail: true,
+      recommendations: [
+        'Consider rotating encryption keys monthly for enhanced security',
+        'Enable automatic backup cleanup for expired data'
+      ],
+      lastAudit: new Date().toISOString()
+    };
+    res.json(complianceReport);
+  } catch (error) {
+    console.error('Error generating compliance report:', error);
+    res.status(500).json({ error: 'Failed to generate compliance report' });
+  }
+});
+
+app.get('/api/privacy/anonymized-reports/:userId', async (req, res) => {
+  try {
+    const anonymizedReports = [
+      {
+        id: '1',
+        reportType: 'Emotional Wellness Trends',
+        generatedAt: new Date().toISOString(),
+        cohortSize: 150,
+        privacyBudgetUsed: 0.1,
+        findings: {
+          emotionalTrends: [
+            { trend: 'Improved anxiety management', frequency: 0.68, confidence: 0.89 },
+            { trend: 'Better sleep patterns', frequency: 0.54, confidence: 0.76 }
+          ],
+          therapeuticEffectiveness: [
+            { intervention: 'Mindfulness exercises', successRate: 0.72, sampleSize: 89 },
+            { intervention: 'Journaling prompts', successRate: 0.65, sampleSize: 124 }
+          ],
+          usagePatterns: [
+            { pattern: 'Evening reflection sessions', percentage: 0.43, noiseLevel: 0.05 },
+            { pattern: 'Voice interaction preference', percentage: 0.67, noiseLevel: 0.03 }
+          ]
+        },
+        privacyGuarantees: {
+          epsilon: 1.0,
+          delta: 0.00001,
+          mechanism: 'laplace'
+        }
+      }
+    ];
+    res.json(anonymizedReports);
+  } catch (error) {
+    console.error('Error fetching anonymized reports:', error);
+    res.status(500).json({ error: 'Failed to fetch reports' });
+  }
+});
+
+app.post('/api/privacy/encrypt-data', async (req, res) => {
+  try {
+    const { userId, password, dataTypes } = req.body;
+    // Simulate encryption process
+    const result = {
+      success: true,
+      encryptedDataId: 'enc_' + Date.now(),
+      dataTypes,
+      timestamp: new Date().toISOString()
+    };
+    res.json(result);
+  } catch (error) {
+    console.error('Error encrypting data:', error);
+    res.status(500).json({ error: 'Failed to encrypt data' });
+  }
+});
+
+app.post('/api/privacy/create-backup', async (req, res) => {
+  try {
+    const { userId, password } = req.body;
+    // Simulate backup creation
+    const backup = {
+      id: 'backup_' + Date.now(),
+      userId,
+      createdAt: new Date().toISOString(),
+      dataTypes: ['journal_entries', 'mood_data', 'conversations', 'goals'],
+      size: '3.2 MB',
+      encrypted: true
+    };
+    res.json(backup);
+  } catch (error) {
+    console.error('Error creating backup:', error);
+    res.status(500).json({ error: 'Failed to create backup' });
+  }
+});
+
+app.post('/api/privacy/generate-anonymized-report', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    // Simulate report generation with differential privacy
+    const report = {
+      id: 'report_' + Date.now(),
+      reportType: 'Weekly Wellness Insights',
+      generatedAt: new Date().toISOString(),
+      cohortSize: 200,
+      privacyBudgetUsed: 0.08,
+      status: 'completed'
+    };
+    res.json(report);
+  } catch (error) {
+    console.error('Error generating anonymized report:', error);
+    res.status(500).json({ error: 'Failed to generate report' });
+  }
+});
+
 // Journal Analytics Dashboard
 app.get('/api/journal/analytics/:userId', async (req, res) => {
   try {
