@@ -4,6 +4,7 @@ import {
   journalEntries, moodEntries, therapeuticGoals, supportForums, forumPosts,
   userAchievements, wellnessStreaks, emotionalPatterns,
   moodForecasts, emotionalContexts, predictiveInsights, emotionalResponseAdaptations, crisisDetectionLogs,
+  monthlyWellnessReports, analyticsMetrics, progressTracking, riskAssessments, longitudinalTrends,
   type User, type InsertUser,
   type Bot, type InsertBot,
   type Message, type InsertMessage,
@@ -24,6 +25,11 @@ import {
   type PredictiveInsight, type InsertPredictiveInsight,
   type EmotionalResponseAdaptation, type InsertEmotionalResponseAdaptation,
   type CrisisDetectionLog, type InsertCrisisDetectionLog,
+  type MonthlyWellnessReport, type InsertMonthlyWellnessReport,
+  type AnalyticsMetric, type InsertAnalyticsMetric,
+  type ProgressTracking, type InsertProgressTracking,
+  type RiskAssessment, type InsertRiskAssessment,
+  type LongitudinalTrend, type InsertLongitudinalTrend,
 } from "@shared/schema";
 import { eq, desc, and } from "drizzle-orm";
 

@@ -387,3 +387,117 @@ export type InsertEmotionalContext = z.infer<typeof insertEmotionalContextSchema
 export type InsertPredictiveInsight = z.infer<typeof insertPredictiveInsightSchema>;
 export type InsertEmotionalResponseAdaptation = z.infer<typeof insertEmotionalResponseAdaptationSchema>;
 export type InsertCrisisDetectionLog = z.infer<typeof insertCrisisDetectionLogSchema>;
+
+// Analytics & Reporting Tables
+export const monthlyWellnessReports = pgTable("monthly_wellness_reports", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  reportMonth: text("report_month").notNull(), // YYYY-MM format
+  wellnessScore: decimal("wellness_score", { precision: 5, scale: 2 }),
+  emotionalVolatility: decimal("emotional_volatility", { precision: 5, scale: 2 }),
+  progressSummary: text("progress_summary"),
+  aiGeneratedInsights: text("ai_generated_insights"),
+  moodTrends: jsonb("mood_trends"),
+  activityMetrics: jsonb("activity_metrics"),
+  therapeuticProgress: jsonb("therapeutic_progress"),
+  riskAssessment: jsonb("risk_assessment"),
+  recommendations: text("recommendations").array(),
+  milestonesAchieved: text("milestones_achieved").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const analyticsMetrics = pgTable("analytics_metrics", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  metricType: text("metric_type").notNull(), // wellness_score, volatility, engagement, etc.
+  value: decimal("value", { precision: 10, scale: 4 }).notNull(),
+  calculatedDate: timestamp("calculated_date").notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const progressTracking = pgTable("progress_tracking", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  trackingPeriod: text("tracking_period").notNull(), // daily, weekly, monthly
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  journalEntries: integer("journal_entries").default(0),
+  moodEntries: integer("mood_entries").default(0),
+  chatSessions: integer("chat_sessions").default(0),
+  goalsCompleted: integer("goals_completed").default(0),
+  averageMoodScore: decimal("average_mood_score", { precision: 3, scale: 2 }),
+  consistencyScore: decimal("consistency_score", { precision: 3, scale: 2 }),
+  therapeuticEngagement: decimal("therapeutic_engagement", { precision: 3, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const riskAssessments = pgTable("risk_assessments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  assessmentDate: timestamp("assessment_date").notNull(),
+  riskLevel: text("risk_level").notNull(), // low, medium, high, critical
+  riskScore: decimal("risk_score", { precision: 3, scale: 2 }).notNull(),
+  riskFactors: text("risk_factors").array(),
+  protectiveFactors: text("protective_factors").array(),
+  recommendations: text("recommendations").array(),
+  triggerEvents: jsonb("trigger_events"),
+  followUpRequired: boolean("follow_up_required").default(false),
+  aiAnalysis: text("ai_analysis"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const longitudinalTrends = pgTable("longitudinal_trends", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  trendType: text("trend_type").notNull(), // mood, wellness, engagement, etc.
+  timeframe: text("timeframe").notNull(), // 3months, 6months, 1year
+  trendDirection: text("trend_direction").notNull(), // improving, stable, declining
+  trendStrength: decimal("trend_strength", { precision: 3, scale: 2 }),
+  dataPoints: jsonb("data_points"),
+  statisticalSignificance: decimal("statistical_significance", { precision: 3, scale: 2 }),
+  insights: text("insights"),
+  predictedOutcome: text("predicted_outcome"),
+  confidenceInterval: jsonb("confidence_interval"),
+  lastCalculated: timestamp("last_calculated").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Insert Schemas for Analytics
+export const insertMonthlyWellnessReportSchema = createInsertSchema(monthlyWellnessReports).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAnalyticsMetricSchema = createInsertSchema(analyticsMetrics).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertProgressTrackingSchema = createInsertSchema(progressTracking).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertRiskAssessmentSchema = createInsertSchema(riskAssessments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertLongitudinalTrendSchema = createInsertSchema(longitudinalTrends).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Export Types for Analytics
+export type MonthlyWellnessReport = typeof monthlyWellnessReports.$inferSelect;
+export type AnalyticsMetric = typeof analyticsMetrics.$inferSelect;
+export type ProgressTracking = typeof progressTracking.$inferSelect;
+export type RiskAssessment = typeof riskAssessments.$inferSelect;
+export type LongitudinalTrend = typeof longitudinalTrends.$inferSelect;
+
+export type InsertMonthlyWellnessReport = z.infer<typeof insertMonthlyWellnessReportSchema>;
+export type InsertAnalyticsMetric = z.infer<typeof insertAnalyticsMetricSchema>;
+export type InsertProgressTracking = z.infer<typeof insertProgressTrackingSchema>;
+export type InsertRiskAssessment = z.infer<typeof insertRiskAssessmentSchema>;
+export type InsertLongitudinalTrend = z.infer<typeof insertLongitudinalTrendSchema>;
