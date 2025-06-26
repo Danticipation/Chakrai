@@ -348,155 +348,73 @@ const AppLayout = () => {
 
       case 'chat':
         return (
-          <div className="flex flex-col h-full">
-            {/* Top Bar - Horoscope, Logo, Affirmation */}
-            <div className="bg-gradient-to-r from-cyan-400 via-blue-500 to-green-400 p-4 rounded-t-lg">
-              <div className="grid grid-cols-3 gap-4 h-20">
-                {/* Horoscope Section */}
-                <div className="bg-cyan-400/80 rounded-lg p-3 flex flex-col justify-center">
-                  <h3 className="text-sm font-bold text-white mb-1">Horoscope</h3>
-                  <p className="text-xs text-white/90 line-clamp-2">
-                    {horoscopeText ? horoscopeText.substring(0, 60) + '...' : "Your cosmic guidance awaits..."}
-                  </p>
+          <div className="flex flex-col h-full bg-white/5 backdrop-blur-sm rounded-lg">
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {messages.length === 0 ? (
+                <div className="text-center text-white/70 py-12">
+                  <MessageCircle size={48} className="mx-auto mb-4 opacity-70" />
+                  <h3 className="text-lg font-semibold text-white mb-2">Welcome to TraI</h3>
+                  <p className="text-white/80">Your therapeutic companion for mental wellness and self-reflection</p>
+                  <p className="text-sm text-white/60 mt-2">Start sharing your thoughts below</p>
                 </div>
-                
-                {/* Logo Section */}
-                <div className="bg-purple-600/80 rounded-lg p-3 flex items-center justify-center">
-                  <div className="text-center">
-                    <img src={traiLogo} alt="TrAI" className="w-8 h-8 mx-auto mb-1" />
-                    <span className="text-xs font-bold text-white">TrAI</span>
+              ) : (
+                messages.map((message, index) => (
+                  <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-md px-4 py-3 rounded-2xl ${
+                      message.sender === 'user' 
+                        ? 'bg-blue-500 text-white' 
+                        : 'bg-white/10 backdrop-blur-sm text-white border border-white/20'
+                    }`}>
+                      <p className="text-sm leading-relaxed">{message.text}</p>
+                      <p className="text-xs mt-2 opacity-70">{message.time}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-white/10 backdrop-blur-sm text-white max-w-md px-4 py-3 rounded-2xl border border-white/20">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
                   </div>
                 </div>
-                
-                {/* Affirmation Section */}
-                <div className="bg-green-400/80 rounded-lg p-3 flex flex-col justify-center">
-                  <h3 className="text-sm font-bold text-white mb-1">Affirmation</h3>
-                  <p className="text-xs text-white/90 line-clamp-2">
-                    {dailyAffirmation.substring(0, 60)}...
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Main Content Area */}
-            <div className="flex-1 bg-purple-600 p-4 grid grid-cols-4 gap-4">
-              {/* Agent Section (Left 3/4) */}
-              <div className="col-span-3 bg-purple-700/50 rounded-lg p-4 flex flex-col">
-                <div className="flex items-center mb-3">
-                  <h2 className="text-lg font-bold text-white">Agent</h2>
-                  {botStats && (
-                    <div className="ml-auto text-sm text-white/80">
-                      {botStats.stage} • Level {botStats.level}
-                    </div>
-                  )}
-                </div>
-                
-                {/* Agent Conversation Area */}
-                <div className="flex-1 overflow-y-auto space-y-3 mb-4">
-                  {messages.length === 0 ? (
-                    <div className="text-center text-white/70 py-8">
-                      <MessageCircle size={32} className="mx-auto mb-3 opacity-70" />
-                      <p className="text-sm">Your AI companion is ready to chat</p>
-                      <p className="text-xs mt-1">I learn your personality to reflect your thoughts</p>
-                    </div>
-                  ) : (
-                    messages.map((message, index) => (
-                      <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                          message.sender === 'user' 
-                            ? 'bg-blue-500 text-white' 
-                            : 'bg-white/20 backdrop-blur-sm text-white'
-                        }`}>
-                          <p>{message.text}</p>
-                          <p className="text-xs mt-1 opacity-70">{message.time}</p>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                  {loading && (
-                    <div className="flex justify-start">
-                      <div className="bg-white/20 backdrop-blur-sm text-white max-w-xs px-3 py-2 rounded-lg">
-                        <div className="flex space-x-1">
-                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce"></div>
-                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Agent Stats/Mood Visualization */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-blue-500/50 rounded p-2">
-                    <div className="w-full h-8 bg-blue-600/30 rounded flex items-center justify-center">
-                      <span className="text-xs text-white">Mood Pattern</span>
-                    </div>
-                  </div>
-                  <div className="bg-blue-500/50 rounded p-2">
-                    <div className="w-full h-8 bg-blue-600/30 rounded flex items-center justify-center">
-                      <span className="text-xs text-white">Analytics</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* User Section (Right 1/4) */}
-              <div className="col-span-1 bg-blue-500/50 rounded-lg p-3">
-                <h3 className="text-sm font-bold text-white mb-3">User</h3>
-                <div className="space-y-2">
-                  <div className="bg-blue-600/30 rounded p-2">
-                    <div className="w-full h-6 bg-blue-700/50 rounded flex items-center justify-center">
-                      <span className="text-xs text-white/80">Profile</span>
-                    </div>
-                  </div>
-                  <div className="bg-blue-600/30 rounded p-2">
-                    <div className="w-full h-6 bg-blue-700/50 rounded flex items-center justify-center">
-                      <span className="text-xs text-white/80">Stats</span>
-                    </div>
-                  </div>
-                  <div className="bg-blue-600/30 rounded p-2">
-                    <div className="w-full h-6 bg-blue-700/50 rounded flex items-center justify-center">
-                      <span className="text-xs text-white/80">Goals</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom - Share Your Thoughts */}
-            <div className="bg-cyan-400 p-4 rounded-b-lg">
-              <div className="flex items-center space-x-3">
-                <span className="text-sm font-semibold text-white">Share Your Thoughts</span>
-                <div className="flex-1 flex space-x-2">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    placeholder="Type your message..."
-                    className="flex-1 px-3 py-2 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-white/70 border border-white/30 focus:border-white focus:outline-none text-sm"
-                    disabled={loading}
-                  />
-                  <button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    className={`p-2 rounded-lg transition-colors ${
-                      isRecording 
-                        ? 'bg-red-500 hover:bg-red-600 text-white' 
-                        : 'bg-white/20 hover:bg-white/30 text-white border border-white/30'
-                    }`}
-                    disabled={loading}
-                  >
-                    {isRecording ? <Square size={18} /> : <Mic size={18} />}
-                  </button>
-                  <button
-                    onClick={sendMessage}
-                    disabled={!input.trim() || loading}
-                    className="p-2 bg-white/20 hover:bg-white/30 disabled:opacity-50 rounded-lg text-white border border-white/30 transition-colors"
-                  >
-                    <Send size={18} />
-                  </button>
-                </div>
+            {/* Chat Input */}
+            <div className="p-6 border-t border-white/20">
+              <div className="flex space-x-3">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  placeholder="Share your thoughts..."
+                  className="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder-white/60 border border-white/30 focus:border-white/50 focus:outline-none"
+                  disabled={loading}
+                />
+                <button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  className={`px-4 py-3 rounded-xl transition-colors ${
+                    isRecording 
+                      ? 'bg-red-500 hover:bg-red-600 text-white' 
+                      : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
+                  }`}
+                  disabled={loading}
+                >
+                  {isRecording ? <Square size={20} /> : <Mic size={20} />}
+                </button>
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || loading}
+                  className="px-4 py-3 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 rounded-xl text-white transition-colors"
+                >
+                  <Send size={20} />
+                </button>
               </div>
             </div>
           </div>
@@ -596,100 +514,69 @@ const AppLayout = () => {
   }
 
   return (
-    <div className="h-screen bg-black flex flex-col">
-      {/* Header - Level 1 Box (Dark Blue) */}
-      <div className="bg-[#1a237e] backdrop-blur-sm p-4 shadow-sm border border-[#3949ab]/30">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <img src={traiLogo} alt="TrAI" className="w-8 h-8" />
-            <h1 className="text-xl font-bold text-white">TrAI</h1>
-          </div>
-          <div className="flex items-center space-x-2">
-            {botStats && (
-              <div className="text-sm text-white/80">
-                {botStats.stage} • Level {botStats.level}
-              </div>
-            )}
-            <button
-              onClick={() => setShowSettings(!showSettings)}
-              className="p-2 rounded-lg hover:bg-[#3949ab]/30 transition-colors"
-            >
-              <User size={20} className="text-white" />
-            </button>
-          </div>
+    <div className="h-screen bg-black flex">
+      {/* Left Sidebar Navigation */}
+      <div className="w-20 bg-[#1a237e] flex flex-col items-center py-4 space-y-4">
+        {/* Logo */}
+        <div className="mb-4">
+          <img src={traiLogo} alt="TrAI" className="w-10 h-10" />
         </div>
         
-        {/* Daily Features Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Daily Affirmation */}
-          <button 
-            onClick={() => setActiveSection('affirmation')}
-            className="bg-[#3949ab]/30 rounded-lg p-3 border border-[#5c6bc0]/30 hover:bg-[#3949ab]/50 transition-colors text-left w-full"
+        {/* Navigation Tabs */}
+        {[
+          { id: 'chat', icon: MessageCircle, label: 'Chat' },
+          { id: 'daily', icon: Brain, label: 'Reflection' },
+          { id: 'journal', icon: BookOpen, label: 'Journal' },
+          { id: 'memory', icon: Brain, label: 'Memory' },
+          { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+          { id: 'rewards', icon: Gift, label: 'Rewards' },
+          { id: 'community', icon: User, label: 'Community' },
+          { id: 'adaptive', icon: Star, label: 'AI Learning' },
+          { id: 'vr', icon: Headphones, label: 'VR Therapy' },
+          { id: 'health', icon: Heart, label: 'Health' },
+          { id: 'privacy', icon: Shield, label: 'Privacy' }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveSection(tab.id)}
+            className={`w-12 h-12 rounded-lg flex items-center justify-center transition-colors ${
+              activeSection === tab.id
+                ? 'bg-[#7986cb] text-white'
+                : 'text-white/70 hover:text-white hover:bg-[#3949ab]/30'
+            }`}
+            title={tab.label}
           >
-            <div className="flex items-center space-x-2 mb-2">
-              <Heart className="text-green-400" size={16} />
-              <span className="text-sm font-semibold text-white">Daily Affirmation</span>
-            </div>
-            <p className="text-xs text-white/90 italic">
-              "{dailyAffirmation}"
-            </p>
+            <tab.icon size={20} />
           </button>
-          
-          {/* Today's Horoscope */}
-          <button 
-            onClick={() => setActiveSection('horoscope')}
-            className="bg-[#3949ab]/30 rounded-lg p-3 border border-[#5c6bc0]/30 hover:bg-[#3949ab]/50 transition-colors text-left w-full"
-          >
-            <div className="flex items-center space-x-2 mb-2">
-              <Star className="text-purple-400" size={16} />
-              <span className="text-sm font-semibold text-white">Horoscope</span>
-            </div>
-            <p className="text-xs text-white/90">
-              {horoscopeText || "Loading your cosmic guidance..."}
-            </p>
-          </button>
-        </div>
+        ))}
+        
+        {/* Settings */}
+        <button
+          onClick={() => setShowSettings(!showSettings)}
+          className="w-12 h-12 rounded-lg flex items-center justify-center text-white/70 hover:text-white hover:bg-[#3949ab]/30 transition-colors mt-auto"
+          title="Settings"
+        >
+          <User size={20} />
+        </button>
       </div>
 
-      {/* Main Content - Level 2 Box (Medium Blue) */}
-      <div className="flex-1 flex p-2">
-        {/* Content Area - Level 3 Box (Light Blue) */}
-        <div className="flex-1 bg-[#3949ab] rounded-lg border border-[#5c6bc0]/30 p-3">
-          <div className="bg-[#5c6bc0] rounded-lg h-full p-3 border border-[#7986cb]/30">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Header */}
+        <div className="bg-[#1a237e] p-4 flex items-center justify-between">
+          <h1 className="text-xl font-bold text-white">TrAI</h1>
+          {botStats && (
+            <div className="text-sm text-white/80">
+              {botStats.stage} • Level {botStats.level}
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 bg-[#3949ab] p-4">
+          <div className="bg-[#5c6bc0] rounded-lg h-full p-4">
             {renderActiveSection()}
           </div>
-        </div>
-      </div>
-
-      {/* Bottom Navigation - Level 1 Box (Dark Blue) */}
-      <div className="bg-[#1a237e] backdrop-blur-sm p-4 border-t border-[#3949ab]/30">
-        <div className="flex justify-center space-x-8">
-          {[
-            { id: 'daily', icon: Brain, label: 'Reflection' },
-            { id: 'chat', icon: MessageCircle, label: 'Chat' },
-            { id: 'journal', icon: BookOpen, label: 'Journal' },
-            { id: 'memory', icon: Brain, label: 'Memory' },
-            { id: 'analytics', icon: BarChart3, label: 'Analytics' },
-            { id: 'rewards', icon: Gift, label: 'Rewards' },
-            { id: 'community', icon: User, label: 'Community' },
-            { id: 'adaptive', icon: Star, label: 'AI Learning' },
-            { id: 'vr', icon: Headphones, label: 'VR Therapy' },
-            { id: 'health', icon: Heart, label: 'Health' },
-            { id: 'privacy', icon: Shield, label: 'Privacy' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveSection(tab.id)}
-              className={`flex flex-col items-center space-y-1 p-2 rounded-lg transition-colors ${
-                activeSection === tab.id
-                  ? 'bg-[#7986cb] text-white'
-                  : 'text-white/70 hover:text-white hover:bg-[#3949ab]/30'
-              }`}
-            >
-              <tab.icon size={24} />
-              <span className="text-xs font-medium">{tab.label}</span>
-            </button>
-          ))}
         </div>
       </div>
 
