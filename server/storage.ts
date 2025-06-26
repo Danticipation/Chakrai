@@ -3,6 +3,7 @@ import {
   users, bots, messages, learnedWords, milestones, userMemories, userFacts,
   journalEntries, moodEntries, therapeuticGoals, supportForums, forumPosts,
   userAchievements, wellnessStreaks, emotionalPatterns,
+  moodForecasts, emotionalContexts, predictiveInsights, emotionalResponseAdaptations, crisisDetectionLogs,
   type User, type InsertUser,
   type Bot, type InsertBot,
   type Message, type InsertMessage,
@@ -18,6 +19,11 @@ import {
   type UserAchievement, type InsertUserAchievement,
   type WellnessStreak, type InsertWellnessStreak,
   type EmotionalPattern, type InsertEmotionalPattern,
+  type MoodForecast, type InsertMoodForecast,
+  type EmotionalContext, type InsertEmotionalContext,
+  type PredictiveInsight, type InsertPredictiveInsight,
+  type EmotionalResponseAdaptation, type InsertEmotionalResponseAdaptation,
+  type CrisisDetectionLog, type InsertCrisisDetectionLog,
 } from "@shared/schema";
 import { eq, desc, and } from "drizzle-orm";
 
@@ -254,10 +260,12 @@ export class DbStorage implements IStorage {
       .where(and(eq(wellnessStreaks.userId, userId), eq(wellnessStreaks.streakType, streakType)));
     
     if (existing) {
+      const currentStreak = existing.currentStreak || 0;
+      const longestStreak = existing.longestStreak || 0;
       const [updated] = await this.db.update(wellnessStreaks)
         .set({ 
-          currentStreak: existing.currentStreak + 1,
-          longestStreak: Math.max(existing.longestStreak, existing.currentStreak + 1),
+          currentStreak: currentStreak + 1,
+          longestStreak: Math.max(longestStreak, currentStreak + 1),
           lastActiveDate: new Date()
         })
         .where(eq(wellnessStreaks.id, existing.id))
@@ -273,6 +281,68 @@ export class DbStorage implements IStorage {
       }).returning();
       return created;
     }
+  }
+
+  // Advanced Emotional Intelligence Storage Methods
+  
+  async createEmotionalContext(data: InsertEmotionalContext): Promise<EmotionalContext> {
+    const [created] = await this.db.insert(emotionalContexts).values(data).returning();
+    return created;
+  }
+
+  async createMoodForecast(data: InsertMoodForecast): Promise<MoodForecast> {
+    const [created] = await this.db.insert(moodForecasts).values(data).returning();
+    return created;
+  }
+
+  async createPredictiveInsight(data: InsertPredictiveInsight): Promise<PredictiveInsight> {
+    const [created] = await this.db.insert(predictiveInsights).values(data).returning();
+    return created;
+  }
+
+  async createEmotionalResponseAdaptation(data: InsertEmotionalResponseAdaptation): Promise<EmotionalResponseAdaptation> {
+    const [created] = await this.db.insert(emotionalResponseAdaptations).values(data).returning();
+    return created;
+  }
+
+  async createCrisisDetectionLog(data: InsertCrisisDetectionLog): Promise<CrisisDetectionLog> {
+    const [created] = await this.db.insert(crisisDetectionLogs).values(data).returning();
+    return created;
+  }
+
+  async getMoodForecasts(userId: number, limit: number = 10): Promise<MoodForecast[]> {
+    return await this.db.select().from(moodForecasts)
+      .where(eq(moodForecasts.userId, userId))
+      .orderBy(desc(moodForecasts.createdAt))
+      .limit(limit);
+  }
+
+  async getPredictiveInsights(userId: number, limit: number = 10): Promise<PredictiveInsight[]> {
+    return await this.db.select().from(predictiveInsights)
+      .where(eq(predictiveInsights.userId, userId))
+      .orderBy(desc(predictiveInsights.createdAt))
+      .limit(limit);
+  }
+
+  async getEmotionalResponseAdaptations(userId: number, limit: number = 10): Promise<EmotionalResponseAdaptation[]> {
+    return await this.db.select().from(emotionalResponseAdaptations)
+      .where(eq(emotionalResponseAdaptations.userId, userId))
+      .orderBy(desc(emotionalResponseAdaptations.createdAt))
+      .limit(limit);
+  }
+
+  async getCrisisDetectionLogs(userId: number, limit: number = 10): Promise<CrisisDetectionLog[]> {
+    return await this.db.select().from(crisisDetectionLogs)
+      .where(eq(crisisDetectionLogs.userId, userId))
+      .orderBy(desc(crisisDetectionLogs.createdAt))
+      .limit(limit);
+  }
+
+  async getEmotionalContexts(userId: number, limit: number = 20): Promise<EmotionalContext[]> {
+    return await this.db.select().from(emotionalContexts)
+      .where(eq(emotionalContexts.userId, userId))
+      .orderBy(desc(emotionalContexts.createdAt))
+      .limit(limit);
   }
 }
 

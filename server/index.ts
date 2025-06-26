@@ -8,6 +8,101 @@ import { storage } from './storage.js';
 import { analyzeEmotionalState } from './emotionalAnalysis.js';
 import { openai } from './openaiRetry.js';
 
+// Helper functions for advanced emotional intelligence features
+async function generateMoodForecast(userId: number, recentMoods: any[]): Promise<any> {
+  try {
+    const prompt = `Based on recent mood data: ${JSON.stringify(recentMoods.slice(-7))}, generate a 24-48 hour mood forecast. Return JSON with: predictedMood (string), confidenceScore (0.0-1.0), riskLevel ('low'|'medium'|'high'|'critical'), triggerFactors (string[]), preventiveRecommendations (string[])`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.3
+    });
+    
+    return JSON.parse(response.choices[0].message.content || '{}');
+  } catch (error) {
+    return {
+      predictedMood: 'neutral',
+      confidenceScore: 0.5,
+      riskLevel: 'low',
+      triggerFactors: [],
+      preventiveRecommendations: ['Continue regular self-care practices']
+    };
+  }
+}
+
+async function generateContextualResponse(originalMessage: string, emotionalState: any, userId: number): Promise<any> {
+  try {
+    const prompt = `Adapt this therapeutic response "${originalMessage}" based on emotional state: ${JSON.stringify(emotionalState)}. Return JSON with: response (adapted message), tone, intensity, responseLength, communicationStyle, priorityFocus (array)`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.4
+    });
+    
+    return JSON.parse(response.choices[0].message.content || '{}');
+  } catch (error) {
+    return {
+      response: originalMessage,
+      tone: 'supportive',
+      intensity: 'moderate',
+      responseLength: 'moderate',
+      communicationStyle: 'therapeutic',
+      priorityFocus: ['emotional support']
+    };
+  }
+}
+
+async function detectCrisisSignals(message: string, userId: number): Promise<any> {
+  try {
+    const prompt = `Analyze this message for crisis indicators: "${message}". Return JSON with: riskLevel ('low'|'medium'|'high'|'critical'), confidence (0.0-1.0), indicators (string[] of specific signals), supportResources (string[] of crisis resources)`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.2
+    });
+    
+    return JSON.parse(response.choices[0].message.content || '{}');
+  } catch (error) {
+    return {
+      riskLevel: 'low',
+      confidence: 0.5,
+      indicators: [],
+      supportResources: []
+    };
+  }
+}
+
+async function analyzeEmotionalPatterns(userId: number, timeframeDays: number): Promise<any> {
+  try {
+    const moodEntries = await storage.getMoodEntries(userId);
+    const prompt = `Analyze emotional patterns from mood data: ${JSON.stringify(moodEntries)}. Return JSON with: dominantEmotions (string[]), averageValence (-1.0 to 1.0), volatility (0.0 to 1.0), trendDirection ('improving'|'declining'|'stable'), triggerPatterns (string[]), insights (string[])`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", 
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.3
+    });
+    
+    return JSON.parse(response.choices[0].message.content || '{}');
+  } catch (error) {
+    return {
+      dominantEmotions: ['neutral'],
+      averageValence: 0.0,
+      volatility: 0.3,
+      trendDirection: 'stable',
+      triggerPatterns: [],
+      insights: ['More data needed for pattern analysis']
+    };
+  }
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
