@@ -34,15 +34,15 @@ body {
   box-sizing: border-box;
 }
 
-/* Global dark background enforcement - OVERRIDDEN FOR COLOR SWAP */
+/* Global dark background enforcement - UPDATED FOR COLOR SWAP */
 html, body, #root {
-  background-color: #3f51b5 !important;
+  background-color: #0a0e1a !important;
   min-height: 100vh !important;
 }
 
-/* Override any white backgrounds in the app - OVERRIDDEN FOR COLOR SWAP */
+/* Override any white backgrounds in the app - UPDATED FOR COLOR SWAP */
 .min-h-screen, .h-screen, .h-full {
-  background-color: #3f51b5 !important;
+  background-color: #0a0e1a !important;
 }
 
 /* Force all text to be white */
@@ -85,25 +85,7 @@ html, body, #root {
   opacity: 1 !important;
 }
 
-/* Eliminate ALL white backgrounds - force dark blue theme */
-div, section, article, main, aside, header, footer, nav {
-  background-color: #0a0e1a !important;
-}
-
-/* Force component backgrounds to dark blue */
-[class*="bg-white"], 
-[class*="bg-gray"], 
-[class*="bg-slate"],
-[style*="background-color: white"],
-[style*="background-color: #fff"],
-[style*="background-color: #ffffff"] {
-  background-color: #0a0e1a !important;
-}
-
-/* Specific overrides for common UI elements */
-.bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-200, .bg-slate-50, .bg-slate-100 {
-  background-color: #0a0e1a !important;
-}
+/* Allow specific color classes to work properly */
 
 /* Input and form elements */
 input, textarea, select, button {
@@ -181,9 +163,7 @@ body {
   overflow: auto;
   height: 100%;
 }
-div[class*="h-screen"], div[class*="min-h-screen"] {
-  background-color: #0e1525 !important;
-}
+/* Allow specific background colors to work */
 
 /* Override all white backgrounds with therapeutic colors */
 div[style*="background-color: #000000"], 
@@ -223,16 +203,7 @@ div[style*="var(--surface-elevated)"] {
   }
 }
 
-/* Force therapeutic colors on main containers only */
-.w-1\/4, .w-1\/2, .flex-1, .h-full, .min-h-screen {
-  background-color: #0e1525 !important;
-}
-
-/* Override white card backgrounds */
-div[style*="backgroundColor: 'var(--surface-elevated')"],
-div[style*="backgroundColor: 'var(--surface-secondary')"] {
-  background-color: #0e1525 !important;
-}
+/* Remove forced overrides to allow color swap */
 
 /* Override CSS variables that might be causing white backgrounds */
 :root {
