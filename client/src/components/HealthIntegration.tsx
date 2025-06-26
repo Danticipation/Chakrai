@@ -201,7 +201,7 @@ const HealthIntegration: React.FC = () => {
               <p className="text-gray-600 mt-2">Connect your devices and discover health-emotion correlations</p>
             </div>
             <div className="text-right">
-              <div className="text-lg font-semibold text-green-600">{devices?.filter(d => d.syncStatus === 'connected').length || 0} Connected</div>
+              <div className="text-lg font-semibold text-green-600">{Array.isArray(devices) ? devices.filter(d => d.syncStatus === 'connected').length : 0} Connected</div>
               <div className="text-sm text-gray-600">Active Devices</div>
             </div>
           </div>
@@ -217,11 +217,11 @@ const HealthIntegration: React.FC = () => {
               <div className="text-xs text-gray-600">Correlations Found</div>
             </div>
             <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-orange-600">{insights?.filter(i => !i.isRead).length || 0}</div>
+              <div className="text-xl font-bold text-orange-600">{Array.isArray(insights) ? insights.filter(i => !i.isRead).length : 0}</div>
               <div className="text-xs text-gray-600">New Insights</div>
             </div>
             <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-green-600">{syncLogs?.filter(l => l.syncStatus === 'success').length || 0}</div>
+              <div className="text-xl font-bold text-green-600">{Array.isArray(syncLogs) ? syncLogs.filter(l => l.syncStatus === 'success').length : 0}</div>
               <div className="text-xs text-gray-600">Successful Syncs</div>
             </div>
           </div>
