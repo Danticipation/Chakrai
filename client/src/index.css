@@ -34,20 +34,29 @@ body {
   box-sizing: border-box;
 }
 
-/* Global dark background enforcement */
+/* Global dark background enforcement - OVERRIDDEN FOR COLOR SWAP */
 html, body, #root {
-  background-color: var(--bg-primary) !important;
+  background-color: #3f51b5 !important;
   min-height: 100vh !important;
 }
 
-/* Override any white backgrounds in the app */
+/* Override any white backgrounds in the app - OVERRIDDEN FOR COLOR SWAP */
 .min-h-screen, .h-screen, .h-full {
-  background-color: var(--bg-primary) !important;
+  background-color: #3f51b5 !important;
 }
 
 /* Force all text to be white */
 *, *::before, *::after {
   color: #FFFFFF !important;
+}
+
+/* Color scheme override for user-requested swap */
+.bg-\[#3f51b5\] {
+  background-color: #3f51b5 !important;
+}
+
+.bg-\[#0a0e1a\] {
+  background-color: #0a0e1a !important;
 }
 
 /* Eliminate ALL white backgrounds - force dark blue theme */
