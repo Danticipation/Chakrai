@@ -526,9 +526,9 @@ const AppLayout = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex">
-        {/* Left Sidebar Navigation - Much Narrower */}
-        <div className="w-24 bg-[#2d3748] flex flex-col py-2 space-y-1">
-          {/* Navigation Buttons - Smaller */}
+        {/* Left Sidebar Navigation */}
+        <div className="w-40 bg-[#2d3748] flex flex-col py-4 space-y-2">
+          {/* Navigation Buttons */}
           {[
             { id: 'chat', label: 'Chat' },
             { id: 'daily', label: 'Reflection' },
@@ -542,7 +542,7 @@ const AppLayout = () => {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id)}
-              className={`w-full h-8 px-1 text-xs font-medium transition-colors ${
+              className={`w-full h-12 px-2 text-sm font-bold transition-colors ${
                 activeSection === tab.id
                   ? 'bg-red-600 text-white'
                   : 'bg-[#4a5568] text-white hover:bg-red-500'
@@ -553,53 +553,53 @@ const AppLayout = () => {
           ))}
         </div>
 
-        {/* Center Chat Area - Much Wider */}
-        <div className="flex-1 bg-[#2d3748] m-2 rounded-lg relative">
-          <div className="absolute inset-2 bg-[#1a202c] rounded">
-            <div className="text-center text-red-500 text-xl font-bold pt-20">Chat Box</div>
+        {/* Center Chat Area - Smaller */}
+        <div className="w-96 bg-[#2d3748] m-4 rounded-lg relative">
+          <div className="absolute inset-4 bg-[#1a202c] rounded">
+            <div className="text-center text-red-500 text-2xl font-bold pt-16">Chat Box</div>
             {renderActiveSection()}
             
             {/* Chat Input at Bottom */}
-            <div className="absolute bottom-4 left-4 right-4 flex space-x-2">
+            <div className="absolute bottom-6 left-6 right-6 flex space-x-3">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                 placeholder="Share your thoughts"
-                className="flex-1 px-3 py-2 bg-[#2d3748] text-white border border-[#4a5568] rounded"
+                className="flex-1 px-4 py-3 bg-[#2d3748] text-white border border-[#4a5568] rounded text-base"
               />
               <button
                 onClick={isRecording ? stopRecording : startRecording}
-                className={`w-10 h-10 rounded flex items-center justify-center transition-colors ${
+                className={`w-12 h-12 rounded flex items-center justify-center transition-colors ${
                   isRecording 
                     ? 'bg-red-500 hover:bg-red-600 text-white' 
                     : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
                 }`}
                 disabled={loading}
               >
-                {isRecording ? <Square size={16} /> : <Mic size={16} />}
+                {isRecording ? <Square size={20} /> : <Mic size={20} />}
               </button>
               <button
                 onClick={sendMessage}
                 disabled={!input.trim() || loading}
-                className="w-10 h-10 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
+                className="w-12 h-12 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
               >
-                <Send size={16} />
+                <Send size={20} />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right Stats Sidebar - Much Narrower */}
-        <div className="w-32 bg-[#5c85d6] m-2 rounded-lg p-2">
-          <div className="text-white text-sm font-bold mb-3 text-center underline">Stats or goal tracking</div>
+        {/* Right Stats Sidebar */}
+        <div className="flex-1 bg-[#5c85d6] m-4 rounded-lg p-6">
+          <div className="text-white text-2xl font-bold mb-6 text-center underline">Stats or goal tracking</div>
           
-          {/* Mock Chart Circles - Much Smaller */}
-          <div className="space-y-3">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+          {/* Mock Chart Circles */}
+          <div className="space-y-8">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+            <div className="w-32 h-32 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+            <div className="w-32 h-32 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
           </div>
         </div>
       </div>
