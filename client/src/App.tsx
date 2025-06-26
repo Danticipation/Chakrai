@@ -526,9 +526,9 @@ const AppLayout = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex">
-        {/* Left Sidebar Navigation */}
-        <div className="w-32 bg-[#2d3748] flex flex-col py-4 space-y-2">
-          {/* Navigation Buttons - Full Width Rectangles */}
+        {/* Left Sidebar Navigation - Much Narrower */}
+        <div className="w-24 bg-[#2d3748] flex flex-col py-2 space-y-1">
+          {/* Navigation Buttons - Smaller */}
           {[
             { id: 'chat', label: 'Chat' },
             { id: 'daily', label: 'Reflection' },
@@ -542,7 +542,7 @@ const AppLayout = () => {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id)}
-              className={`w-full h-10 px-3 text-sm font-medium transition-colors ${
+              className={`w-full h-8 px-1 text-xs font-medium transition-colors ${
                 activeSection === tab.id
                   ? 'bg-red-600 text-white'
                   : 'bg-[#4a5568] text-white hover:bg-red-500'
@@ -553,9 +553,9 @@ const AppLayout = () => {
           ))}
         </div>
 
-        {/* Center Chat Area */}
-        <div className="flex-1 bg-[#2d3748] m-4 rounded-lg relative">
-          <div className="absolute inset-4 bg-[#1a202c] rounded">
+        {/* Center Chat Area - Much Wider */}
+        <div className="flex-1 bg-[#2d3748] m-2 rounded-lg relative">
+          <div className="absolute inset-2 bg-[#1a202c] rounded">
             <div className="text-center text-red-500 text-xl font-bold pt-20">Chat Box</div>
             {renderActiveSection()}
             
@@ -591,15 +591,15 @@ const AppLayout = () => {
           </div>
         </div>
 
-        {/* Right Stats Sidebar */}
-        <div className="w-80 bg-[#5c85d6] m-4 rounded-lg p-4">
-          <div className="text-white text-xl font-bold mb-4 text-center underline">Stats or goal tracking</div>
+        {/* Right Stats Sidebar - Narrower */}
+        <div className="w-64 bg-[#5c85d6] m-2 rounded-lg p-3">
+          <div className="text-white text-lg font-bold mb-4 text-center underline">Stats or goal tracking</div>
           
-          {/* Mock Chart Circles */}
-          <div className="space-y-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+          {/* Mock Chart Circles - Smaller */}
+          <div className="space-y-4">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
           </div>
         </div>
       </div>
