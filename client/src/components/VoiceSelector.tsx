@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Check } from 'lucide-react';
 
 interface Voice {
   id: string;
@@ -27,12 +28,17 @@ export default function VoiceSelector({ selectedVoice, onVoiceChange }: VoiceSel
           <button
             key={voice.id}
             onClick={() => onVoiceChange(voice.id)}
-            className={`p-4 rounded-xl border transition-colors text-left ${
+            className={`p-4 rounded-xl border transition-all duration-200 text-left relative ${
               selectedVoice === voice.id
-                ? 'bg-blue-500/20 border-blue-300/50 text-white'
-                : 'bg-white/5 border-white/20 text-white/80 hover:bg-white/10'
+                ? 'bg-blue-500/30 border-blue-400 text-white shadow-lg ring-2 ring-blue-400/50'
+                : 'bg-white/5 border-white/20 text-white/80 hover:bg-white/10 hover:border-white/30'
             }`}
           >
+            {selectedVoice === voice.id && (
+              <div className="absolute top-2 right-2">
+                <Check size={16} className="text-blue-400" />
+              </div>
+            )}
             <h3 className="font-semibold mb-1">{voice.name}</h3>
             <p className="text-sm opacity-80">{voice.description}</p>
           </button>
