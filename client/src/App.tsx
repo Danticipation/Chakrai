@@ -507,9 +507,7 @@ const AppLayout = () => {
         
         {/* Logo Section */}
         <div className="bg-white rounded-lg p-3 flex items-center justify-center">
-          <div className="text-center">
-            <span className="text-2xl font-bold text-[#1a237e]">Logo</span>
-          </div>
+          <img src={traiLogo} alt="TrAI" className="h-12 w-auto" />
         </div>
         
         {/* Affirmation Section */}
@@ -535,7 +533,7 @@ const AppLayout = () => {
             <img src={traiLogo} alt="TrAI" className="w-8 h-8" />
           </div>
           
-          {/* Navigation Tabs - Vertical */}
+          {/* Navigation Tabs - Vertical Rectangles */}
           {[
             { id: 'chat', icon: MessageCircle, label: 'Chat' },
             { id: 'daily', icon: Brain, label: 'Reflection' },
@@ -552,7 +550,7 @@ const AppLayout = () => {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id)}
-              className={`w-10 h-10 rounded flex items-center justify-center transition-colors ${
+              className={`w-12 h-8 flex items-center justify-center transition-colors ${
                 activeSection === tab.id
                   ? 'bg-[#7986cb] text-white'
                   : 'text-white/70 hover:text-white hover:bg-[#3949ab]/30'
@@ -573,23 +571,53 @@ const AppLayout = () => {
           </button>
         </div>
 
-        {/* Chat Area */}
-        <div className="flex-1 bg-[#2d3748] m-4 rounded-lg relative">
+        {/* Chat Area - Smaller */}
+        <div className="flex-1 bg-[#2d3748] m-4 mr-2 rounded-lg relative max-w-2xl">
           <div className="absolute inset-4 bg-[#1a202c] rounded border-2 border-[#4a5568]">
-            <div className="text-center text-[#3949ab] text-lg font-bold pt-8">Chat box</div>
+            <div className="text-center text-white text-base font-medium pt-4 pb-2">Chat box</div>
             {renderActiveSection()}
           </div>
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-48 bg-[#3949ab] m-4 mr-4 rounded-lg p-4 relative">
+        <div className="w-64 bg-[#3949ab] m-4 ml-2 rounded-lg p-4 relative">
           <div className="bg-white rounded p-3 mb-4">
-            <div className="text-[#1a237e] font-bold text-sm">Stats/goal tracking</div>
-            <div className="text-[#1a237e] text-xs mt-1">or anything else that makes sense</div>
+            <div className="text-[#1a237e] font-bold text-sm mb-2">Goals & Stats</div>
+            {botStats && (
+              <div className="space-y-2">
+                <div className="text-xs text-[#1a237e]">
+                  <span className="font-medium">Level:</span> {botStats.level}
+                </div>
+                <div className="text-xs text-[#1a237e]">
+                  <span className="font-medium">Stage:</span> {botStats.stage}
+                </div>
+                <div className="text-xs text-[#1a237e]">
+                  <span className="font-medium">Words:</span> {botStats.wordsLearned}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="bg-white rounded p-3 mb-4">
+            <div className="text-[#1a237e] font-bold text-sm mb-2">Daily Progress</div>
+            <div className="space-y-2">
+              <div className="text-xs text-[#1a237e]">
+                <span className="font-medium">Conversations:</span> {messages.length}
+              </div>
+              <div className="text-xs text-[#1a237e]">
+                <span className="font-medium">Mood Check:</span> Pending
+              </div>
+              <div className="text-xs text-[#1a237e]">
+                <span className="font-medium">Journal:</span> Not started
+              </div>
+            </div>
           </div>
           
           <div className="bg-white rounded p-3">
-            {/* Placeholder for additional content */}
+            <div className="text-[#1a237e] font-bold text-sm mb-2">Weekly Summary</div>
+            <div className="text-xs text-[#1a237e]">
+              Track your therapeutic journey and emotional patterns over time.
+            </div>
           </div>
           
           {/* Voice Input Buttons - Bottom Right */}
