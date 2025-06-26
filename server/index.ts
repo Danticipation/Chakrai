@@ -288,6 +288,103 @@ app.get('/api/horoscope/:sign', (req, res) => {
   });
 });
 
+// Personality reflection endpoint - AI analysis of user traits and growth
+app.get('/api/personality-reflection/:userId?', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    // Get recent data for analysis using available storage methods
+    const journalEntries = await storage.getJournalEntries(userId).then(entries => entries.slice(0, 5)).catch(() => []);
+    const moodEntries = await storage.getMoodEntries(userId).then(entries => entries.slice(0, 7)).catch(() => []);
+    
+    // Prepare conversation and journal text for analysis
+    const journalText = journalEntries
+      .map(entry => entry.content)
+      .join('\n');
+    
+    const moodSummary = moodEntries
+      .map(mood => `${mood.mood}: ${mood.intensity}/10`)
+      .join(', ');
+
+    // Generate AI personality analysis
+    const analysisPrompt = `Analyze this user's personality, communication style, and emotional patterns based on their recent interactions:
+
+RECENT CONVERSATIONS:
+${conversationText || 'No recent conversations available'}
+
+JOURNAL ENTRIES:
+${journalText || 'No journal entries available'}
+
+MOOD PATTERNS:
+${moodSummary || 'No mood data available'}
+
+Provide a comprehensive personality reflection including:
+1. PERSONALITY TRAITS: Key characteristics and communication style
+2. POSITIVE ATTRIBUTES: Strengths and admirable qualities 
+3. AREAS FOR GROWTH: Gentle suggestions for improvement
+4. EMOTIONAL PATTERNS: How they process and express emotions
+5. THERAPEUTIC INSIGHTS: Professional observations for their wellness journey
+
+Be supportive, encouraging, and therapeutic in tone. Focus on growth and self-awareness.`;
+
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a therapeutic AI providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness.'
+          },
+          {
+            role: 'user',
+            content: analysisPrompt
+          }
+        ],
+        max_tokens: 800,
+        temperature: 0.7
+      })
+    });
+
+    if (openaiResponse.ok) {
+      const data = await openaiResponse.json();
+      const reflection = data.choices[0].message.content;
+      
+      res.json({
+        reflection,
+        lastUpdated: new Date().toISOString(),
+        dataPoints: {
+          conversations: recentMessages.length,
+          journalEntries: journalEntries.length,
+          moodEntries: recentMoods.length
+        }
+      });
+    } else {
+      // Fallback if OpenAI is unavailable
+      res.json({
+        reflection: "Your therapeutic journey shows dedication to self-improvement and emotional awareness. Continue engaging with the platform to develop deeper insights about your personality and growth patterns.",
+        lastUpdated: new Date().toISOString(),
+        dataPoints: {
+          conversations: recentMessages.length,
+          journalEntries: journalEntries.length,
+          moodEntries: recentMoods.length
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Personality reflection error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate personality reflection',
+      reflection: "Continue your therapeutic journey by engaging in conversations and journaling to develop deeper self-awareness and emotional insights.",
+      lastUpdated: new Date().toISOString()
+    });
+  }
+});
+
 // Weekly summary endpoint
 app.get('/api/weekly-summary', (req, res) => {
   try {

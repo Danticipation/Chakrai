@@ -6,6 +6,7 @@ import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import OnboardingQuiz from './components/OnboardingQuiz';
 import TherapeuticJournal from './components/TherapeuticJournal';
+import PersonalityReflection from './components/PersonalityReflection';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -309,24 +310,7 @@ const AppLayout = () => {
   const renderActiveSection = () => {
     switch (activeSection) {
       case 'daily':
-        return (
-          <div className="h-full flex flex-col">
-            <div className="bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6] p-6 rounded-t-2xl">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-800">Daily Reflection</h2>
-                <Heart className="w-6 h-6 text-pink-500" />
-              </div>
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 mb-4">
-                <h3 className="font-semibold text-gray-800 mb-2">Today's Affirmation</h3>
-                <p className="text-gray-700 italic">{dailyAffirmation}</p>
-              </div>
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4">
-                <h3 className="font-semibold text-gray-800 mb-2">Weekly Reflection</h3>
-                <p className="text-gray-700">{weeklySummary}</p>
-              </div>
-            </div>
-          </div>
-        );
+        return <PersonalityReflection userId={1} />;
 
       case 'chat':
         return (
