@@ -476,8 +476,8 @@ const AppLayout = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex">
-        {/* Left Sidebar Navigation - Evenly spaced */}
-        <div className="w-32 bg-[#0a0e1a] flex flex-col justify-center py-8 space-y-3">
+        {/* Left Sidebar Navigation - Larger and blended */}
+        <div className="w-48 bg-[#0a0e1a] flex flex-col justify-center py-8 space-y-6">
           {[
             { id: 'chat', label: 'Chat' },
             { id: 'daily', label: 'Reflection' },
@@ -491,7 +491,7 @@ const AppLayout = () => {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id)}
-              className={`mx-2 h-10 px-2 text-sm font-bold transition-colors rounded ${
+              className={`mx-3 h-14 px-4 text-base font-bold transition-colors rounded ${
                 activeSection === tab.id
                   ? 'bg-red-600 text-white'
                   : 'bg-red-600 text-white hover:bg-red-500'
@@ -505,9 +505,9 @@ const AppLayout = () => {
         {/* Center Content Area - Different layouts based on active section */}
         <div className="flex-1 flex justify-center items-center bg-[#0a0e1a]">
           {activeSection === 'chat' ? (
-            /* Chat Panel - Increased by 50%, centered with empty space around it */
-            <div className="w-[576px] h-[480px] bg-[#0a0e1a] rounded-lg relative border border-white">
-              <div className="absolute inset-4 bg-[#0a0e1a] rounded">
+            /* Chat Panel - Blended background, no visual separation */
+            <div className="w-[576px] h-[480px] bg-[#1a237e] rounded-lg relative">
+              <div className="absolute inset-4 bg-[#1a237e] rounded">
                 <div className="text-center text-white text-xl font-bold pt-6">Chat Box</div>
                 
                 {/* Chat Messages Area */}
@@ -602,9 +602,9 @@ const AppLayout = () => {
           )}
         </div>
 
-        {/* Right Stats Sidebar - Real progress tracking */}
-        <div className="w-48 bg-[#0a0e1a] py-4 px-3">
-          <div className="text-white text-base font-bold mb-4 text-center underline">Stats or goal tracking</div>
+        {/* Right Stats Sidebar - Larger and blended */}
+        <div className="w-64 bg-[#0a0e1a] py-8 px-6">
+          <div className="text-white text-lg font-bold mb-6 text-center underline">Stats or goal tracking</div>
           
           {/* Real Progress Tracking */}
           <div className="space-y-3">
