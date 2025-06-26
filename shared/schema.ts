@@ -719,3 +719,102 @@ export type InsertConversationSummary = z.infer<typeof insertConversationSummary
 export type InsertSemanticMemory = z.infer<typeof insertSemanticMemorySchema>;
 export type InsertMemoryConnection = z.infer<typeof insertMemoryConnectionSchema>;
 export type InsertMemoryInsight = z.infer<typeof insertMemoryInsightSchema>;
+
+// Therapist Portal System - New Feature Addition
+export const therapists = pgTable("therapists", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  licenseNumber: text("license_number").notNull(),
+  specialty: text("specialty"), // e.g., "CBT", "DBT", "Trauma"
+  verified: boolean("verified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const clientTherapistRelationships = pgTable("client_therapist_relationships", {
+  id: serial("id").primaryKey(),
+  clientUserId: integer("client_user_id").notNull(),
+  therapistId: integer("therapist_id").notNull(),
+  status: text("status").notNull().default("pending"), // pending, active, inactive
+  inviteCode: text("invite_code").unique(),
+  createdAt: timestamp("created_at").defaultNow(),
+  activatedAt: timestamp("activated_at"),
+});
+
+export const clientPrivacySettings = pgTable("client_privacy_settings", {
+  id: serial("id").primaryKey(),
+  clientUserId: integer("client_user_id").notNull(),
+  therapistId: integer("therapist_id").notNull(),
+  shareJournalData: boolean("share_journal_data").default(true),
+  shareMoodData: boolean("share_mood_data").default(true),
+  shareReflectionData: boolean("share_reflection_data").default(true),
+  shareCrisisAlerts: boolean("share_crisis_alerts").default(true),
+  blurCrisisFlags: boolean("blur_crisis_flags").default(false),
+  shareSessionSummaries: boolean("share_session_summaries").default(true),
+  dataRetentionDays: integer("data_retention_days").default(90),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const therapistSessionNotes = pgTable("therapist_session_notes", {
+  id: serial("id").primaryKey(),
+  therapistId: integer("therapist_id").notNull(),
+  clientUserId: integer("client_user_id").notNull(),
+  sessionDate: timestamp("session_date").notNull(),
+  notes: text("notes"),
+  recommendations: text("recommendations"),
+  riskAssessment: text("risk_assessment"), // low, medium, high
+  followUpRequired: boolean("follow_up_required").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const riskAlerts = pgTable("risk_alerts", {
+  id: serial("id").primaryKey(),
+  clientUserId: integer("client_user_id").notNull(),
+  therapistId: integer("therapist_id").notNull(),
+  alertType: text("alert_type").notNull(), // mood_spike, crisis_flag, journal_pattern
+  severity: text("severity").notNull(), // low, medium, high, critical
+  description: text("description").notNull(),
+  triggerData: jsonb("trigger_data"), // Store relevant mood/journal data
+  acknowledged: boolean("acknowledged").default(false),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Schema validators for therapist portal
+export const insertTherapistSchema = createInsertSchema(therapists).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertClientTherapistRelationshipSchema = createInsertSchema(clientTherapistRelationships).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertClientPrivacySettingsSchema = createInsertSchema(clientPrivacySettings).omit({
+  id: true,
+});
+
+export const insertTherapistSessionNotesSchema = createInsertSchema(therapistSessionNotes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertRiskAlertSchema = createInsertSchema(riskAlerts).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Types for therapist portal
+export type Therapist = typeof therapists.$inferSelect;
+export type ClientTherapistRelationship = typeof clientTherapistRelationships.$inferSelect;
+export type ClientPrivacySettings = typeof clientPrivacySettings.$inferSelect;
+export type TherapistSessionNotes = typeof therapistSessionNotes.$inferSelect;
+export type RiskAlert = typeof riskAlerts.$inferSelect;
+
+export type InsertTherapist = z.infer<typeof insertTherapistSchema>;
+export type InsertClientTherapistRelationship = z.infer<typeof insertClientTherapistRelationshipSchema>;
+export type InsertClientPrivacySettings = z.infer<typeof insertClientPrivacySettingsSchema>;
+export type InsertTherapistSessionNotes = z.infer<typeof insertTherapistSessionNotesSchema>;
+export type InsertRiskAlert = z.infer<typeof insertRiskAlertSchema>;

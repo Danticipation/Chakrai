@@ -8,6 +8,7 @@ import {
   userWellnessPoints, pointsTransactions, rewardsShop, userPurchases, achievements,
   dailyActivities, communityChallenges, userChallengeProgress, userLevels,
   conversationSummaries, semanticMemories, memoryConnections, memoryInsights,
+  therapists, clientTherapistRelationships, clientPrivacySettings, therapistSessionNotes, riskAlerts,
   type User, type InsertUser,
   type Bot, type InsertBot,
   type Message, type InsertMessage,
@@ -37,6 +38,11 @@ import {
   type SemanticMemory, type InsertSemanticMemory,
   type MemoryConnection, type InsertMemoryConnection,
   type MemoryInsight, type InsertMemoryInsight,
+  type Therapist, type InsertTherapist,
+  type ClientTherapistRelationship, type InsertClientTherapistRelationship,
+  type ClientPrivacySettings, type InsertClientPrivacySettings,
+  type TherapistSessionNotes, type InsertTherapistSessionNotes,
+  type RiskAlert, type InsertRiskAlert,
 } from "@shared/schema";
 import { eq, desc, and } from "drizzle-orm";
 
