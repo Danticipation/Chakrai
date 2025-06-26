@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraI - Offline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a237e 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            background: rgba(63, 81, 181, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            color: #3f51b5;
+            margin-bottom: 20px;
+        }
+
+        .offline-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 24px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .features {
+            text-align: left;
+            margin: 24px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .feature-icon {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .retry-button {
+            background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(63, 81, 181, 0.3);
+        }
+
+        .connection-status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-offline {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .status-online {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="logo">TraI</div>
+        <div class="offline-icon">📱</div>
+        
+        <h1>You're Offline</h1>
+        <p>No internet connection detected. Your wellness data is safely stored locally and will sync when you're back online.</p>
+        
+        <div class="features">
+            <div class="feature-item">
+                <span class="feature-icon">📝</span>
+                <span>Journal entries saved locally</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">💙</span>
+                <span>Mood tracking available offline</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🎯</span>
+                <span>Goals and progress tracked</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🔄</span>
+                <span>Auto-sync when connected</span>
+            </div>
+        </div>
+
+        <div id="connectionStatus" class="connection-status status-offline">
+            <span class="pulse">🔴</span> Checking connection...
+        </div>
+        
+        <button class="retry-button" onclick="checkConnection()">
+            Try Again
+        </button>
+        
+        <div class="footer">
+            TraI - Your Mental Wellness Companion<br>
+            Available offline for your convenience
+        </div>
+    </div>
+
+    <script>
+        let isOnline = navigator.onLine;
+        let retryCount = 0;
+        const maxRetries = 5;
+
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connectionStatus');
+            const retryButton = document.querySelector('.retry-button');
+            
+            if (navigator.onLine) {
+                statusElement.className = 'connection-status status-online';
+                statusElement.innerHTML = '<span>🟢</span> Connection restored!';
+                retryButton.textContent = 'Return to TraI';
+                retryButton.onclick = () => window.location.href = '/';
+            } else {
+                statusElement.className = 'connection-status status-offline';
+                statusElement.innerHTML = '<span class="pulse">🔴</span> Still offline...';
+                retryButton.textContent = 'Try Again';
+            }
+        }
+
+        function checkConnection() {
+            const retryButton = document.querySelector('.retry-button');
+            const statusElement = document.getElementById('connectionStatus');
+            
+            retryButton.textContent = 'Checking...';
+            retryButton.disabled = true;
+            
+            // Test connection with a simple fetch to our server
+            fetch('/?offline-check=true', { 
+                method: 'HEAD',
+                cache: 'no-cache'
+            })
+            .then(response => {
+                if (response.ok) {
+                    statusElement.className = 'connection-status status-online';
+                    statusElement.innerHTML = '<span>🟢</span> Connection restored!';
+                    retryButton.textContent = 'Return to TraI';
+                    retryButton.onclick = () => window.location.href = '/';
+                    retryButton.disabled = false;
+                } else {
+                    throw new Error('Server not responding');
+                }
+            })
+            .catch(() => {
+                retryCount++;
+                statusElement.className = 'connection-status status-offline';
+                
+                if (retryCount >= maxRetries) {
+                    statusElement.innerHTML = '<span>🔴</span> Still offline. Try again later.';
+                    retryButton.textContent = 'Retry Later';
+                } else {
+                    statusElement.innerHTML = `<span class="pulse">🔴</span> Still offline (${retryCount}/${maxRetries})`;
+                    retryButton.textContent = 'Try Again';
+                }
+                
+                retryButton.disabled = false;
+            });
+        }
+
+        // Listen for online/offline events
+        window.addEventListener('online', () => {
+            updateConnectionStatus();
+            retryCount = 0;
+        });
+
+        window.addEventListener('offline', updateConnectionStatus);
+
+        // Check connection status periodically
+        setInterval(() => {
+            if (!navigator.onLine) {
+                updateConnectionStatus();
+            }
+        }, 5000);
+
+        // Initial status check
+        updateConnectionStatus();
+
+        // Auto-retry connection every 30 seconds when offline
+        setInterval(() => {
+            if (!navigator.onLine && retryCount < maxRetries) {
+                checkConnection();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

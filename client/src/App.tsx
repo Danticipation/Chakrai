@@ -17,6 +17,8 @@ import PrivacyCompliance from './components/PrivacyCompliance';
 import TherapistPortal from './components/TherapistPortal';
 import Horoscope from './components/Horoscope';
 import DailyAffirmation from './components/DailyAffirmation';
+import PWAManager from './components/PWAManager';
+import MicroSession from './components/MicroSession';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -67,6 +69,9 @@ const AppLayout = () => {
   const [dailyAffirmation, setDailyAffirmation] = useState('Today is a new opportunity for growth and healing.');
   const [horoscopeText, setHoroscopeText] = useState<string>('');
   const [userZodiacSign, setUserZodiacSign] = useState<string>('aries');
+  const [showMicroSession, setShowMicroSession] = useState(false);
+  const [microSessionType, setMicroSessionType] = useState<'journal' | 'mood' | 'gratitude'>('journal');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
