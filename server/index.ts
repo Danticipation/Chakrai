@@ -858,8 +858,8 @@ app.post('/api/emotional-intelligence/analyze', async (req, res) => {
       sessionId: `session_${Date.now()}`,
       currentMood: emotionalAnalysis.primaryEmotion,
       intensity: Math.round(emotionalAnalysis.intensity * 10),
-      volatility: emotionalAnalysis.arousal,
-      urgency: emotionalAnalysis.riskLevel,
+      volatility: emotionalAnalysis.arousal.toString(),
+      urgency: emotionalAnalysis.riskLevel.toString(),
       recentTriggers: [],
       supportNeeds: emotionalAnalysis.recommendedActions || [],
       contextData: emotionalAnalysis
@@ -946,7 +946,7 @@ app.post('/api/emotional-intelligence/crisis-detection', async (req, res) => {
       confidenceScore: crisisAnalysis.confidence,
       interventionTriggered: crisisAnalysis.riskLevel === 'critical',
       interventionType: crisisAnalysis.riskLevel === 'critical' ? 'immediate' : null,
-      followUpScheduled: crisisAnalysis.riskLevel !== 'low' ? new Date() : null
+      followUpScheduled: crisisAnalysis.riskLevel !== 'low' ? true : null
     });
     
     res.json({
@@ -1257,7 +1257,7 @@ app.post('/api/analytics/risk-assessment', async (req, res) => {
       userId,
       assessmentDate: new Date(),
       riskLevel,
-      riskScore: parseFloat(riskScore.toFixed(2)),
+      riskScore: riskScore.toFixed(2),
       riskFactors,
       protectiveFactors,
       recommendations: [
@@ -1336,14 +1336,14 @@ app.get('/api/analytics/trends/:userId', async (req, res) => {
       trendType: trendType || 'wellness',
       timeframe,
       trendDirection: currentMetrics.wellnessScore >= 70 ? 'improving' : currentMetrics.wellnessScore >= 50 ? 'stable' : 'declining',
-      trendStrength: parseFloat(Math.abs(currentVolatility - 2.0).toFixed(2)),
+      trendStrength: Math.abs(currentVolatility - 2.0).toFixed(2),
       dataPoints: {
         currentWellness: currentMetrics.wellnessScore,
         currentVolatility: currentVolatility,
         currentEngagement: currentEngagement,
         dataPointCount: 30
       },
-      statisticalSignificance: 0.85,
+      statisticalSignificance: "0.85",
       insights: trendInsights,
       predictedOutcome: currentMetrics.wellnessScore >= 70 ? 'Continued improvement expected' : 'Focus on consistency recommended',
       confidenceInterval: {
@@ -1430,7 +1430,7 @@ app.post('/api/journal/analyze', async (req, res) => {
       await storage.createCrisisDetectionLog({
         userId,
         riskLevel: analysis.riskLevel,
-        confidenceScore: 0.85,
+        confidenceScore: "0.85",
         triggerType: 'journal_analysis',
         detectedPatterns: analysis.emotionalPatterns || [],
         immediateResponse: analysis.riskLevel === 'critical' ? 'immediate_intervention' : 'monitoring',
