@@ -12,6 +12,7 @@ import WellnessRewards from './components/WellnessRewards';
 import CommunitySupport from './components/CommunitySupport';
 import AdaptiveLearning from './components/AdaptiveLearning';
 import VRTherapy from './components/VRTherapy';
+import HealthIntegration from './components/HealthIntegration';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -419,6 +420,9 @@ const AppLayout = () => {
       case 'vr':
         return <VRTherapy />;
 
+      case 'health':
+        return <HealthIntegration />;
+
       case 'goals':
         return (
           <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
@@ -519,6 +523,7 @@ const AppLayout = () => {
             { id: 'community', icon: User, label: 'Community' },
             { id: 'adaptive', icon: Star, label: 'AI Learning' },
             { id: 'vr', icon: Headphones, label: 'VR Therapy' },
+            { id: 'health', icon: Heart, label: 'Health' },
             { id: 'goals', icon: Target, label: 'Goals' }
           ].map((tab) => (
             <button
