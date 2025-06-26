@@ -475,7 +475,7 @@ const AppLayout = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex bg-[#0a0e1a]">
+      <div className="flex-1 flex bg-[#3f51b5]">
         {/* Left Sidebar Navigation - Seamless blended buttons */}
         <div className="w-48 flex flex-col justify-center py-8">
           {[
@@ -505,9 +505,9 @@ const AppLayout = () => {
         {/* Center Content Area - Different layouts based on active section */}
         <div className="flex-1 flex justify-center items-center">
           {activeSection === 'chat' ? (
-            /* Chat Panel - Light blue background as requested */
-            <div className="w-[576px] h-[480px] bg-[#3f51b5] rounded-lg relative">
-              <div className="absolute inset-4 bg-[#3f51b5] rounded">
+            /* Chat Panel - Dark blue background as requested */
+            <div className="w-[576px] h-[480px] bg-[#0a0e1a] rounded-lg relative">
+              <div className="absolute inset-4 bg-[#0a0e1a] rounded">
                 <div className="text-center text-white text-xl font-bold pt-6">Chat Box</div>
                 
                 {/* Chat Messages Area */}
