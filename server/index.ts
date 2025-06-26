@@ -1435,18 +1435,7 @@ app.post('/api/journal/analyze', async (req, res) => {
         crisisIndicators: analysis.emotionalPatterns || [],
         interventionTriggered: analysis.riskLevel === 'critical',
         interventionType: analysis.riskLevel === 'critical' ? 'immediate' : null,
-        followUpScheduled: analysis.riskLevel !== 'low' ? true : null,
-        responseActions: [
-          'Crisis support resources provided',
-          'Mental health professional contact recommended',
-          'Follow-up scheduled'
-        ],
-        contextData: {
-          journalContent: content.substring(0, 500),
-          mood: mood,
-          intensity: moodIntensity,
-          themes: analysis.themes
-        }
+        followUpScheduled: analysis.riskLevel !== 'low' ? true : null
       });
     }
 

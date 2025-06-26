@@ -480,7 +480,7 @@ const CommunitySupport: React.FC = () => {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Upcoming Sessions</h3>
               <div className="space-y-4">
-                {therapistSessions?.filter(s => s.status === 'scheduled').map((session) => {
+                {Array.isArray(therapistSessions) && therapistSessions.filter(s => s.status === 'scheduled').map((session) => {
                   const IconComponent = getSessionIcon(session.sessionType);
                   return (
                     <div key={session.id} className="bg-white/40 rounded-lg p-4">
@@ -521,7 +521,7 @@ const CommunitySupport: React.FC = () => {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Session History</h3>
               <div className="space-y-4">
-                {therapistSessions?.filter(s => s.status === 'completed').map((session) => (
+                {Array.isArray(therapistSessions) && therapistSessions.filter(s => s.status === 'completed').map((session) => (
                   <div key={session.id} className="bg-white/40 rounded-lg p-4">
                     <div className="flex justify-between items-center mb-2">
                       <h4 className="font-medium text-gray-800">Session with Therapist #{session.therapistId}</h4>
