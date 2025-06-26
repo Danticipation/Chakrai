@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Brain, RefreshCw, Calendar, MessageCircle, TrendingUp, Users, Clock, Lightbulb } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Progress } from './ui/progress';
 
 interface MemoryDashboard {
   summary: {
@@ -46,8 +46,8 @@ export default function MemoryDashboard() {
   const [refreshing, setRefreshing] = useState(false);
 
   const { data: dashboard, isLoading, refetch } = useQuery<MemoryDashboard>({
-    queryKey: ['/api/memory-dashboard'],
-    queryParams: { userId: 1 }
+    queryKey: ['/api/memory-dashboard', 1],
+    queryFn: () => fetch('/api/memory-dashboard?userId=1').then(res => res.json())
   });
 
   const handleRefresh = async () => {
@@ -62,7 +62,7 @@ export default function MemoryDashboard() {
   };
 
   const getEmotionalColor = (emotion: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       positive: 'bg-green-100 text-green-800',
       negative: 'bg-red-100 text-red-800',
       neutral: 'bg-blue-100 text-blue-800',
@@ -152,7 +152,7 @@ export default function MemoryDashboard() {
                 <Clock className="w-5 h-5 text-orange-600" />
                 <div>
                   <p className="text-sm text-gray-600">Last Memory</p>
-                  <p className="text-lg font-semibold">{formatDate(dashboard?.summary.lastMemoryDate)}</p>
+                  <p className="text-lg font-semibold">{formatDate(dashboard?.summary.lastMemoryDate || '')}</p>
                 </div>
               </div>
             </CardContent>
