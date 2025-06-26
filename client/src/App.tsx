@@ -301,7 +301,9 @@ const AppLayout = () => {
         console.log('Bot response text:', botResponse.substring(0, 50) + '...');
         
         // Cancel any existing audio first
-        speechSynthesis.cancel();
+        if ('speechSynthesis' in window) {
+          speechSynthesis.cancel();
+        }
         
         const audioResponse = await fetch('/api/text-to-speech', {
           method: 'POST',
@@ -395,7 +397,22 @@ const AppLayout = () => {
   };
 
   const enableAudio = () => {
+    // Disable all browser TTS
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel();
+      speechSynthesis.pause();
+    }
+    
+    // Stop any existing audio elements
+    const allAudio = document.querySelectorAll('audio');
+    allAudio.forEach(audio => {
+      audio.pause();
+      audio.remove();
+    });
+    
     setAudioEnabled(true);
+    console.log('ElevenLabs-only audio enabled, all browser TTS disabled');
+    
     if (pendingAudio) {
       const audio = new Audio(pendingAudio);
       audio.play().then(() => {
@@ -1170,13 +1187,9 @@ const AppLayout = () => {
               <button
                 onClick={readReflection}
                 disabled={!weeklySummary}
-                className="px-4 py-2 rounded-xl text-sm font-medium shadow-sm transition-all duration-200 disabled:opacity-50"
-                style={{ 
-                  backgroundColor: 'var(--gentle-lavender)',
-                  color: 'var(--text-primary)'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = 'var(--gentle-lavender-dark)'}
-                onMouseOut={(e) => e.target.style.backgroundColor = 'var(--gentle-lavender)'}
+                className="px-4 py-2 rounded-xl text-sm font-medium shadow-sm transition-all duration-200 disabled:opacity-50 bg-purple-200 text-gray-800"
+                onMouseOver={(e) => (e.target as HTMLElement).style.backgroundColor = '#B8B8DC'}
+                onMouseOut={(e) => (e.target as HTMLElement).style.backgroundColor = '#E6E6FA'}
               >
                 🔊 Read
               </button>
