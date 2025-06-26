@@ -348,37 +348,35 @@ const AppLayout = () => {
 
       case 'chat':
         return (
-          <div className="flex flex-col h-full bg-white/5 backdrop-blur-sm rounded-lg">
+          <div className="h-full flex flex-col p-4">
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto space-y-4 mb-4">
               {messages.length === 0 ? (
-                <div className="text-center text-white/70 py-12">
-                  <MessageCircle size={48} className="mx-auto mb-4 opacity-70" />
-                  <h3 className="text-lg font-semibold text-white mb-2">Welcome to TraI</h3>
-                  <p className="text-white/80">Your therapeutic companion for mental wellness and self-reflection</p>
-                  <p className="text-sm text-white/60 mt-2">Start sharing your thoughts below</p>
+                <div className="text-center text-white/70 py-8">
+                  <MessageCircle size={32} className="mx-auto mb-3 opacity-70" />
+                  <p className="text-sm">Start a conversation with TraI</p>
                 </div>
               ) : (
                 messages.map((message, index) => (
                   <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-md px-4 py-3 rounded-2xl ${
+                    <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
                       message.sender === 'user' 
                         ? 'bg-blue-500 text-white' 
                         : 'bg-white/10 backdrop-blur-sm text-white border border-white/20'
                     }`}>
-                      <p className="text-sm leading-relaxed">{message.text}</p>
-                      <p className="text-xs mt-2 opacity-70">{message.time}</p>
+                      <p>{message.text}</p>
+                      <p className="text-xs mt-1 opacity-70">{message.time}</p>
                     </div>
                   </div>
                 ))
               )}
               {loading && (
                 <div className="flex justify-start">
-                  <div className="bg-white/10 backdrop-blur-sm text-white max-w-md px-4 py-3 rounded-2xl border border-white/20">
+                  <div className="bg-white/10 backdrop-blur-sm text-white max-w-xs px-3 py-2 rounded-lg border border-white/20">
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
                   </div>
                 </div>
@@ -386,35 +384,17 @@ const AppLayout = () => {
             </div>
 
             {/* Chat Input */}
-            <div className="p-6 border-t border-white/20">
-              <div className="flex space-x-3">
+            <div className="border-t border-white/20 pt-4">
+              <div className="flex space-x-2">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Share your thoughts..."
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder-white/60 border border-white/30 focus:border-white/50 focus:outline-none"
+                  placeholder="Type your message..."
+                  className="flex-1 px-3 py-2 rounded bg-white/10 backdrop-blur-sm text-white placeholder-white/60 border border-white/30 focus:border-white/50 focus:outline-none text-sm"
                   disabled={loading}
                 />
-                <button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`px-4 py-3 rounded-xl transition-colors ${
-                    isRecording 
-                      ? 'bg-red-500 hover:bg-red-600 text-white' 
-                      : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
-                  }`}
-                  disabled={loading}
-                >
-                  {isRecording ? <Square size={20} /> : <Mic size={20} />}
-                </button>
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || loading}
-                  className="px-4 py-3 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 rounded-xl text-white transition-colors"
-                >
-                  <Send size={20} />
-                </button>
               </div>
             </div>
           </div>
@@ -514,68 +494,124 @@ const AppLayout = () => {
   }
 
   return (
-    <div className="h-screen bg-black flex">
-      {/* Left Sidebar Navigation */}
-      <div className="w-20 bg-[#1a237e] flex flex-col items-center py-4 space-y-4">
-        {/* Logo */}
-        <div className="mb-4">
-          <img src={traiLogo} alt="TrAI" className="w-10 h-10" />
+    <div className="h-screen bg-[#1a237e] flex flex-col">
+      {/* Top Header - Three Sections */}
+      <div className="bg-[#1a237e] p-4 grid grid-cols-3 gap-4 h-24">
+        {/* Horoscope Section */}
+        <div className="bg-[#3949ab] rounded-lg p-3 flex flex-col">
+          <h3 className="text-sm font-bold text-white mb-1 underline">Horoscope</h3>
+          <p className="text-xs text-white/90 line-clamp-2">
+            {horoscopeText ? horoscopeText.substring(0, 80) + '...' : "Your cosmic guidance awaits..."}
+          </p>
         </div>
         
-        {/* Navigation Tabs */}
-        {[
-          { id: 'chat', icon: MessageCircle, label: 'Chat' },
-          { id: 'daily', icon: Brain, label: 'Reflection' },
-          { id: 'journal', icon: BookOpen, label: 'Journal' },
-          { id: 'memory', icon: Brain, label: 'Memory' },
-          { id: 'analytics', icon: BarChart3, label: 'Analytics' },
-          { id: 'rewards', icon: Gift, label: 'Rewards' },
-          { id: 'community', icon: User, label: 'Community' },
-          { id: 'adaptive', icon: Star, label: 'AI Learning' },
-          { id: 'vr', icon: Headphones, label: 'VR Therapy' },
-          { id: 'health', icon: Heart, label: 'Health' },
-          { id: 'privacy', icon: Shield, label: 'Privacy' }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveSection(tab.id)}
-            className={`w-12 h-12 rounded-lg flex items-center justify-center transition-colors ${
-              activeSection === tab.id
-                ? 'bg-[#7986cb] text-white'
-                : 'text-white/70 hover:text-white hover:bg-[#3949ab]/30'
-            }`}
-            title={tab.label}
-          >
-            <tab.icon size={20} />
-          </button>
-        ))}
+        {/* Logo Section */}
+        <div className="bg-white rounded-lg p-3 flex items-center justify-center">
+          <div className="text-center">
+            <span className="text-2xl font-bold text-[#1a237e]">Logo</span>
+          </div>
+        </div>
         
-        {/* Settings */}
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className="w-12 h-12 rounded-lg flex items-center justify-center text-white/70 hover:text-white hover:bg-[#3949ab]/30 transition-colors mt-auto"
-          title="Settings"
-        >
-          <User size={20} />
-        </button>
+        {/* Affirmation Section */}
+        <div className="bg-[#3949ab] rounded-lg p-3 flex flex-col">
+          <h3 className="text-sm font-bold text-white mb-1 underline">Affirmation</h3>
+          <p className="text-xs text-white/90 line-clamp-2">
+            {dailyAffirmation.substring(0, 80)}...
+          </p>
+        </div>
+        
+        {/* Top Right Stats */}
+        <div className="absolute top-4 right-4 text-sm text-white/80">
+          {botStats && `${botStats.stage} • Level ${botStats.level}`}
+        </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Top Header */}
-        <div className="bg-[#1a237e] p-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white">TrAI</h1>
-          {botStats && (
-            <div className="text-sm text-white/80">
-              {botStats.stage} • Level {botStats.level}
-            </div>
-          )}
+      <div className="flex-1 flex">
+        {/* Left Sidebar Navigation */}
+        <div className="w-16 bg-[#1a237e] flex flex-col items-center py-4 space-y-2">
+          {/* Logo */}
+          <div className="mb-4">
+            <img src={traiLogo} alt="TrAI" className="w-8 h-8" />
+          </div>
+          
+          {/* Navigation Tabs - Vertical */}
+          {[
+            { id: 'chat', icon: MessageCircle, label: 'Chat' },
+            { id: 'daily', icon: Brain, label: 'Reflection' },
+            { id: 'journal', icon: BookOpen, label: 'Journal' },
+            { id: 'memory', icon: Brain, label: 'Memory' },
+            { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+            { id: 'rewards', icon: Gift, label: 'Rewards' },
+            { id: 'community', icon: User, label: 'Community' },
+            { id: 'adaptive', icon: Star, label: 'AI Learning' },
+            { id: 'vr', icon: Headphones, label: 'VR Therapy' },
+            { id: 'health', icon: Heart, label: 'Health' },
+            { id: 'privacy', icon: Shield, label: 'Privacy' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveSection(tab.id)}
+              className={`w-10 h-10 rounded flex items-center justify-center transition-colors ${
+                activeSection === tab.id
+                  ? 'bg-[#7986cb] text-white'
+                  : 'text-white/70 hover:text-white hover:bg-[#3949ab]/30'
+              }`}
+              title={tab.label}
+            >
+              <tab.icon size={16} />
+            </button>
+          ))}
+          
+          {/* Settings */}
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="w-10 h-10 rounded flex items-center justify-center text-white/70 hover:text-white hover:bg-[#3949ab]/30 transition-colors mt-auto"
+            title="Settings"
+          >
+            <User size={16} />
+          </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 bg-[#3949ab] p-4">
-          <div className="bg-[#5c6bc0] rounded-lg h-full p-4">
+        {/* Chat Area */}
+        <div className="flex-1 bg-[#2d3748] m-4 rounded-lg relative">
+          <div className="absolute inset-4 bg-[#1a202c] rounded border-2 border-[#4a5568]">
+            <div className="text-center text-[#3949ab] text-lg font-bold pt-8">Chat box</div>
             {renderActiveSection()}
+          </div>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="w-48 bg-[#3949ab] m-4 mr-4 rounded-lg p-4 relative">
+          <div className="bg-white rounded p-3 mb-4">
+            <div className="text-[#1a237e] font-bold text-sm">Stats/goal tracking</div>
+            <div className="text-[#1a237e] text-xs mt-1">or anything else that makes sense</div>
+          </div>
+          
+          <div className="bg-white rounded p-3">
+            {/* Placeholder for additional content */}
+          </div>
+          
+          {/* Voice Input Buttons - Bottom Right */}
+          <div className="absolute bottom-4 right-4 flex space-x-2">
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              className={`w-10 h-10 rounded flex items-center justify-center transition-colors ${
+                isRecording 
+                  ? 'bg-red-500 hover:bg-red-600 text-white' 
+                  : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
+              }`}
+              disabled={loading}
+            >
+              {isRecording ? <Square size={16} /> : <Mic size={16} />}
+            </button>
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || loading}
+              className="w-10 h-10 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
+            >
+              <Send size={16} />
+            </button>
           </div>
         </div>
       </div>
