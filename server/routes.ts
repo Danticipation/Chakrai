@@ -890,4 +890,176 @@ router.get('/journal/analytics/:userId', async (req, res) => {
   }
 });
 
+// ===== THERAPIST PORTAL ROUTES - NEW FEATURE =====
+
+// Therapist management
+router.post('/therapist/register', async (req, res) => {
+  try {
+    const therapist = await storage.createTherapist(req.body);
+    res.json(therapist);
+  } catch (error) {
+    console.error('Failed to register therapist:', error);
+    res.status(500).json({ error: 'Failed to register therapist' });
+  }
+});
+
+router.get('/therapist/:id', async (req, res) => {
+  try {
+    const therapist = await storage.getTherapistById(parseInt(req.params.id));
+    if (!therapist) {
+      return res.status(404).json({ error: 'Therapist not found' });
+    }
+    res.json(therapist);
+  } catch (error) {
+    console.error('Failed to get therapist:', error);
+    res.status(500).json({ error: 'Failed to get therapist' });
+  }
+});
+
+// Client-therapist relationships
+router.post('/therapist/invite-client', async (req, res) => {
+  try {
+    const { therapistId, clientUserId, inviteCode } = req.body;
+    const relationship = await storage.createClientTherapistRelationship({
+      therapistId,
+      clientUserId,
+      inviteCode,
+      status: 'pending'
+    });
+    res.json(relationship);
+  } catch (error) {
+    console.error('Failed to create client relationship:', error);
+    res.status(500).json({ error: 'Failed to create client relationship' });
+  }
+});
+
+router.get('/therapist/:therapistId/clients', async (req, res) => {
+  try {
+    const therapistId = parseInt(req.params.therapistId);
+    const relationships = await storage.getClientTherapistRelationships(therapistId);
+    res.json(relationships);
+  } catch (error) {
+    console.error('Failed to get therapist clients:', error);
+    res.status(500).json({ error: 'Failed to get therapist clients' });
+  }
+});
+
+router.patch('/therapist/relationship/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const relationship = await storage.updateRelationshipStatus(parseInt(req.params.id), status);
+    res.json(relationship);
+  } catch (error) {
+    console.error('Failed to update relationship status:', error);
+    res.status(500).json({ error: 'Failed to update relationship status' });
+  }
+});
+
+// Client dashboard data
+router.get('/therapist/:therapistId/client/:clientId/dashboard', async (req, res) => {
+  try {
+    const therapistId = parseInt(req.params.therapistId);
+    const clientUserId = parseInt(req.params.clientId);
+    
+    const dashboardData = await storage.getClientDashboardData(therapistId, clientUserId);
+    res.json(dashboardData);
+  } catch (error) {
+    console.error('Failed to get client dashboard data:', error);
+    res.status(500).json({ error: 'Failed to get client dashboard data' });
+  }
+});
+
+// Privacy settings
+router.get('/client/:clientId/therapist/:therapistId/privacy', async (req, res) => {
+  try {
+    const clientUserId = parseInt(req.params.clientId);
+    const therapistId = parseInt(req.params.therapistId);
+    
+    const settings = await storage.getClientPrivacySettings(clientUserId, therapistId);
+    res.json(settings || {
+      shareJournalData: true,
+      shareMoodData: true,
+      shareReflectionData: true,
+      shareCrisisAlerts: true,
+      blurCrisisFlags: false,
+      shareSessionSummaries: true,
+      dataRetentionDays: 90
+    });
+  } catch (error) {
+    console.error('Failed to get privacy settings:', error);
+    res.status(500).json({ error: 'Failed to get privacy settings' });
+  }
+});
+
+router.put('/client/privacy-settings', async (req, res) => {
+  try {
+    const settings = await storage.updateClientPrivacySettings(req.body);
+    res.json(settings);
+  } catch (error) {
+    console.error('Failed to update privacy settings:', error);
+    res.status(500).json({ error: 'Failed to update privacy settings' });
+  }
+});
+
+// Session notes
+router.post('/therapist/session-note', async (req, res) => {
+  try {
+    const note = await storage.createTherapistSessionNote(req.body);
+    res.json(note);
+  } catch (error) {
+    console.error('Failed to create session note:', error);
+    res.status(500).json({ error: 'Failed to create session note' });
+  }
+});
+
+router.get('/therapist/:therapistId/session-notes', async (req, res) => {
+  try {
+    const therapistId = parseInt(req.params.therapistId);
+    const clientUserId = req.query.clientId ? parseInt(req.query.clientId as string) : undefined;
+    
+    const notes = await storage.getTherapistSessionNotes(therapistId, clientUserId);
+    res.json(notes);
+  } catch (error) {
+    console.error('Failed to get session notes:', error);
+    res.status(500).json({ error: 'Failed to get session notes' });
+  }
+});
+
+// Risk alerts
+router.get('/therapist/:therapistId/alerts', async (req, res) => {
+  try {
+    const therapistId = parseInt(req.params.therapistId);
+    const clientUserId = req.query.clientId ? parseInt(req.query.clientId as string) : undefined;
+    const acknowledged = req.query.acknowledged ? req.query.acknowledged === 'true' : undefined;
+    
+    const alerts = await storage.getRiskAlerts(therapistId, clientUserId, acknowledged);
+    res.json(alerts);
+  } catch (error) {
+    console.error('Failed to get risk alerts:', error);
+    res.status(500).json({ error: 'Failed to get risk alerts' });
+  }
+});
+
+router.patch('/therapist/alert/:alertId/acknowledge', async (req, res) => {
+  try {
+    const alert = await storage.acknowledgeRiskAlert(parseInt(req.params.alertId));
+    res.json(alert);
+  } catch (error) {
+    console.error('Failed to acknowledge alert:', error);
+    res.status(500).json({ error: 'Failed to acknowledge alert' });
+  }
+});
+
+// Generate risk alerts (automated)
+router.post('/client/:clientId/generate-risk-alerts', async (req, res) => {
+  try {
+    const clientUserId = parseInt(req.params.clientId);
+    await storage.generateRiskAlerts(clientUserId);
+    res.json({ success: true, message: 'Risk alerts generated' });
+  } catch (error) {
+    console.error('Failed to generate risk alerts:', error);
+    res.status(500).json({ error: 'Failed to generate risk alerts' });
+  }
+});
+
 export default router;

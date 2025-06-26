@@ -182,6 +182,30 @@ export interface IStorage {
   
   createMemoryInsight(data: InsertMemoryInsight): Promise<MemoryInsight>;
   getMemoryInsights(userId: number): Promise<MemoryInsight[]>;
+
+  // Therapist Portal System - New Feature Addition
+  createTherapist(data: InsertTherapist): Promise<Therapist>;
+  getTherapistById(id: number): Promise<Therapist | null>;
+  getTherapistByEmail(email: string): Promise<Therapist | null>;
+  updateTherapist(id: number, data: Partial<InsertTherapist>): Promise<Therapist>;
+  
+  createClientTherapistRelationship(data: InsertClientTherapistRelationship): Promise<ClientTherapistRelationship>;
+  getClientTherapistRelationships(therapistId: number): Promise<ClientTherapistRelationship[]>;
+  getTherapistForClient(clientUserId: number): Promise<ClientTherapistRelationship | null>;
+  updateRelationshipStatus(id: number, status: string): Promise<ClientTherapistRelationship>;
+  
+  getClientPrivacySettings(clientUserId: number, therapistId: number): Promise<ClientPrivacySettings | null>;
+  updateClientPrivacySettings(data: InsertClientPrivacySettings): Promise<ClientPrivacySettings>;
+  
+  createTherapistSessionNote(data: InsertTherapistSessionNotes): Promise<TherapistSessionNotes>;
+  getTherapistSessionNotes(therapistId: number, clientUserId?: number): Promise<TherapistSessionNotes[]>;
+  
+  createRiskAlert(data: InsertRiskAlert): Promise<RiskAlert>;
+  getRiskAlerts(therapistId: number, clientUserId?: number, acknowledged?: boolean): Promise<RiskAlert[]>;
+  acknowledgeRiskAlert(id: number): Promise<RiskAlert>;
+  
+  getClientDashboardData(therapistId: number, clientUserId: number): Promise<any>;
+  generateRiskAlerts(clientUserId: number): Promise<void>;
 }
 
 export class DbStorage implements IStorage {
@@ -1037,6 +1061,215 @@ export class DbStorage implements IStorage {
     return await this.db.select().from(memoryInsights)
       .where(eq(memoryInsights.userId, userId))
       .orderBy(desc(memoryInsights.generatedAt));
+  }
+
+  // Therapist Portal System Implementation
+  async createTherapist(data: InsertTherapist): Promise<Therapist> {
+    const [therapist] = await this.db.insert(therapists).values(data).returning();
+    return therapist;
+  }
+
+  async getTherapistById(id: number): Promise<Therapist | null> {
+    const [therapist] = await this.db.select().from(therapists).where(eq(therapists.id, id));
+    return therapist || null;
+  }
+
+  async getTherapistByEmail(email: string): Promise<Therapist | null> {
+    const [therapist] = await this.db.select().from(therapists).where(eq(therapists.email, email));
+    return therapist || null;
+  }
+
+  async updateTherapist(id: number, data: Partial<InsertTherapist>): Promise<Therapist> {
+    const [therapist] = await this.db.update(therapists).set(data).where(eq(therapists.id, id)).returning();
+    return therapist;
+  }
+
+  async createClientTherapistRelationship(data: InsertClientTherapistRelationship): Promise<ClientTherapistRelationship> {
+    const [relationship] = await this.db.insert(clientTherapistRelationships).values(data).returning();
+    return relationship;
+  }
+
+  async getClientTherapistRelationships(therapistId: number): Promise<ClientTherapistRelationship[]> {
+    return await this.db.select().from(clientTherapistRelationships)
+      .where(eq(clientTherapistRelationships.therapistId, therapistId));
+  }
+
+  async getTherapistForClient(clientUserId: number): Promise<ClientTherapistRelationship | null> {
+    const [relationship] = await this.db.select().from(clientTherapistRelationships)
+      .where(and(
+        eq(clientTherapistRelationships.clientUserId, clientUserId),
+        eq(clientTherapistRelationships.status, 'active')
+      ));
+    return relationship || null;
+  }
+
+  async updateRelationshipStatus(id: number, status: string): Promise<ClientTherapistRelationship> {
+    const [relationship] = await this.db.update(clientTherapistRelationships)
+      .set({ status, activatedAt: status === 'active' ? new Date() : null })
+      .where(eq(clientTherapistRelationships.id, id))
+      .returning();
+    return relationship;
+  }
+
+  async getClientPrivacySettings(clientUserId: number, therapistId: number): Promise<ClientPrivacySettings | null> {
+    const [settings] = await this.db.select().from(clientPrivacySettings)
+      .where(and(
+        eq(clientPrivacySettings.clientUserId, clientUserId),
+        eq(clientPrivacySettings.therapistId, therapistId)
+      ));
+    return settings || null;
+  }
+
+  async updateClientPrivacySettings(data: InsertClientPrivacySettings): Promise<ClientPrivacySettings> {
+    // Upsert privacy settings
+    const [settings] = await this.db
+      .insert(clientPrivacySettings)
+      .values({ ...data, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: [clientPrivacySettings.clientUserId, clientPrivacySettings.therapistId],
+        set: { ...data, updatedAt: new Date() }
+      })
+      .returning();
+    return settings;
+  }
+
+  async createTherapistSessionNote(data: InsertTherapistSessionNotes): Promise<TherapistSessionNotes> {
+    const [note] = await this.db.insert(therapistSessionNotes).values(data).returning();
+    return note;
+  }
+
+  async getTherapistSessionNotes(therapistId: number, clientUserId?: number): Promise<TherapistSessionNotes[]> {
+    let query = this.db.select().from(therapistSessionNotes)
+      .where(eq(therapistSessionNotes.therapistId, therapistId));
+    
+    if (clientUserId) {
+      query = query.where(eq(therapistSessionNotes.clientUserId, clientUserId));
+    }
+    
+    return await query.orderBy(desc(therapistSessionNotes.sessionDate));
+  }
+
+  async createRiskAlert(data: InsertRiskAlert): Promise<RiskAlert> {
+    const [alert] = await this.db.insert(riskAlerts).values(data).returning();
+    return alert;
+  }
+
+  async getRiskAlerts(therapistId: number, clientUserId?: number, acknowledged?: boolean): Promise<RiskAlert[]> {
+    let query = this.db.select().from(riskAlerts)
+      .where(eq(riskAlerts.therapistId, therapistId));
+    
+    if (clientUserId) {
+      query = query.where(eq(riskAlerts.clientUserId, clientUserId));
+    }
+    
+    if (acknowledged !== undefined) {
+      query = query.where(eq(riskAlerts.acknowledged, acknowledged));
+    }
+    
+    return await query.orderBy(desc(riskAlerts.createdAt));
+  }
+
+  async acknowledgeRiskAlert(id: number): Promise<RiskAlert> {
+    const [alert] = await this.db.update(riskAlerts)
+      .set({ acknowledged: true, acknowledgedAt: new Date() })
+      .where(eq(riskAlerts.id, id))
+      .returning();
+    return alert;
+  }
+
+  async getClientDashboardData(therapistId: number, clientUserId: number): Promise<any> {
+    // Get privacy settings first
+    const privacySettings = await this.getClientPrivacySettings(clientUserId, therapistId);
+    
+    const dashboardData: any = {
+      clientId: clientUserId,
+      privacySettings,
+      allowedData: {}
+    };
+
+    if (privacySettings?.shareMoodData) {
+      // Get recent mood data
+      const recentMoods = await this.db.select().from(moodEntries)
+        .where(eq(moodEntries.userId, clientUserId))
+        .orderBy(desc(moodEntries.timestamp))
+        .limit(30);
+      dashboardData.allowedData.moodData = recentMoods;
+    }
+
+    if (privacySettings?.shareJournalData) {
+      // Get recent journal entries (excluding private ones)
+      const recentJournals = await this.db.select().from(journalEntries)
+        .where(and(
+          eq(journalEntries.userId, clientUserId),
+          eq(journalEntries.isPrivate, false)
+        ))
+        .orderBy(desc(journalEntries.createdAt))
+        .limit(10);
+      dashboardData.allowedData.journalData = recentJournals;
+    }
+
+    if (privacySettings?.shareCrisisAlerts) {
+      // Get recent risk alerts
+      const alerts = await this.getRiskAlerts(therapistId, clientUserId);
+      dashboardData.allowedData.riskAlerts = alerts;
+    }
+
+    if (privacySettings?.shareSessionSummaries) {
+      // Get session notes
+      const sessionNotes = await this.getTherapistSessionNotes(therapistId, clientUserId);
+      dashboardData.allowedData.sessionNotes = sessionNotes;
+    }
+
+    return dashboardData;
+  }
+
+  async generateRiskAlerts(clientUserId: number): Promise<void> {
+    // Get therapist relationship
+    const relationship = await this.getTherapistForClient(clientUserId);
+    if (!relationship) return;
+
+    // Check for mood spikes (3+ negative moods in 7 days)
+    const recentMoods = await this.db.select().from(moodEntries)
+      .where(eq(moodEntries.userId, clientUserId))
+      .orderBy(desc(moodEntries.timestamp))
+      .limit(10);
+
+    const negativeMoods = recentMoods.filter(mood => 
+      ['sad', 'anxious', 'angry', 'depressed'].includes(mood.mood.toLowerCase())
+    );
+
+    if (negativeMoods.length >= 3) {
+      await this.createRiskAlert({
+        clientUserId,
+        therapistId: relationship.therapistId,
+        alertType: 'mood_spike',
+        severity: 'medium',
+        description: `Client has experienced ${negativeMoods.length} negative mood entries in recent activity`,
+        triggerData: { moodCount: negativeMoods.length, moods: negativeMoods.slice(0, 3) }
+      });
+    }
+
+    // Check for journal patterns indicating distress
+    const recentJournals = await this.db.select().from(journalEntries)
+      .where(eq(journalEntries.userId, clientUserId))
+      .orderBy(desc(journalEntries.createdAt))
+      .limit(5);
+
+    const distressKeywords = ['suicide', 'kill myself', 'end it all', 'hopeless', 'worthless', 'can\'t go on'];
+    const concerningJournals = recentJournals.filter(journal => 
+      distressKeywords.some(keyword => journal.content.toLowerCase().includes(keyword))
+    );
+
+    if (concerningJournals.length > 0) {
+      await this.createRiskAlert({
+        clientUserId,
+        therapistId: relationship.therapistId,
+        alertType: 'journal_pattern',
+        severity: 'high',
+        description: 'Concerning language patterns detected in recent journal entries',
+        triggerData: { journalCount: concerningJournals.length }
+      });
+    }
   }
 }
 
