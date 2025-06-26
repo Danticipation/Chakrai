@@ -151,7 +151,7 @@ User Facts: ${factText}
 Mirror this user's communication style, personality traits, and mannerisms back to them. Be their therapeutic reflection - use their own patterns, interests, and communication style while providing support. Reference their personal details naturally.`;
       }
     } catch (error) {
-      console.log('Could not load personality data:', error.message);
+      console.log('Could not load personality data:', error instanceof Error ? error.message : 'Unknown error');
     }
     
     // Personality mode configurations
@@ -165,7 +165,7 @@ Mirror this user's communication style, personality traits, and mannerisms back 
       creative: `Act as a creative collaborator - imaginative, inspiring, and artistic. Encourage creative expression, brainstorming, and innovative thinking.`
     };
     
-    const modeInstruction = personalityModes[personalityMode] || personalityModes.friend;
+    const modeInstruction = personalityModes[personalityMode as keyof typeof personalityModes] || personalityModes.friend;
     
     // OpenAI API call with personality mirroring
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -396,7 +396,7 @@ app.get('/api/horoscope/:sign', (req, res) => {
   };
   
   res.json({ 
-    horoscope: horoscopes[sign.toLowerCase()] || "Today is a great day for self-reflection and growth." 
+    horoscope: horoscopes[sign.toLowerCase() as keyof typeof horoscopes] || "Today is a great day for self-reflection and growth." 
   });
 });
 
@@ -597,7 +597,7 @@ app.post('/api/text-to-speech', async (req, res) => {
         headers: {
           'Accept': 'audio/mpeg',
           'Content-Type': 'application/json',
-          'xi-api-key': process.env.ELEVENLABS_API_KEY
+          'xi-api-key': process.env.ELEVENLABS_API_KEY || ''
         },
         body: JSON.stringify({
           text: text,
@@ -637,14 +637,14 @@ app.post('/api/text-to-speech', async (req, res) => {
         throw new Error(`ElevenLabs API error: ${response.status}`);
       }
     } catch (elevenLabsError) {
-      console.log('ElevenLabs API failed:', elevenLabsError.message);
+      console.log('ElevenLabs API failed:', elevenLabsError instanceof Error ? elevenLabsError.message : 'Unknown error');
       
       // NO BROWSER TTS FALLBACK
       res.json({ 
         audioUrl: null,
         useBrowserTTS: false,
         success: false,
-        error: elevenLabsError.message
+        error: elevenLabsError instanceof Error ? elevenLabsError.message : 'Unknown error'
       });
     }
 
@@ -967,14 +967,14 @@ app.post('/api/emotional-intelligence/crisis-detection', async (req, res) => {
 app.get('/api/emotional-intelligence/patterns/:userId', async (req, res) => {
   try {
     const userId = parseInt(req.params.userId) || 1;
-    const timeframe = req.query.timeframe || '30';
+    const timeframe = Array.isArray(req.query.timeframe) ? req.query.timeframe[0] : req.query.timeframe || '30';
     
-    const patterns = await analyzeEmotionalPatterns(userId, parseInt(timeframe));
+    const patterns = await analyzeEmotionalPatterns(userId, parseInt(timeframe as string));
     
     res.json({
       success: true,
       patterns,
-      timeframeDays: parseInt(timeframe),
+      timeframeDays: parseInt(timeframe as string),
       generatedAt: new Date().toISOString()
     });
   } catch (error) {
