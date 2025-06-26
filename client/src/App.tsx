@@ -390,6 +390,69 @@ const AppLayout = () => {
       case 'affirmation':
         return <DailyAffirmation />;
 
+      case 'logo':
+        return (
+          <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-[#5c6bc0]/30 backdrop-blur-sm rounded-2xl p-8 border border-[#7986cb]/30 shadow-lg text-center">
+                <div className="mb-8">
+                  <img src={traiLogo} alt="TrAI" className="h-32 w-auto mx-auto mb-6" />
+                  <h1 className="text-4xl font-bold text-white mb-4">TrAI Mental Wellness</h1>
+                  <p className="text-xl text-white/90 mb-6">Therapeutic AI • Level {botStats?.level || 3}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30">
+                    <h3 className="text-lg font-semibold text-white mb-3">AI Capabilities</h3>
+                    <ul className="text-sm text-white/80 space-y-2 text-left">
+                      <li>• OpenAI GPT-4o powered conversations</li>
+                      <li>• ElevenLabs voice synthesis</li>
+                      <li>• Personality mirroring & learning</li>
+                      <li>• Crisis detection & intervention</li>
+                      <li>• Therapeutic journal analysis</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30">
+                    <h3 className="text-lg font-semibold text-white mb-3">Wellness Features</h3>
+                    <ul className="text-sm text-white/80 space-y-2 text-left">
+                      <li>• Mood tracking & analytics</li>
+                      <li>• VR therapeutic experiences</li>
+                      <li>• Community peer support</li>
+                      <li>• Wearable device integration</li>
+                      <li>• Privacy-first architecture</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30">
+                  <h3 className="text-lg font-semibold text-white mb-3">Your Progress</h3>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl font-bold text-white">{botStats?.wordsLearned || 1000}</div>
+                      <div className="text-sm text-white/60">Words Learned</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-white">Level {botStats?.level || 3}</div>
+                      <div className="text-sm text-white/60">{botStats?.stage || 'Therapist'}</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-white">95%</div>
+                      <div className="text-sm text-white/60">Wellness Score</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 text-center">
+                  <p className="text-sm text-white/60">
+                    Your trusted AI companion for mental wellness and therapeutic support
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       case 'goals':
         return (
           <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
@@ -445,32 +508,56 @@ const AppLayout = () => {
 
   return (
     <div className="h-screen bg-[#0a0e1a] flex flex-col">
-      {/* Top Header - Three Sections */}
-      <div className="bg-[#0a0e1a] p-4 grid grid-cols-3 gap-4 h-24">
-        {/* Horoscope Section */}
-        <div className="bg-purple-700 rounded-lg p-3 flex flex-col">
-          <h3 className="text-sm font-bold text-white mb-1 underline">Horoscope</h3>
-          <p className="text-xs text-white line-clamp-2">
-            {horoscopeText ? horoscopeText.substring(0, 80) + '...' : "Your cosmic guidance awaits..."}
+      {/* Top Header - Expanded Three Sections */}
+      <div className="bg-[#0a0e1a] p-4 grid grid-cols-4 gap-4 h-32">
+        {/* Horoscope Section - Expanded */}
+        <button 
+          onClick={() => setActiveSection('horoscope')}
+          className="bg-purple-700 rounded-lg p-4 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+        >
+          <h3 className="text-lg font-bold text-white mb-2 underline">Horoscope</h3>
+          <p className="text-sm text-white line-clamp-3 text-left">
+            {horoscopeText ? horoscopeText.substring(0, 120) + '...' : "Today brings opportunities for reflection and personal development..."}
           </p>
-        </div>
+          <p className="text-xs text-white/70 mt-2">Click to view full reading</p>
+        </button>
         
-        {/* Logo Section */}
-        <div className="bg-[#0a0e1a] rounded-lg p-3 flex items-center justify-center border border-white">
-          <img src={traiLogo} alt="TrAI" className="h-12 w-auto" />
-        </div>
+        {/* Logo Section - Expanded */}
+        <button 
+          onClick={() => setActiveSection('logo')}
+          className="bg-[#0a0e1a] rounded-lg p-4 flex flex-col items-center justify-center border border-white hover:border-purple-400 transition-colors cursor-pointer"
+        >
+          <img src={traiLogo} alt="TrAI" className="h-16 w-auto mb-2" />
+          <p className="text-xs text-white/70">TraI Mental Wellness</p>
+          <p className="text-xs text-white/50">Click for more info</p>
+        </button>
         
-        {/* Affirmation Section */}
-        <div className="bg-purple-700 rounded-lg p-3 flex flex-col">
-          <h3 className="text-sm font-bold text-white mb-1 underline">Affirmation</h3>
-          <p className="text-xs text-white line-clamp-2">
-            {dailyAffirmation.substring(0, 80)}...
+        {/* Affirmation Section - Expanded */}
+        <button 
+          onClick={() => setActiveSection('affirmation')}
+          className="bg-purple-700 rounded-lg p-4 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+        >
+          <h3 className="text-lg font-bold text-white mb-2 underline">Affirmation</h3>
+          <p className="text-sm text-white line-clamp-3 text-left">
+            {dailyAffirmation.substring(0, 120)}...
           </p>
-        </div>
+          <p className="text-xs text-white/70 mt-2">Click to view full message</p>
+        </button>
         
-        {/* Top Right Stats */}
-        <div className="absolute top-4 right-4 text-sm text-white/80">
-          {botStats && `${botStats.stage} • Level ${botStats.level}`}
+        {/* Stats/Goals Section - Compact */}
+        <div className="bg-[#3f51b5] rounded-lg p-3 flex flex-col">
+          <h3 className="text-sm font-bold text-white mb-2 underline">Stats & Goals</h3>
+          <div className="space-y-1">
+            <div className="text-xs text-white/80">
+              {botStats && `${botStats.stage} • Level ${botStats.level}`}
+            </div>
+            <div className="text-xs text-white/80">
+              Goal Progress: 75%
+            </div>
+            <div className="text-xs text-white/80">
+              Daily Streak: 5 days
+            </div>
+          </div>
         </div>
       </div>
 
@@ -595,6 +682,7 @@ const AppLayout = () => {
                 {activeSection === 'privacy' && 'Privacy & Compliance'}
                 {activeSection === 'horoscope' && 'Horoscope'}
                 {activeSection === 'affirmation' && 'Daily Affirmation'}
+                {activeSection === 'logo' && 'TraI Information'}
                 {activeSection === 'goals' && 'Wellness Goals'}
               </div>
               <div className="h-full bg-[#3f51b5] text-white p-6 overflow-y-auto">
