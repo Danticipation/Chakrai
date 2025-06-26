@@ -83,9 +83,9 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Challenging Layout Implementation**: Successfully implemented exact layout after multiple challenging iterations to match user's precise design vision
 - **Professional Header Layout**: Three-section top header with underlined titles - Horoscope (left), TrAI Logo (center), Affirmation (right) displaying real dynamic content
 - **Left Navigation Sidebar**: w-40 width with larger red button navigation for all therapeutic features (Chat, Journal, Memory, Analytics, etc.) with proper button sizing
-- **Central Chat Interface**: Fixed w-96 width chat box area with "Chat Box" header and chat input positioned at bottom with microphone and send buttons
-- **Right Stats Sidebar**: flex-1 taking majority of space with "Stats or goal tracking" header and large colorful pie chart visualizations
-- **Correct Proportions Finally Achieved**: Left sidebar (w-40), center chat (w-96 fixed), right stats (flex-1) matching user's design mockup exactly
+- **Central Chat Interface**: w-[60%] width chat box area with "Chat Box" header and chat input positioned at bottom with microphone and send buttons
+- **Right Stats Sidebar**: w-[25%] width with "Stats or goal tracking" header and large colorful pie chart visualizations matching design mockup
+- **Correct Proportions Finally Achieved**: Left sidebar (w-40), center chat (60% of space), right stats (25% of space) matching user's design mockup exactly
 - **User Satisfaction**: Layout proportions now correctly match user's design vision after persistent iteration and refinement
 - **Production Ready**: Complete layout implementation with proper proportions, larger navigation buttons, and correctly sized chat area as specified
 
