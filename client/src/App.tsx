@@ -180,31 +180,51 @@ const AppLayout = () => {
         console.log('CARLA AUDIO RECEIVED:', { audioUrlExists: !!audioData.audioUrl, audioLength: audioData.audioUrl?.length });
         
         if (audioData.audioUrl) {
-          console.log('PLAYING CARLA VOICE NOW');
+          console.log('PLAYING CORRECT CARLA VOICE NOW');
+          console.log('Audio URL length:', audioData.audioUrl.length);
           
-          // Clear all existing audio
+          // Kill all existing audio completely
           document.querySelectorAll('audio').forEach(audio => {
             audio.pause();
+            audio.currentTime = 0;
             audio.remove();
           });
           
-          // Create and play Carla audio immediately
-          const audio = new Audio(audioData.audioUrl);
-          audio.volume = 1.0;
+          // Force stop any browser TTS
+          if ('speechSynthesis' in window) {
+            speechSynthesis.cancel();
+            speechSynthesis.pause();
+          }
           
-          // Force play with fallback
-          audio.play().then(() => {
-            console.log('CARLA VOICE PLAYING SUCCESSFULLY');
-          }).catch(() => {
-            console.log('Auto-play blocked - audio will play on next user interaction');
-            // Store for next click
-            const playOnClick = () => {
-              audio.play().then(() => {
-                console.log('CARLA VOICE PLAYING AFTER INTERACTION');
-                document.removeEventListener('click', playOnClick);
-              });
+          // Create single audio element for Carla
+          const carlaAudio = new Audio(audioData.audioUrl);
+          carlaAudio.volume = 1.0;
+          carlaAudio.preload = 'auto';
+          
+          // FORCE CARLA AUDIO PLAYBACK NOW
+          carlaAudio.play().then(() => {
+            console.log('AUTHENTIC CARLA VOICE PLAYING - SUCCESS!');
+          }).catch((error) => {
+            console.log('Browser autoplay blocked - audio will play on next interaction');
+            console.log('CLICK ANYWHERE TO HEAR AUTHENTIC CARLA VOICE');
+            
+            // Store audio for immediate click playback
+            window.pendingCarlaAudio = carlaAudio;
+            
+            // Global click handler for immediate audio permission
+            const playCarlaOnClick = () => {
+              if (window.pendingCarlaAudio) {
+                window.pendingCarlaAudio.play().then(() => {
+                  console.log('AUTHENTIC CARLA VOICE NOW PLAYING!');
+                  window.pendingCarlaAudio = null;
+                }).catch(err => {
+                  console.error('Final Carla playback failed:', err);
+                });
+              }
+              document.removeEventListener('click', playCarlaOnClick);
             };
-            document.addEventListener('click', playOnClick);
+            
+            document.addEventListener('click', playCarlaOnClick, { once: true });
           });
           
         } else {

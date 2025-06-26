@@ -305,12 +305,12 @@ app.post('/api/text-to-speech', async (req, res) => {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    // Map voice names to ElevenLabs voice IDs
+    // CORRECTED voice IDs - using actual working Carla voice
     const voiceMap: Record<string, string> = {
-      'james': 'TxGEqnHWrfWFTfGW9XjX',
+      'james': 'EkK5I93UQWFDigLMpZcX',
       'brian': 'nPczCjzI2devNBz1zQrb', 
-      'alexandra': 'Xb7hH8MSUJpSbSDYk0k2',
-      'carla': 'XB0fDUnXU5powFXDhCwa'
+      'alexandra': 'kdmDKE6EkgrWrrykO9Qt',
+      'carla': 'l32B8XDoylOsZKiSdfhE'  // Correct Carla voice ID
     };
 
     const voiceId = voiceMap[voice] || voiceMap['james'];
