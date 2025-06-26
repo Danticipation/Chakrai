@@ -572,7 +572,7 @@ const AppLayout = () => {
         </div>
 
         {/* Chat Area - Much Smaller */}
-        <div className="w-52 bg-[#2d3748] m-4 mr-2 rounded-lg relative">
+        <div className="w-80 bg-[#2d3748] m-4 mr-2 rounded-lg relative">
           <div className="absolute inset-4 bg-[#1a202c] rounded border-2 border-[#4a5568]">
             <div className="text-center text-white text-base font-medium pt-4 pb-2">Chat box</div>
             {renderActiveSection()}
@@ -581,42 +581,45 @@ const AppLayout = () => {
 
         {/* Right Sidebar - Takes Most Space */}
         <div className="flex-1 bg-[#3949ab] m-4 ml-2 rounded-lg p-4 relative">
-          <div className="bg-white rounded p-3 mb-4">
-            <div className="text-[#1a237e] font-bold text-sm mb-2">Goals & Stats</div>
-            {botStats && (
+          {/* Top positioned white content boxes */}
+          <div className="space-y-4">
+            <div className="bg-white rounded p-3">
+              <div className="text-[#1a237e] font-bold text-sm mb-2">Goals & Stats</div>
+              {botStats && (
+                <div className="space-y-2">
+                  <div className="text-xs text-[#1a237e]">
+                    <span className="font-medium">Level:</span> {botStats.level}
+                  </div>
+                  <div className="text-xs text-[#1a237e]">
+                    <span className="font-medium">Stage:</span> {botStats.stage}
+                  </div>
+                  <div className="text-xs text-[#1a237e]">
+                    <span className="font-medium">Words:</span> {botStats.wordsLearned}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="bg-white rounded p-3">
+              <div className="text-[#1a237e] font-bold text-sm mb-2">Daily Progress</div>
               <div className="space-y-2">
                 <div className="text-xs text-[#1a237e]">
-                  <span className="font-medium">Level:</span> {botStats.level}
+                  <span className="font-medium">Conversations:</span> {messages.length}
                 </div>
                 <div className="text-xs text-[#1a237e]">
-                  <span className="font-medium">Stage:</span> {botStats.stage}
+                  <span className="font-medium">Mood Check:</span> Pending
                 </div>
                 <div className="text-xs text-[#1a237e]">
-                  <span className="font-medium">Words:</span> {botStats.wordsLearned}
+                  <span className="font-medium">Journal:</span> Not started
                 </div>
-              </div>
-            )}
-          </div>
-          
-          <div className="bg-white rounded p-3 mb-4">
-            <div className="text-[#1a237e] font-bold text-sm mb-2">Daily Progress</div>
-            <div className="space-y-2">
-              <div className="text-xs text-[#1a237e]">
-                <span className="font-medium">Conversations:</span> {messages.length}
-              </div>
-              <div className="text-xs text-[#1a237e]">
-                <span className="font-medium">Mood Check:</span> Pending
-              </div>
-              <div className="text-xs text-[#1a237e]">
-                <span className="font-medium">Journal:</span> Not started
               </div>
             </div>
-          </div>
-          
-          <div className="bg-white rounded p-3">
-            <div className="text-[#1a237e] font-bold text-sm mb-2">Weekly Summary</div>
-            <div className="text-xs text-[#1a237e]">
-              Track your therapeutic journey and emotional patterns over time.
+            
+            <div className="bg-white rounded p-3">
+              <div className="text-[#1a237e] font-bold text-sm mb-2">Weekly Summary</div>
+              <div className="text-xs text-[#1a237e]">
+                Track your therapeutic journey and emotional patterns over time.
+              </div>
             </div>
           </div>
           
