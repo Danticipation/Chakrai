@@ -343,62 +343,12 @@ const AppLayout = () => {
 
   const renderActiveSection = () => {
     switch (activeSection) {
+      case 'chat':
+        // Chat is handled separately in the main layout now
+        return null;
+
       case 'daily':
         return <PersonalityReflection userId={1} />;
-
-      case 'chat':
-        return (
-          <div className="h-full flex flex-col p-4">
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-              {messages.length === 0 ? (
-                <div className="text-center text-white/70 py-8">
-                  <MessageCircle size={32} className="mx-auto mb-3 opacity-70" />
-                  <p className="text-sm">Start a conversation with TraI</p>
-                </div>
-              ) : (
-                messages.map((message, index) => (
-                  <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                      message.sender === 'user' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-white/10 backdrop-blur-sm text-white border border-white/20'
-                    }`}>
-                      <p>{message.text}</p>
-                      <p className="text-xs mt-1 opacity-70">{message.time}</p>
-                    </div>
-                  </div>
-                ))
-              )}
-              {loading && (
-                <div className="flex justify-start">
-                  <div className="bg-white/10 backdrop-blur-sm text-white max-w-xs px-3 py-2 rounded-lg border border-white/20">
-                    <div className="flex space-x-1">
-                      <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce"></div>
-                      <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Chat Input */}
-            <div className="border-t border-white/20 pt-4">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Type your message..."
-                  className="flex-1 px-3 py-2 rounded bg-white/10 backdrop-blur-sm text-white placeholder-white/60 border border-white/30 focus:border-white/50 focus:outline-none text-sm"
-                  disabled={loading}
-                />
-              </div>
-            </div>
-          </div>
-        );
 
       case 'journal':
         return (
@@ -552,44 +502,104 @@ const AppLayout = () => {
           ))}
         </div>
 
-        {/* Center Chat Area - Fixed size, centered with empty space */}
+        {/* Center Content Area - Different layouts based on active section */}
         <div className="flex-1 flex justify-center items-center bg-[#0a0e1a]">
-          <div className="w-96 h-80 bg-[#0a0e1a] rounded-lg relative border border-white">
-            <div className="absolute inset-4 bg-[#0a0e1a] rounded">
-              <div className="text-center text-white text-xl font-bold pt-6">Chat Box</div>
-              {renderActiveSection()}
-              
-              {/* Chat Input at Bottom */}
-              <div className="absolute bottom-4 left-4 right-4 flex space-x-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Share your thoughts"
-                  className="flex-1 px-3 py-2 bg-blue-600 text-white border border-blue-500 rounded text-sm placeholder-white/70"
-                />
-                <button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`w-9 h-9 rounded flex items-center justify-center transition-colors ${
-                    isRecording 
-                      ? 'bg-red-500 hover:bg-red-600 text-white' 
-                      : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
-                  }`}
-                  disabled={loading}
-                >
-                  {isRecording ? <Square size={16} /> : <Mic size={16} />}
-                </button>
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || loading}
-                  className="w-9 h-9 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
-                >
-                  <Send size={16} />
-                </button>
+          {activeSection === 'chat' ? (
+            /* Chat Panel - Fixed size, centered with empty space around it */
+            <div className="w-96 h-80 bg-[#0a0e1a] rounded-lg relative border border-white">
+              <div className="absolute inset-4 bg-[#0a0e1a] rounded">
+                <div className="text-center text-white text-xl font-bold pt-6">Chat Box</div>
+                
+                {/* Chat Messages Area */}
+                <div className="absolute top-16 left-4 right-4 bottom-20 overflow-y-auto">
+                  {messages.length === 0 ? (
+                    <div className="text-center text-white/70 py-8">
+                      <MessageCircle size={32} className="mx-auto mb-3 opacity-70" />
+                      <p className="text-sm">Start a conversation with TraI</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {messages.map((message, index) => (
+                        <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                            message.sender === 'user' 
+                              ? 'bg-blue-500 text-white' 
+                              : 'bg-purple-700 text-white'
+                          }`}>
+                            <p>{message.text}</p>
+                            <p className="text-xs mt-1 opacity-70">{message.time}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {loading && (
+                    <div className="flex justify-start mt-4">
+                      <div className="bg-purple-700 text-white max-w-xs px-3 py-2 rounded-lg">
+                        <div className="flex space-x-1">
+                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce"></div>
+                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Chat Input at Bottom */}
+                <div className="absolute bottom-4 left-4 right-4 flex space-x-2">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    placeholder="Share your thoughts"
+                    className="flex-1 px-3 py-2 bg-blue-600 text-white border border-blue-500 rounded text-sm placeholder-white/70"
+                  />
+                  <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`w-9 h-9 rounded flex items-center justify-center transition-colors ${
+                      isRecording 
+                        ? 'bg-red-500 hover:bg-red-600 text-white' 
+                        : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
+                    }`}
+                    disabled={loading}
+                  >
+                    {isRecording ? <Square size={16} /> : <Mic size={16} />}
+                  </button>
+                  <button
+                    onClick={sendMessage}
+                    disabled={!input.trim() || loading}
+                    className="w-9 h-9 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
+                  >
+                    <Send size={16} />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            /* Separate Full Panels for Other Sections */
+            <div className="w-full h-full mx-8 bg-[#0a0e1a] rounded-lg border border-white overflow-hidden">
+              <div className="bg-[#0a0e1a] text-white text-center py-3 border-b border-white/30 font-bold text-lg">
+                {activeSection === 'daily' && 'Personality Reflection'}
+                {activeSection === 'journal' && 'Therapeutic Journal'}
+                {activeSection === 'memory' && 'Memory Dashboard'}
+                {activeSection === 'analytics' && 'Analytics & Reporting'}
+                {activeSection === 'rewards' && 'Wellness Rewards'}
+                {activeSection === 'community' && 'Community & Professional Support'}
+                {activeSection === 'adaptive' && 'Adaptive Learning & Personalization'}
+                {activeSection === 'vr' && 'VR/AR Therapy'}
+                {activeSection === 'health' && 'Health Integration'}
+                {activeSection === 'privacy' && 'Privacy & Compliance'}
+                {activeSection === 'horoscope' && 'Horoscope'}
+                {activeSection === 'affirmation' && 'Daily Affirmation'}
+                {activeSection === 'goals' && 'Wellness Goals'}
+              </div>
+              <div className="h-full bg-[#0a0e1a] text-white p-6 overflow-y-auto">
+                {renderActiveSection()}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Stats Sidebar - Real progress tracking */}
