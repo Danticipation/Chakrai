@@ -184,19 +184,19 @@ const AdaptiveLearning: React.FC = () => {
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-blue-600">{therapyPlans?.filter(p => p.isActive).length || 0}</div>
+              <div className="text-xl font-bold text-blue-600">{Array.isArray(therapyPlans) ? therapyPlans.filter(p => p.isActive).length : 0}</div>
               <div className="text-xs text-gray-600">Active Plans</div>
             </div>
             <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-green-600">{cbtExercises?.filter(e => e.isCompleted).length || 0}</div>
+              <div className="text-xl font-bold text-green-600">{Array.isArray(cbtExercises) ? cbtExercises.filter(e => e.isCompleted).length : 0}</div>
               <div className="text-xs text-gray-600">Completed Exercises</div>
             </div>
             <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-yellow-600">{wellnessRecommendations?.filter(r => r.priorityLevel === 'high').length || 0}</div>
+              <div className="text-xl font-bold text-yellow-600">{Array.isArray(wellnessRecommendations) ? wellnessRecommendations.filter(r => r.priorityLevel === 'high').length : 0}</div>
               <div className="text-xs text-gray-600">Priority Actions</div>
             </div>
             <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-purple-600">{adaptationInsights?.length || 0}</div>
+              <div className="text-xl font-bold text-purple-600">{Array.isArray(adaptationInsights) ? adaptationInsights.length : 0}</div>
               <div className="text-xs text-gray-600">New Insights</div>
             </div>
           </div>
