@@ -9,6 +9,7 @@ import TherapeuticJournal from './components/TherapeuticJournal';
 import PersonalityReflection from './components/PersonalityReflection';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import WellnessRewards from './components/WellnessRewards';
+import CommunitySupport from './components/CommunitySupport';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -407,6 +408,9 @@ const AppLayout = () => {
       case 'rewards':
         return <WellnessRewards />;
 
+      case 'community':
+        return <CommunitySupport />;
+
       case 'goals':
         return (
           <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
@@ -504,6 +508,7 @@ const AppLayout = () => {
             { id: 'journal', icon: BookOpen, label: 'Journal' },
             { id: 'analytics', icon: BarChart3, label: 'Analytics' },
             { id: 'rewards', icon: Gift, label: 'Rewards' },
+            { id: 'community', icon: User, label: 'Community' },
             { id: 'goals', icon: Target, label: 'Goals' }
           ].map((tab) => (
             <button
