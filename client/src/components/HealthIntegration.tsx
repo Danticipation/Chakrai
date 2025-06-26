@@ -84,27 +84,27 @@ const HealthIntegration: React.FC = () => {
 
   const { data: devices = [] } = useQuery<WearableDevice[]>({
     queryKey: ['/api/wearable-devices/1'],
-    queryFn: () => axios.get('/api/wearable-devices/1').then(res => res.data || [])
+    queryFn: () => axios.get('/api/wearable-devices/1').then(res => Array.isArray(res.data) ? res.data : [])
   });
 
   const { data: healthMetrics = [] } = useQuery<HealthMetric[]>({
     queryKey: ['/api/health-metrics/1'],
-    queryFn: () => axios.get('/api/health-metrics/1').then(res => res.data || [])
+    queryFn: () => axios.get('/api/health-metrics/1').then(res => Array.isArray(res.data) ? res.data : [])
   });
 
   const { data: correlations = [] } = useQuery<HealthCorrelation[]>({
     queryKey: ['/api/health-correlations/1'],
-    queryFn: () => axios.get('/api/health-correlations/1').then(res => res.data || [])
+    queryFn: () => axios.get('/api/health-correlations/1').then(res => Array.isArray(res.data) ? res.data : [])
   });
 
   const { data: insights = [] } = useQuery<HealthInsight[]>({
     queryKey: ['/api/health-insights/1'],
-    queryFn: () => axios.get('/api/health-insights/1').then(res => res.data || [])
+    queryFn: () => axios.get('/api/health-insights/1').then(res => Array.isArray(res.data) ? res.data : [])
   });
 
   const { data: syncLogs = [] } = useQuery<SyncLog[]>({
     queryKey: ['/api/device-sync-logs/1'],
-    queryFn: () => axios.get('/api/device-sync-logs/1').then(res => res.data || [])
+    queryFn: () => axios.get('/api/device-sync-logs/1').then(res => Array.isArray(res.data) ? res.data : [])
   });
 
   const { data: privacySettings } = useQuery<PrivacySettings>({
@@ -281,7 +281,7 @@ const HealthIntegration: React.FC = () => {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Connected Devices</h3>
               <div className="space-y-4">
-                {devices.map((device) => {
+                {Array.isArray(devices) && devices.map((device) => {
                   const StatusIcon = getStatusIcon(device.syncStatus);
                   return (
                     <div key={device.id} className="bg-white/40 rounded-lg p-4">
@@ -352,7 +352,7 @@ const HealthIntegration: React.FC = () => {
         {activeTab === 'metrics' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {healthMetrics.map((metric) => {
+              {Array.isArray(healthMetrics) && healthMetrics.map((metric) => {
                 const IconComponent = getMetricIcon(metric.metricType);
                 return (
                   <div key={metric.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
