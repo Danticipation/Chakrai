@@ -44,6 +44,89 @@ export const learnedWords = pgTable("learned_words", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Therapeutic features
+export const journalEntries = pgTable("journal_entries", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  title: text("title"),
+  content: text("content").notNull(),
+  mood: text("mood"),
+  moodIntensity: integer("mood_intensity"),
+  tags: text("tags").array(),
+  isPrivate: boolean("is_private").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const moodEntries = pgTable("mood_entries", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  mood: text("mood").notNull(),
+  intensity: integer("intensity").notNull(),
+  notes: text("notes"),
+  triggers: text("triggers").array(),
+  copingStrategies: text("coping_strategies").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const therapeuticGoals = pgTable("therapeutic_goals", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  category: text("category"),
+  targetValue: integer("target_value").default(100),
+  currentValue: integer("current_value").default(0),
+  unit: text("unit").default("percent"),
+  startDate: timestamp("start_date").defaultNow(),
+  targetDate: timestamp("target_date"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const supportForums = pgTable("support_forums", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category"),
+  memberCount: integer("member_count").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const forumPosts = pgTable("forum_posts", {
+  id: serial("id").primaryKey(),
+  forumId: integer("forum_id").notNull(),
+  userId: integer("user_id").notNull(),
+  anonymousName: text("anonymous_name").notNull(),
+  title: text("title"),
+  content: text("content").notNull(),
+  heartCount: integer("heart_count").default(0),
+  replyCount: integer("reply_count").default(0),
+  isModerated: boolean("is_moderated").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  achievementType: text("achievement_type").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  icon: text("icon"),
+  rarity: text("rarity").default("common"),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+});
+
+export const wellnessStreaks = pgTable("wellness_streaks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  streakType: text("streak_type").notNull(),
+  currentStreak: integer("current_streak").default(0),
+  longestStreak: integer("longest_streak").default(0),
+  lastActiveDate: timestamp("last_active_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const milestones = pgTable("milestones", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),

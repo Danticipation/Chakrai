@@ -458,6 +458,54 @@ const AppLayout = () => {
     console.log('Memory cleared');
   };
 
+  const handleCreateJournalEntry = async () => {
+    try {
+      const title = prompt("Journal Entry Title (optional):");
+      const content = prompt("What's on your mind today?");
+      
+      if (content && content.trim()) {
+        const response = await fetch('/api/journal/entries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: 1,
+            title: title || '',
+            content: content.trim(),
+            mood: 'neutral',
+            moodIntensity: 5
+          })
+        });
+        
+        if (response.ok) {
+          console.log('Journal entry created successfully');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to create journal entry:', error);
+    }
+  };
+
+  const handleMoodSelection = async (mood: string, intensity: number) => {
+    try {
+      const response = await fetch('/api/mood/entries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 1,
+          mood,
+          intensity,
+          notes: `Quick mood check: ${mood}`
+        })
+      });
+      
+      if (response.ok) {
+        console.log('Mood entry created successfully');
+      }
+    } catch (error) {
+      console.error('Failed to create mood entry:', error);
+    }
+  };
+
   const renderContent = () => {
     switch (activeSection) {
       case 'chat':
@@ -549,7 +597,10 @@ const AppLayout = () => {
             <h2 className="text-xl font-bold text-white mb-4">Therapeutic Journal</h2>
             
             {/* New Entry Button */}
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-4 mb-4 flex items-center justify-center space-x-2">
+            <button 
+              onClick={() => handleCreateJournalEntry()}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-4 mb-4 flex items-center justify-center space-x-2"
+            >
               <span>✍️</span>
               <span>New Journal Entry</span>
             </button>
@@ -564,7 +615,11 @@ const AppLayout = () => {
                   { emoji: '😔', label: 'Sad', color: 'bg-blue-500' },
                   { emoji: '😰', label: 'Anxious', color: 'bg-red-500' }
                 ].map((mood, index) => (
-                  <button key={index} className={`${mood.color} hover:opacity-80 text-white rounded-lg p-3 text-center transition-colors`}>
+                  <button 
+                    key={index} 
+                    onClick={() => handleMoodSelection(mood.label.toLowerCase(), 5)}
+                    className={`${mood.color} hover:opacity-80 text-white rounded-lg p-3 text-center transition-colors`}
+                  >
                     <div className="text-2xl mb-1">{mood.emoji}</div>
                     <div className="text-xs">{mood.label}</div>
                   </button>
