@@ -3,6 +3,12 @@ import multer from 'multer';
 import { storage } from './storage.js';
 import { analyzeEmotionalState } from './emotionalAnalysis.js';
 import { openai } from './openaiRetry.js';
+import { 
+  analyzeConversationForMemory, 
+  getSemanticContext, 
+  generateContextualReferences,
+  getMemoryDashboard 
+} from './semanticMemory.js';
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -34,7 +40,7 @@ async function detectCrisisSignals(message, userId) {
 // CHAT & AI ENDPOINTS
 // ====================
 
-// Main chat endpoint with AI integration and personality mirroring
+// Main chat endpoint with AI integration and semantic memory recall
 router.post('/chat', async (req, res) => {
   try {
     const { message, voice = 'carla', userId = 1, personalityMode = 'friend' } = req.body;
@@ -43,7 +49,17 @@ router.post('/chat', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    console.log('Making OpenAI API call...');
+    console.log('Making OpenAI API call with semantic memory...');
+    
+    // Get semantic context for intelligent recall
+    const semanticContext = await getSemanticContext(userId, message);
+    console.log('Semantic context loaded:', { 
+      relevantMemories: semanticContext.relevantMemories.length,
+      connectedMemories: semanticContext.connectedMemories.length 
+    });
+
+    // Generate contextual references for past conversations
+    const contextualReferences = await generateContextualReferences(userId, message, semanticContext);
     
     // Get user's personality data for mirroring
     let personalityContext = '';
@@ -66,14 +82,42 @@ User Facts: ${factText}
       console.log('Could not load personality data:', error);
     }
 
+    // Build semantic memory context for the AI
+    let semanticMemoryContext = '';
+    if (semanticContext.relevantMemories.length > 0) {
+      semanticMemoryContext = `
+SEMANTIC MEMORY CONTEXT:
+Past Conversations: ${semanticContext.relevantMemories.map(m => 
+  `${m.temporalContext}: ${m.content} [${m.emotionalContext}]`
+).join('\n')}
+`;
+    }
+
+    // Add contextual references if available
+    let contextualReferenceText = '';
+    if (contextualReferences.hasReferences && contextualReferences.references.length > 0) {
+      contextualReferenceText = `
+CONTEXTUAL REFERENCES TO INCLUDE:
+${contextualReferences.references.map(ref => 
+  `"${ref.text} — ${ref.followUp}" (confidence: ${ref.confidence})`
+).join('\n')}
+`;
+    }
+
     // Crisis detection
     const crisisData = await detectCrisisSignals(message, userId);
     const crisisDetected = crisisData.riskLevel === 'high' || crisisData.riskLevel === 'critical';
 
-    // Enhanced system prompt with personality mirroring
-    const systemPrompt = `You are TraI, a therapeutic AI companion. Your core purpose is personality mirroring - reflecting the user's own communication style, traits, and identity back to them for self-reflection and growth.
+    // Enhanced system prompt with semantic memory recall
+    const systemPrompt = `You are TraI, a therapeutic AI companion with intelligent memory recall. Your core purpose is personality mirroring while making contextual references to past conversations for deeper therapeutic value.
 
-${personalityContext}
+${personalityContext}${semanticMemoryContext}${contextualReferenceText}
+
+SEMANTIC MEMORY INSTRUCTIONS:
+- Use the semantic memory context to reference past conversations naturally
+- Make contextual connections like "Last week, you mentioned feeling overwhelmed at work — has anything improved since then?"
+- Reference emotional patterns and progress from previous sessions
+- Connect current topics to past discussions for continuity
 
 PERSONALITY MIRRORING INSTRUCTIONS:
 - Mirror the user's communication style from their personality data
@@ -85,7 +129,7 @@ PERSONALITY MIRRORING INSTRUCTIONS:
 Current conversation mode: ${personalityMode}
 Crisis level detected: ${crisisData.riskLevel}
 
-Respond in a way that mirrors their personality while providing therapeutic value.`;
+Respond with semantic awareness, making natural references to past conversations while providing therapeutic value.`;
 
     // Generate OpenAI response
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -157,6 +201,15 @@ Respond in a way that mirrors their personality while providing therapeutic valu
       }
     }
 
+    // Analyze conversation for semantic memory storage
+    try {
+      const sessionId = req.headers['x-session-id'] || `session_${Date.now()}`;
+      await analyzeConversationForMemory(userId, message, aiResponse, sessionId);
+      console.log('Conversation analyzed and stored in semantic memory');
+    } catch (error) {
+      console.error('Error storing semantic memory:', error);
+    }
+
     res.json({
       message: aiResponse,
       response: aiResponse,
@@ -167,7 +220,9 @@ Respond in a way that mirrors their personality while providing therapeutic valu
       crisisDetected: crisisDetected,
       crisisData: crisisDetected ? crisisData : null,
       personalityMode: personalityMode,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      semanticContextUsed: semanticContext.relevantMemories.length > 0,
+      contextualReferences: contextualReferences.hasReferences
     });
     
   } catch (error) {
@@ -490,6 +545,18 @@ Be supportive, encouraging, and therapeutic in tone. Focus on growth and self-aw
         moodEntries: 0
       }
     });
+  }
+});
+
+// Memory Dashboard API endpoint
+router.get('/memory-dashboard', async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId) || 1;
+    const dashboard = await getMemoryDashboard(userId);
+    res.json(dashboard);
+  } catch (error) {
+    console.error('Error getting memory dashboard:', error);
+    res.status(500).json({ error: 'Failed to get memory dashboard' });
   }
 });
 
