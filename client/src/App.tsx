@@ -478,6 +478,7 @@ const AppLayout = () => {
         
         if (response.ok) {
           console.log('Journal entry created successfully');
+          fetchWellnessData(); // Refresh data
         }
       }
     } catch (error) {
@@ -500,6 +501,7 @@ const AppLayout = () => {
       
       if (response.ok) {
         console.log('Mood entry created successfully');
+        fetchWellnessData(); // Refresh data
       }
     } catch (error) {
       console.error('Failed to create mood entry:', error);

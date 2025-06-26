@@ -425,11 +425,157 @@ app.get('/api/stats/:userId', async (req, res) => {
 });
 
 
+// Journal endpoints
+app.post('/api/journal/entries', async (req, res) => {
+  try {
+    const { userId = 1, title, content, mood, moodIntensity, tags } = req.body;
+    
+    const entry = await storage.createJournalEntry({
+      userId,
+      title,
+      content,
+      mood,
+      moodIntensity,
+      tags: tags || [],
+      isPrivate: true
+    });
+    
+    res.json(entry);
+  } catch (error) {
+    console.error('Journal entry creation error:', error);
+    res.status(500).json({ error: 'Failed to create journal entry' });
+  }
+});
+
+app.get('/api/journal/entries/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const entries = await storage.getJournalEntries(userId);
+    res.json(entries);
+  } catch (error) {
+    console.error('Journal entries fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch journal entries' });
+  }
+});
+
+// Mood tracking endpoints
+app.post('/api/mood/entries', async (req, res) => {
+  try {
+    const { userId = 1, mood, intensity, notes, triggers, copingStrategies } = req.body;
+    
+    const entry = await storage.createMoodEntry({
+      userId,
+      mood,
+      intensity,
+      notes,
+      triggers: triggers || [],
+      copingStrategies: copingStrategies || []
+    });
+    
+    res.json(entry);
+  } catch (error) {
+    console.error('Mood entry creation error:', error);
+    res.status(500).json({ error: 'Failed to create mood entry' });
+  }
+});
+
+app.get('/api/mood/entries/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const entries = await storage.getMoodEntries(userId);
+    res.json(entries);
+  } catch (error) {
+    console.error('Mood entries fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch mood entries' });
+  }
+});
+
+// Goals endpoints
+app.post('/api/goals', async (req, res) => {
+  try {
+    const { userId = 1, title, description, category, targetValue, targetDate } = req.body;
+    
+    const goal = await storage.createTherapeuticGoal({
+      userId,
+      title,
+      description,
+      category,
+      targetValue,
+      currentValue: 0,
+      targetDate: targetDate ? new Date(targetDate) : null,
+      isActive: true
+    });
+    
+    res.json(goal);
+  } catch (error) {
+    console.error('Goal creation error:', error);
+    res.status(500).json({ error: 'Failed to create goal' });
+  }
+});
+
+app.get('/api/goals/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const goals = await storage.getTherapeuticGoals(userId);
+    res.json(goals);
+  } catch (error) {
+    console.error('Goals fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch goals' });
+  }
+});
+
+// Community endpoints
+app.get('/api/community/forums', async (req, res) => {
+  try {
+    const forums = await storage.getSupportForums();
+    res.json(forums);
+  } catch (error) {
+    console.error('Forums fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch forums' });
+  }
+});
+
+app.get('/api/community/posts/:forumId', async (req, res) => {
+  try {
+    const forumId = parseInt(req.params.forumId);
+    const posts = await storage.getForumPosts(forumId);
+    res.json(posts);
+  } catch (error) {
+    console.error('Posts fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch posts' });
+  }
+});
+
+// Analytics endpoints
+app.get('/api/analytics/wellness-score/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const score = await storage.calculateWellnessScore(userId);
+    res.json({ score });
+  } catch (error) {
+    console.error('Wellness score error:', error);
+    res.status(500).json({ error: 'Failed to calculate wellness score' });
+  }
+});
+
+app.get('/api/achievements/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    const achievements = await storage.getUserAchievements(userId);
+    res.json(achievements);
+  } catch (error) {
+    console.error('Achievements fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch achievements' });
+  }
+});
+
 // Setup development or production serving AFTER all API routes
 if (process.env.NODE_ENV === "production") {
   serveStatic(app);
 } else {
-  await setupVite(app, server);
+  setupVite(app, server).then(() => {
+    console.log('Vite setup complete');
+  });
 }
 
 server.listen(PORT, "0.0.0.0", () => {
