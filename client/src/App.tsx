@@ -348,76 +348,155 @@ const AppLayout = () => {
 
       case 'chat':
         return (
-          <div className="h-full flex flex-col bg-gradient-to-br from-[#000000] to-[#232323]">
-            <div className="p-4">
-              <h2 className="text-xl font-bold text-gray-200 mb-2">Welcome to TrAI</h2>
-              <p className="text-gray-400 text-sm">Share your thoughts and feelings in a supportive environment</p>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                      message.sender === 'user'
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white/80 text-gray-800 shadow-sm'
-                    }`}
-                  >
-                    <p className="text-sm">{message.text}</p>
-                    <p className={`text-xs mt-1 ${
-                      message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
-                    }`}>
-                      {message.time}
-                    </p>
+          <div className="flex flex-col h-full">
+            {/* Top Bar - Horoscope, Logo, Affirmation */}
+            <div className="bg-gradient-to-r from-cyan-400 via-blue-500 to-green-400 p-4 rounded-t-lg">
+              <div className="grid grid-cols-3 gap-4 h-20">
+                {/* Horoscope Section */}
+                <div className="bg-cyan-400/80 rounded-lg p-3 flex flex-col justify-center">
+                  <h3 className="text-sm font-bold text-white mb-1">Horoscope</h3>
+                  <p className="text-xs text-white/90 line-clamp-2">
+                    {horoscopeText ? horoscopeText.substring(0, 60) + '...' : "Your cosmic guidance awaits..."}
+                  </p>
+                </div>
+                
+                {/* Logo Section */}
+                <div className="bg-purple-600/80 rounded-lg p-3 flex items-center justify-center">
+                  <div className="text-center">
+                    <img src={traiLogo} alt="TrAI" className="w-8 h-8 mx-auto mb-1" />
+                    <span className="text-xs font-bold text-white">TrAI</span>
                   </div>
                 </div>
-              ))}
-              {loading && (
-                <div className="flex justify-start">
-                  <div className="bg-white/80 text-gray-800 shadow-sm max-w-xs lg:max-w-md px-4 py-2 rounded-2xl">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                
+                {/* Affirmation Section */}
+                <div className="bg-green-400/80 rounded-lg p-3 flex flex-col justify-center">
+                  <h3 className="text-sm font-bold text-white mb-1">Affirmation</h3>
+                  <p className="text-xs text-white/90 line-clamp-2">
+                    {dailyAffirmation.substring(0, 60)}...
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 bg-purple-600 p-4 grid grid-cols-4 gap-4">
+              {/* Agent Section (Left 3/4) */}
+              <div className="col-span-3 bg-purple-700/50 rounded-lg p-4 flex flex-col">
+                <div className="flex items-center mb-3">
+                  <h2 className="text-lg font-bold text-white">Agent</h2>
+                  {botStats && (
+                    <div className="ml-auto text-sm text-white/80">
+                      {botStats.stage} • Level {botStats.level}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Agent Conversation Area */}
+                <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+                  {messages.length === 0 ? (
+                    <div className="text-center text-white/70 py-8">
+                      <MessageCircle size={32} className="mx-auto mb-3 opacity-70" />
+                      <p className="text-sm">Your AI companion is ready to chat</p>
+                      <p className="text-xs mt-1">I learn your personality to reflect your thoughts</p>
+                    </div>
+                  ) : (
+                    messages.map((message, index) => (
+                      <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                          message.sender === 'user' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-white/20 backdrop-blur-sm text-white'
+                        }`}>
+                          <p>{message.text}</p>
+                          <p className="text-xs mt-1 opacity-70">{message.time}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {loading && (
+                    <div className="flex justify-start">
+                      <div className="bg-white/20 backdrop-blur-sm text-white max-w-xs px-3 py-2 rounded-lg">
+                        <div className="flex space-x-1">
+                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce"></div>
+                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-1.5 h-1.5 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Agent Stats/Mood Visualization */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-blue-500/50 rounded p-2">
+                    <div className="w-full h-8 bg-blue-600/30 rounded flex items-center justify-center">
+                      <span className="text-xs text-white">Mood Pattern</span>
+                    </div>
+                  </div>
+                  <div className="bg-blue-500/50 rounded p-2">
+                    <div className="w-full h-8 bg-blue-600/30 rounded flex items-center justify-center">
+                      <span className="text-xs text-white">Analytics</span>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
+
+              {/* User Section (Right 1/4) */}
+              <div className="col-span-1 bg-blue-500/50 rounded-lg p-3">
+                <h3 className="text-sm font-bold text-white mb-3">User</h3>
+                <div className="space-y-2">
+                  <div className="bg-blue-600/30 rounded p-2">
+                    <div className="w-full h-6 bg-blue-700/50 rounded flex items-center justify-center">
+                      <span className="text-xs text-white/80">Profile</span>
+                    </div>
+                  </div>
+                  <div className="bg-blue-600/30 rounded p-2">
+                    <div className="w-full h-6 bg-blue-700/50 rounded flex items-center justify-center">
+                      <span className="text-xs text-white/80">Stats</span>
+                    </div>
+                  </div>
+                  <div className="bg-blue-600/30 rounded p-2">
+                    <div className="w-full h-6 bg-blue-700/50 rounded flex items-center justify-center">
+                      <span className="text-xs text-white/80">Goals</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="p-4 bg-white/50 backdrop-blur-sm">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Share your thoughts..."
-                  className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-400 focus:outline-none"
-                  disabled={loading}
-                />
-                <button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`px-4 py-3 rounded-xl transition-colors ${
-                    isRecording 
-                      ? 'bg-red-500 hover:bg-red-600 text-white' 
-                      : 'bg-purple-500 hover:bg-purple-600 text-white'
-                  }`}
-                  disabled={loading}
-                >
-                  {isRecording ? <Square size={24} /> : <Mic size={36} />}
-                </button>
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || loading}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-100 rounded-lg text-white transition-colors"
-                >
-                  <Send size={36} />
-                </button>
+            {/* Bottom - Share Your Thoughts */}
+            <div className="bg-cyan-400 p-4 rounded-b-lg">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-semibold text-white">Share Your Thoughts</span>
+                <div className="flex-1 flex space-x-2">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    placeholder="Type your message..."
+                    className="flex-1 px-3 py-2 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-white/70 border border-white/30 focus:border-white focus:outline-none text-sm"
+                    disabled={loading}
+                  />
+                  <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`p-2 rounded-lg transition-colors ${
+                      isRecording 
+                        ? 'bg-red-500 hover:bg-red-600 text-white' 
+                        : 'bg-white/20 hover:bg-white/30 text-white border border-white/30'
+                    }`}
+                    disabled={loading}
+                  >
+                    {isRecording ? <Square size={18} /> : <Mic size={18} />}
+                  </button>
+                  <button
+                    onClick={sendMessage}
+                    disabled={!input.trim() || loading}
+                    className="p-2 bg-white/20 hover:bg-white/30 disabled:opacity-50 rounded-lg text-white border border-white/30 transition-colors"
+                  >
+                    <Send size={18} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
