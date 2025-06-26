@@ -95,8 +95,8 @@ const WellnessRewards: React.FC = () => {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'engagement': return Trophy;
-      case 'milestone': return Target;
-      case 'wellness': return Star;
+      case 'milestone': return Star;
+      case 'wellness': return Target;
       case 'achievement': return Award;
       default: return Trophy;
     }
@@ -104,108 +104,81 @@ const WellnessRewards: React.FC = () => {
 
   const purchaseReward = async (rewardId: number) => {
     try {
-      await axios.post('/api/purchase-reward', { userId: 1, rewardId });
+      await axios.post(`/api/rewards-shop/${rewardId}/purchase`, { userId: 1 });
       // Refresh data after purchase
-      window.location.reload();
     } catch (error) {
-      console.error('Failed to purchase reward:', error);
+      console.error('Purchase failed:', error);
     }
   };
 
   const joinChallenge = async (challengeId: number) => {
     try {
-      await axios.post('/api/join-challenge', { userId: 1, challengeId });
+      await axios.post(`/api/community-challenges/${challengeId}/join`, { userId: 1 });
       // Refresh data after joining
-      window.location.reload();
     } catch (error) {
       console.error('Failed to join challenge:', error);
     }
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6] p-4 overflow-y-auto">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 mb-6 border border-white/20">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <Gift className="text-purple-600" />
-              Wellness Rewards
-            </h1>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-purple-600">{wellnessPoints?.availablePoints || 0}</div>
-              <div className="text-sm text-gray-600">Available Points</div>
-            </div>
-          </div>
-          
-          {/* Level Progress */}
-          <div className="bg-white/40 rounded-lg p-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">Level {wellnessPoints?.currentLevel || 1}</span>
-              <span className="text-xs text-gray-600">{wellnessPoints?.pointsToNextLevel || 0} points to next level</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{ 
-                  width: `${wellnessPoints ? (100 - (wellnessPoints.pointsToNextLevel / 100) * 100) : 0}%` 
-                }}
-              ></div>
-            </div>
-          </div>
-        </div>
+    <div className="max-w-6xl mx-auto p-6 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen">
+      <div className="text-center mb-8">
+        <Gift className="w-16 h-16 text-purple-600 mx-auto mb-4" />
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">Wellness Rewards</h1>
+        <p className="text-gray-600">Earn points and unlock achievements on your therapeutic journey</p>
+      </div>
 
-        {/* Navigation Tabs */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl mb-6 border border-white/20">
-          <div className="flex">
-            {[
-              { id: 'overview', label: 'Overview', icon: TrendingUp },
-              { id: 'shop', label: 'Rewards Shop', icon: Gift },
-              { id: 'challenges', label: 'Challenges', icon: Users },
-              { id: 'achievements', label: 'Achievements', icon: Trophy }
-            ].map((tab) => {
-              const IconComponent = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-xl font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-purple-500 text-white'
-                      : 'text-gray-700 hover:bg-white/40'
-                  }`}
-                >
-                  <IconComponent size={18} />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      <div className="flex flex-wrap justify-center gap-4 mb-8">
+        {['overview', 'shop', 'challenges', 'achievements'].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-6 py-3 rounded-xl font-medium transition-all ${
+              activeTab === tab
+                ? 'bg-purple-500 text-white shadow-lg'
+                : 'bg-white/60 text-gray-700 hover:bg-white/80'
+            }`}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
+      </div>
 
-        {/* Tab Content */}
+      <div className="space-y-8">
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Points Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                 <div className="flex items-center gap-3">
                   <Star className="text-yellow-500" size={24} />
                   <div>
-                    <div className="text-2xl font-bold text-gray-800">{wellnessPoints?.lifetimePoints || 0}</div>
-                    <div className="text-sm text-gray-600">Lifetime Points</div>
+                    <div className="text-2xl font-bold text-gray-800">{wellnessPoints?.totalPoints || 0}</div>
+                    <div className="text-sm text-gray-600">Total Points</div>
                   </div>
                 </div>
               </div>
+
               <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                 <div className="flex items-center gap-3">
-                  <Trophy className="text-purple-500" size={24} />
+                  <Gift className="text-green-500" size={24} />
                   <div>
-                    <div className="text-2xl font-bold text-gray-800">{achievements?.filter(a => a.is_unlocked).length || 0}</div>
-                    <div className="text-sm text-gray-600">Achievements</div>
+                    <div className="text-2xl font-bold text-gray-800">{wellnessPoints?.availablePoints || 0}</div>
+                    <div className="text-sm text-gray-600">Available Points</div>
                   </div>
                 </div>
               </div>
+
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="text-purple-500" size={24} />
+                  <div>
+                    <div className="text-2xl font-bold text-gray-800">{wellnessPoints?.currentLevel || 1}</div>
+                    <div className="text-sm text-gray-600">Current Level</div>
+                  </div>
+                </div>
+              </div>
+
               <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                 <div className="flex items-center gap-3">
                   <Zap className="text-blue-500" size={24} />
@@ -221,7 +194,7 @@ const WellnessRewards: React.FC = () => {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Streaks</h3>
               <div className="space-y-3">
-                {streaks?.map((streak) => (
+                {Array.isArray(streaks) ? streaks.map((streak) => (
                   <div key={streak.id} className="flex items-center justify-between p-3 bg-white/40 rounded-lg">
                     <div>
                       <div className="font-medium text-gray-800 capitalize">{streak.streak_type.replace('_', ' ')}</div>
@@ -232,7 +205,7 @@ const WellnessRewards: React.FC = () => {
                       <div className="text-xs text-gray-600">days</div>
                     </div>
                   </div>
-                )) || <div className="text-gray-600">No active streaks</div>}
+                )) : <div className="text-gray-600">No active streaks</div>}
               </div>
             </div>
           </div>
@@ -241,7 +214,7 @@ const WellnessRewards: React.FC = () => {
         {activeTab === 'shop' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {rewards?.map((reward) => (
+              {Array.isArray(rewards) ? rewards.map((reward) => (
                 <div key={reward.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="font-semibold text-gray-800">{reward.name}</h3>
@@ -262,7 +235,7 @@ const WellnessRewards: React.FC = () => {
                     </button>
                   </div>
                 </div>
-              )) || <div className="text-gray-600">No rewards available</div>}
+              )) : <div className="text-gray-600">No rewards available</div>}
             </div>
           </div>
         )}
@@ -304,19 +277,17 @@ const WellnessRewards: React.FC = () => {
         {activeTab === 'achievements' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {achievements?.map((achievement) => {
+              {Array.isArray(achievements) ? achievements.map((achievement) => {
                 const IconComponent = getCategoryIcon(achievement.category);
                 return (
                   <div 
                     key={achievement.id} 
-                    className={`bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${
-                      achievement.is_unlocked ? 'ring-2 ring-yellow-400' : 'opacity-75'
-                    }`}
+                    className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20"
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <IconComponent 
-                          size={20} 
+                          size={24} 
                           className={achievement.is_unlocked ? 'text-yellow-500' : 'text-gray-400'} 
                         />
                         <h3 className="font-semibold text-gray-800">{achievement.name}</h3>
@@ -338,7 +309,7 @@ const WellnessRewards: React.FC = () => {
                     </div>
                   </div>
                 );
-              }) || <div className="text-gray-600">No achievements available</div>}
+              }) : <div className="text-gray-600">No achievements available</div>}
             </div>
           </div>
         )}
