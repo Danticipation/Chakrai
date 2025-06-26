@@ -48,7 +48,38 @@ html, body, #root {
 /* Force all text to be white */
 *, *::before, *::after {
   color: #FFFFFF !important;
-  pointer-events: inherit !important;
+}
+
+/* Eliminate ALL white backgrounds - force dark blue theme */
+div, section, article, main, aside, header, footer, nav {
+  background-color: #0a0e1a !important;
+}
+
+/* Force component backgrounds to dark blue */
+[class*="bg-white"], 
+[class*="bg-gray"], 
+[class*="bg-slate"],
+[style*="background-color: white"],
+[style*="background-color: #fff"],
+[style*="background-color: #ffffff"] {
+  background-color: #0a0e1a !important;
+}
+
+/* Specific overrides for common UI elements */
+.bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-200, .bg-slate-50, .bg-slate-100 {
+  background-color: #0a0e1a !important;
+}
+
+/* Input and form elements */
+input, textarea, select, button {
+  background-color: #1a237e !important;
+  color: #FFFFFF !important;
+  border-color: #3949ab !important;
+}
+
+/* Card and panel backgrounds */
+.card, .panel, [role="dialog"], [role="tabpanel"] {
+  background-color: #0a0e1a !important;
 }
 
 /* Ensure all text elements are white */
