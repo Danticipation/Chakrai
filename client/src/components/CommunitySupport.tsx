@@ -228,7 +228,7 @@ const CommunitySupport: React.FC = () => {
           <div className="space-y-6">
             {!selectedForum && !selectedPost && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {forums?.map((forum) => {
+                {Array.isArray(forums) && forums.map((forum) => {
                   const IconComponent = getCategoryIcon(forum.category);
                   return (
                     <div 
@@ -292,7 +292,7 @@ const CommunitySupport: React.FC = () => {
 
                 {/* Forum Posts */}
                 <div className="space-y-4">
-                  {forumPosts?.map((post) => (
+                  {Array.isArray(forumPosts) && forumPosts.map((post) => (
                     <div 
                       key={post.id} 
                       className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20 cursor-pointer hover:bg-white/70 transition-colors"
@@ -359,7 +359,7 @@ const CommunitySupport: React.FC = () => {
 
                 {/* Forum Replies */}
                 <div className="space-y-4">
-                  {forumReplies?.map((reply) => (
+                  {Array.isArray(forumReplies) && forumReplies.map((reply) => (
                     <div key={reply.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                       <p className="text-gray-700 mb-4">{reply.content}</p>
                       <div className="flex justify-between items-center">
@@ -385,7 +385,7 @@ const CommunitySupport: React.FC = () => {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Peer Check-ins</h3>
               <div className="space-y-4">
-                {peerCheckIns?.map((checkIn) => (
+                {Array.isArray(peerCheckIns) && peerCheckIns.map((checkIn) => (
                   <div key={checkIn.id} className="bg-white/40 rounded-lg p-4">
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="font-medium text-gray-800 capitalize">{checkIn.checkInType.replace('_', ' ')} Support</h4>
@@ -431,7 +431,7 @@ const CommunitySupport: React.FC = () => {
         {activeTab === 'therapists' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {therapists?.map((therapist) => (
+              {Array.isArray(therapists) && therapists.map((therapist) => (
                 <div key={therapist.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                   <div className="flex items-start justify-between mb-4">
                     <div>
@@ -448,7 +448,7 @@ const CommunitySupport: React.FC = () => {
                   </div>
                   <p className="text-gray-700 mb-4">{therapist.bio}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {therapist.sessionTypes?.map((type) => {
+                    {Array.isArray(therapist.sessionTypes) && therapist.sessionTypes.map((type) => {
                       const IconComponent = getSessionIcon(type);
                       return (
                         <span key={type} className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
