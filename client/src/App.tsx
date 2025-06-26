@@ -475,9 +475,9 @@ const AppLayout = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex bg-[#0a0e1a]">
         {/* Left Sidebar Navigation - Larger and blended */}
-        <div className="w-48 bg-[#0a0e1a] flex flex-col justify-center py-8 space-y-6">
+        <div className="w-48 flex flex-col justify-center py-8 space-y-6">
           {[
             { id: 'chat', label: 'Chat' },
             { id: 'daily', label: 'Reflection' },
@@ -503,7 +503,7 @@ const AppLayout = () => {
         </div>
 
         {/* Center Content Area - Different layouts based on active section */}
-        <div className="flex-1 flex justify-center items-center bg-[#0a0e1a]">
+        <div className="flex-1 flex justify-center items-center">
           {activeSection === 'chat' ? (
             /* Chat Panel - Blended background, no visual separation */
             <div className="w-[576px] h-[480px] bg-[#1a237e] rounded-lg relative">
@@ -603,7 +603,7 @@ const AppLayout = () => {
         </div>
 
         {/* Right Stats Sidebar - Larger and blended */}
-        <div className="w-64 bg-[#0a0e1a] py-8 px-6">
+        <div className="w-64 py-8 px-6">
           <div className="text-white text-lg font-bold mb-6 text-center underline">Stats or goal tracking</div>
           
           {/* Real Progress Tracking */}
