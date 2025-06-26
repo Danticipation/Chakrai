@@ -1429,11 +1429,13 @@ app.post('/api/journal/analyze', async (req, res) => {
     if (analysis.riskLevel === 'high' || analysis.riskLevel === 'critical') {
       await storage.createCrisisDetectionLog({
         userId,
+        messageContent: JSON.stringify(analysis),
         riskLevel: analysis.riskLevel,
         confidenceScore: "0.85",
-        triggerType: 'journal_analysis',
-        detectedPatterns: analysis.emotionalPatterns || [],
-        immediateResponse: analysis.riskLevel === 'critical' ? 'immediate_intervention' : 'monitoring',
+        crisisIndicators: analysis.emotionalPatterns || [],
+        interventionTriggered: analysis.riskLevel === 'critical',
+        interventionType: analysis.riskLevel === 'critical' ? 'immediate' : null,
+        followUpScheduled: analysis.riskLevel !== 'low' ? true : null,
         responseActions: [
           'Crisis support resources provided',
           'Mental health professional contact recommended',
