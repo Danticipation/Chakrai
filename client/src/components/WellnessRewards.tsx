@@ -210,7 +210,7 @@ const WellnessRewards: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Zap className="text-blue-500" size={24} />
                   <div>
-                    <div className="text-2xl font-bold text-gray-800">{streaks?.reduce((sum, s) => sum + s.current_streak, 0) || 0}</div>
+                    <div className="text-2xl font-bold text-gray-800">{Array.isArray(streaks) ? streaks.reduce((sum, s) => sum + s.current_streak, 0) : 0}</div>
                     <div className="text-sm text-gray-600">Active Streaks</div>
                   </div>
                 </div>
@@ -270,7 +270,7 @@ const WellnessRewards: React.FC = () => {
         {activeTab === 'challenges' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {challenges?.map((challenge) => (
+              {Array.isArray(challenges) ? challenges.map((challenge) => (
                 <div key={challenge.id} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="font-semibold text-gray-800">{challenge.name}</h3>
@@ -296,7 +296,7 @@ const WellnessRewards: React.FC = () => {
                     {challenge.is_active ? 'Join Challenge' : 'Challenge Ended'}
                   </button>
                 </div>
-              )) || <div className="text-gray-600">No challenges available</div>}
+              )) : <div className="text-gray-600">No challenges available</div>}
             </div>
           </div>
         )}
