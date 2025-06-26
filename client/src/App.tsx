@@ -508,41 +508,43 @@ const AppLayout = () => {
 
   return (
     <div className="h-screen bg-[#0a0e1a] flex flex-col">
-      {/* Top Header - Expanded Sections */}
-      <div className="bg-[#0a0e1a] p-4 grid grid-cols-3 gap-4 h-48">
-        {/* Horoscope Section - Large Expanded */}
-        <button 
-          onClick={() => setActiveSection('horoscope')}
-          className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
-        >
-          <h3 className="text-2xl font-bold text-white mb-4 underline">Horoscope</h3>
-          <p className="text-base text-white text-left leading-relaxed flex-1">
-            {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
-          </p>
-          <p className="text-sm text-white/70 mt-4 font-semibold">Click to expand</p>
-        </button>
-        
-        {/* Logo Section - Center */}
-        <button 
-          onClick={() => setActiveSection('logo')}
-          className="bg-[#0a0e1a] rounded-lg p-6 flex flex-col items-center justify-center border-2 border-white hover:border-purple-400 transition-colors cursor-pointer"
-        >
-          <img src={traiLogo} alt="TrAI" className="h-24 w-auto mb-4" />
-          <p className="text-lg text-white/70 font-bold">TraI Mental Wellness</p>
-          <p className="text-sm text-white/50 mt-2">Click for more info</p>
-        </button>
-        
-        {/* Affirmation Section - Large Expanded */}
-        <button 
-          onClick={() => setActiveSection('affirmation')}
-          className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
-        >
-          <h3 className="text-2xl font-bold text-white mb-4 underline">Affirmation</h3>
-          <p className="text-base text-white text-left leading-relaxed flex-1">
-            {dailyAffirmation.substring(0, 200)}...
-          </p>
-          <p className="text-sm text-white/70 mt-4 font-semibold">Click to here</p>
-        </button>
+      {/* Top Header - Expanded to Chat Box */}
+      <div className="bg-[#0a0e1a] p-4 flex justify-center">
+        <div className="grid grid-cols-3 gap-4 w-[1152px] h-[200px]">
+          {/* Horoscope Section - Expanded */}
+          <button 
+            onClick={() => setActiveSection('horoscope')}
+            className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+          >
+            <h3 className="text-2xl font-bold text-white mb-4 underline">Horoscope</h3>
+            <p className="text-base text-white text-left leading-relaxed flex-1">
+              {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
+            </p>
+            <p className="text-sm text-white/70 mt-4 font-semibold">Click to expand</p>
+          </button>
+          
+          {/* Logo Section - Center */}
+          <button 
+            onClick={() => setActiveSection('logo')}
+            className="bg-[#0a0e1a] rounded-lg p-6 flex flex-col items-center justify-center border-2 border-white hover:border-purple-400 transition-colors cursor-pointer"
+          >
+            <img src={traiLogo} alt="TrAI" className="h-24 w-auto mb-4" />
+            <p className="text-lg text-white/70 font-bold">TraI Mental Wellness</p>
+            <p className="text-sm text-white/50 mt-2">Click for more info</p>
+          </button>
+          
+          {/* Affirmation Section - Expanded */}
+          <button 
+            onClick={() => setActiveSection('affirmation')}
+            className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+          >
+            <h3 className="text-2xl font-bold text-white mb-4 underline">Affirmation</h3>
+            <p className="text-base text-white text-left leading-relaxed flex-1">
+              {dailyAffirmation.substring(0, 200)}...
+            </p>
+            <p className="text-sm text-white/70 mt-4 font-semibold">Click to here</p>
+          </button>
+        </div>
       </div>
 
       {/* Main Content Area */}
