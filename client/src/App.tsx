@@ -400,6 +400,9 @@ const AppLayout = () => {
           />
         );
 
+      case 'analytics':
+        return <AnalyticsDashboard userId={1} />;
+
       case 'goals':
         return (
           <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">

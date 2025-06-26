@@ -67,12 +67,12 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
   // Fetch dashboard data
   const { data: dashboardData, isLoading: dashboardLoading, refetch: refetchDashboard } = useQuery({
     queryKey: [`/api/analytics/dashboard/${userId}`],
-  });
+  }) as any;
 
   // Fetch monthly reports
   const { data: reportsData, isLoading: reportsLoading } = useQuery({
     queryKey: [`/api/analytics/monthly-reports/${userId}`],
-  });
+  }) as any;
 
   // Fetch longitudinal trends
   const { data: trendsData, isLoading: trendsLoading, refetch: refetchTrends } = useQuery({
@@ -271,7 +271,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
       );
     }
 
-    const reports = reportsData?.reports || [];
+    const reports = (reportsData as any)?.reports || [];
 
     return (
       <div className="space-y-6">
