@@ -491,7 +491,7 @@ const AppLayout = () => {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id)}
-              className={`w-full h-14 px-4 text-base font-bold transition-colors ${
+              className={`w-full h-20 px-6 text-xl font-bold transition-colors ${
                 activeSection === tab.id
                   ? 'bg-red-600 text-white'
                   : 'bg-red-600 text-white hover:bg-red-500'
@@ -602,53 +602,53 @@ const AppLayout = () => {
           )}
         </div>
 
-        {/* Right Stats Sidebar - Larger and blended */}
-        <div className="w-64 py-8 px-6">
-          <div className="text-white text-lg font-bold mb-6 text-center underline">Stats or goal tracking</div>
+        {/* Right Stats Sidebar - Enlarged and blended */}
+        <div className="w-96 py-8 px-8">
+          <div className="text-white text-2xl font-bold mb-8 text-center underline">Stats or goal tracking</div>
           
           {/* Real Progress Tracking */}
-          <div className="space-y-3">
+          <div className="space-y-6">
             {/* Daily Journaling Progress */}
-            <div className="bg-purple-700 rounded p-2">
-              <div className="text-white text-xs font-bold mb-1">Daily Journaling</div>
-              <div className="bg-[#0a0e1a] rounded-full h-2 mb-1">
-                <div className="bg-green-400 h-2 rounded-full" style={{width: '75%'}}></div>
+            <div className="bg-purple-700 rounded-lg p-6">
+              <div className="text-white text-lg font-bold mb-3">Daily Journaling</div>
+              <div className="bg-[#0a0e1a] rounded-full h-4 mb-3">
+                <div className="bg-green-400 h-4 rounded-full" style={{width: '75%'}}></div>
               </div>
-              <div className="text-white text-xs">15/20 days this month</div>
+              <div className="text-white text-base">15/20 days this month</div>
             </div>
 
             {/* Weekly Chat Sessions */}
-            <div className="bg-purple-700 rounded p-2">
-              <div className="text-white text-xs font-bold mb-1">Weekly Chat Goal</div>
-              <div className="bg-[#0a0e1a] rounded-full h-2 mb-1">
-                <div className="bg-blue-400 h-2 rounded-full" style={{width: '60%'}}></div>
+            <div className="bg-purple-700 rounded-lg p-6">
+              <div className="text-white text-lg font-bold mb-3">Weekly Chat Goal</div>
+              <div className="bg-[#0a0e1a] rounded-full h-4 mb-3">
+                <div className="bg-blue-400 h-4 rounded-full" style={{width: '60%'}}></div>
               </div>
-              <div className="text-white text-xs">3/5 sessions this week</div>
+              <div className="text-white text-base">3/5 sessions this week</div>
             </div>
 
             {/* Mood Tracking Consistency */}
-            <div className="bg-purple-700 rounded p-2">
-              <div className="text-white text-xs font-bold mb-1">Mood Tracking</div>
-              <div className="bg-[#0a0e1a] rounded-full h-2 mb-1">
-                <div className="bg-yellow-400 h-2 rounded-full" style={{width: '90%'}}></div>
+            <div className="bg-purple-700 rounded-lg p-6">
+              <div className="text-white text-lg font-bold mb-3">Mood Tracking</div>
+              <div className="bg-[#0a0e1a] rounded-full h-4 mb-3">
+                <div className="bg-yellow-400 h-4 rounded-full" style={{width: '90%'}}></div>
               </div>
-              <div className="text-white text-xs">27/30 days tracked</div>
+              <div className="text-white text-base">27/30 days tracked</div>
             </div>
 
             {/* App Usage Streak */}
-            <div className="bg-purple-700 rounded p-2">
-              <div className="text-white text-xs font-bold mb-1">App Usage Streak</div>
-              <div className="bg-[#0a0e1a] rounded-full h-2 mb-1">
-                <div className="bg-purple-400 h-2 rounded-full" style={{width: '85%'}}></div>
+            <div className="bg-purple-700 rounded-lg p-6">
+              <div className="text-white text-lg font-bold mb-3">App Usage Streak</div>
+              <div className="bg-[#0a0e1a] rounded-full h-4 mb-3">
+                <div className="bg-purple-400 h-4 rounded-full" style={{width: '85%'}}></div>
               </div>
-              <div className="text-white text-xs">17 consecutive days</div>
+              <div className="text-white text-base">17 consecutive days</div>
             </div>
 
             {/* Overall Wellness Score */}
-            <div className="bg-purple-700 rounded p-2 text-center">
-              <div className="text-white text-xs font-bold mb-1">Overall Wellness</div>
-              <div className="text-white text-lg font-bold">85%</div>
-              <div className="text-white text-xs">This month</div>
+            <div className="bg-purple-700 rounded-lg p-6 text-center">
+              <div className="text-white text-lg font-bold mb-3">Overall Wellness</div>
+              <div className="text-white text-3xl font-bold">85%</div>
+              <div className="text-white text-base">This month</div>
             </div>
           </div>
         </div>
