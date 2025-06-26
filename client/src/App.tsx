@@ -486,7 +486,9 @@ const AppLayout = () => {
             { id: 'analytics', label: 'Analytics' },
             { id: 'rewards', label: 'Rewards' },
             { id: 'community', label: 'Community' },
-            { id: 'adaptive', label: 'AI Learning' }
+            { id: 'adaptive', label: 'AI Learning' },
+            { id: 'vr', label: 'VR Therapy' },
+            { id: 'health', label: 'Wearables' }
           ].map((tab) => (
             <button
               key={tab.id}
