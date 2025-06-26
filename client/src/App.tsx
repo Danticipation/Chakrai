@@ -527,122 +527,79 @@ const AppLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex">
         {/* Left Sidebar Navigation */}
-        <div className="w-16 bg-[#1a237e] flex flex-col items-center py-4 space-y-2">
-          {/* Logo */}
-          <div className="mb-4">
-            <img src={traiLogo} alt="TrAI" className="w-8 h-8" />
-          </div>
-          
-          {/* Navigation Tabs - Vertical Rectangles */}
+        <div className="w-32 bg-[#2d3748] flex flex-col py-4 space-y-2">
+          {/* Navigation Buttons - Full Width Rectangles */}
           {[
-            { id: 'chat', icon: MessageCircle, label: 'Chat' },
-            { id: 'daily', icon: Brain, label: 'Reflection' },
-            { id: 'journal', icon: BookOpen, label: 'Journal' },
-            { id: 'memory', icon: Brain, label: 'Memory' },
-            { id: 'analytics', icon: BarChart3, label: 'Analytics' },
-            { id: 'rewards', icon: Gift, label: 'Rewards' },
-            { id: 'community', icon: User, label: 'Community' },
-            { id: 'adaptive', icon: Star, label: 'AI Learning' },
-            { id: 'vr', icon: Headphones, label: 'VR Therapy' },
-            { id: 'health', icon: Heart, label: 'Health' },
-            { id: 'privacy', icon: Shield, label: 'Privacy' }
+            { id: 'chat', label: 'Chat' },
+            { id: 'daily', label: 'Reflection' },
+            { id: 'journal', label: 'Journal' },
+            { id: 'memory', label: 'Memory' },
+            { id: 'analytics', label: 'Analytics' },
+            { id: 'rewards', label: 'Rewards' },
+            { id: 'community', label: 'Community' },
+            { id: 'adaptive', label: 'AI Learning' }
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id)}
-              className={`w-12 h-8 flex items-center justify-center transition-colors ${
+              className={`w-full h-10 px-3 text-sm font-medium transition-colors ${
                 activeSection === tab.id
-                  ? 'bg-[#7986cb] text-white'
-                  : 'text-white/70 hover:text-white hover:bg-[#3949ab]/30'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-[#4a5568] text-white hover:bg-red-500'
               }`}
-              title={tab.label}
             >
-              <tab.icon size={16} />
+              {tab.label}
             </button>
           ))}
-          
-          {/* Settings */}
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="w-10 h-10 rounded flex items-center justify-center text-white/70 hover:text-white hover:bg-[#3949ab]/30 transition-colors mt-auto"
-            title="Settings"
-          >
-            <User size={16} />
-          </button>
         </div>
 
-        {/* Chat Area - Much Smaller */}
-        <div className="w-80 bg-[#2d3748] m-4 mr-2 rounded-lg relative">
-          <div className="absolute inset-4 bg-[#1a202c] rounded border-2 border-[#4a5568]">
-            <div className="text-center text-white text-base font-medium pt-4 pb-2">Chat box</div>
+        {/* Center Chat Area */}
+        <div className="flex-1 bg-[#2d3748] m-4 rounded-lg relative">
+          <div className="absolute inset-4 bg-[#1a202c] rounded">
+            <div className="text-center text-red-500 text-xl font-bold pt-20">Chat Box</div>
             {renderActiveSection()}
+            
+            {/* Chat Input at Bottom */}
+            <div className="absolute bottom-4 left-4 right-4 flex space-x-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                placeholder="Share your thoughts"
+                className="flex-1 px-3 py-2 bg-[#2d3748] text-white border border-[#4a5568] rounded"
+              />
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`w-10 h-10 rounded flex items-center justify-center transition-colors ${
+                  isRecording 
+                    ? 'bg-red-500 hover:bg-red-600 text-white' 
+                    : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
+                }`}
+                disabled={loading}
+              >
+                {isRecording ? <Square size={16} /> : <Mic size={16} />}
+              </button>
+              <button
+                onClick={sendMessage}
+                disabled={!input.trim() || loading}
+                className="w-10 h-10 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
+              >
+                <Send size={16} />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Right Sidebar - Takes Most Space */}
-        <div className="flex-1 bg-[#3949ab] m-4 ml-2 rounded-lg p-4 relative">
-          {/* Top positioned white content boxes */}
-          <div className="space-y-4">
-            <div className="bg-white rounded p-3">
-              <div className="text-[#1a237e] font-bold text-sm mb-2">Goals & Stats</div>
-              {botStats && (
-                <div className="space-y-2">
-                  <div className="text-xs text-[#1a237e]">
-                    <span className="font-medium">Level:</span> {botStats.level}
-                  </div>
-                  <div className="text-xs text-[#1a237e]">
-                    <span className="font-medium">Stage:</span> {botStats.stage}
-                  </div>
-                  <div className="text-xs text-[#1a237e]">
-                    <span className="font-medium">Words:</span> {botStats.wordsLearned}
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <div className="bg-white rounded p-3">
-              <div className="text-[#1a237e] font-bold text-sm mb-2">Daily Progress</div>
-              <div className="space-y-2">
-                <div className="text-xs text-[#1a237e]">
-                  <span className="font-medium">Conversations:</span> {messages.length}
-                </div>
-                <div className="text-xs text-[#1a237e]">
-                  <span className="font-medium">Mood Check:</span> Pending
-                </div>
-                <div className="text-xs text-[#1a237e]">
-                  <span className="font-medium">Journal:</span> Not started
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded p-3">
-              <div className="text-[#1a237e] font-bold text-sm mb-2">Weekly Summary</div>
-              <div className="text-xs text-[#1a237e]">
-                Track your therapeutic journey and emotional patterns over time.
-              </div>
-            </div>
-          </div>
+        {/* Right Stats Sidebar */}
+        <div className="w-80 bg-[#5c85d6] m-4 rounded-lg p-4">
+          <div className="text-white text-xl font-bold mb-4 text-center underline">Stats or goal tracking</div>
           
-          {/* Voice Input Buttons - Bottom Right */}
-          <div className="absolute bottom-4 right-4 flex space-x-2">
-            <button
-              onClick={isRecording ? stopRecording : startRecording}
-              className={`w-10 h-10 rounded flex items-center justify-center transition-colors ${
-                isRecording 
-                  ? 'bg-red-500 hover:bg-red-600 text-white' 
-                  : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
-              }`}
-              disabled={loading}
-            >
-              {isRecording ? <Square size={16} /> : <Mic size={16} />}
-            </button>
-            <button
-              onClick={sendMessage}
-              disabled={!input.trim() || loading}
-              className="w-10 h-10 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
-            >
-              <Send size={16} />
-            </button>
+          {/* Mock Chart Circles */}
+          <div className="space-y-6">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
           </div>
         </div>
       </div>
