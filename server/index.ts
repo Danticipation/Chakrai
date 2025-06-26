@@ -867,7 +867,7 @@ app.post('/api/emotional-intelligence/mood-forecast/:userId', async (req, res) =
     const userId = parseInt(req.params.userId) || 1;
     
     // Generate mood forecast using recent mood data
-    const recentMoods = await storage.getMoodEntries(userId, 14);
+    const recentMoods = await storage.getMoodEntries(userId);
     const forecast = await generateMoodForecast(userId, recentMoods);
     
     res.json({
