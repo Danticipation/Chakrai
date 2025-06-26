@@ -404,6 +404,9 @@ const AppLayout = () => {
       case 'analytics':
         return <AnalyticsDashboard userId={1} />;
 
+      case 'rewards':
+        return <WellnessRewards />;
+
       case 'goals':
         return (
           <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
@@ -500,6 +503,7 @@ const AppLayout = () => {
             { id: 'chat', icon: MessageCircle, label: 'Chat' },
             { id: 'journal', icon: BookOpen, label: 'Journal' },
             { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+            { id: 'rewards', icon: Gift, label: 'Rewards' },
             { id: 'goals', icon: Target, label: 'Goals' }
           ].map((tab) => (
             <button
