@@ -349,7 +349,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   const selectedMood = moodOptions.find(mood => mood.value === entry.mood) || moodOptions[2];
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6] p-4">
+    <div className="h-full flex flex-col bg-gradient-to-br from-[#fff200] to-[#fff200] p-4">
       {/* Success Message */}
       {showSuccess && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center">
@@ -361,7 +361,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
       <div className="flex-1 overflow-y-auto">
         {/* Header with Navigation Tabs */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Therapeutic Journal</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">Therapeutic Journal</h2>
           <p className="text-gray-600">Express your thoughts and feelings in a safe, private space</p>
           
           {/* Navigation Tabs */}
@@ -378,7 +378,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                   activeTab === tab.id
                     ? 'bg-white text-purple-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
+                    : 'text-white/60 hover:text-gray-800'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
@@ -398,7 +398,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
               placeholder="Give your entry a title (optional)"
               value={entry.title}
               onChange={(e) => setEntry(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-400 focus:outline-none text-lg font-medium"
+              className="w-full px-4 py-3 rounded-xl border-2 border-[#7986cb]/30 focus:border-blue-400 focus:outline-none text-lg font-medium"
             />
           </div>
 
@@ -415,7 +415,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   e.target.style.height = 'auto';
                   e.target.style.height = e.target.scrollHeight + 'px';
                 }}
-                className="w-full min-h-[200px] px-4 py-3 pr-16 rounded-xl border-2 border-gray-200 focus:border-blue-400 focus:outline-none resize-none text-base leading-relaxed"
+                className="w-full min-h-[200px] px-4 py-3 pr-16 rounded-xl border-2 border-[#7986cb]/30 focus:border-blue-400 focus:outline-none resize-none text-base leading-relaxed"
                 style={{ maxHeight: '400px' }}
               />
               
@@ -477,8 +477,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
           </div>
 
           {/* Mood Intensity */}
-          <div className="mb-6">
-            <label className="block text-gray-700 font-medium mb-3">
+          <div className="mb-6 bg-[#1a237e]/20 rounded-xl p-4">
+            <label className="block text-white font-medium mb-3">
               Intensity: {entry.moodIntensity}/10
             </label>
             <input
@@ -487,9 +487,9 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
               max="10"
               value={entry.moodIntensity}
               onChange={(e) => setEntry(prev => ({ ...prev, moodIntensity: parseInt(e.target.value) }))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+              className="w-full h-2 bg-[#3949ab]/50 rounded-lg appearance-none cursor-pointer slider"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-white/70 mt-1">
               <span>Mild</span>
               <span>Moderate</span>
               <span>Intense</span>
@@ -497,8 +497,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
           </div>
 
           {/* Tags */}
-          <div className="mb-6">
-            <label className="block text-gray-700 font-medium mb-3">Tags (help categorize your thoughts)</label>
+          <div className="mb-6 bg-[#1a237e]/20 rounded-xl p-4">
+            <label className="block text-white font-medium mb-3">Tags (help categorize your thoughts)</label>
             
             {/* Current Tags */}
             {entry.tags.length > 0 && (
@@ -506,12 +506,12 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                 {entry.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center"
+                    className="bg-[#3949ab] text-white px-3 py-1 rounded-full text-sm flex items-center"
                   >
                     {tag}
                     <button
                       onClick={() => removeTag(tag)}
-                      className="ml-2 text-blue-600 hover:text-blue-800"
+                      className="ml-2 text-white/80 hover:text-white"
                     >
                       ×
                     </button>
@@ -529,8 +529,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   disabled={entry.tags.includes(tag)}
                   className={`px-3 py-1 rounded-full text-sm transition-all ${
                     entry.tags.includes(tag)
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-[#5c6bc0]/50 text-white/50 cursor-not-allowed'
+                      : 'bg-[#1a237e] text-white hover:bg-[#3949ab]'
                   }`}
                 >
                   {tag}
@@ -546,11 +546,11 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addTag(newTag)}
-                className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-blue-400 focus:outline-none text-sm"
+                className="flex-1 px-3 py-2 rounded-lg border border-[#3949ab]/50 bg-[#1a237e]/30 text-white placeholder-white/60 focus:border-[#7986cb] focus:outline-none text-sm"
               />
               <button
                 onClick={() => addTag(newTag)}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 bg-[#3949ab] text-white rounded-lg hover:bg-[#7986cb] transition-colors"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -597,33 +597,33 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* Recent Entries (shown only on write tab) */}
         {activeTab === 'write' && recentEntries.length > 0 && (
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+          <div className="bg-[#1a237e]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
               <Calendar className="w-5 h-5 mr-2" />
               Recent Entries
             </h3>
             <div className="space-y-3">
               {recentEntries.map((recentEntry, index) => (
-                <div key={index} className="bg-white/80 rounded-lg p-4 border border-gray-200">
+                <div key={index} className="bg-[#3949ab]/30 rounded-lg p-4 border border-[#7986cb]/30">
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-gray-800">
+                    <h4 className="font-medium text-white">
                       {recentEntry.title || `Entry ${index + 1}`}
                     </h4>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-white/60">
                       {new Date(recentEntry.createdAt || '').toLocaleDateString()}
                     </span>
                   </div>
-                  <p className="text-gray-600 text-sm line-clamp-2">
+                  <p className="text-white/80 text-sm line-clamp-2">
                     {recentEntry.content.substring(0, 100)}...
                   </p>
                   <div className="flex items-center mt-2 text-xs">
                     <span className={`px-2 py-1 rounded-full ${
-                      moodOptions.find(m => m.value === recentEntry.mood)?.color || 'bg-gray-100 text-gray-700'
+                      moodOptions.find(m => m.value === recentEntry.mood)?.color || 'bg-[#5c6bc0] text-white'
                     }`}>
                       {moodOptions.find(m => m.value === recentEntry.mood)?.label || 'Unknown'}
                     </span>
                     {recentEntry.tags.length > 0 && (
-                      <span className="ml-2 text-gray-500">
+                      <span className="ml-2 text-white/60">
                         +{recentEntry.tags.length} tags
                       </span>
                     )}
