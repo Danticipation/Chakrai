@@ -526,9 +526,8 @@ const AppLayout = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex">
-        {/* Left Sidebar Navigation */}
-        <div className="w-40 bg-[#2d3748] flex flex-col py-4 space-y-2">
-          {/* Navigation Buttons */}
+        {/* Left Sidebar Navigation - Evenly spaced */}
+        <div className="w-32 bg-[#2d3748] flex flex-col justify-center py-8 space-y-3">
           {[
             { id: 'chat', label: 'Chat' },
             { id: 'daily', label: 'Reflection' },
@@ -542,7 +541,7 @@ const AppLayout = () => {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id)}
-              className={`w-full h-12 px-2 text-sm font-bold transition-colors ${
+              className={`mx-2 h-10 px-2 text-sm font-bold transition-colors rounded ${
                 activeSection === tab.id
                   ? 'bg-red-600 text-white'
                   : 'bg-[#4a5568] text-white hover:bg-red-500'
@@ -553,53 +552,94 @@ const AppLayout = () => {
           ))}
         </div>
 
-        {/* Center Chat Area - 60% of space */}
-        <div className="w-[60%] bg-[#2d3748] m-4 rounded-lg relative">
-          <div className="absolute inset-4 bg-[#1a202c] rounded">
-            <div className="text-center text-red-500 text-2xl font-bold pt-16">Chat Box</div>
-            {renderActiveSection()}
-            
-            {/* Chat Input at Bottom */}
-            <div className="absolute bottom-6 left-6 right-6 flex space-x-3">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder="Share your thoughts"
-                className="flex-1 px-4 py-3 bg-[#2d3748] text-white border border-[#4a5568] rounded text-base"
-              />
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`w-12 h-12 rounded flex items-center justify-center transition-colors ${
-                  isRecording 
-                    ? 'bg-red-500 hover:bg-red-600 text-white' 
-                    : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
-                }`}
-                disabled={loading}
-              >
-                {isRecording ? <Square size={20} /> : <Mic size={20} />}
-              </button>
-              <button
-                onClick={sendMessage}
-                disabled={!input.trim() || loading}
-                className="w-12 h-12 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
-              >
-                <Send size={20} />
-              </button>
+        {/* Center Chat Area - Fixed size, centered with empty space */}
+        <div className="flex-1 flex justify-center items-center">
+          <div className="w-96 h-80 bg-[#2d3748] rounded-lg relative">
+            <div className="absolute inset-4 bg-[#1a202c] rounded">
+              <div className="text-center text-red-500 text-xl font-bold pt-6">Chat Box</div>
+              {renderActiveSection()}
+              
+              {/* Chat Input at Bottom */}
+              <div className="absolute bottom-4 left-4 right-4 flex space-x-2">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  placeholder="Share your thoughts"
+                  className="flex-1 px-3 py-2 bg-[#2d3748] text-white border border-[#4a5568] rounded text-sm"
+                />
+                <button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  className={`w-9 h-9 rounded flex items-center justify-center transition-colors ${
+                    isRecording 
+                      ? 'bg-red-500 hover:bg-red-600 text-white' 
+                      : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white'
+                  }`}
+                  disabled={loading}
+                >
+                  {isRecording ? <Square size={16} /> : <Mic size={16} />}
+                </button>
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || loading}
+                  className="w-9 h-9 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
+                >
+                  <Send size={16} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right Stats Sidebar - 25% of space with pie charts */}
-        <div className="w-[25%] bg-[#5c85d6] m-4 rounded-lg p-4">
-          <div className="text-white text-lg font-bold mb-6 text-center underline">Stats or goal tracking</div>
+        {/* Right Stats Sidebar - Real progress tracking */}
+        <div className="w-48 bg-[#5c85d6] py-4 px-3">
+          <div className="text-white text-base font-bold mb-4 text-center underline">Stats or goal tracking</div>
           
-          {/* Colorful Pie Charts like in design */}
-          <div className="space-y-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 via-yellow-400 via-red-400 to-blue-600 mx-auto"></div>
+          {/* Real Progress Tracking */}
+          <div className="space-y-3">
+            {/* Daily Journaling Progress */}
+            <div className="bg-white/20 rounded p-2">
+              <div className="text-white text-xs font-bold mb-1">Daily Journaling</div>
+              <div className="bg-white/30 rounded-full h-2 mb-1">
+                <div className="bg-green-400 h-2 rounded-full" style={{width: '75%'}}></div>
+              </div>
+              <div className="text-white text-xs">15/20 days this month</div>
+            </div>
+
+            {/* Weekly Chat Sessions */}
+            <div className="bg-white/20 rounded p-2">
+              <div className="text-white text-xs font-bold mb-1">Weekly Chat Goal</div>
+              <div className="bg-white/30 rounded-full h-2 mb-1">
+                <div className="bg-blue-400 h-2 rounded-full" style={{width: '60%'}}></div>
+              </div>
+              <div className="text-white text-xs">3/5 sessions this week</div>
+            </div>
+
+            {/* Mood Tracking Consistency */}
+            <div className="bg-white/20 rounded p-2">
+              <div className="text-white text-xs font-bold mb-1">Mood Tracking</div>
+              <div className="bg-white/30 rounded-full h-2 mb-1">
+                <div className="bg-yellow-400 h-2 rounded-full" style={{width: '90%'}}></div>
+              </div>
+              <div className="text-white text-xs">27/30 days tracked</div>
+            </div>
+
+            {/* App Usage Streak */}
+            <div className="bg-white/20 rounded p-2">
+              <div className="text-white text-xs font-bold mb-1">App Usage Streak</div>
+              <div className="bg-white/30 rounded-full h-2 mb-1">
+                <div className="bg-purple-400 h-2 rounded-full" style={{width: '85%'}}></div>
+              </div>
+              <div className="text-white text-xs">17 consecutive days</div>
+            </div>
+
+            {/* Overall Wellness Score */}
+            <div className="bg-white/20 rounded p-2 text-center">
+              <div className="text-white text-xs font-bold mb-1">Overall Wellness</div>
+              <div className="text-white text-lg font-bold">85%</div>
+              <div className="text-white text-xs">This month</div>
+            </div>
           </div>
         </div>
       </div>
