@@ -239,7 +239,7 @@ const AdaptiveLearning: React.FC = () => {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Therapy Journey</h3>
               <div className="space-y-4">
-                {therapyPlans?.filter(p => p.isActive).map((plan) => (
+                {Array.isArray(therapyPlans) ? therapyPlans.filter(p => p.isActive).map((plan) => (
                   <div key={plan.id} className="bg-white/40 rounded-lg p-4">
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="font-medium text-gray-800">{plan.planName}</h4>
@@ -251,11 +251,11 @@ const AdaptiveLearning: React.FC = () => {
                       Phase {plan.currentPhase} of {plan.totalPhases} • {plan.planType.toUpperCase()}
                     </div>
                     <div className="flex flex-wrap gap-2 mb-3">
-                      {plan.focusAreas.map((area) => (
+                      {Array.isArray(plan.focusAreas) ? plan.focusAreas.map((area) => (
                         <span key={area} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
                           {area.replace('_', ' ')}
                         </span>
-                      ))}
+                      )) : null}
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
@@ -264,7 +264,11 @@ const AdaptiveLearning: React.FC = () => {
                       ></div>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">No active therapy plans</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -312,7 +316,7 @@ const AdaptiveLearning: React.FC = () => {
                     </div>
                     <p className="text-sm text-gray-600 mb-3">{insight.insightDescription}</p>
                     <div className="text-xs text-gray-500">
-                      Based on: {insight.dataSources.join(', ')}
+                      Based on: {Array.isArray(insight.dataSources) ? insight.dataSources.join(', ') : 'Unknown sources'}
                     </div>
                   </div>
                 )) : (
@@ -624,22 +628,26 @@ const AdaptiveLearning: React.FC = () => {
                   <div>
                     <h4 className="font-medium text-gray-700 mb-3">Exercise Preferences</h4>
                     <div className="flex flex-wrap gap-2">
-                      {userPreferences.exercisePreferences?.map((pref) => (
+                      {Array.isArray(userPreferences.exercisePreferences) ? userPreferences.exercisePreferences.map((pref) => (
                         <span key={pref} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                           {pref}
                         </span>
-                      ))}
+                      )) : (
+                        <span className="text-sm text-gray-500">No preferences set</span>
+                      )}
                     </div>
                   </div>
 
                   <div>
                     <h4 className="font-medium text-gray-700 mb-3">Preferred Topics</h4>
                     <div className="flex flex-wrap gap-2">
-                      {userPreferences.preferredTopics?.map((topic) => (
+                      {Array.isArray(userPreferences.preferredTopics) ? userPreferences.preferredTopics.map((topic) => (
                         <span key={topic} className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
                           {topic.replace('_', ' ')}
                         </span>
-                      ))}
+                      )) : (
+                        <span className="text-sm text-gray-500">No topics set</span>
+                      )}
                     </div>
                   </div>
 
