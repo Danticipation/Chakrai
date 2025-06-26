@@ -203,7 +203,7 @@ const AdaptiveLearning: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl mb-6 border border-white/20">
+        <div className="bg-[#1a237e]/20 backdrop-blur-sm rounded-xl mb-6 border border-[#1a237e]/30">
           <div className="flex">
             {[
               { id: 'overview', label: 'Overview', icon: TrendingUp },
@@ -220,8 +220,8 @@ const AdaptiveLearning: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-xl font-medium transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-purple-500 text-white'
-                      : 'text-gray-700 hover:bg-white/40'
+                      ? 'bg-[#1a237e] text-white'
+                      : 'text-white hover:bg-[#1a237e]/40'
                   }`}
                 >
                   <IconComponent size={18} />

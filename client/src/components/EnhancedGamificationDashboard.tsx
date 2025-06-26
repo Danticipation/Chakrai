@@ -226,7 +226,7 @@ const EnhancedGamificationDashboard: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-2 mb-6">
+        <div className="bg-[#1a237e]/20 backdrop-blur-sm rounded-2xl shadow-lg p-2 mb-6 border border-[#1a237e]/30">
           <div className="flex space-x-2">
             {[
               { id: 'overview', label: 'Overview', icon: '📊' },
@@ -239,8 +239,8 @@ const EnhancedGamificationDashboard: React.FC = () => {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[#ADD8E6] to-[#98FB98] text-white shadow-lg'
-                    : 'text-gray-600 hover:bg-white/50'
+                    ? 'bg-[#1a237e] text-white shadow-lg'
+                    : 'text-white hover:bg-[#1a237e]/40'
                 }`}
               >
                 <span>{tab.icon}</span>

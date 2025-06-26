@@ -237,8 +237,8 @@ export default function VRTherapyDashboard() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-white rounded-2xl shadow-lg mb-6">
-          <div className="flex border-b border-gray-200">
+        <div className="bg-[#1a237e]/20 rounded-2xl shadow-lg mb-6 border border-[#1a237e]/30">
+          <div className="flex border-b border-[#1a237e]/30">
             {[
               { id: 'environments', label: 'VR Environments', icon: '🌟' },
               { id: 'sessions', label: 'My Sessions', icon: '📊' },
@@ -250,8 +250,8 @@ export default function VRTherapyDashboard() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
                   activeTab === tab.id
-                    ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
-                    : 'text-gray-500 hover:text-purple-600'
+                    ? 'text-white border-b-2 border-[#1a237e] bg-[#1a237e]/40'
+                    : 'text-white/70 hover:text-white hover:bg-[#1a237e]/20'
                 }`}
               >
                 <span className="mr-2">{tab.icon}</span>
