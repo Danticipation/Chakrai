@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Brain, RefreshCw, Calendar, MessageCircle, TrendingUp, Users, Clock, Lightbulb } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
@@ -57,20 +56,23 @@ export default function MemoryDashboard() {
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleDateString();
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const getEmotionalColor = (emotion: string) => {
-    const colors: Record<string, string> = {
+    const colors = {
       positive: 'bg-green-100 text-green-800',
       negative: 'bg-red-100 text-red-800',
-      neutral: 'bg-blue-100 text-blue-800',
+      neutral: 'bg-gray-100 text-gray-800',
       anxious: 'bg-yellow-100 text-yellow-800',
-      peaceful: 'bg-green-100 text-green-800',
-      mixed: 'bg-purple-100 text-purple-800'
+      excited: 'bg-blue-100 text-blue-800'
     };
-    return colors[emotion.toLowerCase()] || 'bg-gray-100 text-gray-800';
+    return colors[emotion.toLowerCase() as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
   if (isLoading) {
@@ -125,7 +127,7 @@ export default function MemoryDashboard() {
           <div className="bg-[#3f51b5] rounded-lg border border-white/20">
             <div className="p-4">
               <div className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-white" />
+                <Brain className="w-5 h-5 text-white" />
                 <div>
                   <p className="text-sm text-white/80">Active Memories</p>
                   <p className="text-2xl font-bold text-white">{dashboard?.summary.activeMemories || 0}</p>
@@ -152,13 +154,14 @@ export default function MemoryDashboard() {
                 <Clock className="w-5 h-5 text-white" />
                 <div>
                   <p className="text-sm text-white/80">Last Memory</p>
-                  <p className="text-lg font-semibold text-white">{formatDate(dashboard?.summary.lastMemoryDate || '')}</p>
+                  <p className="text-sm font-medium text-white">{dashboard?.summary.lastMemoryDate ? formatDate(dashboard.summary.lastMemoryDate) : 'None yet'}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Recent Memories and Top Topics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Memories */}
           <div className="bg-[#3f51b5] rounded-lg border border-white/20">
