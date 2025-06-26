@@ -441,7 +441,6 @@ const AppLayout = () => {
             setAudioEnabled(true);
           }).catch(error => {
             console.log('Audio playback blocked:', error);
-            setPendingAudio(audioUrl);
           });
         }
       }
