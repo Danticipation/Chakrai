@@ -759,7 +759,7 @@ const AppLayout = () => {
             </div>
           ) : (
             /* Separate Full Panels for Other Sections */
-            <div className="w-full h-full mx-8 bg-[#3f51b5] rounded-lg border border-white overflow-hidden">
+            <div className="w-full h-full mx-2 md:mx-8 bg-[#3f51b5] rounded-lg border border-white overflow-hidden">
               <div className="bg-[#3f51b5] text-white text-center py-3 border-b border-white/30 font-bold text-lg">
                 {activeSection === 'daily' && 'Personality Reflection'}
                 {activeSection === 'journal' && 'Therapeutic Journal'}
@@ -783,8 +783,8 @@ const AppLayout = () => {
           )}
         </div>
 
-        {/* Right Stats Sidebar - Enlarged and blended */}
-        <div className="w-96 py-8 px-8">
+        {/* Right Stats Sidebar - Mobile Responsive */}
+        <div className="hidden md:block w-96 py-8 px-8">
           <div className="text-white text-2xl font-bold mb-8 text-center underline">Stats or goal tracking</div>
           
           {/* Real Progress Tracking */}
