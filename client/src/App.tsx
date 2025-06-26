@@ -295,88 +295,86 @@ const AppLayout = () => {
       updateDailyReflection(userMessageText, botResponse);
       
       // Generate audio for bot response - SINGLE SOURCE ONLY
-      try {
-        console.log('=== CHAT AUDIO DEBUG START ===');
-        console.log('Selected voice ID:', selectedReflectionVoice);
-        console.log('Bot response text:', botResponse.substring(0, 50) + '...');
+      // FORCE CARLA VOICE PLAYBACK
+      console.log('=== FORCING CARLA VOICE ===');
+      console.log('Bot response text:', botResponse.substring(0, 50) + '...');
+      
+      // Kill all browser TTS
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        speechSynthesis.pause();
+      }
+      
+      const audioResponse = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text: botResponse,
+          voice: 'carla',
+          emotionalContext: 'calming'
+        })
+      });
         
-        // Cancel any existing audio first
-        if ('speechSynthesis' in window) {
-          speechSynthesis.cancel();
-        }
+      console.log('Audio response status:', audioResponse.status);
+      
+      if (audioResponse.ok) {
+        const audioData = await audioResponse.json();
+        console.log('CARLA AUDIO RECEIVED:', { audioUrlExists: !!audioData.audioUrl, audioLength: audioData.audioUrl?.length });
         
-        const audioResponse = await fetch('/api/text-to-speech', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            text: botResponse,
-            voice: selectedReflectionVoice,
-            emotionalContext: 'calming'
-          })
-        });
-        
-        console.log('Audio response status:', audioResponse.status);
-        
-        if (audioResponse.ok) {
-          const audioData = await audioResponse.json();
-          console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length });
+        if (audioData.audioUrl) {
+          console.log('PLAYING CARLA VOICE NOW');
           
-          // FORCE ELEVENLABS CARLA AUDIO ONLY
-          if (audioData.audioUrl && audioData.audioUrl.includes('data:audio/mpeg;base64,')) {
-            console.log('ELEVENLABS AUDIO DETECTED - FORCING PLAYBACK');
-            console.log('Audio data length:', audioData.audioUrl.length);
-            
-            // Kill any existing audio
-            const existingAudio = document.querySelectorAll('audio');
-            existingAudio.forEach(audio => {
-              audio.pause();
-              audio.remove();
-            });
-            
-            // Force ElevenLabs audio
-            const audioElement = document.createElement('audio');
-            audioElement.src = audioData.audioUrl;
-            audioElement.volume = 1.0;
-            audioElement.controls = false;
-            audioElement.style.display = 'none';
-            
-            document.body.appendChild(audioElement);
-            
-            audioElement.play().then(() => {
-              console.log('CARLA ELEVENLABS VOICE PLAYING SUCCESSFULLY');
-            }).catch(err => {
-              console.log('ElevenLabs play failed:', err);
-              // Try muted then unmuted
-              audioElement.muted = true;
-              audioElement.play().then(() => {
-                setTimeout(() => {
-                  audioElement.muted = false;
-                  console.log('CARLA VOICE PLAYING (UNMUTED)');
-                }, 100);
+          // Clear all existing audio
+          document.querySelectorAll('audio').forEach(audio => {
+            audio.pause();
+            audio.remove();
+          });
+          
+          // Create and play Carla audio immediately
+          const audio = new Audio(audioData.audioUrl);
+          audio.volume = 1.0;
+          
+          // Force play with fallback
+          audio.play().then(() => {
+            console.log('CARLA VOICE PLAYING SUCCESSFULLY');
+          }).catch(() => {
+            console.log('Auto-play blocked - audio will play on next user interaction');
+            // Store for next click
+            const playOnClick = () => {
+              audio.play().then(() => {
+                console.log('CARLA VOICE PLAYING AFTER INTERACTION');
+                document.removeEventListener('click', playOnClick);
               });
-            });
-            
-            // Clean up after playing
-            audioElement.addEventListener('ended', () => {
-              document.body.removeChild(audioElement);
-            });
-            
-            return;
-          }
+            };
+            document.addEventListener('click', playOnClick);
+          });
+          
+          return;
+        } else {
+          console.log('NO AUDIO URL RECEIVED');
         }
-        
-        console.log('ElevenLabs audio not available - NO FALLBACK');
-        
-      } catch (voiceError) {
-        console.log('Voice error - NO AUDIO FALLBACK');
+      } else {
+        console.log('AUDIO REQUEST FAILED:', audioResponse.status);
       }
       
       setBotStats(prev => prev ? {
         ...prev,
-        wordsLearned: res.data.wordsLearned || prev.wordsLearned,
-        stage: res.data.stage || prev.stage,
-        level: res.data.stage === 'Infant' ? 1 : res.data.stage === 'Toddler' ? 2 : res.data.stage === 'Child' ? 3 : res.data.stage === 'Adolescent' ? 4 : 5
+        wordsLearned: data.wordsLearned || prev.wordsLearned,
+        stage: data.stage || prev.stage,
+        level: data.stage === 'Infant' ? 1 : data.stage === 'Toddler' ? 2 : data.stage === 'Child' ? 3 : data.stage === 'Adolescent' ? 4 : 5
       } : null);
+      
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
+        sender: 'bot',
+        text: 'Sorry, I encountered an issue. Please try again.',
+        time: getCurrentTime()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setLoading(false);
+    }
       
     } catch (err) {
       console.error('Chat failed', err);
