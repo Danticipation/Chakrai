@@ -372,7 +372,7 @@ export class DbStorage implements IStorage {
         streakType,
         currentStreak: 1,
         longestStreak: 1,
-        lastActiveDate: new Date()
+        lastActivityDate: new Date()
       }).returning();
       return created;
     }

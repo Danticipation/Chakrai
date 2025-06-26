@@ -407,8 +407,7 @@ export type InsertMoodEntry = z.infer<typeof insertMoodEntrySchema>;
 export type InsertTherapeuticGoal = z.infer<typeof insertTherapeuticGoalSchema>;
 export type InsertSupportForum = z.infer<typeof insertSupportForumSchema>;
 export type InsertForumPost = z.infer<typeof insertForumPostSchema>;
-export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
-export type InsertWellnessStreak = z.infer<typeof insertWellnessStreakSchema>;
+// InsertUserAchievement and InsertWellnessStreak types will be defined after schemas
 export type InsertEmotionalPattern = z.infer<typeof insertEmotionalPatternSchema>;
 export type InsertMoodForecast = z.infer<typeof insertMoodForecastSchema>;
 export type InsertEmotionalContext = z.infer<typeof insertEmotionalContextSchema>;
@@ -661,6 +660,21 @@ export const insertLongitudinalTrendSchema = createInsertSchema(longitudinalTren
   id: true,
   createdAt: true,
 });
+
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
+  id: true,
+  unlockedAt: true,
+});
+
+export const insertWellnessStreakSchema = createInsertSchema(wellnessStreaks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Additional insert types
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+export type InsertWellnessStreak = z.infer<typeof insertWellnessStreakSchema>;
 
 // Export Types for Analytics
 export type MonthlyWellnessReport = typeof monthlyWellnessReports.$inferSelect;
