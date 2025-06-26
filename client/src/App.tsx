@@ -510,7 +510,7 @@ const AppLayout = () => {
     <div className="h-screen bg-[#0a0e1a] flex flex-col">
       {/* Top Header - Expanded to Chat Box */}
       <div className="bg-[#0a0e1a] p-4 flex justify-center">
-        <div className="grid grid-cols-3 gap-4 w-[1152px] h-[200px] -ml-12">
+        <div className="grid grid-cols-3 gap-4 w-[1152px] h-[200px] -ml-16">
           {/* Horoscope Section - Expanded */}
           <button 
             onClick={() => setActiveSection('horoscope')}
