@@ -319,15 +319,46 @@ const AppLayout = () => {
           const audioData = await audioResponse.json();
           console.log('Audio response data:', { hasAudioUrl: !!audioData.audioUrl, audioUrlLength: audioData.audioUrl?.length });
           
-          // ELEVENLABS CARLA VOICE ONLY
-          if (audioData.audioUrl && audioData.audioUrl.length > 1000) {
-            console.log('PLAYING CARLA VOICE FROM ELEVENLABS');
+          // FORCE ELEVENLABS CARLA AUDIO ONLY
+          if (audioData.audioUrl && audioData.audioUrl.includes('data:audio/mpeg;base64,')) {
+            console.log('ELEVENLABS AUDIO DETECTED - FORCING PLAYBACK');
+            console.log('Audio data length:', audioData.audioUrl.length);
             
-            const audio = new Audio(audioData.audioUrl);
-            audio.volume = 1.0;
-            audio.play();
+            // Kill any existing audio
+            const existingAudio = document.querySelectorAll('audio');
+            existingAudio.forEach(audio => {
+              audio.pause();
+              audio.remove();
+            });
             
-            console.log('CARLA VOICE STARTED');
+            // Force ElevenLabs audio
+            const audioElement = document.createElement('audio');
+            audioElement.src = audioData.audioUrl;
+            audioElement.volume = 1.0;
+            audioElement.controls = false;
+            audioElement.style.display = 'none';
+            
+            document.body.appendChild(audioElement);
+            
+            audioElement.play().then(() => {
+              console.log('CARLA ELEVENLABS VOICE PLAYING SUCCESSFULLY');
+            }).catch(err => {
+              console.log('ElevenLabs play failed:', err);
+              // Try muted then unmuted
+              audioElement.muted = true;
+              audioElement.play().then(() => {
+                setTimeout(() => {
+                  audioElement.muted = false;
+                  console.log('CARLA VOICE PLAYING (UNMUTED)');
+                }, 100);
+              });
+            });
+            
+            // Clean up after playing
+            audioElement.addEventListener('ended', () => {
+              document.body.removeChild(audioElement);
+            });
+            
             return;
           }
         }
@@ -381,40 +412,25 @@ const AppLayout = () => {
 
   const testAudio = async () => {
     try {
-      console.log('=== AUDIO TEST START ===');
+      console.log('=== ELEVENLABS AUDIO TEST ===');
       
-      // Test browser audio capability
-      try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 440;
-        gainNode.gain.value = 0.1;
-        
-        oscillator.start();
-        setTimeout(() => oscillator.stop(), 200);
-        console.log('Browser beep test completed');
-      } catch (beepError: any) {
-        console.error('Browser beep failed:', beepError);
-      }
+      // Kill all browser TTS immediately
+      speechSynthesis.cancel();
+      speechSynthesis.pause();
       
-      // Test ElevenLabs API
+      // Test ElevenLabs API only
       const response = await fetch('/api/text-to-speech', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          text: 'Audio test successful',
-          voiceId: selectedReflectionVoice
+          text: 'ElevenLabs Carla voice test',
+          voice: 'carla'
         })
       });
       
       if (response.ok) {
-        const audioBlob = await response.blob();
-        console.log('Test audio blob size:', audioBlob.size);
+        const audioData = await response.json();
+        console.log('ElevenLabs test response:', audioData.audioUrl ? 'SUCCESS' : 'FAILED');
         
         if (audioBlob.size > 0) {
           const audioUrl = URL.createObjectURL(audioBlob);
@@ -1172,10 +1188,10 @@ const AppLayout = () => {
           {/* Horoscope Section */}
           <div className="h-1/2 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm bg-purple-200">
                 ⭐
               </div>
-              <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Horoscope</h2>
+              <h2 className="text-xl font-semibold text-gray-800">Daily Horoscope</h2>
             </div>
             <div className="rounded-2xl p-5 h-48 overflow-y-auto shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
               <div className="mb-4">
@@ -1246,8 +1262,8 @@ const AppLayout = () => {
 
         {/* Center Panel - Therapeutic Chat Interface */}
         <div className="w-1/2 flex flex-col" style={{ backgroundColor: '#F5F7FA' }}>
-          <div className="h-full flex flex-col" style={{ borderLeft: '1px solid var(--gentle-lavender-dark)', borderRight: '1px solid var(--gentle-lavender-dark)' }}>
-            <div className="p-6 flex items-center justify-center" style={{ borderBottom: '1px solid var(--gentle-lavender-dark)' }}>
+          <div className="h-full flex flex-col border-l border-r border-purple-300">
+            <div className="p-6 flex items-center justify-center border-b border-purple-300">
               <img 
                 src={traiLogo}
                 alt="TraI Vision Logo" 
