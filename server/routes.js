@@ -638,4 +638,28 @@ router.get('/weekly-summary', async (req, res) => {
   }
 });
 
+// ====================
+// USER ENDPOINTS
+// ====================
+
+// Get current user endpoint that frontend expects
+router.get('/user/current', async (req, res) => {
+  try {
+    // For now, return a mock user since we don't have proper authentication
+    // In production, this would authenticate and return actual user data
+    const user = {
+      id: 1,
+      username: 'user',
+      displayName: 'User',
+      hasCompletedOnboarding: true, // Set to true to skip onboarding
+      createdAt: new Date().toISOString()
+    };
+    
+    res.json(user);
+  } catch (error) {
+    console.error('User current error:', error);
+    res.status(500).json({ error: 'Failed to get current user' });
+  }
+});
+
 export default router;
