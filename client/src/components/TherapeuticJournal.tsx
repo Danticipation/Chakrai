@@ -457,20 +457,25 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
           {/* Mood Selection */}
           <div className="mb-6">
-            <label className="block text-gray-700 font-medium mb-3">How are you feeling?</label>
+            <label className="block text-white font-medium mb-3">How are you feeling?</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {moodOptions.map((mood) => (
                 <button
                   key={mood.value}
                   onClick={() => setEntry(prev => ({ ...prev, mood: mood.value }))}
-                  className={`p-3 rounded-xl border-2 transition-all text-center ${
+                  className={`p-3 rounded-xl border-2 transition-all text-center relative ${
                     entry.mood === mood.value
-                      ? 'border-blue-400 bg-blue-50 shadow-md'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
+                      ? 'border-[#7986cb] bg-[#5c6bc0]/50 shadow-lg ring-2 ring-[#7986cb]/50 scale-105'
+                      : 'border-[#3949ab]/50 bg-[#1a237e]/30 hover:border-[#5c6bc0] hover:bg-[#3949ab]/40'
                   }`}
                 >
+                  {entry.mood === mood.value && (
+                    <div className="absolute top-1 right-1 w-3 h-3 bg-[#7986cb] rounded-full flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                    </div>
+                  )}
                   <div className="text-2xl mb-1">{mood.icon}</div>
-                  <div className="text-xs font-medium">{mood.label}</div>
+                  <div className="text-xs font-medium text-white">{mood.label}</div>
                 </button>
               ))}
             </div>
