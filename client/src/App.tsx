@@ -56,6 +56,8 @@ const AppLayout = () => {
   const [dailyAffirmation, setDailyAffirmation] = useState('');
   const [dailyHoroscope, setDailyHoroscope] = useState('');
   const [zodiacSign, setZodiacSign] = useState('');
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
 
   const personalityModes = [
     'friend', 'counsel', 'study', 'diary', 'goal-setting', 'wellness', 'creative'
@@ -335,14 +337,96 @@ const AppLayout = () => {
     }
   };
 
-  const startRecording = () => {
-    setIsRecording(true);
-    console.log('Voice recording started');
+  const startRecording = async () => {
+    try {
+      console.log('Starting voice recording...');
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
+        }
+      });
+      
+      const recorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      
+      const chunks: Blob[] = [];
+      
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+      
+      recorder.onstop = async () => {
+        console.log('Recording stopped, processing audio...');
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        await sendAudioToWhisper(audioBlob);
+        
+        // Clean up
+        stream.getTracks().forEach(track => track.stop());
+        setMediaRecorder(null);
+        setAudioChunks([]);
+      };
+      
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      console.log('Recording started successfully');
+      
+      // Auto-stop after 30 seconds
+      setTimeout(() => {
+        if (recorder.state === 'recording') {
+          stopRecording();
+        }
+      }, 30000);
+      
+    } catch (error) {
+      console.error('Microphone error:', error);
+      alert('Microphone access denied. Please allow microphone permissions and try again.');
+      setIsRecording(false);
+    }
   };
 
   const stopRecording = () => {
-    setIsRecording(false);
-    console.log('Voice recording stopped');
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      console.log('Stopping recording...');
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const sendAudioToWhisper = async (audioBlob: Blob) => {
+    try {
+      console.log('Sending audio to Whisper API...');
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const transcribedText = data.text || data.transcription || '';
+        
+        if (transcribedText.trim()) {
+          console.log('Transcription successful:', transcribedText);
+          setInput(transcribedText);
+        } else {
+          console.log('No speech detected in audio');
+        }
+      } else {
+        console.error('Transcription failed:', response.status);
+        alert('Voice transcription failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Transcription error:', error);
+      alert('Voice transcription error. Please check your connection.');
+    }
   };
 
   const handleProfileSave = () => {
@@ -424,11 +508,14 @@ const AppLayout = () => {
                 />
                 <button
                   onClick={isRecording ? stopRecording : startRecording}
-                  className={`p-2 rounded-lg transition-colors ${
-                    isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-500 hover:bg-gray-600'
-                  } text-white`}
+                  className={`p-3 rounded-lg transition-all duration-200 ${
+                    isRecording 
+                      ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
+                      : 'bg-blue-500 hover:bg-blue-600'
+                  } text-white shadow-lg`}
+                  title={isRecording ? 'Stop recording' : 'Start voice recording'}
                 >
-                  {isRecording ? <Square size={20} /> : <Mic size={20} />}
+                  {isRecording ? <Square size={24} /> : <Mic size={24} />}
                 </button>
                 <button
                   onClick={sendMessage}
@@ -644,9 +731,9 @@ const AppLayout = () => {
         <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50">
           <button 
             onClick={enableAudio}
-            className="bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg hover:bg-red-700 transition-colors flex items-center gap-2 animate-pulse"
+            className="bg-green-600 text-white px-8 py-4 rounded-xl shadow-lg hover:bg-green-700 transition-colors flex items-center gap-2 animate-pulse text-lg font-bold"
           >
-            🔊 CLICK TO ENABLE CARLA VOICE
+            🔊 ACTIVATE AUTHENTIC CARLA VOICE
           </button>
         </div>
       )}
