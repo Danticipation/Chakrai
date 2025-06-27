@@ -91,6 +91,22 @@ const AppLayout = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  // Keyboard support for closing modals
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (showSettings) {
+          setShowSettings(false);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showSettings]);
+
   useEffect(() => {
     fetchBotStats();
     fetchDailyAffirmation();
