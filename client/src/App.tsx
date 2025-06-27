@@ -52,6 +52,11 @@ interface Goal {
 
 const AppLayout = () => {
   const [activeSection, setActiveSection] = useState('chat');
+  
+  // Debug logging for activeSection changes
+  useEffect(() => {
+    console.log('Active section changed to:', activeSection);
+  }, [activeSection]);
   const [isRecording, setIsRecording] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [input, setInput] = useState('');
@@ -725,7 +730,7 @@ const AppLayout = () => {
                 onClick={() => setActiveSection(tab.id)}
                 className={`flex flex-col items-center justify-center p-4 rounded-xl font-medium transition-all touch-target ${
                   activeSection === tab.id
-                    ? 'bg-purple-600 text-white shadow-lg transform scale-95'
+                    ? 'bg-green-500 text-white shadow-lg transform scale-95 ring-2 ring-white'
                     : 'bg-purple-800/60 text-white/80 hover:bg-purple-700 active:scale-95'
                 }`}
                 style={{ minHeight: '70px' }}
@@ -870,7 +875,16 @@ const AppLayout = () => {
             </div>
           ) : (
             /* Separate Full Panels for Other Sections */
-            <div className="w-full h-full mx-2 md:mx-8 bg-[#3f51b5] rounded-lg border border-white overflow-hidden">
+            <div className="w-full h-full mx-2 md:mx-8 bg-[#3f51b5] rounded-lg border border-white overflow-hidden relative">
+              {/* Return to Chat Button */}
+              <button 
+                onClick={() => setActiveSection('chat')}
+                className="absolute top-2 right-2 z-10 bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-full text-sm font-medium transition-colors flex items-center space-x-1 shadow-lg"
+              >
+                <MessageCircle size={14} />
+                <span>Chat</span>
+              </button>
+              
               <div className="bg-[#3f51b5] text-white text-center py-3 border-b border-white/30 font-bold text-lg">
                 {activeSection === 'daily' && 'Personality Reflection'}
                 {activeSection === 'journal' && 'Therapeutic Journal'}
