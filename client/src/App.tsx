@@ -988,14 +988,20 @@ const AppLayout = () => {
           }}
         >
           <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-md border border-[#3949ab]/30 relative">
-            <button
-              onClick={() => setShowSettings(false)}
-              className="absolute top-4 right-4 w-10 h-10 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white transition-colors z-50 shadow-lg border-2 border-white"
-              aria-label="Close settings"
-            >
-              <X size={20} />
-            </button>
-            <h3 className="text-lg font-semibold mb-4 text-white">Settings</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-white">Voice Settings</h3>
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => setShowSettings(false)}
+                  className="w-12 h-12 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white transition-colors shadow-lg border-2 border-white mb-1"
+                  aria-label="Close settings"
+                  style={{ zIndex: 9999 }}
+                >
+                  <X size={24} />
+                </button>
+                <span className="text-xs text-white/70">Close</span>
+              </div>
+            </div>
             <VoiceSelector 
               selectedVoice={selectedVoice} 
               onVoiceChange={setSelectedVoice} 
