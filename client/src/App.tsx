@@ -980,14 +980,15 @@ const AppLayout = () => {
       {/* Settings Modal */}
       {showSettings && (
         <div 
-          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/70 flex items-center justify-center p-6 z-50"
+          style={{ paddingTop: '60px', paddingBottom: '60px' }}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowSettings(false);
             }
           }}
         >
-          <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-md border border-[#3949ab]/30 relative">
+          <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-md border border-[#3949ab]/30 relative max-h-full overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-white">Voice Settings</h3>
               <div className="flex flex-col items-center">
