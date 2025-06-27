@@ -918,7 +918,7 @@ const AppLayout = () => {
                 {activeSection === 'logo' && 'TraI Information'}
                 {activeSection === 'goals' && 'Wellness Goals'}
               </div>
-              <div className="h-full bg-[#3f51b5] text-white p-6 overflow-y-auto">
+              <div className="h-full bg-[#3f51b5] text-white p-6 overflow-y-auto mobile-scroll" style={{ minHeight: '0', maxHeight: 'calc(100vh - 200px)' }}>
                 {renderActiveSection()}
               </div>
             </div>

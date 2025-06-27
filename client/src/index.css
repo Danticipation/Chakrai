@@ -153,6 +153,26 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
   padding-bottom: 20px;
 }
 
+/* Enhanced mobile scrolling for horoscope */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Specific horoscope scrolling fix */
+@media (max-width: 768px) {
+  .horoscope-container,
+  .mobile-scroll {
+    height: calc(100vh - 160px);
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+  }
+}
+
 /* Fix for iOS bounce scrolling */
 html {
   overflow: hidden;
