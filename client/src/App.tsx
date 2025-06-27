@@ -964,6 +964,31 @@ const AppLayout = () => {
         </div>
       )}
 
+      {/* Mobile Bottom Tab Bar - Quick Access */}
+      <div className="md:hidden bg-[#1a237e] border-t border-white/20 pb-safe">
+        <div className="flex justify-around items-center py-2">
+          {[
+            { id: 'chat', icon: '💬', label: 'Chat' },
+            { id: 'journal', icon: '📝', label: 'Journal' },
+            { id: 'daily', icon: '🧠', label: 'Reflect' },
+            { id: 'analytics', icon: '📊', label: 'Stats' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveSection(tab.id)}
+              className={`flex flex-col items-center p-2 rounded-lg transition-all ${
+                activeSection === tab.id
+                  ? 'text-white bg-purple-600/30'
+                  : 'text-white/70 hover:text-white hover:bg-purple-700/20'
+              }`}
+            >
+              <span className="text-xl mb-1">{tab.icon}</span>
+              <span className="mobile-text-xs font-medium">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* PWA Manager */}
       <PWAManager onNotificationPermissionChange={setNotificationsEnabled} />
 
