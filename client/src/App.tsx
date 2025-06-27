@@ -607,42 +607,58 @@ const AppLayout = () => {
   return (
     <div className="min-h-screen bg-[#0a0e1a] flex flex-col">
       {/* Mobile-Optimized Header */}
-      <div className="bg-[#0a0e1a] p-3 md:p-4">
-        {/* Mobile: Compact Header Row */}
+      <div className="bg-[#0a0e1a] p-2 md:p-4">
+        {/* Mobile: Compact Header */}
         <div className="block md:hidden">
-          <div className="flex gap-2 mb-3">
+          {/* Top Row: Logo and Status */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-3">
+              <img src={traiLogo} alt="TrAI" className="h-10 w-auto" />
+              <div>
+                <p className="text-white font-bold text-lg">TraI</p>
+                <p className="text-white/70 text-xs">Mental Wellness</p>
+              </div>
+            </div>
+            
+            {/* Quick Stats */}
+            <div className="text-right">
+              <p className="text-white/90 text-sm font-medium">Level {botStats?.level || 3}</p>
+              <p className="text-white/60 text-xs">{botStats?.stage || 'Therapist'}</p>
+            </div>
+          </div>
+          
+          {/* Bottom Row: Quick Access */}
+          <div className="flex gap-2">
             <button 
               onClick={() => setActiveSection('horoscope')}
-              className="flex-1 bg-purple-700 rounded-lg p-3 hover:bg-purple-600 transition-colors"
+              className="flex-1 bg-purple-700/80 rounded-lg p-2 hover:bg-purple-600 transition-colors"
             >
-              <h3 className="text-sm font-bold text-white mb-1">Daily Horoscope</h3>
-              <p className="text-xs text-white/80 truncate">
-                {horoscopeText ? horoscopeText.substring(0, 50) + '...' : "Today brings growth opportunities..."}
-              </p>
+              <div className="flex items-center justify-center space-x-1">
+                <span className="text-lg">⭐</span>
+                <span className="text-xs text-white font-medium">Horoscope</span>
+              </div>
             </button>
             
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="flex-1 bg-purple-700 rounded-lg p-3 hover:bg-purple-600 transition-colors"
+              className="flex-1 bg-purple-700/80 rounded-lg p-2 hover:bg-purple-600 transition-colors"
             >
-              <h3 className="text-sm font-bold text-white mb-1">Daily Affirmation</h3>
-              <p className="text-xs text-white/80 truncate">
-                {dailyAffirmation.substring(0, 50)}...
-              </p>
+              <div className="flex items-center justify-center space-x-1">
+                <span className="text-lg">✨</span>
+                <span className="text-xs text-white font-medium">Affirmation</span>
+              </div>
+            </button>
+            
+            <button 
+              onClick={() => setShowSettings(true)}
+              className="flex-1 bg-purple-700/80 rounded-lg p-2 hover:bg-purple-600 transition-colors"
+            >
+              <div className="flex items-center justify-center space-x-1">
+                <span className="text-lg">⚙️</span>
+                <span className="text-xs text-white font-medium">Settings</span>
+              </div>
             </button>
           </div>
-          
-          {/* Mobile Logo Section */}
-          <button 
-            onClick={() => setActiveSection('logo')}
-            className="w-full bg-[#0a0e1a] rounded-lg p-4 flex items-center justify-center border border-white/30 hover:border-purple-400 transition-colors"
-          >
-            <img src={traiLogo} alt="TrAI" className="h-16 w-auto mr-3" />
-            <div className="text-left">
-              <p className="text-base text-white font-bold">TraI Mental Wellness</p>
-              <p className="text-xs text-white/70">Your AI Companion</p>
-            </div>
-          </button>
         </div>
 
         {/* Desktop: Original Layout */}
@@ -687,33 +703,38 @@ const AppLayout = () => {
 
       {/* Main Content Area - Mobile Responsive */}
       <div className="flex-1 flex flex-col md:flex-row bg-[#0a0e1a]">
-        {/* Mobile Navigation - Horizontal scrolling */}
-        <div className="md:hidden flex overflow-x-auto px-4 py-2 space-x-2 border-b border-white/20">
-          {[
-            { id: 'chat', label: 'Chat' },
-            { id: 'daily', label: 'Reflection' },
-            { id: 'journal', label: 'Journal' },
-            { id: 'memory', label: 'Memory' },
-            { id: 'analytics', label: 'Analytics' },
-            { id: 'rewards', label: 'Rewards' },
-            { id: 'community', label: 'Community' },
-            { id: 'adaptive', label: 'AI Learning' },
-            { id: 'vr', label: 'VR Therapy' },
-            { id: 'health', label: 'Wearables' },
-            { id: 'therapist', label: 'Therapist Portal' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveSection(tab.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors ${
-                activeSection === tab.id
-                  ? 'bg-red-600 text-white'
-                  : 'bg-red-600/80 text-white hover:bg-red-500'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Mobile Navigation - Improved Grid Layout */}
+        <div className="md:hidden bg-[#1a237e] border-b border-white/20">
+          <div className="grid grid-cols-4 gap-1 p-2">
+            {[
+              { id: 'chat', label: 'Chat', icon: '💬' },
+              { id: 'daily', label: 'Reflect', icon: '🧠' },
+              { id: 'journal', label: 'Journal', icon: '📝' },
+              { id: 'memory', label: 'Memory', icon: '🎯' },
+              { id: 'analytics', label: 'Analytics', icon: '📊' },
+              { id: 'rewards', label: 'Rewards', icon: '🎁' },
+              { id: 'community', label: 'Community', icon: '👥' },
+              { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
+              { id: 'vr', label: 'VR Therapy', icon: '🥽' },
+              { id: 'health', label: 'Health', icon: '💗' },
+              { id: 'therapist', label: 'Therapist', icon: '🩺' },
+              { id: 'privacy', label: 'Privacy', icon: '🔒' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveSection(tab.id)}
+                className={`flex flex-col items-center p-3 rounded-lg text-xs font-medium transition-all ${
+                  activeSection === tab.id
+                    ? 'bg-purple-600 text-white shadow-lg scale-105'
+                    : 'bg-purple-800/60 text-white/80 hover:bg-purple-700 active:scale-95'
+                }`}
+                style={{ minHeight: '60px' }}
+              >
+                <span className="text-lg mb-1">{tab.icon}</span>
+                <span className="leading-tight text-center">{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Desktop Left Sidebar Navigation */}
@@ -746,90 +767,104 @@ const AppLayout = () => {
         </div>
 
         {/* Center Content Area - Mobile Responsive */}
-        <div className="flex-1 flex justify-center items-center p-4 md:p-0">
+        <div className="flex-1 flex justify-center items-center p-2 md:p-0 mobile-content">
           {activeSection === 'chat' ? (
-            /* Chat Panel - Mobile responsive sizing */
-            <div className="w-full max-w-[1152px] h-[70vh] md:h-[960px] bg-[#3f51b5] rounded-lg relative">
-              <div className="absolute inset-4 bg-[#3f51b5] rounded">
-                <div className="text-center text-white text-xl font-bold pt-6">Chat Box</div>
-                
-                {/* Chat Messages Area */}
-                <div className="absolute top-16 left-4 right-4 bottom-20 overflow-y-auto">
-                  {messages.length === 0 ? (
-                    <div className="text-center text-white py-8">
-                      <MessageCircle size={32} className="mx-auto mb-3" />
-                      <p className="text-sm">Start a conversation with TraI</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {messages.map((message, index) => (
-                        <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                            message.sender === 'user' 
-                              ? 'bg-blue-500 text-white' 
-                              : 'bg-purple-700 text-white'
-                          }`}>
-                            <p>{message.text}</p>
-                            <p className="text-xs mt-1">{message.time}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {loading && (
-                    <div className="flex justify-start mt-4">
-                      <div className="bg-purple-700 text-white max-w-xs px-3 py-2 rounded-lg">
-                        <div className="flex space-x-1">
-                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
-                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+            /* Mobile-Optimized Chat Panel */
+            <div className="w-full h-full flex flex-col bg-[#3f51b5] rounded-lg overflow-hidden">
+              {/* Chat Header */}
+              <div className="bg-[#2c3e83] text-white text-center py-3 border-b border-white/20">
+                <div className="flex items-center justify-center space-x-2">
+                  <MessageCircle size={20} />
+                  <span className="font-bold text-lg">Chat with TraI</span>
                 </div>
-                
-                {/* Chat Input at Bottom */}
-                <div className="absolute bottom-4 left-4 right-4">
-                  {/* Recording Status Indicator */}
-                  {isRecording && (
-                    <div className="mb-2 flex items-center justify-center">
-                      <div className="bg-red-500/90 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse mr-2"></div>
-                        Recording... Tap the mic to stop
+              </div>
+              
+              {/* Chat Messages Area - Mobile Optimized */}
+              <div className="flex-1 overflow-y-auto p-4 pb-safe mobile-scroll" style={{ minHeight: '0' }}>
+                {messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-white">
+                    <MessageCircle size={48} className="mb-4 opacity-60" />
+                    <p className="text-lg font-medium mb-2">Welcome to TraI</p>
+                    <p className="mobile-text-sm opacity-80 text-center px-4">
+                      Your AI companion for mental wellness. Start by sharing what's on your mind or use voice input.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {messages.map((message, index) => (
+                      <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[85%] px-4 py-3 rounded-2xl chat-bubble ${
+                          message.sender === 'user' 
+                            ? 'bg-blue-500 text-white rounded-br-md' 
+                            : 'bg-purple-700 text-white rounded-bl-md'
+                        }`}>
+                          <p className="mobile-text-sm leading-relaxed">{message.text}</p>
+                          <p className="mobile-text-xs mt-2 opacity-70">{message.time}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {loading && (
+                  <div className="flex justify-start mt-4">
+                    <div className="bg-purple-700 text-white px-4 py-3 rounded-2xl rounded-bl-md">
+                      <div className="flex space-x-1 items-center">
+                        <span className="text-xs mr-2">TraI is typing</span>
+                        <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
                     </div>
-                  )}
-                  
-                  <div className="flex space-x-2">
+                  </div>
+                )}
+              </div>
+              
+              {/* Mobile Chat Input Area */}
+              <div className="bg-[#2c3e83] p-4 border-t border-white/20">
+                {/* Recording Status Indicator */}
+                {isRecording && (
+                  <div className="mb-3 flex items-center justify-center">
+                    <div className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center shadow-lg">
+                      <div className="w-3 h-3 bg-white rounded-full animate-pulse mr-3"></div>
+                      <span>Recording... Tap mic to stop</span>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="flex space-x-3 items-end">
+                  <div className="flex-1">
                     <input
                       type="text"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      placeholder="Share your thoughts or tap mic to speak"
-                      className="flex-1 px-3 py-2 bg-blue-600 text-white border border-blue-500 rounded text-sm placeholder-white/70"
+                      placeholder="Type your message..."
+                      className="w-full px-4 py-3 bg-white/10 text-white border border-white/20 rounded-2xl text-sm placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
                     />
-                    <button
-                      onClick={isRecording ? stopRecording : startRecording}
-                      className={`w-12 h-9 rounded flex items-center justify-center transition-all duration-200 ${
-                        isRecording 
-                          ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse scale-110' 
-                          : 'bg-[#5c6bc0] hover:bg-[#7986cb] text-white hover:scale-105'
-                      }`}
-                      disabled={loading}
-                      title={isRecording ? "Stop recording (tap to stop)" : "Start voice recording (tap and speak)"}
-                    >
-                      {isRecording ? <Square size={18} /> : <Mic size={18} />}
-                    </button>
-                    <button
-                      onClick={sendMessage}
-                      disabled={!input.trim() || loading}
-                      className="w-9 h-9 bg-[#1a237e] hover:bg-[#3949ab] disabled:opacity-50 rounded text-white transition-colors flex items-center justify-center"
-                    >
-                      <Send size={16} />
-                    </button>
                   </div>
+                  
+                  {/* Voice Input Button */}
+                  <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
+                      isRecording 
+                        ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse scale-110 shadow-lg' 
+                        : 'bg-purple-600 hover:bg-purple-700 text-white hover:scale-110 shadow-md'
+                    }`}
+                    disabled={loading}
+                    title={isRecording ? "Stop recording" : "Start voice input"}
+                  >
+                    {isRecording ? <Square size={20} /> : <Mic size={20} />}
+                  </button>
+                  
+                  {/* Send Button */}
+                  <button
+                    onClick={sendMessage}
+                    disabled={!input.trim() || loading}
+                    className="w-12 h-12 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-full text-white transition-all duration-200 flex items-center justify-center hover:scale-110 shadow-md"
+                  >
+                    <Send size={20} />
+                  </button>
                 </div>
               </div>
             </div>
