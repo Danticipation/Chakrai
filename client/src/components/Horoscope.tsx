@@ -162,8 +162,8 @@ export default function Horoscope() {
             </div>
           </div>
 
-          {/* Horoscope Display */}
-          <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30">
+          {/* Horoscope Display - Enhanced for Full Content */}
+          <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30 min-h-[400px] max-h-[600px] overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="flex items-center space-x-3">
@@ -182,7 +182,7 @@ export default function Horoscope() {
                 </button>
               </div>
             ) : horoscopeData ? (
-              <div>
+              <div className="space-y-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     <Sparkles className="text-purple-300" size={20} />
@@ -206,9 +206,18 @@ export default function Horoscope() {
                     </span>
                   </button>
                 </div>
-                <p className="text-white/90 leading-relaxed text-lg">
-                  {horoscopeData.horoscope}
-                </p>
+                {/* Enhanced Content Display Area */}
+                <div className="bg-[#3949ab]/20 rounded-lg p-6 space-y-4 horoscope-content">
+                  <div className="text-white/90 leading-relaxed text-lg space-y-4">
+                    {horoscopeData.horoscope.split('\n').map((paragraph, index) => (
+                      paragraph.trim() && (
+                        <p key={index} className="mb-4 last:mb-0 horoscope-text">
+                          {paragraph.trim()}
+                        </p>
+                      )
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : null}
           </div>

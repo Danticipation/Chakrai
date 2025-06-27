@@ -498,9 +498,9 @@ router.get('/horoscope/:sign', async (req, res) => {
         model: "gpt-4o",
         messages: [{
           role: "user",
-          content: `Generate a therapeutic horoscope for ${sign} focused on mental wellness, self-care, and emotional growth. Be supportive and encouraging.`
+          content: `Generate a comprehensive therapeutic horoscope for ${sign} focused on mental wellness, self-care, and emotional growth. Include specific guidance on emotional well-being, mindfulness practices, personal growth opportunities, and practical wellness advice. Be supportive, encouraging, and detailed. Aim for 3-4 paragraphs that provide meaningful therapeutic insights.`
         }],
-        max_tokens: 100,
+        max_tokens: 300,
         temperature: 0.8
       });
       

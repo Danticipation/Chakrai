@@ -171,6 +171,22 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
     scroll-behavior: smooth;
     overscroll-behavior: contain;
   }
+  
+  /* Enhanced mobile horoscope content area */
+  .horoscope-content {
+    min-height: 350px;
+    max-height: 500px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Mobile horoscope text formatting */
+  .horoscope-text {
+    line-height: 1.6;
+    font-size: 16px;
+    margin-bottom: 1rem;
+  }
 }
 
 /* Fix for iOS bounce scrolling */
