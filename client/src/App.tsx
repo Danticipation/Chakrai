@@ -705,7 +705,7 @@ const AppLayout = () => {
       <div className="flex-1 flex flex-col md:flex-row bg-[#0a0e1a]">
         {/* Mobile Navigation - Improved Grid Layout */}
         <div className="md:hidden bg-[#1a237e] border-b border-white/20">
-          <div className="grid grid-cols-4 gap-1 p-2">
+          <div className="grid grid-cols-4 gap-2 p-3">
             {[
               { id: 'chat', label: 'Chat', icon: '💬' },
               { id: 'daily', label: 'Reflect', icon: '🧠' },
@@ -723,15 +723,15 @@ const AppLayout = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveSection(tab.id)}
-                className={`flex flex-col items-center p-3 rounded-lg text-xs font-medium transition-all ${
+                className={`flex flex-col items-center justify-center p-4 rounded-xl font-medium transition-all touch-target ${
                   activeSection === tab.id
-                    ? 'bg-purple-600 text-white shadow-lg scale-105'
+                    ? 'bg-purple-600 text-white shadow-lg transform scale-95'
                     : 'bg-purple-800/60 text-white/80 hover:bg-purple-700 active:scale-95'
                 }`}
-                style={{ minHeight: '60px' }}
+                style={{ minHeight: '70px' }}
               >
-                <span className="text-lg mb-1">{tab.icon}</span>
-                <span className="leading-tight text-center">{tab.label}</span>
+                <span className="text-xl mb-2">{tab.icon}</span>
+                <span className="mobile-text-xs leading-tight text-center">{tab.label}</span>
               </button>
             ))}
           </div>
@@ -767,10 +767,10 @@ const AppLayout = () => {
         </div>
 
         {/* Center Content Area - Mobile Responsive */}
-        <div className="flex-1 flex justify-center items-center p-2 md:p-0 mobile-content">
+        <div className="flex-1 p-2 md:p-0 mobile-content">
           {activeSection === 'chat' ? (
             /* Mobile-Optimized Chat Panel */
-            <div className="w-full h-full flex flex-col bg-[#3f51b5] rounded-lg overflow-hidden">
+            <div className="w-full h-full flex flex-col bg-[#3f51b5] rounded-lg overflow-hidden mobile-chat">
               {/* Chat Header */}
               <div className="bg-[#2c3e83] text-white text-center py-3 border-b border-white/20">
                 <div className="flex items-center justify-center space-x-2">
@@ -820,11 +820,11 @@ const AppLayout = () => {
               </div>
               
               {/* Mobile Chat Input Area */}
-              <div className="bg-[#2c3e83] p-4 border-t border-white/20">
+              <div className="bg-[#2c3e83] p-4 border-t border-white/20 pb-safe">
                 {/* Recording Status Indicator */}
                 {isRecording && (
                   <div className="mb-3 flex items-center justify-center">
-                    <div className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center shadow-lg">
+                    <div className="bg-red-500 text-white px-4 py-2 rounded-full mobile-text-sm font-medium flex items-center shadow-lg">
                       <div className="w-3 h-3 bg-white rounded-full animate-pulse mr-3"></div>
                       <span>Recording... Tap mic to stop</span>
                     </div>
@@ -838,8 +838,8 @@ const AppLayout = () => {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      placeholder="Type your message..."
-                      className="w-full px-4 py-3 bg-white/10 text-white border border-white/20 rounded-2xl text-sm placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
+                      placeholder="Share what's on your mind..."
+                      className="w-full px-5 py-4 bg-white/10 text-white border border-white/20 rounded-2xl text-base placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent ios-input-fix"
                     />
                   </div>
                   
