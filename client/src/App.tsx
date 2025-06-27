@@ -57,6 +57,7 @@ const AppLayout = () => {
   useEffect(() => {
     console.log('Active section changed to:', activeSection);
   }, [activeSection]);
+
   const [isRecording, setIsRecording] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [input, setInput] = useState('');
@@ -962,10 +963,21 @@ const AppLayout = () => {
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+        <div 
+          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowSettings(false);
+            }
+          }}
+        >
           <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-md border border-[#3949ab]/30">
             <h3 className="text-lg font-semibold mb-4 text-white">Settings</h3>
-            <VoiceSelector selectedVoice={selectedVoice} onVoiceChange={setSelectedVoice} />
+            <VoiceSelector 
+              selectedVoice={selectedVoice} 
+              onVoiceChange={setSelectedVoice} 
+              onClose={() => setShowSettings(false)}
+            />
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => setShowSettings(false)}

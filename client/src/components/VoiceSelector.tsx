@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 interface Voice {
   id: string;
@@ -17,11 +17,23 @@ const voices: Voice[] = [
 interface VoiceSelectorProps {
   selectedVoice: string;
   onVoiceChange: (voiceId: string) => void;
+  onClose?: () => void;
 }
 
-export default function VoiceSelector({ selectedVoice, onVoiceChange }: VoiceSelectorProps) {
+export default function VoiceSelector({ selectedVoice, onVoiceChange, onClose }: VoiceSelectorProps) {
   return (
-    <div className="p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+    <div className="p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 relative">
+      {/* Close Button */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white transition-colors z-10"
+          aria-label="Close voice selection"
+        >
+          <X size={16} />
+        </button>
+      )}
+      
       <h2 className="text-2xl font-bold text-white mb-4">Voice Selection</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {voices.map((voice) => (
