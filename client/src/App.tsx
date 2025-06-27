@@ -820,7 +820,7 @@ const AppLayout = () => {
               </div>
               
               {/* Mobile Chat Input Area */}
-              <div className="bg-[#2c3e83] p-4 border-t border-white/20 pb-safe">
+              <div className="bg-[#2c3e83] p-4 border-t border-white/20" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem) + 60px)' }}>
                 {/* Recording Status Indicator */}
                 {isRecording && (
                   <div className="mb-3 flex items-center justify-center">
