@@ -21,22 +21,8 @@ interface VoiceSelectorProps {
 }
 
 export default function VoiceSelector({ selectedVoice, onVoiceChange, onClose }: VoiceSelectorProps) {
-  console.log('VoiceSelector rendered with onClose:', !!onClose);
-  
   return (
     <div className="p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 relative">
-      {/* Close Button */}
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 w-10 h-10 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white transition-colors z-50 shadow-lg border-2 border-white"
-          aria-label="Close voice selection"
-          style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 9999 }}
-        >
-          <X size={20} />
-        </button>
-      )}
-      
       <h2 className="text-2xl font-bold text-white mb-4">Voice Selection</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {voices.map((voice) => (
