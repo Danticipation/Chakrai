@@ -277,8 +277,8 @@ div[style*="var(--surface-elevated)"] {
   
   /* Mobile content area */
   .mobile-content {
-    height: calc(100vh - 160px); /* Account for header + bottom nav */
-    max-height: calc(100vh - 160px);
+    height: calc(100vh - 120px); /* Account for header + nav only */
+    max-height: calc(100vh - 120px);
     overflow: hidden;
   }
   

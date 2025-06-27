@@ -767,10 +767,10 @@ const AppLayout = () => {
         </div>
 
         {/* Center Content Area - Mobile Responsive */}
-        <div className="flex-1 p-2 md:p-0 mobile-content">
+        <div className="flex-1 mobile-content">
           {activeSection === 'chat' ? (
-            /* Mobile-Optimized Chat Panel */
-            <div className="w-full h-full flex flex-col bg-[#3f51b5] rounded-lg overflow-hidden mobile-chat">
+            /* Mobile-Optimized Chat Panel - Full Width */
+            <div className="w-full h-full flex flex-col bg-[#3f51b5] overflow-hidden mobile-chat">
               {/* Chat Header */}
               <div className="bg-[#2c3e83] text-white text-center py-3 border-b border-white/20">
                 <div className="flex items-center justify-center space-x-2">
@@ -964,30 +964,7 @@ const AppLayout = () => {
         </div>
       )}
 
-      {/* Mobile Bottom Tab Bar - Quick Access */}
-      <div className="md:hidden bg-[#1a237e] border-t border-white/20 pb-safe">
-        <div className="flex justify-around items-center py-2">
-          {[
-            { id: 'chat', icon: '💬', label: 'Chat' },
-            { id: 'journal', icon: '📝', label: 'Journal' },
-            { id: 'daily', icon: '🧠', label: 'Reflect' },
-            { id: 'analytics', icon: '📊', label: 'Stats' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveSection(tab.id)}
-              className={`flex flex-col items-center p-2 rounded-lg transition-all ${
-                activeSection === tab.id
-                  ? 'text-white bg-purple-600/30'
-                  : 'text-white/70 hover:text-white hover:bg-purple-700/20'
-              }`}
-            >
-              <span className="text-xl mb-1">{tab.icon}</span>
-              <span className="mobile-text-xs font-medium">{tab.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+
 
       {/* PWA Manager */}
       <PWAManager onNotificationPermissionChange={setNotificationsEnabled} />
