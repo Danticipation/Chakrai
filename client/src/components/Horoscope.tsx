@@ -125,26 +125,36 @@ export default function Horoscope() {
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-4 overflow-y-auto mobile-scroll">
-      <div className="w-full max-w-none sm:max-w-4xl mx-auto">
-        <div className="bg-[#1e293b]/40 backdrop-blur-xl rounded-2xl p-6 border border-[#7986cb]/20 shadow-lg">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 rounded-full bg-gradient-to-r from-[#3f51b5] to-[#5c6bc0] shadow-lg">
-                <Star className="text-white" size={24} />
+    <div className="fixed inset-0 z-50 bg-gradient-to-br from-[#0f172a] to-[#1e293b] overflow-y-auto">
+      <div className="min-h-full p-4 py-8">
+        <div className="max-w-4xl mx-auto bg-[#1e293b]/80 backdrop-blur-xl rounded-2xl border border-[#7986cb]/30 shadow-2xl mb-8">
+          <div className="sticky top-0 bg-[#1e293b]/90 backdrop-blur-xl p-6 border-b border-[#7986cb]/20 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 rounded-full bg-gradient-to-r from-[#3f51b5] to-[#5c6bc0] shadow-lg">
+                  <Star className="text-white" size={24} />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-light text-white tracking-wide">Daily Horoscope</h1>
+                  <p className="text-white/60 text-sm mt-1">Cosmic guidance for your wellness journey</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-3xl font-light text-white tracking-wide">Daily Horoscope</h1>
-                <p className="text-white/60 text-sm mt-1">Cosmic guidance for your wellness journey</p>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleRefresh}
+                  disabled={loading}
+                  className="p-3 rounded-xl bg-[#1e293b]/60 hover:bg-[#1e293b]/80 transition-all duration-200 disabled:opacity-50 border border-[#7986cb]/20 hover:border-[#7986cb]/40"
+                >
+                  <RefreshCw className={`text-white ${loading ? 'animate-spin' : ''}`} size={20} />
+                </button>
+                <button
+                  onClick={() => window.history.back()}
+                  className="p-3 rounded-xl bg-red-600/20 hover:bg-red-600/40 transition-all duration-200 border border-red-400/20 hover:border-red-400/40"
+                >
+                  <span className="text-white text-xl">×</span>
+                </button>
               </div>
             </div>
-            <button
-              onClick={handleRefresh}
-              disabled={loading}
-              className="p-3 rounded-xl bg-[#1e293b]/60 hover:bg-[#1e293b]/80 transition-all duration-200 disabled:opacity-50 border border-[#7986cb]/20 hover:border-[#7986cb]/40"
-            >
-              <RefreshCw className={`text-white ${loading ? 'animate-spin' : ''}`} size={20} />
-            </button>
           </div>
 
           {/* Professional Zodiac Sign Selector */}
@@ -211,17 +221,15 @@ export default function Horoscope() {
                     </span>
                   </button>
                 </div>
-                {/* Professional Content Display */}
-                <div className="bg-gradient-to-br from-[#3f51b5]/20 to-[#5c6bc0]/20 rounded-lg border border-[#7986cb]/30 shadow-sm overflow-hidden">
-                  <div className="p-6">
-                    <div className="prose prose-invert max-w-none">
-                      <div className="text-white/95 text-base leading-relaxed font-light tracking-wide space-y-4">
-                        {horoscopeData.horoscope.split('\n\n').filter(p => p.trim()).map((paragraph, index) => (
-                          <p key={index} className="text-white/90 leading-7 mb-4 last:mb-0">
-                            {paragraph.trim()}
-                          </p>
-                        ))}
-                      </div>
+                {/* Full-Screen Content Display */}
+                <div className="bg-white/5 rounded-xl p-8 border border-white/10 backdrop-blur-sm">
+                  <div className="prose prose-lg prose-invert max-w-none">
+                    <div className="text-white leading-8 space-y-6 text-lg font-light">
+                      {horoscopeData.horoscope.split(/\n\s*\n/).filter(p => p.trim()).map((paragraph, index) => (
+                        <p key={index} className="text-white/95 leading-8 text-justify">
+                          {paragraph.trim()}
+                        </p>
+                      ))}
                     </div>
                   </div>
                 </div>
