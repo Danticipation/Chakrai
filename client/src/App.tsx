@@ -789,10 +789,10 @@ const AppLayout = () => {
         </div>
 
         {/* Center Content Area - Mobile Responsive */}
-        <div className="flex-1 mobile-content">
+        <div className="flex-1 mobile-content" style={{ height: 'calc(100vh - 200px)' }}>
           {activeSection === 'chat' ? (
             /* Mobile-Optimized Chat Panel - Full Width */
-            <div className="w-full h-full flex flex-col bg-[#3f51b5] overflow-hidden mobile-chat">
+            <div className="w-full h-full flex flex-col bg-[#3f51b5] overflow-hidden mobile-chat" style={{ maxHeight: '100%' }}>
               {/* Chat Header */}
               <div className="bg-[#2c3e83] text-white text-center py-3 border-b border-white/20">
                 <div className="flex items-center justify-center space-x-2">
@@ -802,7 +802,15 @@ const AppLayout = () => {
               </div>
               
               {/* Chat Messages Area - Mobile Optimized */}
-              <div className="flex-1 overflow-y-auto p-4 pb-safe mobile-scroll" style={{ minHeight: '0' }}>
+              <div 
+                ref={(el) => {
+                  if (el && messages.length > 0) {
+                    setTimeout(() => el.scrollTop = el.scrollHeight, 100);
+                  }
+                }}
+                className="flex-1 overflow-y-auto p-4 pb-safe mobile-scroll" 
+                style={{ minHeight: '0', maxHeight: 'calc(100vh - 280px)' }}
+              >
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-white">
                     <MessageCircle size={48} className="mb-4 opacity-60" />
