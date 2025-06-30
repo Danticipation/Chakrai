@@ -206,14 +206,18 @@ export default function Horoscope() {
                     </span>
                   </button>
                 </div>
-                {/* Enhanced Content Display Area */}
-                <div className="bg-[#3949ab]/20 rounded-lg p-4 space-y-4 horoscope-content w-full max-w-full overflow-hidden">
-                  <div className="text-white/90 leading-relaxed space-y-4 w-full max-w-full">
-                    {horoscopeData.horoscope.split('\n').map((paragraph, index) => (
+                {/* Mobile-Optimized Content Display */}
+                <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/20">
+                  <div className="text-white text-justify leading-7 space-y-4">
+                    {horoscopeData.horoscope.split(/\n\s*\n/).map((paragraph, index) => (
                       paragraph.trim() && (
-                        <p key={index} className="mb-4 last:mb-0 horoscope-text text-base w-full max-w-full break-words">
-                          {paragraph.trim()}
-                        </p>
+                        <div key={index} className="text-base font-normal tracking-wide">
+                          {paragraph.trim().split('\n').map((line, lineIndex) => (
+                            <p key={lineIndex} className="mb-2 last:mb-0">
+                              {line.trim()}
+                            </p>
+                          ))}
+                        </div>
                       )
                     ))}
                   </div>
