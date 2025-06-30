@@ -497,11 +497,22 @@ router.get('/horoscope/:sign', async (req, res) => {
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [{
+          role: "system",
+          content: "You are a therapeutic astrologer providing comprehensive wellness guidance. Always write complete, full-length horoscopes with proper paragraph structure and meaningful therapeutic insights."
+        }, {
           role: "user",
-          content: `Generate a comprehensive therapeutic horoscope for ${sign} focused on mental wellness, self-care, and emotional growth. Include specific guidance on emotional well-being, mindfulness practices, personal growth opportunities, and practical wellness advice. Be supportive, encouraging, and detailed. Aim for 3-4 paragraphs that provide meaningful therapeutic insights.`
+          content: `Write a complete, comprehensive therapeutic horoscope for ${sign}. Focus on mental wellness, emotional healing, and personal growth. Include 4-5 full paragraphs covering:
+
+1. Current emotional landscape and opportunities
+2. Specific mindfulness and self-care practices
+3. Personal growth and relationship insights  
+4. Practical wellness advice and action steps
+5. Encouraging closing thoughts
+
+Make it supportive, detailed, and therapeutically valuable. Write complete sentences and full paragraphs. Do not cut off mid-sentence.`
         }],
-        max_tokens: 300,
-        temperature: 0.8
+        max_tokens: 800,
+        temperature: 0.7
       });
       
       const horoscope = response.choices[0].message.content?.trim() || "Today brings opportunities for personal growth and emotional healing.";
