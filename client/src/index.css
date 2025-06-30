@@ -192,6 +192,7 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
+    display: block !important;
   }
   
   .horoscope-content {
@@ -199,6 +200,7 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
     max-width: 100% !important;
     box-sizing: border-box !important;
     overflow-x: hidden !important;
+    min-width: 0 !important;
   }
   
   /* Mobile chat scrolling enhancement */

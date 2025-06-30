@@ -125,9 +125,9 @@ export default function Horoscope() {
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-[#5c6bc0]/30 backdrop-blur-sm rounded-2xl p-6 border border-[#7986cb]/30 shadow-lg">
+    <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-4 sm:p-6 overflow-y-auto">
+      <div className="w-full max-w-none sm:max-w-2xl mx-auto">
+        <div className="bg-[#5c6bc0]/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-[#7986cb]/30 shadow-lg">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
               <Star className="text-purple-300" size={32} />
