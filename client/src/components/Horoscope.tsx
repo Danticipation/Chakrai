@@ -207,11 +207,11 @@ export default function Horoscope() {
                   </button>
                 </div>
                 {/* Enhanced Content Display Area */}
-                <div className="bg-[#3949ab]/20 rounded-lg p-4 space-y-4 horoscope-content w-full">
-                  <div className="text-white/90 leading-relaxed space-y-4 w-full">
+                <div className="bg-[#3949ab]/20 rounded-lg p-4 space-y-4 horoscope-content w-full max-w-full overflow-hidden">
+                  <div className="text-white/90 leading-relaxed space-y-4 w-full max-w-full">
                     {horoscopeData.horoscope.split('\n').map((paragraph, index) => (
                       paragraph.trim() && (
-                        <p key={index} className="mb-4 last:mb-0 horoscope-text text-base w-full">
+                        <p key={index} className="mb-4 last:mb-0 horoscope-text text-base w-full max-w-full break-words">
                           {paragraph.trim()}
                         </p>
                       )
