@@ -125,9 +125,9 @@ export default function Horoscope() {
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-[#1e293b]/40 backdrop-blur-xl rounded-2xl p-8 border border-[#7986cb]/20 shadow-2xl">
+    <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-4 overflow-y-auto mobile-scroll">
+      <div className="w-full max-w-none sm:max-w-4xl mx-auto">
+        <div className="bg-[#1e293b]/40 backdrop-blur-xl rounded-2xl p-6 border border-[#7986cb]/20 shadow-lg">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-4">
               <div className="p-3 rounded-full bg-gradient-to-r from-[#3f51b5] to-[#5c6bc0] shadow-lg">
@@ -167,8 +167,8 @@ export default function Horoscope() {
             </div>
           </div>
 
-          {/* Horoscope Display - Enhanced for Full Content */}
-          <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30 min-h-[400px] max-h-[600px] overflow-y-auto">
+          {/* Horoscope Display - Mobile Optimized */}
+          <div className="bg-[#1a237e]/50 rounded-xl p-4 border border-[#3949ab]/30 max-h-[calc(100vh-400px)] overflow-y-auto mobile-scroll">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="flex items-center space-x-3">
