@@ -38,14 +38,14 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
 
   if (isLoading) {
     return (
-      <div className="p-6 h-full bg-[#7986cb]">
+      <div className="p-6 h-full theme-primary">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <Brain className="w-6 h-6 text-[#9fa8da]" />
             Personality Reflection
           </h2>
         </div>
-        <div className="bg-[#9fa8da]/30 backdrop-blur-sm rounded-xl p-6 border border-[#9fa8da]/50">
+        <div className="theme-primary/30 backdrop-blur-sm rounded-xl p-6 border border-[#9fa8da]/50">
           <div className="animate-pulse space-y-4">
             <div className="h-4 bg-white/30 rounded w-3/4"></div>
             <div className="h-4 bg-white/30 rounded w-1/2"></div>
@@ -59,7 +59,7 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
 
   if (error) {
     return (
-      <div className="p-6 h-full bg-[#7986cb]">
+      <div className="p-6 h-full theme-primary">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <Brain className="w-6 h-6 text-[#9fa8da]" />
@@ -67,7 +67,7 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
           </h2>
           <button
             onClick={handleRefresh}
-            className="p-2 bg-[#9fa8da] text-white rounded-lg hover:bg-[#BBDEFB] transition-colors"
+            className="p-2 theme-primary text-white rounded-lg hover:theme-primary transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -118,7 +118,7 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
   };
 
   return (
-    <div className="p-6 h-full bg-[#7986cb] overflow-y-auto">
+    <div className="p-6 h-full theme-primary overflow-y-auto">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
           <Brain className="w-6 h-6 text-[#9fa8da]" />
@@ -126,7 +126,7 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
         </h2>
         <button
           onClick={handleRefresh}
-          className="p-2 bg-[#9fa8da] text-white rounded-lg hover:bg-[#BBDEFB] transition-colors flex items-center gap-2"
+          className="p-2 theme-primary text-white rounded-lg hover:theme-primary transition-colors flex items-center gap-2"
           title="Refresh Analysis"
         >
           <RefreshCw className="w-4 h-4" />
@@ -135,7 +135,7 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
       </div>
 
       {/* Data Points Summary */}
-      <div className="bg-[#9fa8da]/30 backdrop-blur-sm rounded-xl p-4 mb-4 border border-[#9fa8da]/50">
+      <div className="theme-primary/30 backdrop-blur-sm rounded-xl p-4 mb-4 border border-[#9fa8da]/50">
         <div className="flex justify-between items-center text-sm text-white/80">
           <span>Analysis based on:</span>
           <div className="flex gap-4">
@@ -150,7 +150,7 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
       </div>
 
       {/* AI Personality Analysis */}
-      <div className="bg-[#9fa8da]/30 backdrop-blur-sm rounded-xl p-6 space-y-4 border border-[#9fa8da]/50">
+      <div className="theme-primary/30 backdrop-blur-sm rounded-xl p-6 space-y-4 border border-[#9fa8da]/50">
         <div className="flex items-center gap-2 mb-4">
           <Brain className="w-5 h-5 text-[#BBDEFB]" />
           <h3 className="text-lg font-semibold text-white">AI Personality Analysis</h3>

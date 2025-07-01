@@ -103,7 +103,7 @@ export default function MemoryDashboard() {
           <Button 
             onClick={handleRefresh}
             disabled={refreshing}
-            className="theme-card hover:bg-[#303f9f] text-white"
+            className="theme-card hover:theme-primary text-white"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh

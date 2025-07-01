@@ -131,8 +131,8 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-br from-[#0f172a] to-[#1e293b] overflow-y-auto">
       <div className="min-h-full p-4 py-8">
-        <div className="max-w-4xl mx-auto bg-[#1e293b]/80 backdrop-blur-xl rounded-2xl border border-[#7986cb]/30 shadow-2xl mb-8">
-          <div className="sticky top-0 bg-[#1e293b]/90 backdrop-blur-xl p-6 border-b border-[#7986cb]/20 mb-6">
+        <div className="max-w-4xl mx-auto theme-primary/80 backdrop-blur-xl rounded-2xl border border-[#7986cb]/30 shadow-2xl mb-8">
+          <div className="sticky top-0 theme-primary/90 backdrop-blur-xl p-6 border-b border-[#7986cb]/20 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="p-3 rounded-full bg-gradient-to-r from-[#3f51b5] to-[#5c6bc0] shadow-lg">
@@ -147,7 +147,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
                 <button
                   onClick={handleRefresh}
                   disabled={loading}
-                  className="p-3 rounded-xl bg-[#1e293b]/60 hover:bg-[#1e293b]/80 transition-all duration-200 disabled:opacity-50 border border-[#7986cb]/20 hover:border-[#7986cb]/40"
+                  className="p-3 rounded-xl theme-primary/60 hover:theme-primary/80 transition-all duration-200 disabled:opacity-50 border border-[#7986cb]/20 hover:border-[#7986cb]/40"
                 >
                   <RefreshCw className={`text-white ${loading ? 'animate-spin' : ''}`} size={20} />
                 </button>
@@ -173,7 +173,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
                   className={`py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
                     selectedSign === sign
                       ? 'bg-gradient-to-r from-[#3f51b5] to-[#5c6bc0] text-white shadow-lg border border-[#7986cb]/50 scale-105'
-                      : 'bg-[#1e293b]/60 text-white/80 hover:bg-[#1e293b]/80 hover:text-white border border-[#7986cb]/20 hover:border-[#7986cb]/40'
+                      : 'theme-primary/60 text-white/80 hover:theme-primary/80 hover:text-white border border-[#7986cb]/20 hover:border-[#7986cb]/40'
                   }`}
                 >
                   {sign.charAt(0).toUpperCase() + sign.slice(1)}
@@ -196,7 +196,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
                 <p className="text-red-300 mb-4">{error}</p>
                 <button
                   onClick={handleRefresh}
-                  className="px-4 py-2 theme-primary text-white rounded-lg hover:bg-[#3949ab] transition-colors"
+                  className="px-4 py-2 theme-primary text-white rounded-lg hover:theme-primary transition-colors"
                 >
                   Try Again
                 </button>
@@ -213,7 +213,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
                   <button
                     onClick={handleVoiceToggle}
                     disabled={loading}
-                    className="p-2 rounded-lg bg-[#7986cb]/50 hover:bg-[#7986cb]/70 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                    className="p-2 rounded-lg theme-primary/50 hover:theme-primary/70 transition-colors disabled:opacity-50 flex items-center space-x-2"
                     title={isPlaying ? "Stop reading" : "Read aloud"}
                   >
                     {isPlaying ? (

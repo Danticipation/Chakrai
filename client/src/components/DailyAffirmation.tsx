@@ -96,7 +96,7 @@ export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
   return (
     <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-[#5c6bc0]/30 backdrop-blur-sm rounded-2xl p-6 border border-[#7986cb]/30 shadow-lg">
+        <div className="theme-primary/30 backdrop-blur-sm rounded-2xl p-6 border border-[#7986cb]/30 shadow-lg">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
               <Heart className="text-green-300" size={32} />
@@ -106,7 +106,7 @@ export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
               <button
                 onClick={handleRefresh}
                 disabled={loading}
-                className="p-2 rounded-lg bg-[#7986cb]/50 hover:bg-[#7986cb]/70 transition-colors disabled:opacity-50"
+                className="p-2 rounded-lg theme-primary/50 hover:theme-primary/70 transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`text-white ${loading ? 'animate-spin' : ''}`} size={20} />
               </button>
@@ -136,7 +136,7 @@ export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
                 <p className="text-red-300 mb-4">{error}</p>
                 <button
                   onClick={handleRefresh}
-                  className="px-4 py-2 theme-primary text-white rounded-lg hover:bg-[#3949ab] transition-colors"
+                  className="px-4 py-2 theme-primary text-white rounded-lg hover:theme-primary transition-colors"
                 >
                   Try Again
                 </button>
@@ -153,7 +153,7 @@ export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
                   <button
                     onClick={playAffirmationAudio}
                     disabled={isPlaying}
-                    className="p-2 rounded-lg bg-[#7986cb]/50 hover:bg-[#7986cb]/70 transition-colors disabled:opacity-50"
+                    className="p-2 rounded-lg theme-primary/50 hover:theme-primary/70 transition-colors disabled:opacity-50"
                   >
                     {isPlaying ? (
                       <VolumeX className="text-white" size={20} />
@@ -179,7 +179,7 @@ export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
           </div>
 
           {/* Affirmation Tips */}
-          <div className="mt-6 bg-[#5c6bc0]/30 rounded-xl p-4 border border-[#7986cb]/30">
+          <div className="mt-6 theme-primary/30 rounded-xl p-4 border border-[#7986cb]/30">
             <h3 className="text-lg font-semibold text-white mb-3">How to Use Your Affirmation</h3>
             <ul className="text-sm text-white/80 space-y-2">
               <li>• Read it slowly and mindfully</li>

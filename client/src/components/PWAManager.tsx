@@ -298,7 +298,7 @@ export default function PWAManager({ onNotificationPermissionChange }: PWAManage
       {notificationPermission !== 'granted' && (
         <button
           onClick={requestNotificationPermission}
-          className="fixed bottom-20 right-4 theme-card hover:bg-[#3949ab] text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 z-40"
+          className="fixed bottom-20 right-4 theme-card hover:theme-primary text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 z-40"
           title="Enable Notifications"
         >
           {notificationPermission === 'denied' ? (

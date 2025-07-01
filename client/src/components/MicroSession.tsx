@@ -247,7 +247,7 @@ export default function MicroSession({
           {!sessionStarted ? (
             <button
               onClick={startRecording}
-              className="theme-card hover:bg-[#3949ab] text-white p-4 rounded-full transition-all duration-200 hover:scale-105 shadow-lg"
+              className="theme-card hover:theme-primary text-white p-4 rounded-full transition-all duration-200 hover:scale-105 shadow-lg"
             >
               <Mic className="w-6 h-6" />
             </button>
@@ -263,7 +263,7 @@ export default function MicroSession({
               ) : (
                 <button
                   onClick={startRecording}
-                  className="theme-card hover:bg-[#3949ab] text-white p-4 rounded-full transition-all duration-200"
+                  className="theme-card hover:theme-primary text-white p-4 rounded-full transition-all duration-200"
                 >
                   <Mic className="w-6 h-6" />
                 </button>
@@ -334,7 +334,7 @@ export default function MicroSession({
           {transcription && (
             <button
               onClick={saveSession}
-              className="flex-1 theme-card hover:bg-[#3949ab] text-white py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-2"
+              className="flex-1 theme-card hover:theme-primary text-white py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-2"
             >
               <Send className="w-4 h-4" />
               <span>Save Session</span>
