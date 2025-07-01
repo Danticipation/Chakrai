@@ -649,7 +649,7 @@ const AppLayout = () => {
 
       case 'themes':
         return (
-          <div className="h-full bg-[var(--theme-background)] p-6 overflow-y-auto">
+          <div className="h-full theme-background p-6 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
               <ThemeSelector onClose={() => setActiveSection('chat')} />
             </div>
@@ -658,7 +658,7 @@ const AppLayout = () => {
 
       case 'voice':
         return (
-          <div className="h-full bg-[var(--theme-background)] p-6 overflow-y-auto">
+          <div className="h-full theme-background p-6 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
               <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg">
                 <h2 className="text-3xl font-bold text-white mb-6 text-center">Voice Settings</h2>
@@ -721,7 +721,7 @@ const AppLayout = () => {
 
       case 'logo':
         return (
-          <div className="h-full bg-[var(--theme-background)] p-6 overflow-y-auto">
+          <div className="h-full theme-background p-6 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
               <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg text-center">
                 <div className="mb-8">
@@ -780,20 +780,20 @@ const AppLayout = () => {
 
       case 'goals':
         return (
-          <div className="p-4 h-full overflow-y-auto bg-[var(--theme-background)]">
+          <div className="p-4 h-full overflow-y-auto theme-background">
             <h2 className="text-2xl font-bold theme-text mb-4">Wellness Goals</h2>
             <div className="space-y-4">
               {[
                 { name: 'Daily Mindfulness', current: 12, target: 21, color: 'theme-accent' },
                 { name: 'Anxiety Management', current: 8, target: 14, color: 'theme-primary' },
-                { name: 'Social Connection', current: 3, target: 7, color: 'bg-[var(--theme-secondary)]' }
+                { name: 'Social Connection', current: 3, target: 7, color: 'theme-secondary' }
               ].map((goal, index) => (
                 <div key={index} className="theme-card backdrop-blur-sm rounded-xl p-4">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-semibold theme-text">{goal.name}</h3>
                     <span className="text-sm theme-text opacity-60">{goal.current}/{goal.target} days</span>
                   </div>
-                  <div className="w-full bg-[var(--theme-secondary)] rounded-full h-3">
+                  <div className="w-full theme-secondary rounded-full h-3">
                     <div 
                       className={`${goal.color} h-3 rounded-full transition-all duration-300`}
                       style={{ width: `${(goal.current / goal.target) * 100}%` }}
@@ -807,7 +807,7 @@ const AppLayout = () => {
 
       default:
         return (
-          <div className="flex items-center justify-center h-full bg-[var(--theme-background)]">
+          <div className="flex items-center justify-center h-full theme-background">
             <p className="theme-text-secondary">Select a section to get started</p>
           </div>
         );
@@ -825,7 +825,7 @@ const AppLayout = () => {
 
   if (showOnboarding) {
     return (
-      <div className="h-screen bg-[var(--theme-background)]">
+      <div className="h-screen theme-background">
         <OnboardingQuiz onComplete={handleCompleteOnboarding} />
       </div>
     );
@@ -1233,7 +1233,7 @@ const AppLayout = () => {
             {/* Daily Journaling Progress */}
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Daily Journaling</div>
-              <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
+              <div className="theme-background rounded-full h-4 mb-3">
                 <div className="theme-accent h-4 rounded-full" style={{width: '75%'}}></div>
               </div>
               <div className="theme-text text-base">15/20 days this month</div>
@@ -1242,7 +1242,7 @@ const AppLayout = () => {
             {/* Weekly Chat Sessions */}
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Weekly Chat Goal</div>
-              <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
+              <div className="theme-background rounded-full h-4 mb-3">
                 <div className="theme-accent h-4 rounded-full" style={{width: '60%'}}></div>
               </div>
               <div className="theme-text text-base">3/5 sessions this week</div>
@@ -1251,7 +1251,7 @@ const AppLayout = () => {
             {/* Mood Tracking Consistency */}
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Mood Tracking</div>
-              <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
+              <div className="theme-background rounded-full h-4 mb-3">
                 <div className="bg-yellow-400 h-4 rounded-full" style={{width: '90%'}}></div>
               </div>
               <div className="theme-text text-base">27/30 days tracked</div>
@@ -1260,8 +1260,8 @@ const AppLayout = () => {
             {/* App Usage Streak */}
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">App Usage Streak</div>
-              <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
-                <div className="bg-[var(--theme-secondary)] h-4 rounded-full" style={{width: '85%'}}></div>
+              <div className="theme-background rounded-full h-4 mb-3">
+                <div className="theme-secondary h-4 rounded-full" style={{width: '85%'}}></div>
               </div>
               <div className="theme-text text-base">17 consecutive days</div>
             </div>
