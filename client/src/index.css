@@ -982,6 +982,19 @@ button:focus {
     touch-action: manipulation;
   }
   
+  /* Critical fix - prevent pointer-events from blocking scroll */
+  .mobile-polish-container > * {
+    pointer-events: auto !important;
+  }
+  
+  /* Ensure scroll areas are not blocked by overlays */
+  .mobile-content-scroll-area > *,
+  .mobile-chat-container > *,
+  .mobile-chat-messages-scroll > * {
+    pointer-events: auto !important;
+    touch-action: auto !important;
+  }
+  
   /* Mobile scrolling fix - ensure entire page area is scrollable */
   .mobile-content-area, .mobile-modal-content {
     overflow-y: auto;
@@ -1003,23 +1016,47 @@ button:focus {
   body, html {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    touch-action: manipulation !important;
+    touch-action: pan-y !important;
+    height: 100% !important;
   }
   
-  /* Remove any CSS that limits touch areas to edges */
-  * {
-    touch-action: auto;
+  /* Ensure main containers allow proper scrolling */
+  .mobile-polish-container {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    height: 100vh !important;
+    position: relative !important;
   }
   
-  /* Ensure all content areas allow scrolling */
-  .mobile-polish-container, 
-  .theme-background,
-  .flex.flex-col,
-  .h-full,
-  .min-h-screen {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
+  /* Mobile content scroll area - allow natural scrolling */
+  .mobile-content-scroll-area {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    height: auto !important;
+    min-height: calc(100vh - 220px) !important;
+    flex: 1 !important;
+  }
+  
+  /* Mobile chat container - remove height restrictions */
+  .mobile-chat-container {
+    min-height: calc(100vh - 240px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* Mobile chat messages - natural scrolling without height limits */
+  .mobile-chat-messages-scroll {
+    flex: 1;
+    padding: 20px 16px;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    /* Remove all height constraints that prevent scrolling */
+    height: auto !important;
+    min-height: calc(100vh - 320px) !important;
   }
   
   /* Smooth animations */

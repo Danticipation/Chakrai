@@ -1102,10 +1102,10 @@ const AppLayout = () => {
         </div>
 
         {/* Center Content Area - Mobile Responsive */}
-        <div className="flex-1 mobile-content" style={{ height: 'calc(100vh - 200px)' }}>
+        <div className="flex-1 mobile-content-scroll-area">
           {activeSection === 'chat' ? (
             /* Mobile-Optimized Chat Panel - Full Width */
-            <div className="w-full h-full flex flex-col theme-card overflow-hidden mobile-chat" style={{ maxHeight: '100%' }}>
+            <div className="w-full flex flex-col theme-card mobile-chat-container">
               {/* Chat Header */}
               <div className="theme-surface theme-text text-center py-3 border-b border-white/20">
                 <div className="flex items-center justify-center space-x-2">
@@ -1121,8 +1121,7 @@ const AppLayout = () => {
                     setTimeout(() => el.scrollTop = el.scrollHeight, 100);
                   }
                 }}
-                className="mobile-chat-messages" 
-                style={{ minHeight: '0', maxHeight: 'calc(100vh - 280px)' }}
+                className="mobile-chat-messages-scroll"
               >
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full theme-text">
