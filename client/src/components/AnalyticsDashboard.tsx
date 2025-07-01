@@ -249,14 +249,14 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-gray-900 rounded-lg p-1 mb-6">
-          <div className="flex gap-1">
+        <div className="bg-gray-900 rounded-lg p-2 mb-6 border border-gray-600">
+          <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
                 activeTab === 'overview'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
+                  : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
               }`}
             >
               <BarChart3 className="w-4 h-4" />
@@ -264,10 +264,10 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
             </button>
             <button
               onClick={() => setActiveTab('reports')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
                 activeTab === 'reports'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
+                  : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
               }`}
             >
               <Calendar className="w-4 h-4" />
@@ -275,10 +275,10 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
             </button>
             <button
               onClick={() => setActiveTab('trends')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
                 activeTab === 'trends'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
+                  : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
               }`}
             >
               <TrendingUp className="w-4 h-4" />
