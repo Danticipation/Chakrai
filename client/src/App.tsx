@@ -571,6 +571,15 @@ const AppLayout = () => {
       case 'privacy-policy':
         return <PrivacyPolicy />;
 
+      case 'themes':
+        return (
+          <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
+            <div className="max-w-2xl mx-auto">
+              <ThemeSelector onClose={() => setActiveSection('chat')} />
+            </div>
+          </div>
+        );
+
       case 'voice':
         return (
           <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
@@ -858,6 +867,7 @@ const AppLayout = () => {
                 { id: 'memory', label: 'Memory', icon: '🎯' },
                 { id: 'analytics', label: 'Analytics', icon: '📊' },
                 { id: 'voice', label: 'Voice', icon: '🎤' },
+                { id: 'themes', label: 'Themes', icon: '🎨' },
                 { id: 'rewards', label: 'Rewards', icon: '🎁' },
                 { id: 'community', label: 'Community', icon: '👥' },
                 { id: 'vr', label: 'VR Therapy', icon: '🥽' },
@@ -924,6 +934,7 @@ const AppLayout = () => {
               { id: 'memory', label: 'Memory' },
               { id: 'analytics', label: 'Analytics' },
               { id: 'voice', label: 'Voice Settings' },
+              { id: 'themes', label: 'Color Themes' },
               { id: 'rewards', label: 'Rewards' },
               { id: 'community', label: 'Community' },
               { id: 'adaptive', label: 'AI Learning' },
@@ -1242,7 +1253,9 @@ const AppWithOnboarding = () => {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppWithOnboarding />
+      <ThemeProvider>
+        <AppWithOnboarding />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
