@@ -137,67 +137,67 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
     <div className="space-y-6">
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200">
+        <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 flex items-center">
+            <CardTitle className="text-sm font-medium text-white flex items-center">
               <TrendingUp className="w-4 h-4 mr-2" />
               Emotional Improvement
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-900">
+            <div className="text-2xl font-bold text-white">
               {dashboard?.summary.weeklyEmotionalImprovement > 0 ? '+' : ''}
               {((dashboard?.summary.weeklyEmotionalImprovement || 0) * 100).toFixed(1)}%
             </div>
-            <p className="text-xs text-blue-600 mt-1">Last 7 days</p>
+            <p className="text-xs text-white/70 mt-1">Last 7 days</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-100 border-green-200">
+        <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-700 flex items-center">
+            <CardTitle className="text-sm font-medium text-white flex items-center">
               <Heart className="w-4 h-4 mr-2" />
               Top Affirmation
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold text-green-900 capitalize">
+            <div className="text-lg font-bold text-white capitalize">
               {dashboard?.summary.topAffirmationType || 'Self-Compassion'}
             </div>
-            <p className="text-xs text-green-600 mt-1">Most effective type</p>
+            <p className="text-xs text-white/70 mt-1">Most effective type</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-violet-100 border-purple-200">
+        <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 flex items-center">
+            <CardTitle className="text-sm font-medium text-white flex items-center">
               <Target className="w-4 h-4 mr-2" />
               Overall Efficacy
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-900">
+            <div className="text-2xl font-bold text-white">
               {((dashboard?.summary.overallEfficacy || 0) * 100).toFixed(0)}%
             </div>
-            <p className="text-xs text-purple-600 mt-1">Therapeutic effectiveness</p>
+            <p className="text-xs text-white/70 mt-1">Therapeutic effectiveness</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Emotional Trends Chart */}
-      <Card>
+      <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <BarChart3 className="w-5 h-5 mr-2 text-blue-600" />
+          <CardTitle className="flex items-center text-white">
+            <BarChart3 className="w-5 h-5 mr-2 text-white" />
             Emotional Trends (7 Days)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {dashboard?.emotionalTrends.map((trend, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 bg-[#3f51b5]/20 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <div className="text-sm font-medium text-gray-700">
+                  <div className="text-sm font-medium text-white">
                     {new Date(trend.date).toLocaleDateString()}
                   </div>
                   <Badge variant={trend.avgSentiment > 0 ? 'default' : 'secondary'} className="text-xs">
@@ -206,10 +206,10 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
-                    <div className="text-sm font-semibold text-gray-900">
+                    <div className="text-sm font-semibold text-white">
                       Sentiment: {(trend.avgSentiment * 100).toFixed(0)}%
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-white/70">
                       Intensity: {(trend.avgIntensity * 100).toFixed(0)}%
                     </div>
                   </div>
@@ -225,26 +225,26 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
       </Card>
 
       {/* Effective Affirmations */}
-      <Card>
+      <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Sparkles className="w-5 h-5 mr-2 text-yellow-600" />
+          <CardTitle className="flex items-center text-white">
+            <Sparkles className="w-5 h-5 mr-2 text-white" />
             Most Effective Affirmations
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {dashboard?.effectiveAffirmations.map((affirmation, index) => (
-              <div key={index} className="p-4 border rounded-lg bg-gradient-to-r from-yellow-50 to-orange-50">
+              <div key={index} className="p-4 border border-[#7986cb]/30 rounded-lg bg-[#3f51b5]/20">
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-gray-900 capitalize">
+                  <h4 className="font-semibold text-white capitalize">
                     {affirmation.affirmationType.replace('-', ' ')}
                   </h4>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs text-white border-white/30">
                     {(affirmation.avgEfficacy * 100).toFixed(0)}% effective
                   </Badge>
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-white/70">
                   <p>Presented {affirmation.totalPresented} times</p>
                   <p>Engagement: {affirmation.avgEngagement}</p>
                 </div>
