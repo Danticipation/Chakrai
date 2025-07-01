@@ -200,7 +200,7 @@ const WellnessRewards: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-[#3f51b5] rounded-xl p-1 mb-6 border border-white/20">
+        <div className="theme-card rounded-xl p-1 mb-6 border border-[var(--theme-accent)]">
           <div className="flex space-x-1">
             {[
               { id: 'overview', label: 'Overview', icon: TrendingUp },
