@@ -934,7 +934,7 @@ const AppLayout = () => {
         <div className="md:hidden theme-surface border-b border-white/20">
           {/* User Features Section */}
           <div className="border-b border-white/10 pb-2">
-            <div className="text-white/60 text-xs font-medium px-3 pt-2 pb-1">Wellness Features</div>
+            <div className="theme-text-secondary text-xs font-medium px-3 pt-2 pb-1">Wellness Features</div>
             <div className="grid grid-cols-4 gap-2 px-3">
               {[
                 { id: 'chat', label: 'Home', icon: '🏠' },
@@ -983,7 +983,7 @@ const AppLayout = () => {
 
           {/* Internal Tools Section */}
           <div className="pt-2">
-            <div className="text-white/60 text-xs font-medium px-3 pb-1">Professional Tools</div>
+            <div className="theme-text-secondary text-xs font-medium px-3 pb-1">Professional Tools</div>
             <div className="grid grid-cols-4 gap-2 px-3 pb-2">
               {[
                 { id: 'therapist', label: 'Therapist', icon: '🩺' },
@@ -1018,7 +1018,7 @@ const AppLayout = () => {
         <div className="hidden md:flex w-72 flex-col justify-center py-8">
           {/* User Features Section */}
           <div className="mb-4">
-            <div className="text-white/60 text-sm font-medium px-6 pb-2">Wellness Features</div>
+            <div className="theme-text-secondary text-sm font-medium px-6 pb-2">Wellness Features</div>
             {[
               { id: 'chat', label: 'Home' },
               { id: 'daily', label: 'Reflection' },
@@ -1051,7 +1051,7 @@ const AppLayout = () => {
 
           {/* Internal Tools Section */}
           <div className="border-t border-white/20 pt-4">
-            <div className="text-white/60 text-sm font-medium px-6 pb-2">Professional Tools</div>
+            <div className="theme-text-secondary text-sm font-medium px-6 pb-2">Professional Tools</div>
             {[
               { id: 'therapist', label: 'Therapist Portal' },
               { id: 'privacy', label: 'Privacy & Compliance' },
@@ -1098,7 +1098,7 @@ const AppLayout = () => {
                 style={{ minHeight: '0', maxHeight: 'calc(100vh - 280px)' }}
               >
                 {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-white">
+                  <div className="flex flex-col items-center justify-center h-full theme-text">
                     <MessageCircle size={48} className="mb-4 opacity-60" />
                     <p className="text-lg font-medium mb-2">Welcome to TraI</p>
                     <p className="mobile-text-sm opacity-80 text-center px-4">
@@ -1136,7 +1136,7 @@ const AppLayout = () => {
               </div>
               
               {/* Mobile Chat Input Area */}
-              <div className="bg-[#2c3e83] p-4 border-t border-white/20" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem) + 80px)' }}>
+              <div className="theme-surface p-4 border-t border-white/20" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem) + 80px)' }}>
                 {/* Recording Status Indicator */}
                 {isRecording && (
                   <div className="mb-3 flex items-center justify-center">
@@ -1155,7 +1155,7 @@ const AppLayout = () => {
                       onChange={(e) => setInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                       placeholder="Share what's on your mind..."
-                      className="w-full px-5 py-4 bg-white/10 text-white border border-white/20 rounded-2xl text-base placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent ios-input-fix"
+                      className="w-full px-5 py-4 theme-surface theme-text border border-[var(--theme-accent)] rounded-2xl text-base placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--theme-secondary)] focus:border-transparent ios-input-fix"
                     />
                   </div>
                   
