@@ -580,10 +580,16 @@ const AppLayout = () => {
                     <label className="block text-white/90 text-lg font-medium mb-4">Select AI Voice Companion</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
-                        { id: 'hope', name: 'Hope', description: 'Warm and encouraging voice for daily support' },
-                        { id: 'james', name: 'James', description: 'Professional and calming therapeutic voice' },
-                        { id: 'charlotte', name: 'Charlotte', description: 'Gentle and empathetic companion voice' },
-                        { id: 'bronson', name: 'Bronson', description: 'Confident and reassuring wellness guide' }
+                        // Original voices
+                        { id: 'james', name: 'James', description: 'Professional and calming' },
+                        { id: 'brian', name: 'Brian', description: 'Deep and resonant' },
+                        { id: 'alexandra', name: 'Alexandra', description: 'Clear and articulate' },
+                        { id: 'carla', name: 'Carla', description: 'Warm and empathetic' },
+                        // New voices added
+                        { id: 'hope', name: 'Hope', description: 'Warm and encouraging' },
+                        { id: 'charlotte', name: 'Charlotte', description: 'Gentle and empathetic' },
+                        { id: 'bronson', name: 'Bronson', description: 'Confident and reassuring' },
+                        { id: 'marcus', name: 'Marcus', description: 'Smooth and supportive' }
                       ].map((voice) => (
                         <button
                           key={voice.id}
