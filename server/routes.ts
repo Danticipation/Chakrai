@@ -5,6 +5,7 @@ import { analyzeEmotionalState } from './emotionalAnalysis.js';
 import { openai } from './openaiRetry.js';
 import { agentSystem } from './agentSystem.js';
 import { TherapeuticAnalyticsSystem } from './therapeuticAnalytics.js';
+import { userSessionManager } from './userSession.js';
 
 const analyticsSystem = new TherapeuticAnalyticsSystem();
 
@@ -166,13 +167,21 @@ async function analyzeEmotionalPatterns(userId: number, timeframeDays: number): 
 // Main chat endpoint with AI integration
 router.post('/chat', async (req, res) => {
   try {
-    const { message, voice, userId = 1, personalityMode = 'supportive' } = req.body;
+    const { message, voice, personalityMode = 'supportive' } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    console.log('Chat request:', { message: message.substring(0, 50) + '...', voice, userId });
+    // Get or create anonymous user
+    const sessionInfo = userSessionManager.getSessionFromRequest(req);
+    const anonymousUser = await userSessionManager.getOrCreateAnonymousUser(
+      sessionInfo.deviceFingerprint, 
+      sessionInfo.sessionId
+    );
+    const userId = anonymousUser.id;
+
+    console.log('Chat request:', { message: message.substring(0, 50) + '...', voice, userId: anonymousUser.id, isAnonymous: anonymousUser.isAnonymous });
 
     // Crisis detection
     const crisisData = await detectCrisisSignals(message, userId);

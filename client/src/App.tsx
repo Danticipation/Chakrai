@@ -98,6 +98,40 @@ const AppLayout = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [userQuery, setUserQuery] = useState('');
+
+  // Device fingerprinting for anonymous user profiles
+  const [deviceFingerprint, setDeviceFingerprint] = useState('');
+
+  useEffect(() => {
+    // Generate device fingerprint for anonymous user identification
+    const generateFingerprint = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx!.textBaseline = 'top';
+      ctx!.font = '14px Arial';
+      ctx!.fillText('Device fingerprint', 2, 2);
+      
+      const fingerprint = [
+        navigator.userAgent,
+        navigator.language,
+        screen.width + 'x' + screen.height,
+        new Date().getTimezoneOffset(),
+        canvas.toDataURL()
+      ].join('|');
+      
+      // Create a simple hash of the fingerprint
+      let hash = 0;
+      for (let i = 0; i < fingerprint.length; i++) {
+        const char = fingerprint.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      
+      return Math.abs(hash).toString(36);
+    };
+
+    setDeviceFingerprint(generateFingerprint());
+  }, []);
   const [selectedVoice, setSelectedVoice] = useState('hope');
   const [selectedReflectionVoice, setSelectedReflectionVoice] = useState('hope');
   const [isLoading, setIsLoading] = useState(false);
@@ -279,7 +313,8 @@ const AppLayout = () => {
         },
         body: JSON.stringify({
           message: input,
-          voice: selectedVoice
+          voice: selectedVoice,
+          deviceFingerprint: deviceFingerprint
         }),
       });
 

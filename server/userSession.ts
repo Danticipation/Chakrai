@@ -47,9 +47,7 @@ export class UserSessionManager {
         username: `anonymous_${newSessionId}`,
         sessionId: newSessionId,
         deviceFingerprint,
-        isAnonymous: true,
-        createdAt: new Date(),
-        lastActiveAt: new Date()
+        isAnonymous: true
       });
 
       return {
