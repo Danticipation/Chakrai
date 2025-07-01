@@ -1123,7 +1123,7 @@ const AppLayout = () => {
                 )}
                 {loading && (
                   <div className="flex justify-start mt-4">
-                    <div className="bg-purple-700 text-white px-4 py-3 rounded-2xl rounded-bl-md">
+                    <div className="bg-[var(--theme-primary)] theme-text px-4 py-3 rounded-2xl rounded-bl-md">
                       <div className="flex space-x-1 items-center">
                         <span className="text-xs mr-2">TraI is typing</span>
                         <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
@@ -1165,7 +1165,7 @@ const AppLayout = () => {
                     className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
                       isRecording 
                         ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse scale-110 shadow-lg' 
-                        : 'bg-purple-600 hover:bg-purple-700 text-white hover:scale-110 shadow-md'
+                        : 'bg-[var(--theme-primary)] hover:bg-[var(--theme-primary-light)] theme-text hover:scale-110 shadow-md'
                     }`}
                     disabled={loading}
                     title={isRecording ? "Stop recording" : "Start voice input"}
@@ -1190,7 +1190,7 @@ const AppLayout = () => {
               {/* Return to Chat Button */}
               <button 
                 onClick={() => setActiveSection('chat')}
-                className="absolute top-2 right-2 z-10 bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-full text-sm font-medium transition-colors flex items-center space-x-1 shadow-lg"
+                className="absolute top-2 right-2 z-10 bg-[var(--theme-primary)] hover:bg-[var(--theme-primary-light)] theme-text px-3 py-1 rounded-full text-sm font-medium transition-colors flex items-center space-x-1 shadow-lg"
               >
                 <MessageCircle size={14} />
                 <span>Chat</span>
@@ -1234,7 +1234,7 @@ const AppLayout = () => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Daily Journaling</div>
               <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
-                <div className="bg-green-400 h-4 rounded-full" style={{width: '75%'}}></div>
+                <div className="bg-[var(--theme-accent)] h-4 rounded-full" style={{width: '75%'}}></div>
               </div>
               <div className="theme-text text-base">15/20 days this month</div>
             </div>
@@ -1261,7 +1261,7 @@ const AppLayout = () => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">App Usage Streak</div>
               <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
-                <div className="bg-purple-400 h-4 rounded-full" style={{width: '85%'}}></div>
+                <div className="bg-[var(--theme-secondary)] h-4 rounded-full" style={{width: '85%'}}></div>
               </div>
               <div className="theme-text text-base">17 consecutive days</div>
             </div>
