@@ -640,19 +640,26 @@ Make it supportive, detailed, and therapeutically valuable. Write complete sente
 // Mood tracking endpoint
 router.post('/mood', async (req, res) => {
   try {
-    const { userId, mood, intensity, triggers, notes } = req.body;
+    const { mood, intensity, triggers, notes, deviceFingerprint } = req.body;
     
-    if (!userId || !mood || intensity === undefined) {
-      return res.status(400).json({ error: 'userId, mood, and intensity are required' });
+    if (!mood || intensity === undefined) {
+      return res.status(400).json({ error: 'mood and intensity are required' });
     }
 
+    // Get or create anonymous user
+    const sessionInfo = userSessionManager.getSessionFromRequest(req);
+    const fingerprint = deviceFingerprint || sessionInfo.deviceFingerprint;
+    const anonymousUser = await userSessionManager.getOrCreateAnonymousUser(
+      fingerprint, 
+      sessionInfo.sessionId
+    );
+
     const moodEntry = await storage.createMoodEntry({
-      userId: parseInt(userId),
+      userId: anonymousUser.id,
       mood,
       intensity: parseInt(intensity),
       triggers: triggers || [],
-      notes: notes || '',
-      timestamp: new Date()
+      notes: notes || ''
     });
     
     res.json({ 
@@ -671,6 +678,24 @@ router.get('/mood/:userId', async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
     const moodEntries = await storage.getMoodEntries(userId);
+    res.json({ moodEntries });
+  } catch (error) {
+    console.error('Get mood entries error:', error);
+    res.status(500).json({ error: 'Failed to get mood entries' });
+  }
+});
+
+// Get mood entries for anonymous user
+router.get('/mood', async (req, res) => {
+  try {
+    // Get or create anonymous user
+    const sessionInfo = userSessionManager.getSessionFromRequest(req);
+    const anonymousUser = await userSessionManager.getOrCreateAnonymousUser(
+      sessionInfo.deviceFingerprint, 
+      sessionInfo.sessionId
+    );
+    
+    const moodEntries = await storage.getMoodEntries(anonymousUser.id);
     res.json({ moodEntries });
   } catch (error) {
     console.error('Get mood entries error:', error);
@@ -947,11 +972,38 @@ router.get('/journal/entries/:userId', async (req, res) => {
   }
 });
 
+// Get journal entries for anonymous user
+router.get('/journal/entries', async (req, res) => {
+  try {
+    // Get or create anonymous user
+    const sessionInfo = userSessionManager.getSessionFromRequest(req);
+    const anonymousUser = await userSessionManager.getOrCreateAnonymousUser(
+      sessionInfo.deviceFingerprint, 
+      sessionInfo.sessionId
+    );
+    
+    const entries = await storage.getJournalEntries(anonymousUser.id);
+    res.json(entries || []);
+  } catch (error) {
+    console.error('Failed to fetch journal entries:', error);
+    res.status(500).json({ error: 'Failed to fetch journal entries' });
+  }
+});
+
 router.post('/journal/entries', async (req, res) => {
   try {
-    const { userId, content, mood, tags, triggers, copingStrategies, isPrivate } = req.body;
+    const { content, mood, tags, triggers, copingStrategies, isPrivate, deviceFingerprint } = req.body;
+    
+    // Get or create anonymous user
+    const sessionInfo = userSessionManager.getSessionFromRequest(req);
+    const fingerprint = deviceFingerprint || sessionInfo.deviceFingerprint;
+    const anonymousUser = await userSessionManager.getOrCreateAnonymousUser(
+      fingerprint, 
+      sessionInfo.sessionId
+    );
+    
     const entry = await storage.createJournalEntry({
-      userId: userId || 1,
+      userId: anonymousUser.id,
       content,
       mood,
       tags: tags || [],
