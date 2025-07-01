@@ -300,25 +300,21 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
         <div className="flex gap-2">
           <button
             onClick={() => setActiveView('list')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              activeView === 'list' ? 'shadow-sm' : ''
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 ${
+              activeView === 'list' 
+                ? 'bg-blue-600 text-white border-blue-400 shadow-lg' 
+                : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
             }`}
-            style={{ 
-              backgroundColor: activeView === 'list' ? 'var(--surface-secondary)' : 'transparent',
-              color: 'var(--text-primary)'
-            }}
           >
             Entries ({entries.length})
           </button>
           <button
             onClick={() => setActiveView('analytics')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              activeView === 'analytics' ? 'shadow-sm' : ''
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 ${
+              activeView === 'analytics' 
+                ? 'bg-blue-600 text-white border-blue-400 shadow-lg' 
+                : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
             }`}
-            style={{ 
-              backgroundColor: activeView === 'analytics' ? 'var(--surface-secondary)' : 'transparent',
-              color: 'var(--text-primary)'
-            }}
           >
             Analytics
           </button>

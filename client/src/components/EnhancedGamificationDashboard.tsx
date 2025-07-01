@@ -226,8 +226,8 @@ const EnhancedGamificationDashboard: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-[var(--theme-secondary)] backdrop-blur-sm rounded-2xl shadow-lg p-2 mb-6 border border-[#1a237e]/30">
-          <div className="flex space-x-2">
+        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+          <div className="grid grid-cols-4 gap-1">
             {[
               { id: 'overview', label: 'Overview', icon: '📊' },
               { id: 'rewards', label: 'Rewards Shop', icon: '🎁' },
@@ -237,14 +237,14 @@ const EnhancedGamificationDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl transition-all duration-200 ${
+                className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
-                    ? 'theme-primary text-white shadow-lg'
-                    : 'text-white hover:theme-primary/40'
+                    ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                    : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
                 }`}
               >
-                <span>{tab.icon}</span>
-                <span className="font-medium">{tab.label}</span>
+                <span className="text-lg">{tab.icon}</span>
+                <div className="text-xs mt-1">{tab.label}</div>
               </button>
             ))}
           </div>

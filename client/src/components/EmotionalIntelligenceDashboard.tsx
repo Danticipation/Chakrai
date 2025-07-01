@@ -192,8 +192,8 @@ export default function EmotionalIntelligenceDashboard() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+      <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+        <div className="grid grid-cols-4 gap-1">
           {[
             { id: 'overview', label: 'System Overview' },
             { id: 'forecasts', label: 'Mood Forecasts' },
@@ -203,16 +203,16 @@ export default function EmotionalIntelligenceDashboard() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === tab.id
-                  ? 'border-purple-500 text-purple-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
               }`}
             >
               {tab.label}
             </button>
           ))}
-        </nav>
+        </div>
       </div>
 
       {/* Tab Content */}

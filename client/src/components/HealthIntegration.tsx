@@ -246,8 +246,8 @@ const HealthIntegration: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-[var(--theme-secondary)] backdrop-blur-sm rounded-xl mb-6 border border-[#1a237e]/30">
-          <div className="flex">
+        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+          <div className="grid grid-cols-5 gap-1">
             {[
               { id: 'devices', label: 'My Devices', icon: Smartphone },
               { id: 'metrics', label: 'Health Data', icon: Heart },
@@ -260,13 +260,13 @@ const HealthIntegration: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-xl font-medium transition-colors ${
+                  className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                     activeTab === tab.id
-                      ? 'theme-primary text-white'
-                      : 'text-white hover:theme-primary/40'
+                      ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                      : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
                   }`}
                 >
-                  <IconComponent size={18} />
+                  <IconComponent className="w-4 h-4 mx-auto mb-1" />
                   {tab.label}
                 </button>
               );
