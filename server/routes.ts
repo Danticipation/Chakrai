@@ -11,6 +11,59 @@ const analyticsSystem = new TherapeuticAnalyticsSystem();
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
+// ====================
+// TEXT SCRUBBING UTILITY
+// ====================
+
+// Clean text before sending to ElevenLabs TTS
+function scrubTextForTTS(text: string): string {
+  return text
+    // Remove markdown formatting
+    .replace(/\*\*(.+?)\*\*/g, '$1')  // Bold **text** -> text
+    .replace(/\*(.+?)\*/g, '$1')      // Italic *text* -> text
+    .replace(/_{2,}(.+?)_{2,}/g, '$1') // Underline __text__ -> text
+    .replace(/_(.+?)_/g, '$1')        // Single underscore _text_ -> text
+    .replace(/~~(.+?)~~/g, '$1')      // Strikethrough ~~text~~ -> text
+    
+    // Remove section markers and formatting
+    .replace(/###\s+/g, '')           // Remove ### headers
+    .replace(/##\s+/g, '')            // Remove ## headers  
+    .replace(/#\s+/g, '')             // Remove # headers
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1') // Links [text](url) -> text
+    
+    // Remove special characters that sound awkward
+    .replace(/\*+/g, '')              // Remove asterisks
+    .replace(/#{3,}/g, '')            // Remove multiple hashes
+    .replace(/_{3,}/g, '')            // Remove multiple underscores
+    .replace(/`+/g, '')               // Remove backticks
+    .replace(/\|/g, ' ')              // Replace pipes with spaces
+    .replace(/\~/g, '')               // Remove tildes
+    .replace(/\^/g, '')               // Remove carets
+    .replace(/\[|\]/g, '')            // Remove square brackets
+    .replace(/\{|\}/g, '')            // Remove curly brackets
+    
+    // Clean up spacing and line breaks
+    .replace(/\n{3,}/g, '\n\n')       // Max 2 line breaks
+    .replace(/\s{3,}/g, ' ')          // Max 1 space between words
+    .replace(/\.{3,}/g, '...')        // Max 3 dots for ellipsis
+    
+    // Replace common symbols with spoken equivalents
+    .replace(/&/g, ' and ')           // & -> and
+    .replace(/@/g, ' at ')            // @ -> at
+    .replace(/%/g, ' percent ')       // % -> percent
+    .replace(/\$/g, ' dollars ')      // $ -> dollars
+    .replace(/\+/g, ' plus ')         // + -> plus
+    .replace(/=/g, ' equals ')        // = -> equals
+    
+    // Clean up any remaining formatting artifacts
+    .replace(/\s*:\s*$/gm, ':')       // Clean up colons at line ends
+    .replace(/^\s*[-•]\s*/gm, '')     // Remove bullet points
+    
+    // Final cleanup
+    .trim()
+    .replace(/\s+/g, ' ');            // Normalize all whitespace
+}
+
 // Helper functions for advanced emotional intelligence features
 async function generateMoodForecast(userId: number, recentMoods: any[]): Promise<any> {
   try {
@@ -203,6 +256,11 @@ Adapt your response to mirror the user's communication patterns while maintainin
         console.log(`Making ElevenLabs request for voice: ${selectedVoice} (ID: ${voiceId})`);
         console.log(`Text to synthesize: "${aiResponse.substring(0, 50)}..."`);
         
+        // Scrub text before sending to ElevenLabs
+        const scrubbedText = scrubTextForTTS(aiResponse);
+        console.log(`Original text: "${aiResponse.substring(0, 100)}..."`);
+        console.log(`Scrubbed text: "${scrubbedText.substring(0, 100)}..."`);
+        
         const elevenLabsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
           method: 'POST',
           headers: {
@@ -211,7 +269,7 @@ Adapt your response to mirror the user's communication patterns while maintainin
             'xi-api-key': process.env.ELEVENLABS_API_KEY
           } as HeadersInit,
           body: JSON.stringify({
-            text: aiResponse,
+            text: scrubbedText,
             model_id: 'eleven_monolingual_v1',
             voice_settings: {
               stability: 0.6,
@@ -348,6 +406,11 @@ router.post('/text-to-speech', async (req, res) => {
     try {
       console.log(`Making ElevenLabs request for voice: ${voice} (ID: ${voiceId})`);
       
+      // Scrub text before sending to ElevenLabs
+      const scrubbedText = scrubTextForTTS(text);
+      console.log(`Original text: "${text.substring(0, 100)}..."`);
+      console.log(`Scrubbed text: "${scrubbedText.substring(0, 100)}..."`);
+      
       const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
         headers: {
@@ -356,7 +419,7 @@ router.post('/text-to-speech', async (req, res) => {
           'xi-api-key': process.env.ELEVENLABS_API_KEY || ''
         } as HeadersInit,
         body: JSON.stringify({
-          text: text,
+          text: scrubbedText,
           model_id: 'eleven_monolingual_v1',
           voice_settings: {
             stability: 0.5,
