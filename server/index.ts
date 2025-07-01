@@ -27,7 +27,7 @@ console.log('Routes module loaded successfully');
 app.get('/api/bot-stats', (req, res) => {
   res.json({ 
     level: 3,
-    stage: "Therapist",
+    stage: "Wellness Companion",
     wordsLearned: 1000
   });
 });

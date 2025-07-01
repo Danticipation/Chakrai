@@ -645,7 +645,7 @@ const AppLayout = () => {
                       <li>• ElevenLabs voice synthesis</li>
                       <li>• Personality mirroring & learning</li>
                       <li>• Crisis detection & intervention</li>
-                      <li>• Therapeutic journal analysis</li>
+                      <li>• Wellness journal analysis</li>
                     </ul>
                   </div>
 
