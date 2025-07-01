@@ -282,6 +282,15 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Real-Time Theme Switching**: Theme changes apply instantly across all components without page reload for seamless user experience
 - **Production Ready**: Complete enhanced theme system fully operational with rich color variations and theme-independent progress indicators
 
+### July 1, 2025 - AI Specialist Text Visibility Fix & Mobile Input Area Enhancement Completed
+- **AI Specialist Text Color Fix**: Resolved critical text visibility issue where agent selection text was same color as background making it unreadable
+- **Complete AgentSystem Theme Integration**: Updated all hardcoded colors in AgentSystem component to use theme variables (theme-text, theme-text-secondary, theme-card, etc.)
+- **Enhanced Mobile Input Area**: Fixed iPhone 15 Pro chat input being cut off with improved mobile-input-area CSS class using sticky positioning and enhanced safe area support
+- **Theme-Consistent Agent Cards**: Agent selection cards now use proper theme colors with theme-card backgrounds and theme-text styling for perfect readability
+- **Dynamic Viewport Support**: Added modern browser support with 100dvh for better mobile keyboard handling on iPhone 15 Pro
+- **iOS Keyboard Optimization**: Enhanced safe area calculations and transform optimizations for smooth iOS keyboard interaction
+- **Production Ready Mobile**: Complete mobile interface fixes ensuring chat input remains visible and AI Specialist text is perfectly readable across all themes
+
 ### July 1, 2025 - Complete 8-Voice System Implementation & Voice Display Fix Completed - All Voices Fully Operational
 - **8-Voice System Completed**: Successfully implemented complete voice system with 8 total voices (4 male, 4 female) as requested by user
 - **Original Voices Restored**: Added back all original voices (James, Brian, Alexandra, Carla) alongside new voices instead of replacing them
