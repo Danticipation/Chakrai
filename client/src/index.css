@@ -88,6 +88,41 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
   color: var(--theme-text);
 }
 
+/* Additional theme card styling */
+.theme-card {
+  background-color: var(--theme-primary) !important;
+  border: 1px solid var(--theme-accent) !important;
+}
+
+/* Ensure theme variables are properly applied */
+.theme-background {
+  background-color: var(--theme-background) !important;
+}
+
+.theme-surface {
+  background-color: var(--theme-surface) !important;
+}
+
+.theme-primary {
+  background-color: var(--theme-primary) !important;
+}
+
+.theme-primary-dark {
+  background-color: var(--theme-primary-dark) !important;
+}
+
+.theme-secondary {
+  background-color: var(--theme-secondary) !important;
+}
+
+.theme-text {
+  color: var(--theme-text) !important;
+}
+
+.theme-text-secondary {
+  color: var(--theme-text-secondary) !important;
+}
+
 /* Pulse animation for recording microphone */
 @keyframes pulse {
   0% {

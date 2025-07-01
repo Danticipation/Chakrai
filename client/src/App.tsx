@@ -1002,7 +1002,7 @@ const AppLayout = () => {
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
                       ? 'theme-surface theme-text shadow-lg transform scale-95 ring-2 ring-white'
-                      : 'bg-[var(--theme-primary)] theme-text hover:bg-[var(--theme-primary-light)] active:scale-95'
+                      : 'theme-primary theme-text hover:theme-primary-light active:scale-95'
                   }`}
                   style={{ minHeight: '60px' }}
                 >
@@ -1287,7 +1287,7 @@ const AppLayout = () => {
             }
           }}
         >
-          <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-md border border-[#3949ab]/30 relative max-h-full overflow-y-auto">
+          <div className="theme-card rounded-2xl p-6 w-full max-w-md border border-[var(--theme-accent)]/30 relative max-h-full overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-white">Voice Settings</h3>
               <div className="flex flex-col items-center">
