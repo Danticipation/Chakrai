@@ -929,9 +929,9 @@ const AppLayout = () => {
       </div>
 
       {/* Main Content Area - Mobile Responsive */}
-      <div className="flex-1 flex flex-col md:flex-row bg-[#0a0e1a]">
+      <div className="flex-1 flex flex-col md:flex-row theme-background">
         {/* Mobile Navigation - Separated User Features & Internal Tools */}
-        <div className="md:hidden bg-[#1a237e] border-b border-white/20">
+        <div className="md:hidden theme-surface border-b border-white/20">
           {/* User Features Section */}
           <div className="border-b border-white/10 pb-2">
             <div className="text-white/60 text-xs font-medium px-3 pt-2 pb-1">Wellness Features</div>
@@ -1078,9 +1078,9 @@ const AppLayout = () => {
         <div className="flex-1 mobile-content" style={{ height: 'calc(100vh - 200px)' }}>
           {activeSection === 'chat' ? (
             /* Mobile-Optimized Chat Panel - Full Width */
-            <div className="w-full h-full flex flex-col bg-[#3f51b5] overflow-hidden mobile-chat" style={{ maxHeight: '100%' }}>
+            <div className="w-full h-full flex flex-col theme-card overflow-hidden mobile-chat" style={{ maxHeight: '100%' }}>
               {/* Chat Header */}
-              <div className="bg-[#2c3e83] text-white text-center py-3 border-b border-white/20">
+              <div className="theme-surface theme-text text-center py-3 border-b border-white/20">
                 <div className="flex items-center justify-center space-x-2">
                   <MessageCircle size={20} />
                   <span className="font-bold text-lg">Chat with TraI</span>
