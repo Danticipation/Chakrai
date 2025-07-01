@@ -249,26 +249,41 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="theme-card rounded-xl p-1 mb-6 border border-[var(--theme-accent)]">
-          <div className="flex space-x-1">
-            {[
-              { id: 'overview', label: 'Overview', icon: BarChart3 },
-              { id: 'reports', label: 'Monthly Reports', icon: Calendar },
-              { id: 'trends', label: 'Longitudinal Trends', icon: TrendingUp },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all font-medium ${
-                  activeTab === tab.id
-                    ? 'bg-white text-black shadow-lg'
-                    : 'bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm'
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                <span className="font-medium">{tab.label}</span>
-              </button>
-            ))}
+        <div className="bg-gray-900 rounded-lg p-1 mb-6">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'overview'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'reports'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              }`}
+            >
+              <Calendar className="w-4 h-4" />
+              Monthly Reports
+            </button>
+            <button
+              onClick={() => setActiveTab('trends')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'trends'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              }`}
+            >
+              <TrendingUp className="w-4 h-4" />
+              Longitudinal Trends
+            </button>
           </div>
         </div>
 

@@ -145,26 +145,53 @@ export function InteractiveDashboard({ userId }: InteractiveDashboardProps) {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
-        {[
-          { key: 'overview', label: 'Overview', icon: BarChart3 },
-          { key: 'emotions', label: 'Emotions', icon: PieChart },
-          { key: 'progress', label: 'Progress', icon: Target },
-          { key: 'insights', label: 'Insights', icon: Award }
-        ].map(({ key, label, icon: Icon }) => (
+      <div className="bg-gray-900 rounded-lg p-1">
+        <div className="flex gap-1">
           <button
-            key={key}
-            onClick={() => setActiveView(key as any)}
-            className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
-              activeView === key
-                ? 'bg-white text-black shadow-lg'
-                : 'bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm'
+            onClick={() => setActiveView('overview')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+              activeView === 'overview'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-300 hover:text-white hover:bg-gray-800'
             }`}
           >
-            <Icon className="w-4 h-4" />
-            <span>{label}</span>
+            <BarChart3 className="w-4 h-4" />
+            Overview
           </button>
-        ))}
+          <button
+            onClick={() => setActiveView('emotions')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+              activeView === 'emotions'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-300 hover:text-white hover:bg-gray-800'
+            }`}
+          >
+            <PieChart className="w-4 h-4" />
+            Emotions
+          </button>
+          <button
+            onClick={() => setActiveView('progress')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+              activeView === 'progress'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-300 hover:text-white hover:bg-gray-800'
+            }`}
+          >
+            <Target className="w-4 h-4" />
+            Progress
+          </button>
+          <button
+            onClick={() => setActiveView('insights')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+              activeView === 'insights'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-300 hover:text-white hover:bg-gray-800'
+            }`}
+          >
+            <Award className="w-4 h-4" />
+            Insights
+          </button>
+        </div>
       </div>
 
       {/* Overview Tab */}

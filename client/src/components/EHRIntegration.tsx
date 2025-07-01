@@ -178,27 +178,53 @@ export function EHRIntegration() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-4 mb-6">
-          {[
-            { key: 'overview', label: 'Overview', icon: Activity },
-            { key: 'exports', label: 'Clinical Exports', icon: FileDown },
-            { key: 'insurance', label: 'Insurance', icon: CreditCard },
-            { key: 'compliance', label: 'Compliance', icon: Shield }
-          ].map(({ key, label, icon: Icon }) => (
-            <Button
-              key={key}
-              variant={activeTab === key ? 'default' : 'outline'}
-              onClick={() => setActiveTab(key as any)}
-              className={`px-6 py-3 rounded-xl transition-all font-medium ${
-                activeTab === key 
-                  ? 'bg-white text-black shadow-lg' 
-                  : 'bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm border-white/20'
+        <div className="bg-gray-900 rounded-lg p-1 mb-6">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'overview'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
               }`}
             >
-              <Icon className="w-4 h-4 mr-2" />
-              {label}
-            </Button>
-          ))}
+              <Activity className="w-4 h-4" />
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('exports')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'exports'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              }`}
+            >
+              <FileDown className="w-4 h-4" />
+              Clinical Exports
+            </button>
+            <button
+              onClick={() => setActiveTab('insurance')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'insurance'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              }`}
+            >
+              <CreditCard className="w-4 h-4" />
+              Insurance
+            </button>
+            <button
+              onClick={() => setActiveTab('compliance')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                activeTab === 'compliance'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              }`}
+            >
+              <Shield className="w-4 h-4" />
+              Compliance
+            </button>
+          </div>
         </div>
 
         {/* Overview Tab */}
