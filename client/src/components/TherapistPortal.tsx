@@ -209,7 +209,7 @@ const TherapistPortal: React.FC = () => {
         <CardContent>
           <div className="space-y-3">
             {riskAlerts.slice(0, 5).map(alert => (
-              <div key={alert.id} className="flex items-center justify-between p-3 bg-[#1a237e]/20 rounded-lg">
+              <div key={alert.id} className="flex items-center justify-between p-3 bg-[var(--theme-secondary)] rounded-lg">
                 <div className="flex items-center space-x-3">
                   <Badge className={`${getSeverityColor(alert.severity)} text-white`}>
                     {alert.severity}
@@ -292,7 +292,7 @@ const TherapistPortal: React.FC = () => {
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-white">Recent Mood Entries</h4>
                     {clientDashboard.allowedData.moodData.slice(0, 10).map((mood: any, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2 bg-[#1a237e]/20 rounded">
+                      <div key={idx} className="flex items-center justify-between p-2 bg-[var(--theme-secondary)] rounded">
                         <span className="text-white">{mood.mood}</span>
                         <div className="flex items-center space-x-2">
                           <Progress value={(mood.intensity || 5) * 10} className="w-20" />
@@ -311,7 +311,7 @@ const TherapistPortal: React.FC = () => {
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-white">Recent Journal Entries</h4>
                     {clientDashboard.allowedData.journalData.slice(0, 5).map((entry: any, idx) => (
-                      <div key={idx} className="p-3 bg-[#1a237e]/20 rounded">
+                      <div key={idx} className="p-3 bg-[var(--theme-secondary)] rounded">
                         <p className="text-white text-sm">{entry.content.substring(0, 200)}...</p>
                         <p className="text-xs text-white/70 mt-1">{formatDate(entry.createdAt)}</p>
                       </div>
@@ -327,7 +327,7 @@ const TherapistPortal: React.FC = () => {
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-white">Risk Alerts</h4>
                     {clientDashboard.allowedData.riskAlerts.map((alert: any, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-[#1a237e]/20 rounded">
+                      <div key={idx} className="flex items-center justify-between p-3 bg-[var(--theme-secondary)] rounded">
                         <div>
                           <Badge className={`${getSeverityColor(alert.severity)} text-white mb-1`}>
                             {alert.severity}
@@ -348,19 +348,19 @@ const TherapistPortal: React.FC = () => {
                 <div className="space-y-3">
                   {clientDashboard.privacySettings ? (
                     <>
-                      <div className="flex items-center justify-between p-2 bg-[#1a237e]/20 rounded">
+                      <div className="flex items-center justify-between p-2 bg-[var(--theme-secondary)] rounded">
                         <span className="text-white">Share Journal Data</span>
                         <Switch checked={clientDashboard.privacySettings.shareJournalData} disabled />
                       </div>
-                      <div className="flex items-center justify-between p-2 bg-[#1a237e]/20 rounded">
+                      <div className="flex items-center justify-between p-2 bg-[var(--theme-secondary)] rounded">
                         <span className="text-white">Share Mood Data</span>
                         <Switch checked={clientDashboard.privacySettings.shareMoodData} disabled />
                       </div>
-                      <div className="flex items-center justify-between p-2 bg-[#1a237e]/20 rounded">
+                      <div className="flex items-center justify-between p-2 bg-[var(--theme-secondary)] rounded">
                         <span className="text-white">Share Crisis Alerts</span>
                         <Switch checked={clientDashboard.privacySettings.shareCrisisAlerts} disabled />
                       </div>
-                      <div className="flex items-center justify-between p-2 bg-[#1a237e]/20 rounded">
+                      <div className="flex items-center justify-between p-2 bg-[var(--theme-secondary)] rounded">
                         <span className="text-white">Blur Crisis Flags</span>
                         <Switch checked={clientDashboard.privacySettings.blurCrisisFlags} disabled />
                       </div>
@@ -387,7 +387,7 @@ const TherapistPortal: React.FC = () => {
         <CardContent>
           <div className="space-y-4">
             {sessionNotes.map(note => (
-              <div key={note.id} className="p-4 bg-[#1a237e]/20 rounded-lg">
+              <div key={note.id} className="p-4 bg-[var(--theme-secondary)] rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-white font-medium">Client {note.clientUserId}</h4>
                   <div className="flex items-center space-x-2">
@@ -414,14 +414,14 @@ const TherapistPortal: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0a0e1a]">
+      <div className="flex items-center justify-center min-h-screen theme-primary">
         <div className="text-white">Loading therapist portal...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] p-6">
+    <div className="min-h-screen theme-primary p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Therapist Portal</h1>

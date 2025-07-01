@@ -179,7 +179,7 @@ export default function PrivacyComplianceDashboard() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="border-b border-[#1a237e]/30 bg-[#1a237e]/20 rounded-t-xl">
+      <div className="border-b border-[#1a237e]/30 bg-[var(--theme-secondary)] rounded-t-xl">
         <nav className="-mb-px flex space-x-8 px-6">
           {[
             { id: 'encryption', label: 'Data Encryption' },

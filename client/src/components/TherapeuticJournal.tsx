@@ -680,7 +680,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                         <div key={index} className="flex items-center justify-between">
                           <span className="text-white/90">{theme.theme}</span>
                           <div className="flex items-center">
-                            <div className="w-20 bg-[#1a237e]/50 rounded-full h-2 mr-2">
+                            <div className="w-20 bg-[var(--theme-secondary)] rounded-full h-2 mr-2">
                               <div 
                                 className="bg-[#000000] h-2 rounded-full"
                                 style={{ width: `${(theme.frequency / 20) * 100}%` }}
