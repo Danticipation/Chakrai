@@ -698,16 +698,16 @@ button:focus {
     overscroll-behavior: contain;
   }
   
-  /* Professional mobile container */
+  /* Professional mobile container - SCROLLING FIXED */
   .mobile-polish-container {
     min-height: 100vh;
     min-height: 100dvh;
     background: var(--theme-background);
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: visible;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    /* Ensure container is fully scrollable */
-    touch-action: pan-y;
+    /* Allow natural scrolling everywhere */
+    touch-action: auto;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
@@ -1012,20 +1012,30 @@ button:focus {
     touch-action: pan-y;
   }
   
-  /* Critical mobile scrolling fix - ensure full page area is scrollable */
+  /* CRITICAL MOBILE SCROLLING FIX - Allow scrolling everywhere */
   body, html {
-    overflow-y: auto !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
-    height: 100% !important;
+    touch-action: auto !important;
+    height: auto !important;
+    min-height: 100% !important;
   }
   
-  /* Ensure main containers allow proper scrolling */
-  .mobile-polish-container {
-    overflow-y: auto !important;
+  /* Ensure all elements allow touch scrolling */
+  *, *:before, *:after {
     -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
-    height: 100vh !important;
+    touch-action: auto !important;
+  }
+  
+  /* COMPLETE MOBILE SCROLLING FIX - Remove all height constraints */
+  .mobile-polish-container {
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: auto !important;
+    height: auto !important;
+    min-height: 100vh !important;
     position: relative !important;
   }
   
