@@ -271,10 +271,7 @@ div[style*="var(--surface-elevated)"] {
   background-color: #ff0000 !important;
 }
 
-/* Force therapeutic colors on all panels and containers */
-.w-1\/4, .w-1\/2, .w-full {
-  background-color: #0e2662 !important;
-}
+/* Allow themes to apply to containers */
 
 /* Mobile input area left shift */
 @media (max-width: 768px) {
@@ -304,12 +301,7 @@ div[style*="var(--surface-elevated)"] {
 
 /* Remove forced overrides to allow color swap */
 
-/* Override CSS variables that might be causing white backgrounds */
-:root {
-  --surface-elevated: #21c434 !important;
-  --surface-primary: #0e1525 !important;
-  --surface-secondary: #0e2662   !important;
-}
+/* Allow theme variables to work properly */
 
 /* Enhanced Mobile Interface Optimizations */
 
@@ -370,7 +362,6 @@ div[style*="var(--surface-elevated)"] {
   /* Mobile header compact */
   .mobile-header {
     padding: 8px 12px;
-    background: #0a0e1a;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
@@ -630,4 +621,29 @@ button:focus {
 
 .theme-accent {
   background-color: var(--theme-accent) !important;
+}
+
+/* Gradient theme classes */
+.from-theme-background {
+  --tw-gradient-from: var(--theme-background) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-theme-primary {
+  --tw-gradient-to: var(--theme-primary) var(--tw-gradient-to-position);
+}
+
+.from-theme-primary {
+  --tw-gradient-from: var(--theme-primary) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-theme-secondary {
+  --tw-gradient-to: var(--theme-secondary) var(--tw-gradient-to-position);
+}
+
+.border-theme-accent {
+  border-color: var(--theme-accent);
 }

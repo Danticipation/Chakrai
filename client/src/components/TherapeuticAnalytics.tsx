@@ -137,7 +137,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
     <div className="space-y-6">
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+        <Card className="bg-gradient-to-br from-theme-primary to-theme-secondary border-theme-accent/30">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-white flex items-center">
               <TrendingUp className="w-4 h-4 mr-2" />
@@ -153,7 +153,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+        <Card className="bg-gradient-to-br from-theme-primary to-theme-secondary border-theme-accent/30">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-white flex items-center">
               <Heart className="w-4 h-4 mr-2" />
@@ -168,7 +168,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+        <Card className="bg-gradient-to-br from-theme-primary to-theme-secondary border-theme-accent/30">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-white flex items-center">
               <Target className="w-4 h-4 mr-2" />
@@ -185,7 +185,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
       </div>
 
       {/* Emotional Trends Chart */}
-      <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+      <Card className="bg-gradient-to-br from-theme-primary to-theme-secondary border-theme-accent/30">
         <CardHeader>
           <CardTitle className="flex items-center text-white">
             <BarChart3 className="w-5 h-5 mr-2 text-white" />
@@ -225,7 +225,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
       </Card>
 
       {/* Effective Affirmations */}
-      <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+      <Card className="bg-gradient-to-br from-theme-primary to-theme-secondary border-theme-accent/30">
         <CardHeader>
           <CardTitle className="flex items-center text-white">
             <Sparkles className="w-5 h-5 mr-2 text-white" />
@@ -235,7 +235,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {dashboard?.effectiveAffirmations.map((affirmation, index) => (
-              <div key={index} className="p-4 border border-[#7986cb]/30 rounded-lg theme-card/20">
+              <div key={index} className="p-4 border border-theme-accent/30 rounded-lg theme-card/20">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-semibold text-white capitalize">
                     {affirmation.affirmationType.replace('-', ' ')}
@@ -258,7 +258,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
 
   const renderReports = () => (
     <div className="space-y-6">
-      <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+      <Card className="bg-gradient-to-br from-theme-primary to-theme-secondary border-theme-accent/30">
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-white">
             <span className="flex items-center">
@@ -312,7 +312,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
               </div>
 
               {/* Clinical Metrics */}
-              <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+              <Card className="bg-gradient-to-br from-theme-primary to-theme-secondary border-theme-accent/30">
                 <CardHeader>
                   <CardTitle className="text-lg text-white">Clinical Metrics</CardTitle>
                 </CardHeader>
@@ -347,7 +347,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
               </Card>
 
               {/* Key Insights */}
-              <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+              <Card className="bg-gradient-to-br from-theme-primary to-theme-secondary border-theme-accent/30">
                 <CardHeader>
                   <CardTitle className="text-white">Key Insights</CardTitle>
                 </CardHeader>
@@ -396,7 +396,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-4">
+    <div className="min-h-screen bg-gradient-to-br from-theme-primary to-theme-secondary p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6">

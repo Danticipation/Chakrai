@@ -3,7 +3,7 @@ import { Shield, Lock, Eye, FileText, AlertTriangle, Phone } from 'lucide-react'
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0e1a] to-[#1a237e] text-white p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-theme-background to-theme-primary text-white p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
