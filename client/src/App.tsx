@@ -80,6 +80,7 @@ const AppLayout = () => {
   const [selectedVoice, setSelectedVoice] = useState('hope');
   const [selectedReflectionVoice, setSelectedReflectionVoice] = useState('hope');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingVoice, setIsLoadingVoice] = useState(false);
   const [dailyAffirmation, setDailyAffirmation] = useState('Today is a new opportunity for growth and healing.');
   const [horoscopeText, setHoroscopeText] = useState<string>('');
   const [userZodiacSign, setUserZodiacSign] = useState<string>('aries');
@@ -319,6 +320,7 @@ const AppLayout = () => {
         // ElevenLabs Carla voice playback with aggressive activation
         if (data.audioUrl && data.audioUrl.length > 1000) {
           console.log(`ElevenLabs ${data.voiceUsed || 'Carla'} voice detected: ${data.audioUrl.length} characters`);
+          setIsLoadingVoice(true);
           
           const playElevenLabsAudio = async () => {
             try {
@@ -338,6 +340,7 @@ const AppLayout = () => {
               try {
                 await audio.play();
                 console.log('✓ ElevenLabs Carla voice played successfully');
+                setIsLoadingVoice(false);
                 
                 // Cleanup URL after playing
                 audio.addEventListener('ended', () => {
@@ -346,6 +349,7 @@ const AppLayout = () => {
                 
               } catch (playError) {
                 console.log('Direct play blocked, setting up click trigger...');
+                setIsLoadingVoice(false);
                 
                 // Show user that audio is ready
                 const audioReadyMessage = {
@@ -377,6 +381,7 @@ const AppLayout = () => {
               
             } catch (error) {
               console.error('ElevenLabs audio processing failed:', error);
+              setIsLoadingVoice(false);
             }
           };
           

@@ -16,6 +16,7 @@ export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
 
   const fetchDailyAffirmation = async () => {
     setLoading(true);
@@ -43,9 +44,10 @@ export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
   };
 
   const playAffirmationAudio = async () => {
-    if (!affirmationData || isPlaying) return;
+    if (!affirmationData || isPlaying || isLoadingAudio) return;
     
-    setIsPlaying(true);
+    setIsLoadingAudio(true);
+    setError(null);
     
     try {
       const response = await fetch('/api/text-to-speech', {
@@ -76,12 +78,26 @@ export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
             URL.revokeObjectURL(audioUrl);
           });
           
+          audio.addEventListener('error', () => {
+            setIsPlaying(false);
+            URL.revokeObjectURL(audioUrl);
+            setError('Audio playback failed');
+          });
+          
+          setIsLoadingAudio(false);
+          setIsPlaying(true);
           await audio.play();
+        } else {
+          throw new Error('No audio data received');
         }
+      } else {
+        throw new Error('Voice synthesis failed');
       }
     } catch (error) {
       console.error('Failed to play affirmation audio:', error);
+      setIsLoadingAudio(false);
       setIsPlaying(false);
+      setError('Voice reading failed. Please try again.');
     }
   };
 
@@ -152,14 +168,20 @@ export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
                   </div>
                   <button
                     onClick={playAffirmationAudio}
-                    disabled={isPlaying}
-                    className="p-2 rounded-lg theme-primary/50 hover:theme-primary/70 transition-colors disabled:opacity-50"
+                    disabled={isPlaying || isLoadingAudio}
+                    className="p-2 rounded-lg theme-primary/50 hover:theme-primary/70 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                    title={isLoadingAudio ? "Loading audio..." : isPlaying ? "Stop audio" : "Listen to affirmation"}
                   >
-                    {isPlaying ? (
+                    {isLoadingAudio ? (
+                      <Loader2 className="text-white animate-spin" size={20} />
+                    ) : isPlaying ? (
                       <VolumeX className="text-white" size={20} />
                     ) : (
                       <Volume2 className="text-white" size={20} />
                     )}
+                    <span className="text-sm text-white hidden sm:inline">
+                      {isLoadingAudio ? "Loading..." : isPlaying ? "Stop" : "Listen"}
+                    </span>
                   </button>
                 </div>
                 
