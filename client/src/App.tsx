@@ -832,9 +832,9 @@ const AppLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] flex flex-col">
+    <div className="min-h-screen theme-background flex flex-col">
       {/* Mobile-Optimized Header */}
-      <div className="bg-[#0a0e1a] p-2 md:p-4">
+      <div className="theme-background p-2 md:p-4">
         {/* Mobile: Compact Header */}
         <div className="block md:hidden">
           {/* Top Row: Logo and Status */}
