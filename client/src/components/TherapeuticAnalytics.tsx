@@ -269,7 +269,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
               <select 
                 value={reportPeriod} 
                 onChange={(e) => setReportPeriod(e.target.value as any)}
-                className="text-sm border rounded px-2 py-1"
+                className="text-sm border border-white/30 bg-[#3f51b5]/20 text-white rounded px-2 py-1"
               >
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
