@@ -649,7 +649,7 @@ const AppLayout = () => {
 
       case 'themes':
         return (
-          <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
+          <div className="h-full bg-[var(--theme-background)] p-6 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
               <ThemeSelector onClose={() => setActiveSection('chat')} />
             </div>
@@ -658,7 +658,7 @@ const AppLayout = () => {
 
       case 'voice':
         return (
-          <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
+          <div className="h-full bg-[var(--theme-background)] p-6 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
               <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg">
                 <h2 className="text-3xl font-bold text-white mb-6 text-center">Voice Settings</h2>
@@ -721,7 +721,7 @@ const AppLayout = () => {
 
       case 'logo':
         return (
-          <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
+          <div className="h-full bg-[var(--theme-background)] p-6 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
               <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg text-center">
                 <div className="mb-8">
@@ -780,7 +780,7 @@ const AppLayout = () => {
 
       case 'goals':
         return (
-          <div className="p-4 h-full overflow-y-auto bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
+          <div className="p-4 h-full overflow-y-auto bg-[var(--theme-background)]">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Wellness Goals</h2>
             <div className="space-y-4">
               {[
@@ -807,7 +807,7 @@ const AppLayout = () => {
 
       default:
         return (
-          <div className="flex items-center justify-center h-full bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
+          <div className="flex items-center justify-center h-full bg-[var(--theme-background)]">
             <p className="text-gray-600">Select a section to get started</p>
           </div>
         );
@@ -825,7 +825,7 @@ const AppLayout = () => {
 
   if (showOnboarding) {
     return (
-      <div className="h-screen bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6]">
+      <div className="h-screen bg-[var(--theme-background)]">
         <OnboardingQuiz onComplete={handleCompleteOnboarding} />
       </div>
     );
