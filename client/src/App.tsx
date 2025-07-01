@@ -1234,7 +1234,7 @@ const AppLayout = () => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Daily Journaling</div>
               <div className="theme-background rounded-full h-4 mb-3">
-                <div className="theme-accent h-4 rounded-full" style={{width: '75%'}}></div>
+                <div className="progress-high h-4 rounded-full" style={{width: '75%'}}></div>
               </div>
               <div className="theme-text text-base">15/20 days this month</div>
             </div>
@@ -1243,7 +1243,7 @@ const AppLayout = () => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Weekly Chat Goal</div>
               <div className="theme-background rounded-full h-4 mb-3">
-                <div className="theme-accent h-4 rounded-full" style={{width: '60%'}}></div>
+                <div className="progress-medium h-4 rounded-full" style={{width: '60%'}}></div>
               </div>
               <div className="theme-text text-base">3/5 sessions this week</div>
             </div>
@@ -1252,7 +1252,7 @@ const AppLayout = () => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Mood Tracking</div>
               <div className="theme-background rounded-full h-4 mb-3">
-                <div className="bg-yellow-400 h-4 rounded-full" style={{width: '90%'}}></div>
+                <div className="progress-high h-4 rounded-full" style={{width: '90%'}}></div>
               </div>
               <div className="theme-text text-base">27/30 days tracked</div>
             </div>
@@ -1261,7 +1261,7 @@ const AppLayout = () => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">App Usage Streak</div>
               <div className="theme-background rounded-full h-4 mb-3">
-                <div className="theme-secondary h-4 rounded-full" style={{width: '85%'}}></div>
+                <div className="progress-high h-4 rounded-full" style={{width: '85%'}}></div>
               </div>
               <div className="theme-text text-base">17 consecutive days</div>
             </div>

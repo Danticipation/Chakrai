@@ -642,3 +642,16 @@ button:focus {
 .theme-background {
   background-color: var(--theme-background) !important;
 }
+
+/* Enhanced Theme System - Rich Color Variations */
+.theme-primary-mid { background-color: var(--theme-primary-mid) !important; }
+.theme-secondary-light { background-color: var(--theme-secondary-light) !important; }
+.theme-secondary-dark { background-color: var(--theme-secondary-dark) !important; }
+.theme-accent-light { background-color: var(--theme-accent-light) !important; }
+.theme-surface-light { background-color: var(--theme-surface-light) !important; }
+
+/* Progress Bar System - Red to Yellow to Green (Theme Independent) */
+.progress-gradient { background: linear-gradient(90deg, var(--progress-start) 0%, var(--progress-middle) 50%, var(--progress-end) 100%) !important; }
+.progress-low { background-color: var(--progress-start) !important; }
+.progress-medium { background-color: var(--progress-middle) !important; }
+.progress-high { background-color: var(--progress-end) !important; }
