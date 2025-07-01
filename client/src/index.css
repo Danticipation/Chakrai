@@ -1057,16 +1057,68 @@ button:focus {
     touch-action: pan-y !important;
   }
   
-  /* Mobile chat messages - natural scrolling without height limits */
+  /* Mobile chat messages - CRITICAL SCROLLING FIX */
   .mobile-chat-messages-scroll {
     flex: 1;
     padding: 20px 16px;
-    overflow-y: auto !important;
+    overflow-y: visible !important;
     -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
+    touch-action: auto !important;
     /* Remove all height constraints that prevent scrolling */
     height: auto !important;
     min-height: calc(100vh - 320px) !important;
+    /* CRITICAL: Allow touch events to pass through */
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  /* FORCE all chat content to allow scrolling */
+  .mobile-chat-messages-scroll > *,
+  .mobile-chat-messages-scroll div,
+  .mobile-chat-messages-scroll p {
+    touch-action: auto !important;
+    pointer-events: auto !important;
+  }
+  
+  /* CRITICAL: Fix theme-card blocking touch events */
+  .theme-card,
+  .mobile-chat-container {
+    touch-action: auto !important;
+    pointer-events: auto !important;
+    overflow-y: visible !important;
+    position: relative !important;
+  }
+  
+  /* Make sure center content area doesn't block touches */
+  .mobile-content-scroll-area {
+    touch-action: auto !important;
+    pointer-events: auto !important;
+    overflow-y: visible !important;
+  }
+  
+  /* ULTIMATE FIX: Override any CSS that blocks center area scrolling */
+  @media (max-width: 768px) {
+    .flex-1,
+    .w-full,
+    .h-full,
+    .theme-card,
+    .theme-surface,
+    .mobile-chat-container,
+    .mobile-content-scroll-area,
+    .mobile-chat-messages-scroll {
+      touch-action: auto !important;
+      pointer-events: auto !important;
+      overflow: visible !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Force page scrolling to work everywhere */
+    body {
+      overflow-y: auto !important;
+      touch-action: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
   }
   
   /* Smooth animations */
