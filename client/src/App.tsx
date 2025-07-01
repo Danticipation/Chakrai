@@ -74,8 +74,8 @@ const AppLayout = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [userQuery, setUserQuery] = useState('');
-  const [selectedVoice, setSelectedVoice] = useState('carla');
-  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState('carla');
+  const [selectedVoice, setSelectedVoice] = useState('hope');
+  const [selectedReflectionVoice, setSelectedReflectionVoice] = useState('hope');
   const [isLoading, setIsLoading] = useState(false);
   const [dailyAffirmation, setDailyAffirmation] = useState('Today is a new opportunity for growth and healing.');
   const [horoscopeText, setHoroscopeText] = useState<string>('');

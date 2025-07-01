@@ -182,14 +182,14 @@ Adapt your response to mirror the user's communication patterns while maintainin
 
     // Generate ElevenLabs voice synthesis
     const voiceMap: Record<string, string> = {
+      'hope': 'iCrDUkL56s3C8sCRl7wb',
       'james': 'EkK5I93UQWFDigLMpZcX',
-      'brian': 'nPczCjzI2devNBz1zQrb', 
-      'alexandra': 'kdmDKE6EkgrWrrykO9Qt',
-      'carla': 'l32B8XDoylOsZKiSdfhE'
+      'charlotte': 'XB0fDUnXU5powFXDhCwa',
+      'bronson': 'TsW8a1Lp3kExG3Ny7cUn'
     };
 
-    const selectedVoice = voice || 'carla';
-    const voiceId = voiceMap[selectedVoice] || voiceMap['carla'];
+    const selectedVoice = voice || 'hope';
+    const voiceId = voiceMap[selectedVoice] || voiceMap['hope'];
     let audioUrl = null;
 
     if (process.env.ELEVENLABS_API_KEY) {
@@ -325,13 +325,13 @@ router.post('/text-to-speech', async (req, res) => {
     }
 
     const voiceMap: Record<string, string> = {
+      'hope': 'iCrDUkL56s3C8sCRl7wb',
       'james': 'EkK5I93UQWFDigLMpZcX',
-      'brian': 'nPczCjzI2devNBz1zQrb', 
-      'alexandra': 'kdmDKE6EkgrWrrykO9Qt',
-      'carla': 'l32B8XDoylOsZKiSdfhE'
+      'charlotte': 'XB0fDUnXU5powFXDhCwa',
+      'bronson': 'TsW8a1Lp3kExG3Ny7cUn'
     };
 
-    const voiceId = voiceMap[voice] || voiceMap['james'];
+    const voiceId = voiceMap[voice] || voiceMap['hope'];
     
     try {
       console.log(`Making ElevenLabs request for voice: ${voice} (ID: ${voiceId})`);
