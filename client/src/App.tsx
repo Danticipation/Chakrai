@@ -784,9 +784,9 @@ const AppLayout = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Wellness Goals</h2>
             <div className="space-y-4">
               {[
-                { name: 'Daily Mindfulness', current: 12, target: 21, color: 'bg-green-500' },
-                { name: 'Anxiety Management', current: 8, target: 14, color: 'bg-blue-500' },
-                { name: 'Social Connection', current: 3, target: 7, color: 'bg-purple-500' }
+                { name: 'Daily Mindfulness', current: 12, target: 21, color: 'bg-[var(--theme-accent)]' },
+                { name: 'Anxiety Management', current: 8, target: 14, color: 'bg-[var(--theme-primary)]' },
+                { name: 'Social Connection', current: 3, target: 7, color: 'bg-[var(--theme-secondary)]' }
               ].map((goal, index) => (
                 <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-4">
                   <div className="flex justify-between items-center mb-2">
@@ -858,31 +858,31 @@ const AppLayout = () => {
           <div className="flex gap-2">
             <button 
               onClick={() => setActiveSection('horoscope')}
-              className="flex-1 bg-purple-700/80 rounded-lg p-2 hover:bg-purple-600 transition-colors"
+              className="flex-1 bg-[var(--theme-primary)]/80 rounded-lg p-2 hover:bg-[var(--theme-primary-light)] transition-colors"
             >
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">⭐</span>
-                <span className="text-xs text-white font-medium">Horoscope</span>
+                <span className="text-xs theme-text font-medium">Horoscope</span>
               </div>
             </button>
             
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="flex-1 bg-purple-700/80 rounded-lg p-2 hover:bg-purple-600 transition-colors"
+              className="flex-1 bg-[var(--theme-primary)]/80 rounded-lg p-2 hover:bg-[var(--theme-primary-light)] transition-colors"
             >
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">✨</span>
-                <span className="text-xs text-white font-medium">Affirmation</span>
+                <span className="text-xs theme-text font-medium">Affirmation</span>
               </div>
             </button>
             
             <button 
               onClick={() => setShowSettings(true)}
-              className="flex-1 bg-purple-700/80 rounded-lg p-2 hover:bg-purple-600 transition-colors"
+              className="flex-1 bg-[var(--theme-primary)]/80 rounded-lg p-2 hover:bg-[var(--theme-primary-light)] transition-colors"
             >
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">⚙️</span>
-                <span className="text-xs text-white font-medium">Settings</span>
+                <span className="text-xs theme-text font-medium">Settings</span>
               </div>
             </button>
           </div>
@@ -894,13 +894,13 @@ const AppLayout = () => {
             {/* Horoscope Section - Expanded */}
             <button 
               onClick={() => setActiveSection('horoscope')}
-              className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+              className="bg-[var(--theme-primary)] rounded-lg p-6 flex flex-col hover:bg-[var(--theme-primary-light)] transition-colors cursor-pointer"
             >
-              <h3 className="text-2xl font-bold text-white mb-4 underline">Horoscope</h3>
-              <p className="text-base text-white text-left leading-relaxed flex-1">
+              <h3 className="text-2xl font-bold theme-text mb-4 underline">Horoscope</h3>
+              <p className="text-base theme-text text-left leading-relaxed flex-1">
                 {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
               </p>
-              <p className="text-sm text-white/70 mt-4 font-semibold">Click to expand</p>
+              <p className="text-sm theme-text/70 mt-4 font-semibold">Click to expand</p>
             </button>
             
             {/* Logo Section - Center */}
@@ -916,13 +916,13 @@ const AppLayout = () => {
             {/* Affirmation Section - Expanded */}
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="bg-purple-700 rounded-lg p-6 flex flex-col hover:bg-purple-600 transition-colors cursor-pointer"
+              className="bg-[var(--theme-primary)] rounded-lg p-6 flex flex-col hover:bg-[var(--theme-primary-light)] transition-colors cursor-pointer"
             >
-              <h3 className="text-2xl font-bold text-white mb-4 underline">Affirmation</h3>
-              <p className="text-base text-white text-left leading-relaxed flex-1">
+              <h3 className="text-2xl font-bold theme-text mb-4 underline">Affirmation</h3>
+              <p className="text-base theme-text text-left leading-relaxed flex-1">
                 {dailyAffirmation.substring(0, 200)}...
               </p>
-              <p className="text-sm text-white/70 mt-4 font-semibold">Click to here</p>
+              <p className="text-sm theme-text/70 mt-4 font-semibold">Click to here</p>
             </button>
           </div>
         </div>
@@ -969,8 +969,8 @@ const AppLayout = () => {
                   }}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
-                      ? 'bg-green-500 text-white shadow-lg transform scale-95 ring-2 ring-white'
-                      : 'bg-purple-800/60 text-white/80 hover:bg-purple-700 active:scale-95'
+                      ? 'bg-[var(--theme-accent)] theme-text shadow-lg transform scale-95 ring-2 ring-white'
+                      : 'bg-[var(--theme-primary)]/60 theme-text/80 hover:bg-[var(--theme-primary)] active:scale-95'
                   }`}
                   style={{ minHeight: '60px' }}
                 >
@@ -1112,7 +1112,7 @@ const AppLayout = () => {
                         <div className={`max-w-[85%] px-4 py-3 rounded-2xl chat-bubble ${
                           message.sender === 'user' 
                             ? 'bg-blue-500 text-white rounded-br-md' 
-                            : 'bg-purple-700 text-white rounded-bl-md'
+                            : 'bg-[var(--theme-primary)] theme-text rounded-bl-md'
                         }`}>
                           <p className="mobile-text-sm leading-relaxed">{message.text}</p>
                           <p className="mobile-text-xs mt-2 opacity-70">{message.time}</p>
