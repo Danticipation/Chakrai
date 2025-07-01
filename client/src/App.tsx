@@ -22,6 +22,7 @@ import DailyAffirmation from './components/DailyAffirmation';
 import PWAManager from './components/PWAManager';
 import MicroSession from './components/MicroSession';
 import TherapeuticAnalytics from './components/TherapeuticAnalytics';
+import { EHRIntegration } from './components/EHRIntegration';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -835,7 +836,8 @@ const AppLayout = () => {
             { id: 'vr', label: 'VR Therapy' },
             { id: 'health', label: 'Wearables' },
             { id: 'therapist', label: 'Therapist Portal' },
-            { id: 'outcomes', label: 'Therapeutic Outcomes' }
+            { id: 'outcomes', label: 'Therapeutic Outcomes' },
+            { id: 'ehr', label: 'EHR Integration' }
           ].map((tab) => (
             <button
               key={tab.id}

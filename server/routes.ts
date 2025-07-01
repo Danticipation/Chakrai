@@ -1434,4 +1434,444 @@ router.get('/api/analytics/dashboard/:userId', async (req, res) => {
   }
 });
 
+// ================================
+// EHR INTEGRATION & INSURANCE SYSTEM ENDPOINTS
+// ================================
+
+import { 
+  FHIRService, 
+  InsuranceService, 
+  ClinicalExportService, 
+  AuditService, 
+  EncryptionService 
+} from './ehrIntegration.js';
+
+// EHR Integration Management
+router.post('/api/ehr/integration', async (req, res) => {
+  try {
+    const { 
+      userId, 
+      therapistId, 
+      ehrSystemType, 
+      fhirEndpoint, 
+      apiKey, 
+      clientId,
+      tenantId,
+      syncFrequency,
+      dataTypes 
+    } = req.body;
+
+    // Encrypt sensitive data
+    const encryptedApiKey = apiKey ? EncryptionService.encrypt(apiKey, process.env.EHR_ENCRYPTION_KEY || 'default-key') : null;
+
+    const integration = await storage.createEhrIntegration({
+      userId,
+      therapistId,
+      ehrSystemType,
+      fhirEndpoint,
+      apiKey: encryptedApiKey?.encryptedData,
+      clientId,
+      tenantId,
+      syncFrequency: syncFrequency || 'daily',
+      dataTypes: dataTypes || ['sessions', 'assessments', 'progress_notes']
+    });
+
+    // Log audit trail
+    await AuditService.logAccess(
+      userId,
+      therapistId,
+      'create',
+      'ehr_integration',
+      integration.id.toString(),
+      req.ip,
+      req.get('User-Agent') || '',
+      'success'
+    );
+
+    res.json({ success: true, integration: { ...integration, apiKey: '[ENCRYPTED]' } });
+  } catch (error) {
+    console.error('EHR integration creation error:', error);
+    res.status(500).json({ error: 'Failed to create EHR integration' });
+  }
+});
+
+// Generate FHIR Resources
+router.post('/api/ehr/fhir/patient', async (req, res) => {
+  try {
+    const { userId, userData } = req.body;
+    
+    const patientResource = FHIRService.generatePatientResource(userId, userData);
+    
+    const fhirResource = await storage.createFhirResource({
+      userId,
+      resourceType: 'Patient',
+      resourceId: patientResource.id,
+      fhirVersion: 'R4',
+      resourceData: patientResource
+    });
+
+    res.json({ success: true, resource: fhirResource });
+  } catch (error) {
+    console.error('FHIR Patient creation error:', error);
+    res.status(500).json({ error: 'Failed to create FHIR Patient resource' });
+  }
+});
+
+router.post('/api/ehr/fhir/encounter', async (req, res) => {
+  try {
+    const { sessionId, userId, therapistId, sessionData } = req.body;
+    
+    const encounterResource = FHIRService.generateEncounterResource(sessionId, userId, therapistId, sessionData);
+    
+    const fhirResource = await storage.createFhirResource({
+      userId,
+      resourceType: 'Encounter',
+      resourceId: encounterResource.id,
+      fhirVersion: 'R4',
+      resourceData: encounterResource
+    });
+
+    res.json({ success: true, resource: fhirResource });
+  } catch (error) {
+    console.error('FHIR Encounter creation error:', error);
+    res.status(500).json({ error: 'Failed to create FHIR Encounter resource' });
+  }
+});
+
+router.post('/api/ehr/fhir/observation', async (req, res) => {
+  try {
+    const { observationId, userId, observationType, value, effectiveDate } = req.body;
+    
+    const observationResource = FHIRService.generateObservationResource(
+      observationId, 
+      userId, 
+      observationType, 
+      value, 
+      effectiveDate
+    );
+    
+    const fhirResource = await storage.createFhirResource({
+      userId,
+      resourceType: 'Observation',
+      resourceId: observationResource.id,
+      fhirVersion: 'R4',
+      resourceData: observationResource
+    });
+
+    res.json({ success: true, resource: fhirResource });
+  } catch (error) {
+    console.error('FHIR Observation creation error:', error);
+    res.status(500).json({ error: 'Failed to create FHIR Observation resource' });
+  }
+});
+
+// Insurance Eligibility Verification
+router.post('/api/insurance/verify-eligibility', async (req, res) => {
+  try {
+    const { userId, therapistId, memberId, insuranceProvider, therapistNPI } = req.body;
+    
+    const verification = await InsuranceService.verifyEligibility(memberId, insuranceProvider, therapistNPI);
+    
+    const eligibility = await storage.createInsuranceEligibility({
+      userId,
+      therapistId,
+      insuranceProvider,
+      memberId,
+      eligibilityStatus: verification.eligibilityStatus,
+      coverageType: verification.coverageType,
+      copayAmount: verification.copayAmount,
+      deductibleRemaining: verification.deductibleRemaining,
+      annualLimit: verification.annualLimit,
+      sessionsRemaining: verification.sessionsRemaining,
+      preAuthRequired: verification.preAuthRequired,
+      verificationDate: new Date(verification.verificationDate),
+      expirationDate: new Date(verification.expirationDate)
+    });
+
+    res.json({ success: true, eligibility, verification });
+  } catch (error) {
+    console.error('Insurance verification error:', error);
+    res.status(500).json({ error: 'Failed to verify insurance eligibility' });
+  }
+});
+
+// Session Billing
+router.post('/api/insurance/session-billing', async (req, res) => {
+  try {
+    const { 
+      userId, 
+      therapistId, 
+      sessionId, 
+      insuranceEligibilityId,
+      sessionType, 
+      sessionDuration, 
+      diagnosisCode 
+    } = req.body;
+    
+    const cptCode = InsuranceService.generateCPTCode(sessionType, sessionDuration);
+    const billableAmount = InsuranceService.calculateBillableAmount(cptCode, 'default');
+    
+    const billing = await storage.createSessionBilling({
+      userId,
+      therapistId,
+      sessionId,
+      insuranceEligibilityId,
+      cptCode,
+      diagnosisCode,
+      sessionDate: new Date(),
+      sessionDuration,
+      sessionType,
+      billableAmount
+    });
+
+    res.json({ success: true, billing, cptCode, billableAmount });
+  } catch (error) {
+    console.error('Session billing error:', error);
+    res.status(500).json({ error: 'Failed to create session billing' });
+  }
+});
+
+// Clinical Data Export
+router.post('/api/ehr/export/pdf', async (req, res) => {
+  try {
+    const { userId, therapistId, dateRange, includedData } = req.body;
+    
+    const exportResult = await ClinicalExportService.generatePDFReport(
+      userId, 
+      therapistId, 
+      dateRange, 
+      includedData
+    );
+    
+    const clinicalExport = await storage.createClinicalExport({
+      userId,
+      therapistId,
+      exportType: 'pdf_report',
+      exportFormat: 'pdf',
+      dateRange,
+      includedData,
+      filePath: exportResult.filePath,
+      fileSize: exportResult.fileSize,
+      complianceLevel: 'hipaa'
+    });
+
+    // Log export action
+    await AuditService.logAccess(
+      userId,
+      therapistId,
+      'export',
+      'clinical_data',
+      clinicalExport.id.toString(),
+      req.ip,
+      req.get('User-Agent') || '',
+      'success',
+      { exportType: 'pdf', fileSize: exportResult.fileSize }
+    );
+
+    res.json({ 
+      success: true, 
+      export: clinicalExport,
+      downloadUrl: `/api/ehr/download/${clinicalExport.id}`
+    });
+  } catch (error) {
+    console.error('PDF export error:', error);
+    res.status(500).json({ error: 'Failed to generate PDF export' });
+  }
+});
+
+router.post('/api/ehr/export/csv', async (req, res) => {
+  try {
+    const { userId, dateRange, includedData } = req.body;
+    
+    const exportResult = await ClinicalExportService.generateCSVExport(
+      userId, 
+      dateRange, 
+      includedData
+    );
+    
+    const clinicalExport = await storage.createClinicalExport({
+      userId,
+      exportType: 'csv_data',
+      exportFormat: 'csv',
+      dateRange,
+      includedData,
+      filePath: exportResult.filePath,
+      fileSize: exportResult.fileSize,
+      complianceLevel: 'hipaa'
+    });
+
+    res.json({ 
+      success: true, 
+      export: clinicalExport,
+      downloadUrl: `/api/ehr/download/${clinicalExport.id}`
+    });
+  } catch (error) {
+    console.error('CSV export error:', error);
+    res.status(500).json({ error: 'Failed to generate CSV export' });
+  }
+});
+
+router.post('/api/ehr/export/fhir-bundle', async (req, res) => {
+  try {
+    const { userId, dateRange } = req.body;
+    
+    const exportResult = await ClinicalExportService.generateFHIRBundle(
+      userId, 
+      dateRange
+    );
+    
+    const clinicalExport = await storage.createClinicalExport({
+      userId,
+      exportType: 'fhir_bundle',
+      exportFormat: 'json',
+      dateRange,
+      includedData: ['sessions', 'assessments', 'observations'],
+      filePath: exportResult.filePath,
+      fileSize: exportResult.fileSize,
+      complianceLevel: 'hipaa'
+    });
+
+    res.json({ 
+      success: true, 
+      export: clinicalExport,
+      downloadUrl: `/api/ehr/download/${clinicalExport.id}`
+    });
+  } catch (error) {
+    console.error('FHIR Bundle export error:', error);
+    res.status(500).json({ error: 'Failed to generate FHIR Bundle export' });
+  }
+});
+
+// Download Clinical Exports
+router.get('/api/ehr/download/:exportId', async (req, res) => {
+  try {
+    const exportId = parseInt(req.params.exportId);
+    const clinicalExport = await storage.getClinicalExport(exportId);
+    
+    if (!clinicalExport || !clinicalExport.filePath) {
+      return res.status(404).json({ error: 'Export not found' });
+    }
+
+    // Update download count
+    await storage.updateClinicalExportDownload(exportId);
+
+    // Log download access
+    await AuditService.logAccess(
+      clinicalExport.userId,
+      clinicalExport.therapistId,
+      'download',
+      'clinical_export',
+      exportId.toString(),
+      req.ip,
+      req.get('User-Agent') || '',
+      'success'
+    );
+
+    res.download(clinicalExport.filePath);
+  } catch (error) {
+    console.error('Export download error:', error);
+    res.status(500).json({ error: 'Failed to download export' });
+  }
+});
+
+// Get User's Clinical Exports
+router.get('/api/ehr/exports/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const exports = await storage.getUserClinicalExports(userId);
+    
+    res.json({ exports });
+  } catch (error) {
+    console.error('Get exports error:', error);
+    res.status(500).json({ error: 'Failed to get exports' });
+  }
+});
+
+// Insurance Summary for Licensed Therapists
+router.post('/api/insurance/session-summary', async (req, res) => {
+  try {
+    const { 
+      therapistId, 
+      userId, 
+      sessionDate, 
+      sessionDuration, 
+      sessionType,
+      treatmentGoals,
+      progressNotes,
+      diagnosisCode,
+      interventions 
+    } = req.body;
+    
+    // Verify therapist licensing (would check against license database in production)
+    const isLicensed = true; // Mock verification
+    
+    if (!isLicensed) {
+      return res.status(403).json({ error: 'Therapist licensing verification failed' });
+    }
+
+    const cptCode = InsuranceService.generateCPTCode(sessionType, sessionDuration);
+    const billableAmount = InsuranceService.calculateBillableAmount(cptCode, 'default');
+    
+    const summary = {
+      sessionId: `SESSION-${Date.now()}`,
+      therapistId,
+      userId: `PATIENT-${userId}`,
+      sessionDate,
+      sessionDuration,
+      sessionType,
+      cptCode,
+      diagnosisCode,
+      billableAmount,
+      treatmentGoals,
+      progressNotes,
+      interventions,
+      clinicalImpression: `Patient demonstrated ${progressNotes.engagement || 'good'} engagement in therapy session. ${progressNotes.progress || 'Continued progress towards treatment goals observed.'} Recommend ${progressNotes.recommendation || 'continuing current treatment plan'}.`,
+      nextAppointment: progressNotes.nextAppointment || null,
+      riskAssessment: progressNotes.riskLevel || 'low',
+      complianceNotes: 'Session conducted in accordance with HIPAA privacy standards and professional therapeutic guidelines.'
+    };
+
+    // Store insurance-eligible session summary
+    const billing = await storage.createSessionBilling({
+      userId,
+      therapistId,
+      sessionId: summary.sessionId,
+      cptCode,
+      diagnosisCode,
+      sessionDate: new Date(sessionDate),
+      sessionDuration,
+      sessionType,
+      billableAmount,
+      claimStatus: 'draft'
+    });
+
+    res.json({ 
+      success: true, 
+      summary, 
+      billingRecord: billing,
+      eligibleForInsurance: true,
+      message: 'Insurance-eligible session summary generated successfully'
+    });
+  } catch (error) {
+    console.error('Insurance session summary error:', error);
+    res.status(500).json({ error: 'Failed to generate insurance session summary' });
+  }
+});
+
+// Audit Trail Retrieval
+router.get('/api/ehr/audit-logs/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const startDate = req.query.startDate as string;
+    const endDate = req.query.endDate as string;
+    
+    const auditLogs = await storage.getAuditLogs(userId, startDate, endDate);
+    
+    res.json({ auditLogs });
+  } catch (error) {
+    console.error('Audit logs retrieval error:', error);
+    res.status(500).json({ error: 'Failed to retrieve audit logs' });
+  }
+});
+
 export default router;
