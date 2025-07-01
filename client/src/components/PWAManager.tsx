@@ -259,7 +259,7 @@ export default function PWAManager({ onNotificationPermissionChange }: PWAManage
     <>
       {/* Install App Prompt */}
       {showInstallPrompt && isInstallable && !isInstalled && (
-        <div className="fixed top-4 left-4 right-4 z-50 bg-[#3f51b5] text-white rounded-lg p-4 shadow-lg border border-white/20">
+        <div className="fixed top-4 left-4 right-4 z-50 theme-card text-white rounded-lg p-4 shadow-lg border border-[var(--theme-accent)]">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
               <Download className="w-6 h-6 text-white" />
@@ -298,7 +298,7 @@ export default function PWAManager({ onNotificationPermissionChange }: PWAManage
       {notificationPermission !== 'granted' && (
         <button
           onClick={requestNotificationPermission}
-          className="fixed bottom-20 right-4 bg-[#3f51b5] hover:bg-[#3949ab] text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 z-40"
+          className="fixed bottom-20 right-4 theme-card hover:bg-[#3949ab] text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 z-40"
           title="Enable Notifications"
         >
           {notificationPermission === 'denied' ? (

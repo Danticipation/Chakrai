@@ -314,7 +314,7 @@ export function EHRIntegration() {
                     <select 
                       value={selectedExportType}
                       onChange={(e) => setSelectedExportType(e.target.value as any)}
-                      className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2"
+                      className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2"
                     >
                       <option value="pdf">PDF Report</option>
                       <option value="csv">CSV Data</option>
@@ -327,7 +327,7 @@ export function EHRIntegration() {
                       type="date"
                       value={dateRange.start}
                       onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
-                      className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2"
+                      className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2"
                     />
                   </div>
                   <div>
@@ -336,7 +336,7 @@ export function EHRIntegration() {
                       type="date"
                       value={dateRange.end}
                       onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
-                      className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2"
+                      className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2"
                     />
                   </div>
                 </div>
@@ -404,12 +404,12 @@ export function EHRIntegration() {
                     <input 
                       type="text"
                       placeholder="Enter member ID"
-                      className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2 placeholder-white/50"
+                      className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2 placeholder-white/50"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white/90 mb-2">Insurance Provider</label>
-                    <select className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2">
+                    <select className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2">
                       <option value="">Select Provider</option>
                       <option value="bcbs">Blue Cross Blue Shield</option>
                       <option value="aetna">Aetna</option>
@@ -437,7 +437,7 @@ export function EHRIntegration() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-white/90 mb-2">Session Type</label>
-                    <select className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2">
+                    <select className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2">
                       <option value="individual">Individual Therapy</option>
                       <option value="group">Group Therapy</option>
                       <option value="family">Family Therapy</option>
@@ -449,7 +449,7 @@ export function EHRIntegration() {
                     <input 
                       type="number"
                       placeholder="45"
-                      className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2 placeholder-white/50"
+                      className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2 placeholder-white/50"
                     />
                   </div>
                   <div>
@@ -457,14 +457,14 @@ export function EHRIntegration() {
                     <input 
                       type="text"
                       placeholder="F41.1"
-                      className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2 placeholder-white/50"
+                      className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2 placeholder-white/50"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white/90 mb-2">Session Date</label>
                     <input 
                       type="date"
-                      className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2"
+                      className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2"
                     />
                   </div>
                 </div>
@@ -472,7 +472,7 @@ export function EHRIntegration() {
                   <label className="block text-sm font-medium text-white/90 mb-2">Progress Notes</label>
                   <textarea 
                     placeholder="Document therapeutic progress and interventions..."
-                    className="w-full rounded-md border border-white/30 bg-[#3f51b5]/20 text-white px-3 py-2 placeholder-white/50"
+                    className="w-full rounded-md border border-white/30 bg-[var(--theme-secondary)] text-white px-3 py-2 placeholder-white/50"
                     rows={4}
                   />
                 </div>

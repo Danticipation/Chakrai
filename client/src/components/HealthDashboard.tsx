@@ -71,7 +71,7 @@ export default function HealthDashboard() {
       <div className="space-y-6">
         {/* Health Metrics Summary */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/80">Heart Rate</p>
@@ -84,7 +84,7 @@ export default function HealthDashboard() {
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/80">Steps</p>
@@ -97,7 +97,7 @@ export default function HealthDashboard() {
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/80">Sleep</p>
@@ -110,7 +110,7 @@ export default function HealthDashboard() {
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/80">Stress Level</p>
@@ -125,7 +125,7 @@ export default function HealthDashboard() {
         </div>
 
         {/* Device Status */}
-        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
           <h3 className="text-lg font-semibold text-white mb-4">Connected Devices</h3>
           <div className="space-y-3">
             {devices?.map((device) => (
@@ -149,7 +149,7 @@ export default function HealthDashboard() {
         </div>
 
         {/* Recent Correlations */}
-        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
           <h3 className="text-lg font-semibold text-white mb-4">Health Insights</h3>
           <div className="space-y-3">
             {correlations?.slice(0, 3).map((correlation) => (
@@ -190,7 +190,7 @@ export default function HealthDashboard() {
         {/* Device List */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {devices?.map((device) => (
-            <div key={device.id} className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+            <div key={device.id} className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h4 className="text-white font-semibold">{device.deviceName}</h4>
@@ -242,7 +242,7 @@ export default function HealthDashboard() {
     return (
       <div className="space-y-6">
         {/* Correlation Analysis */}
-        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
           <h3 className="text-lg font-semibold text-white mb-4">Health & Wellness Correlations</h3>
           <div className="space-y-4">
             {correlations?.map((correlation) => (
@@ -294,7 +294,7 @@ export default function HealthDashboard() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-[#3f51b5] rounded-xl p-1 mb-6 border border-white/20">
+        <div className="theme-card rounded-xl p-1 mb-6 border border-[var(--theme-accent)]">
           <div className="flex space-x-1">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },

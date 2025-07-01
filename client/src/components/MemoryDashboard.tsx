@@ -103,7 +103,7 @@ export default function MemoryDashboard() {
           <Button 
             onClick={handleRefresh}
             disabled={refreshing}
-            className="bg-[#3f51b5] hover:bg-[#303f9f] text-white"
+            className="theme-card hover:bg-[#303f9f] text-white"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
@@ -112,7 +112,7 @@ export default function MemoryDashboard() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+          <div className="theme-card rounded-lg border border-[var(--theme-accent)]">
             <div className="p-4">
               <div className="flex items-center space-x-2">
                 <MessageCircle className="w-5 h-5 text-white" />
@@ -124,7 +124,7 @@ export default function MemoryDashboard() {
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+          <div className="theme-card rounded-lg border border-[var(--theme-accent)]">
             <div className="p-4">
               <div className="flex items-center space-x-2">
                 <Brain className="w-5 h-5 text-white" />
@@ -136,7 +136,7 @@ export default function MemoryDashboard() {
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+          <div className="theme-card rounded-lg border border-[var(--theme-accent)]">
             <div className="p-4">
               <div className="flex items-center space-x-2">
                 <Users className="w-5 h-5 text-white" />
@@ -148,7 +148,7 @@ export default function MemoryDashboard() {
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+          <div className="theme-card rounded-lg border border-[var(--theme-accent)]">
             <div className="p-4">
               <div className="flex items-center space-x-2">
                 <Clock className="w-5 h-5 text-white" />
@@ -164,7 +164,7 @@ export default function MemoryDashboard() {
         {/* Recent Memories and Top Topics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Memories */}
-          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+          <div className="theme-card rounded-lg border border-[var(--theme-accent)]">
             <div className="p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <MessageCircle className="w-5 h-5 text-white" />
@@ -205,7 +205,7 @@ export default function MemoryDashboard() {
           </div>
 
           {/* Top Topics */}
-          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+          <div className="theme-card rounded-lg border border-[var(--theme-accent)]">
             <div className="p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <TrendingUp className="w-5 h-5 text-white" />
@@ -236,7 +236,7 @@ export default function MemoryDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Memory Insights */}
-          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+          <div className="theme-card rounded-lg border border-[var(--theme-accent)]">
             <div className="p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <Lightbulb className="w-5 h-5 text-white" />
@@ -266,7 +266,7 @@ export default function MemoryDashboard() {
           </div>
 
           {/* Emotional Patterns */}
-          <div className="bg-[#3f51b5] rounded-lg border border-white/20">
+          <div className="theme-card rounded-lg border border-[var(--theme-accent)]">
             <div className="p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <Calendar className="w-5 h-5 text-white" />

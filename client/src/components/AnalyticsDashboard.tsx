@@ -116,7 +116,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
       <div className="space-y-6">
         {/* Key Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/80">Wellness Score</p>
@@ -131,7 +131,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
             </p>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/80">Emotional Volatility</p>
@@ -146,7 +146,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
             </p>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/80">Therapeutic Engagement</p>
@@ -165,7 +165,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Mood Trend Chart */}
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <h3 className="text-lg font-semibold text-white mb-4">Mood Trend (Last 30 Days)</h3>
             <div className="h-48">
               {charts.moodTrend.length > 0 ? (
@@ -194,7 +194,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
           </div>
 
           {/* Emotion Distribution */}
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <h3 className="text-lg font-semibold text-white mb-4">Emotion Distribution</h3>
             <div className="h-48">
               {Object.keys(charts.emotionDistribution).length > 0 ? (
@@ -227,7 +227,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
         </div>
 
         {/* AI Insights */}
-        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
           <h3 className="text-lg font-semibold text-white mb-4">AI Wellness Insights</h3>
           <div className="prose prose-sm max-w-none text-white/80">
             {insights.split('\n').map((line, index) => (
@@ -249,7 +249,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-[#3f51b5] rounded-xl p-1 mb-6 border border-white/20">
+        <div className="theme-card rounded-xl p-1 mb-6 border border-[var(--theme-accent)]">
           <div className="flex space-x-1">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },

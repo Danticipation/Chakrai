@@ -195,7 +195,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
         <CardContent>
           <div className="space-y-3">
             {dashboard?.emotionalTrends.map((trend, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-[#3f51b5]/20 rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 theme-card/20 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className="text-sm font-medium text-white">
                     {new Date(trend.date).toLocaleDateString()}
@@ -235,7 +235,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {dashboard?.effectiveAffirmations.map((affirmation, index) => (
-              <div key={index} className="p-4 border border-[#7986cb]/30 rounded-lg bg-[#3f51b5]/20">
+              <div key={index} className="p-4 border border-[#7986cb]/30 rounded-lg theme-card/20">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-semibold text-white capitalize">
                     {affirmation.affirmationType.replace('-', ' ')}
@@ -269,7 +269,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
               <select 
                 value={reportPeriod} 
                 onChange={(e) => setReportPeriod(e.target.value as any)}
-                className="text-sm border border-white/30 bg-[#3f51b5]/20 text-white rounded px-2 py-1"
+                className="text-sm border border-white/30 theme-card/20 text-white rounded px-2 py-1"
               >
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
@@ -287,23 +287,23 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
             <div className="space-y-6">
               {/* Report Summary */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-[#3f51b5]/20 rounded-lg">
+                <div className="text-center p-4 theme-card/20 rounded-lg">
                   <div className="text-2xl font-bold text-white">{efficacyReport.totalUsers}</div>
                   <div className="text-sm text-white/70">Total Users</div>
                 </div>
-                <div className="text-center p-4 bg-[#3f51b5]/20 rounded-lg">
+                <div className="text-center p-4 theme-card/20 rounded-lg">
                   <div className="text-2xl font-bold text-white">
                     {(efficacyReport.averageEmotionalImprovement * 100).toFixed(1)}%
                   </div>
                   <div className="text-sm text-white/70">Emotional Improvement</div>
                 </div>
-                <div className="text-center p-4 bg-[#3f51b5]/20 rounded-lg">
+                <div className="text-center p-4 theme-card/20 rounded-lg">
                   <div className="text-2xl font-bold text-white">
                     {efficacyReport.goalCompletionRate.toFixed(1)}%
                   </div>
                   <div className="text-sm text-white/70">Goal Completion</div>
                 </div>
-                <div className="text-center p-4 bg-[#3f51b5]/20 rounded-lg">
+                <div className="text-center p-4 theme-card/20 rounded-lg">
                   <div className="text-2xl font-bold text-white">
                     {(efficacyReport.userRetentionRate * 100).toFixed(1)}%
                   </div>

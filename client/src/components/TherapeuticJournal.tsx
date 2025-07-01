@@ -390,7 +390,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* Tab Content */}
         {activeTab === 'write' && (
-          <div className="bg-[#3f51b5]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+          <div className="theme-card/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
           {/* Title Input */}
           <div className="mb-4">
             <input
@@ -602,7 +602,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* Recent Entries (shown only on write tab) */}
         {activeTab === 'write' && recentEntries.length > 0 && (
-          <div className="bg-[#3f51b5]/20 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+          <div className="theme-card/20 backdrop-blur-sm rounded-2xl shadow-lg p-6">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
               <Calendar className="w-5 h-5 mr-2" />
               Recent Entries
@@ -641,7 +641,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
-          <div className="bg-[#3f51b5]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+          <div className="theme-card/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <BarChart3 className="w-5 h-5 mr-2" />
               Journal Analytics
@@ -721,7 +721,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* AI Insights Tab */}
         {activeTab === 'insights' && (
-          <div className="bg-[#3f51b5]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+          <div className="theme-card/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Brain className="w-5 h-5 mr-2" />
               AI Insights
@@ -761,7 +761,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
         {/* Export Reports Tab */}
         {activeTab === 'export' && (
-          <div className="bg-[#3f51b5]/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
+          <div className="theme-card/30 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Download className="w-5 h-5 mr-2" />
               Export Reports

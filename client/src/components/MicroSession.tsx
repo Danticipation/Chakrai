@@ -247,7 +247,7 @@ export default function MicroSession({
           {!sessionStarted ? (
             <button
               onClick={startRecording}
-              className="bg-[#3f51b5] hover:bg-[#3949ab] text-white p-4 rounded-full transition-all duration-200 hover:scale-105 shadow-lg"
+              className="theme-card hover:bg-[#3949ab] text-white p-4 rounded-full transition-all duration-200 hover:scale-105 shadow-lg"
             >
               <Mic className="w-6 h-6" />
             </button>
@@ -263,7 +263,7 @@ export default function MicroSession({
               ) : (
                 <button
                   onClick={startRecording}
-                  className="bg-[#3f51b5] hover:bg-[#3949ab] text-white p-4 rounded-full transition-all duration-200"
+                  className="theme-card hover:bg-[#3949ab] text-white p-4 rounded-full transition-all duration-200"
                 >
                   <Mic className="w-6 h-6" />
                 </button>
@@ -296,7 +296,7 @@ export default function MicroSession({
           <div className="mb-4">
             <button
               onClick={transcribeAudio}
-              className="w-full bg-[#3f51b5]/20 hover:bg-[#3f51b5]/30 text-white py-3 px-4 rounded-xl border border-[#3f51b5]/30 transition-colors"
+              className="w-full theme-card/20 hover:theme-card/30 text-white py-3 px-4 rounded-xl border border-[#3f51b5]/30 transition-colors"
             >
               Convert to Text
             </button>
@@ -306,8 +306,8 @@ export default function MicroSession({
         {isProcessing && (
           <div className="text-center mb-4">
             <div className="text-white/60 text-sm">Processing audio...</div>
-            <div className="w-full bg-[#3f51b5]/20 rounded-full h-2 mt-2">
-              <div className="bg-[#3f51b5] h-2 rounded-full animate-pulse w-1/2"></div>
+            <div className="w-full theme-card/20 rounded-full h-2 mt-2">
+              <div className="theme-card h-2 rounded-full animate-pulse w-1/2"></div>
             </div>
           </div>
         )}
@@ -315,7 +315,7 @@ export default function MicroSession({
         {/* Transcription Display */}
         {transcription && (
           <div className="mb-4">
-            <div className="bg-[#3f51b5]/20 rounded-xl p-4 border border-[#3f51b5]/30">
+            <div className="theme-card/20 rounded-xl p-4 border border-[#3f51b5]/30">
               <h4 className="text-white font-medium text-sm mb-2">Your Session:</h4>
               <p className="text-white/90 text-sm leading-relaxed">{transcription}</p>
             </div>
@@ -334,7 +334,7 @@ export default function MicroSession({
           {transcription && (
             <button
               onClick={saveSession}
-              className="flex-1 bg-[#3f51b5] hover:bg-[#3949ab] text-white py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-2"
+              className="flex-1 theme-card hover:bg-[#3949ab] text-white py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-2"
             >
               <Send className="w-4 h-4" />
               <span>Save Session</span>
