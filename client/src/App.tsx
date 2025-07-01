@@ -1186,7 +1186,7 @@ const AppLayout = () => {
             </div>
           ) : (
             /* Separate Full Panels for Other Sections */
-            <div className="w-full h-full mx-2 md:mx-8 bg-[#3f51b5] rounded-lg border border-white overflow-hidden relative">
+            <div className="w-full h-full mx-2 md:mx-8 theme-card rounded-lg border border-white overflow-hidden relative">
               {/* Return to Chat Button */}
               <button 
                 onClick={() => setActiveSection('chat')}
@@ -1196,7 +1196,7 @@ const AppLayout = () => {
                 <span>Chat</span>
               </button>
               
-              <div className="bg-[#3f51b5] text-white text-center py-3 border-b border-white/30 font-bold text-lg">
+              <div className="theme-card theme-text text-center py-3 border-b border-white/30 font-bold text-lg">
                 {activeSection === 'daily' && 'Personality Reflection'}
                 {activeSection === 'journal' && 'Therapeutic Journal'}
                 {activeSection === 'memory' && 'Memory Dashboard'}
@@ -1217,7 +1217,7 @@ const AppLayout = () => {
                 {activeSection === 'ehr' && 'EHR Integration'}
                 {activeSection === 'privacy-policy' && 'Privacy Policy & Terms'}
               </div>
-              <div className="h-full bg-[#3f51b5] text-white p-6 overflow-y-auto mobile-scroll" style={{ minHeight: '0', maxHeight: 'calc(100vh - 200px)' }}>
+              <div className="h-full theme-card theme-text p-6 overflow-y-auto mobile-scroll" style={{ minHeight: '0', maxHeight: 'calc(100vh - 200px)' }}>
                 {renderActiveSection()}
               </div>
             </div>

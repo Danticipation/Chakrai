@@ -10,10 +10,10 @@ export default function ThemeSelector({ onClose }: ThemeSelectorProps) {
   const { currentTheme, changeTheme } = useTheme();
 
   return (
-    <div className="p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 relative">
+    <div className="p-6 theme-card backdrop-blur-sm rounded-2xl border border-white/20 relative">
       <div className="flex items-center gap-3 mb-6">
-        <Palette className="text-white" size={24} />
-        <h2 className="text-2xl font-bold text-white">Choose Your Theme</h2>
+        <Palette className="theme-text" size={24} />
+        <h2 className="text-2xl font-bold theme-text">Choose Your Theme</h2>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -44,12 +44,12 @@ export default function ThemeSelector({ onClose }: ThemeSelectorProps) {
                 ></div>
               </div>
               {currentTheme.id === theme.id && (
-                <Check size={16} className="text-white ml-auto" />
+                <Check size={16} className="theme-text ml-auto" />
               )}
             </div>
             
-            <h3 className="font-semibold text-white mb-2">{theme.name}</h3>
-            <p className="text-sm text-white/70">
+            <h3 className="font-semibold theme-text mb-2">{theme.name}</h3>
+            <p className="text-sm theme-text opacity-70">
               {theme.id === 'blue' && 'Classic therapeutic blue for calming wellness'}
               {theme.id === 'lavender' && 'Gentle lavender for peaceful relaxation'}
               {theme.id === 'teal' && 'Healing teal for renewal and growth'}
