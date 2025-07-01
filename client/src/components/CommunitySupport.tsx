@@ -155,7 +155,7 @@ const CommunitySupport: React.FC = () => {
         </div>
 
         {/* Scheduled Check-ins */}
-        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
           <h3 className="text-lg font-semibold text-white mb-4">Scheduled Check-ins</h3>
           <div className="space-y-3">
             {checkIns?.map((checkIn) => (
@@ -184,7 +184,7 @@ const CommunitySupport: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a237e] p-4">
+    <div className="min-h-screen theme-primary p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -193,7 +193,7 @@ const CommunitySupport: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-[#3f51b5] rounded-xl p-1 mb-6 border border-white/20">
+        <div className="theme-card rounded-xl p-1 mb-6 border border-[var(--theme-accent)]">
           <div className="flex space-x-1">
             {[
               { id: 'forums', label: 'Support Forums', icon: MessageSquare },
@@ -205,7 +205,7 @@ const CommunitySupport: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                   activeTab === tab.id
-                    ? 'bg-[#1a237e] text-white shadow-sm'
+                    ? 'theme-primary text-white shadow-sm'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >

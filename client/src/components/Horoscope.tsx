@@ -183,7 +183,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
           </div>
 
           {/* Horoscope Display - Mobile Optimized */}
-          <div className="bg-[#1a237e]/50 rounded-xl p-4 border border-[#3949ab]/30 max-h-[calc(100vh-400px)] overflow-y-auto mobile-scroll">
+          <div className="bg-[var(--theme-secondary)] rounded-xl p-4 border border-[#3949ab]/30 max-h-[calc(100vh-400px)] overflow-y-auto mobile-scroll">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="flex items-center space-x-3">
@@ -196,7 +196,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
                 <p className="text-red-300 mb-4">{error}</p>
                 <button
                   onClick={handleRefresh}
-                  className="px-4 py-2 bg-[#1a237e] text-white rounded-lg hover:bg-[#3949ab] transition-colors"
+                  className="px-4 py-2 theme-primary text-white rounded-lg hover:bg-[#3949ab] transition-colors"
                 >
                   Try Again
                 </button>

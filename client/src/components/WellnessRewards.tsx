@@ -191,7 +191,7 @@ const WellnessRewards: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a237e] p-4">
+    <div className="min-h-screen theme-primary p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -213,7 +213,7 @@ const WellnessRewards: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                   activeTab === tab.id
-                    ? 'bg-[#1a237e] text-white shadow-sm'
+                    ? 'theme-primary text-white shadow-sm'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >

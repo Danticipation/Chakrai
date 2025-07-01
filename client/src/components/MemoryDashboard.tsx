@@ -77,7 +77,7 @@ export default function MemoryDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#1a237e] p-4">
+      <div className="min-h-screen theme-primary p-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
@@ -89,7 +89,7 @@ export default function MemoryDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a237e] p-4">
+    <div className="min-h-screen theme-primary p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -173,7 +173,7 @@ export default function MemoryDashboard() {
               <p className="text-white/80 mb-6">Latest conversations and insights</p>
               <div className="space-y-4">
                 {dashboard?.recentMemories?.slice(0, 5).map((memory) => (
-                  <div key={memory.id} className="border border-white/30 rounded-lg p-3 bg-[#1a237e]">
+                  <div key={memory.id} className="border border-white/30 rounded-lg p-3 theme-primary">
                     <div className="flex items-start justify-between mb-2">
                       <Badge className="bg-white/20 text-white border-white/30">
                         {memory.emotionalContext}
@@ -245,7 +245,7 @@ export default function MemoryDashboard() {
               <p className="text-white/80 mb-6">Patterns and insights from your conversations</p>
               <div className="space-y-4">
                 {dashboard?.memoryInsights?.slice(0, 4).map((insight, index) => (
-                  <div key={index} className="border border-white/30 rounded-lg p-3 bg-[#1a237e]">
+                  <div key={index} className="border border-white/30 rounded-lg p-3 theme-primary">
                     <div className="flex items-start justify-between mb-2">
                       <Badge className="bg-white/20 text-white border-white/30">{insight.type}</Badge>
                       <div className="flex items-center space-x-1">
@@ -275,7 +275,7 @@ export default function MemoryDashboard() {
               <p className="text-white/80 mb-6">How your emotional state has evolved</p>
               <div className="space-y-4">
                 {dashboard?.emotionalPatterns?.map((pattern, index) => (
-                  <div key={index} className="border border-white/30 rounded-lg p-3 bg-[#1a237e]">
+                  <div key={index} className="border border-white/30 rounded-lg p-3 theme-primary">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-white">{pattern.timeframe}</span>
                       <Badge className="bg-white/20 text-white border-white/30">
