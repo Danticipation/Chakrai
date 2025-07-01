@@ -92,7 +92,7 @@ interface AdaptiveTherapyPlanProps {
   onPlanUpdate?: (plan: TherapeuticPlan) => void;
 }
 
-export function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps) {
+function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps) {
   const [currentPlan, setCurrentPlan] = useState<TherapeuticPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [adapting, setAdapting] = useState(false);
@@ -525,3 +525,6 @@ export function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPla
     </div>
   );
 }
+
+export default AdaptiveTherapyPlan;
+
