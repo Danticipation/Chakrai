@@ -1001,8 +1001,8 @@ const AppLayout = () => {
                   }}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
-                      ? 'bg-orange-500 text-white shadow-lg transform scale-95 ring-2 ring-white'
-                      : 'bg-orange-700/60 text-white/80 hover:bg-orange-600 active:scale-95'
+                      ? 'theme-surface theme-text shadow-lg transform scale-95 ring-2 ring-white'
+                      : 'bg-[var(--theme-primary)] theme-text hover:bg-[var(--theme-primary-light)] active:scale-95'
                   }`}
                   style={{ minHeight: '60px' }}
                 >
@@ -1040,8 +1040,8 @@ const AppLayout = () => {
                 onClick={() => setActiveSection(tab.id)}
                 className={`w-full h-16 px-6 text-lg font-bold transition-colors ${
                   activeSection === tab.id
-                    ? 'bg-green-600 text-white'
-                    : 'bg-green-600 text-white hover:bg-green-500'
+                    ? 'theme-surface theme-text'
+                    : 'bg-[var(--theme-primary)] theme-text hover:bg-[var(--theme-primary-light)]'
                 }`}
               >
                 {tab.label}
@@ -1064,8 +1064,8 @@ const AppLayout = () => {
                 onClick={() => setActiveSection(tab.id)}
                 className={`w-full h-16 px-6 text-lg font-bold transition-colors ${
                   activeSection === tab.id
-                    ? 'bg-orange-600 text-white'
-                    : 'bg-orange-600 text-white hover:bg-orange-500'
+                    ? 'theme-surface theme-text'
+                    : 'bg-[var(--theme-accent)] theme-text hover:bg-[var(--theme-primary-light)]'
                 }`}
               >
                 {tab.label}
@@ -1231,21 +1231,21 @@ const AppLayout = () => {
           {/* Real Progress Tracking */}
           <div className="space-y-6">
             {/* Daily Journaling Progress */}
-            <div className="bg-purple-700 rounded-lg p-6">
-              <div className="text-white text-lg font-bold mb-3">Daily Journaling</div>
-              <div className="bg-[#0a0e1a] rounded-full h-4 mb-3">
+            <div className="theme-card rounded-lg p-6">
+              <div className="theme-text text-lg font-bold mb-3">Daily Journaling</div>
+              <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
                 <div className="bg-green-400 h-4 rounded-full" style={{width: '75%'}}></div>
               </div>
-              <div className="text-white text-base">15/20 days this month</div>
+              <div className="theme-text text-base">15/20 days this month</div>
             </div>
 
             {/* Weekly Chat Sessions */}
-            <div className="bg-purple-700 rounded-lg p-6">
-              <div className="text-white text-lg font-bold mb-3">Weekly Chat Goal</div>
-              <div className="bg-[#0a0e1a] rounded-full h-4 mb-3">
+            <div className="theme-card rounded-lg p-6">
+              <div className="theme-text text-lg font-bold mb-3">Weekly Chat Goal</div>
+              <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
                 <div className="bg-blue-400 h-4 rounded-full" style={{width: '60%'}}></div>
               </div>
-              <div className="text-white text-base">3/5 sessions this week</div>
+              <div className="theme-text text-base">3/5 sessions this week</div>
             </div>
 
             {/* Mood Tracking Consistency */}
