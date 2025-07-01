@@ -256,6 +256,36 @@ const AppLayout = () => {
 
         setMessages(prev => [...prev, botMessage]);
 
+        // Check for potential agent handoff
+        try {
+          const handoffResponse = await fetch('/api/agents/analyze-handoff', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: 1,
+              message: input,
+              conversationHistory: messages.slice(-5) // Send last 5 messages for context
+            })
+          });
+
+          if (handoffResponse.ok) {
+            const handoffData = await handoffResponse.json();
+            
+            if (handoffData.shouldHandoff && handoffData.confidence > 0.7 && handoffData.handoffMessage) {
+              // Add agent handoff suggestion message
+              const handoffMessage: Message = {
+                sender: 'bot',
+                text: handoffData.handoffMessage + "\n\n*Click 'Specialists' in the navigation to connect with this specialist.*",
+                time: new Date().toLocaleTimeString()
+              };
+              
+              setMessages(prev => [...prev, handoffMessage]);
+            }
+          }
+        } catch (error) {
+          console.error('Agent handoff analysis failed:', error);
+        }
+
         // ElevenLabs Carla voice playback with aggressive activation
         if (data.audioUrl && data.audioUrl.length > 1000) {
           console.log(`ElevenLabs ${data.voiceUsed || 'Carla'} voice detected: ${data.audioUrl.length} characters`);
@@ -496,6 +526,9 @@ const AppLayout = () => {
 
       case 'therapy-plans':
         return <AdaptiveTherapyPlan userId={1} onPlanUpdate={(plan) => console.log('Plan updated:', plan)} />;
+
+      case 'agents':
+        return <AgentSystem userId={1} />;
 
       case 'vr':
         return <VRTherapy />;
@@ -743,6 +776,7 @@ const AppLayout = () => {
               { id: 'community', label: 'Community', icon: '👥' },
               { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
               { id: 'therapy-plans', label: 'Plans', icon: '📋' },
+              { id: 'agents', label: 'Specialists', icon: '🧩' },
               { id: 'vr', label: 'VR Therapy', icon: '🥽' },
               { id: 'health', label: 'Health', icon: '💗' },
               { id: 'therapist', label: 'Therapist', icon: '🩺' },
@@ -777,6 +811,7 @@ const AppLayout = () => {
             { id: 'community', label: 'Community' },
             { id: 'adaptive', label: 'AI Learning' },
             { id: 'therapy-plans', label: 'Therapy Plans' },
+            { id: 'agents', label: 'AI Specialists' },
             { id: 'vr', label: 'VR Therapy' },
             { id: 'health', label: 'Wearables' },
             { id: 'therapist', label: 'Therapist Portal' }
@@ -926,6 +961,7 @@ const AppLayout = () => {
                 {activeSection === 'community' && 'Community & Professional Support'}
                 {activeSection === 'adaptive' && 'Adaptive Learning & Personalization'}
                 {activeSection === 'therapy-plans' && 'Personalized Therapy Plans'}
+                {activeSection === 'agents' && 'AI Therapeutic Specialists'}
                 {activeSection === 'vr' && 'VR/AR Therapy'}
                 {activeSection === 'health' && 'Health Integration'}
                 {activeSection === 'privacy' && 'Privacy & Compliance'}

@@ -217,10 +217,10 @@ function AgentSystem({ userId }: AgentSystemProps) {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-white">Choose Your Therapeutic Specialist</CardTitle>
                   <Button 
-                    variant="ghost" 
+                    variant="outline" 
                     size="sm" 
                     onClick={() => setShowAgentSelection(false)}
-                    className="text-white hover:bg-white/10"
+                    className="text-white hover:bg-white/10 border-white/20"
                   >
                     <X className="w-4 h-4" />
                   </Button>
