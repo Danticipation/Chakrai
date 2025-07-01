@@ -21,6 +21,7 @@ import Horoscope from './components/Horoscope';
 import DailyAffirmation from './components/DailyAffirmation';
 import PWAManager from './components/PWAManager';
 import MicroSession from './components/MicroSession';
+import TherapeuticAnalytics from './components/TherapeuticAnalytics';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -557,6 +558,9 @@ const AppLayout = () => {
       case 'therapist':
         return <TherapistPortal />;
 
+      case 'outcomes':
+        return <TherapeuticAnalytics userId={1} />;
+
       case 'horoscope':
         return <Horoscope />;
 
@@ -795,7 +799,8 @@ const AppLayout = () => {
               { id: 'vr', label: 'VR Therapy', icon: '🥽' },
               { id: 'health', label: 'Health', icon: '💗' },
               { id: 'therapist', label: 'Therapist', icon: '🩺' },
-              { id: 'privacy', label: 'Privacy', icon: '🔒' }
+              { id: 'privacy', label: 'Privacy', icon: '🔒' },
+              { id: 'outcomes', label: 'Outcomes', icon: '📈' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -984,6 +989,7 @@ const AppLayout = () => {
                 {activeSection === 'affirmation' && 'Daily Affirmation'}
                 {activeSection === 'logo' && 'TraI Information'}
                 {activeSection === 'goals' && 'Wellness Goals'}
+                {activeSection === 'outcomes' && 'Therapeutic Outcomes'}
               </div>
               <div className="h-full bg-[#3f51b5] text-white p-6 overflow-y-auto mobile-scroll" style={{ minHeight: '0', maxHeight: 'calc(100vh - 200px)' }}>
                 {renderActiveSection()}
