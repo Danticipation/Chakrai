@@ -182,10 +182,16 @@ Adapt your response to mirror the user's communication patterns while maintainin
 
     // Generate ElevenLabs voice synthesis
     const voiceMap: Record<string, string> = {
-      'hope': 'iCrDUkL56s3C8sCRl7wb',
-      'james': 'EkK5I93UQWFDigLMpZcX',
-      'charlotte': 'XB0fDUnXU5powFXDhCwa',
-      'bronson': 'TsW8a1Lp3kExG3Ny7cUn'
+      // Original voices
+      'james': 'EkK5I93UQWFDigLMpZcX',  // Male
+      'brian': 'nPczCjzI2devNBz1zQrb',  // Male
+      'alexandra': 'kdmDKE6EkgrWrrykO9Qt', // Female
+      'carla': 'l32B8XDoylOsZKiSdfhE',  // Female
+      // New voices added
+      'hope': 'iCrDUkL56s3C8sCRl7wb',   // Female
+      'charlotte': 'XB0fDUnXU5powFXDhCwa', // Female
+      'bronson': 'TsW8a1Lp3kExG3Ny7cUn', // Male
+      'marcus': 'TxGEqnHWrfWFTfGW9XjX'   // Male
     };
 
     const selectedVoice = voice || 'hope';
@@ -325,10 +331,16 @@ router.post('/text-to-speech', async (req, res) => {
     }
 
     const voiceMap: Record<string, string> = {
-      'hope': 'iCrDUkL56s3C8sCRl7wb',
-      'james': 'EkK5I93UQWFDigLMpZcX',
-      'charlotte': 'XB0fDUnXU5powFXDhCwa',
-      'bronson': 'TsW8a1Lp3kExG3Ny7cUn'
+      // Original voices
+      'james': 'EkK5I93UQWFDigLMpZcX',  // Male
+      'brian': 'nPczCjzI2devNBz1zQrb',  // Male
+      'alexandra': 'kdmDKE6EkgrWrrykO9Qt', // Female
+      'carla': 'l32B8XDoylOsZKiSdfhE',  // Female
+      // New voices added
+      'hope': 'iCrDUkL56s3C8sCRl7wb',   // Female
+      'charlotte': 'XB0fDUnXU5powFXDhCwa', // Female
+      'bronson': 'TsW8a1Lp3kExG3Ny7cUn', // Male
+      'marcus': 'TxGEqnHWrfWFTfGW9XjX'   // Male
     };
 
     const voiceId = voiceMap[voice] || voiceMap['hope'];

@@ -8,10 +8,16 @@ interface Voice {
 }
 
 const voices: Voice[] = [
-  { id: 'hope', name: 'Hope', description: 'Warm and supportive' },
-  { id: 'james', name: 'James', description: 'Calm and professional' },
-  { id: 'charlotte', name: 'Charlotte', description: 'Gentle and understanding' },
-  { id: 'bronson', name: 'Bronson', description: 'Energetic and encouraging' }
+  // Original voices
+  { id: 'james', name: 'James', description: 'Professional and calming' },
+  { id: 'brian', name: 'Brian', description: 'Deep and resonant' },
+  { id: 'alexandra', name: 'Alexandra', description: 'Clear and articulate' },
+  { id: 'carla', name: 'Carla', description: 'Warm and empathetic' },
+  // New voices added
+  { id: 'hope', name: 'Hope', description: 'Warm and encouraging' },
+  { id: 'charlotte', name: 'Charlotte', description: 'Gentle and empathetic' },
+  { id: 'bronson', name: 'Bronson', description: 'Confident and reassuring' },
+  { id: 'marcus', name: 'Marcus', description: 'Smooth and supportive' }
 ];
 
 interface VoiceSelectorProps {
