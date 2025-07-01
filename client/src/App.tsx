@@ -665,8 +665,8 @@ const AppLayout = () => {
                   <h3 className="text-lg font-semibold text-white mb-3">Your Progress</h3>
                   <div className="grid grid-cols-2 gap-6 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-white">Active</div>
-                      <div className="text-sm text-white/60">{botStats?.stage || 'Wellness Companion'}</div>
+                      <div className="text-2xl font-bold text-white">{botStats?.stage || 'Wellness Companion'}</div>
+                      <div className="text-sm text-white/60">Level {botStats?.level || 3}</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-white">95%</div>
