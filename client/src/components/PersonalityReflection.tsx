@@ -94,15 +94,15 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
       const isNumberedSection = /^\d+\.\s+[A-Z\s]+:/.test(title);
       
       if (isNumberedSection) {
-        const cleanTitle = title.replace(/^\d+\.\s+/, '').replace(':', '');
+        const cleanTitle = title.replace(/^\d+\.\s+/, '').replace(':', '').trim();
         return (
           <div key={index} className="mb-4">
-            <h3 className="font-semibold text-[#9fa8da] mb-2 flex items-center gap-2">
+            <h3 className="font-semibold text-[#9fa8da] mb-2 flex items-center gap-2 whitespace-nowrap">
               {cleanTitle.includes('TRAIT') && <User className="w-4 h-4" />}
               {cleanTitle.includes('POSITIVE') && <TrendingUp className="w-4 h-4" />}
               {cleanTitle.includes('GROWTH') && <RotateCcw className="w-4 h-4" />}
               {cleanTitle.includes('EMOTIONAL') && <Brain className="w-4 h-4" />}
-              {cleanTitle}
+              <span className="whitespace-nowrap">{cleanTitle}</span>
             </h3>
             <p className="text-white/90 leading-relaxed whitespace-pre-wrap">{content}</p>
           </div>
