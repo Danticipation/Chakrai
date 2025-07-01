@@ -12,6 +12,7 @@ import WellnessRewards from './components/WellnessRewards';
 import CommunitySupport from './components/CommunitySupport';
 import AdaptiveLearning from './components/AdaptiveLearning';
 import AdaptiveTherapyPlan from './components/AdaptiveTherapyPlan';
+import AgentSystem from './components/AgentSystem';
 import VRTherapy from './components/VRTherapy';
 import HealthIntegration from './components/HealthIntegration';
 import PrivacyCompliance from './components/PrivacyCompliance';

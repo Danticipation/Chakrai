@@ -3,6 +3,7 @@ import multer from 'multer';
 import { storage } from './storage.js';
 import { analyzeEmotionalState } from './emotionalAnalysis.js';
 import { openai } from './openaiRetry.js';
+import { agentSystem } from './agentSystem.js';
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -1125,6 +1126,151 @@ router.get('/user/notification-preferences', async (req, res) => {
   } catch (error) {
     console.error('Failed to get notification preferences:', error);
     res.status(500).json({ error: 'Failed to get preferences' });
+  }
+});
+
+// ============================================================================
+// THERAPEUTIC AGENT SYSTEM ENDPOINTS
+// ============================================================================
+
+// Get available therapeutic agents
+router.get('/agents', async (req, res) => {
+  try {
+    const agents = agentSystem.getAvailableAgents();
+    res.json({ agents });
+  } catch (error) {
+    console.error('Failed to get agents:', error);
+    res.status(500).json({ error: 'Failed to retrieve agents' });
+  }
+});
+
+// Analyze message for potential agent handoff
+router.post('/agents/analyze-handoff', async (req, res) => {
+  try {
+    const { userId, message, conversationHistory } = req.body;
+    
+    if (!userId || !message) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const analysis = await agentSystem.analyzeForHandoff(
+      parseInt(userId), 
+      message, 
+      conversationHistory || []
+    );
+    
+    // If handoff is recommended, include the offer message
+    if (analysis.shouldHandoff && analysis.recommendedAgent) {
+      analysis.handoffMessage = agentSystem.createHandoffOffer(
+        analysis.recommendedAgent, 
+        analysis.reason || ''
+      );
+    }
+
+    res.json(analysis);
+  } catch (error) {
+    console.error('Failed to analyze handoff:', error);
+    res.status(500).json({ error: 'Failed to analyze message' });
+  }
+});
+
+// Start agent session
+router.post('/agents/start-session', async (req, res) => {
+  try {
+    const { userId, agentType, objective } = req.body;
+    
+    if (!userId || !agentType || !objective) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const session = await agentSystem.startAgentSession(
+      parseInt(userId), 
+      agentType, 
+      objective
+    );
+    
+    res.json({ 
+      success: true, 
+      session,
+      message: `Connected to ${agentType.replace('_', ' ')} specialist. How can I help you with ${objective}?`
+    });
+  } catch (error) {
+    console.error('Failed to start agent session:', error);
+    res.status(500).json({ error: 'Failed to start session' });
+  }
+});
+
+// Send message to active agent
+router.post('/agents/chat', async (req, res) => {
+  try {
+    const { userId, message } = req.body;
+    
+    if (!userId || !message) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const session = agentSystem.getActiveSession(parseInt(userId));
+    if (!session) {
+      return res.status(404).json({ error: 'No active agent session' });
+    }
+
+    const result = await agentSystem.generateAgentResponse(
+      parseInt(userId), 
+      message
+    );
+    
+    // If agent recommends transferring back to main bot
+    if (result.shouldTransferBack) {
+      agentSystem.completeSession(parseInt(userId), result.transferReason);
+      result.response += `\n\n*Session completed. Transferring you back to the main therapeutic companion.*`;
+    }
+
+    res.json({
+      response: result.response,
+      insights: result.insights,
+      sessionActive: !result.shouldTransferBack,
+      transferReason: result.transferReason
+    });
+  } catch (error) {
+    console.error('Failed to process agent chat:', error);
+    res.status(500).json({ error: 'Failed to process message' });
+  }
+});
+
+// Get active agent session
+router.get('/agents/session/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const session = agentSystem.getActiveSession(userId);
+    
+    res.json({ 
+      hasActiveSession: !!session,
+      session: session || null
+    });
+  } catch (error) {
+    console.error('Failed to get agent session:', error);
+    res.status(500).json({ error: 'Failed to retrieve session' });
+  }
+});
+
+// End agent session manually
+router.post('/agents/end-session', async (req, res) => {
+  try {
+    const { userId, completionNotes } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'Missing userId' });
+    }
+
+    agentSystem.completeSession(parseInt(userId), completionNotes);
+    
+    res.json({ 
+      success: true, 
+      message: 'Agent session ended successfully'
+    });
+  } catch (error) {
+    console.error('Failed to end agent session:', error);
+    res.status(500).json({ error: 'Failed to end session' });
   }
 });
 
