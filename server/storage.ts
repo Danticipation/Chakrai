@@ -44,14 +44,17 @@ import {
   type TherapistSessionNotes, type InsertTherapistSessionNotes,
   type RiskAlert, type InsertRiskAlert,
 } from "@shared/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, lt } from "drizzle-orm";
 
 export interface IStorage {
   // Users
   createUser(data: InsertUser): Promise<User>;
   getUserById(id: number): Promise<User | null>;
   getUserByUsername(username: string): Promise<User | null>;
+  getUserByDeviceFingerprint(fingerprint: string): Promise<User | null>;
   updateUser(id: number, data: Partial<InsertUser>): Promise<User>;
+  updateUserLastActive(id: number): Promise<void>;
+  deleteInactiveAnonymousUsers(beforeDate: Date): Promise<void>;
   
   // Bots
   getBotByUserId(userId: number): Promise<Bot | null>;
@@ -234,6 +237,24 @@ export class DbStorage implements IStorage {
   async updateUser(id: number, data: Partial<InsertUser>): Promise<User> {
     const [user] = await this.db.update(users).set(data).where(eq(users.id, id)).returning();
     return user;
+  }
+
+  async getUserByDeviceFingerprint(fingerprint: string): Promise<User | null> {
+    const [user] = await this.db.select().from(users).where(eq(users.deviceFingerprint, fingerprint));
+    return user || null;
+  }
+
+  async updateUserLastActive(id: number): Promise<void> {
+    await this.db.update(users).set({ lastActiveAt: new Date() }).where(eq(users.id, id));
+  }
+
+  async deleteInactiveAnonymousUsers(beforeDate: Date): Promise<void> {
+    await this.db.delete(users).where(
+      and(
+        eq(users.isAnonymous, true),
+        eq(users.lastActiveAt, beforeDate)
+      )
+    );
   }
 
   // Bots

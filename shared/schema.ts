@@ -2,14 +2,18 @@ import { pgTable, serial, text, integer, boolean, timestamp, jsonb, decimal } fr
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Basic user system
+// Basic user system with anonymous user support
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   email: text("email").unique(),
   passwordHash: text("password_hash"),
   displayName: text("display_name"),
+  sessionId: text("session_id").unique(),
+  deviceFingerprint: text("device_fingerprint"),
+  isAnonymous: boolean("is_anonymous").default(false),
   onboardingCompleted: boolean("onboarding_completed").default(false),
+  lastActiveAt: timestamp("last_active_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
