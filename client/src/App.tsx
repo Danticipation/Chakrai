@@ -23,6 +23,7 @@ import PWAManager from './components/PWAManager';
 import MicroSession from './components/MicroSession';
 import TherapeuticAnalytics from './components/TherapeuticAnalytics';
 import { EHRIntegration } from './components/EHRIntegration';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -565,6 +566,9 @@ const AppLayout = () => {
       case 'ehr':
         return <EHRIntegration />;
 
+      case 'privacy-policy':
+        return <PrivacyPolicy />;
+
       case 'horoscope':
         return <Horoscope />;
 
@@ -801,7 +805,8 @@ const AppLayout = () => {
               { id: 'therapist', label: 'Therapist', icon: '🩺' },
               { id: 'privacy', label: 'Privacy', icon: '🔒' },
               { id: 'outcomes', label: 'Outcomes', icon: '📈' },
-              { id: 'ehr', label: 'EHR', icon: '🏥' }
+              { id: 'ehr', label: 'EHR', icon: '🏥' },
+              { id: 'privacy-policy', label: 'Legal', icon: '📜' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -837,7 +842,8 @@ const AppLayout = () => {
             { id: 'health', label: 'Wearables' },
             { id: 'therapist', label: 'Therapist Portal' },
             { id: 'outcomes', label: 'Therapeutic Outcomes' },
-            { id: 'ehr', label: 'EHR Integration' }
+            { id: 'ehr', label: 'EHR Integration' },
+            { id: 'privacy-policy', label: 'Privacy Policy' }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -994,6 +1000,7 @@ const AppLayout = () => {
                 {activeSection === 'goals' && 'Wellness Goals'}
                 {activeSection === 'outcomes' && 'Therapeutic Outcomes'}
                 {activeSection === 'ehr' && 'EHR Integration'}
+                {activeSection === 'privacy-policy' && 'Privacy Policy & Terms'}
               </div>
               <div className="h-full bg-[#3f51b5] text-white p-6 overflow-y-auto mobile-scroll" style={{ minHeight: '0', maxHeight: 'calc(100vh - 200px)' }}>
                 {renderActiveSection()}
