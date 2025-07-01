@@ -72,8 +72,29 @@ const AppLayout = () => {
   const [botStats, setBotStats] = useState<BotStats | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
   const [weeklySummary, setWeeklySummary] = useState<string>('');
   const [showReflection, setShowReflection] = useState(false);
+
+  // Feature descriptions for user guidance
+  const featureDescriptions: Record<string, string> = {
+    'daily': 'AI-powered personality reflection that analyzes your conversations to provide insights about your communication style, emotional patterns, and personal growth opportunities.',
+    'journal': 'Private therapeutic journaling with mood tracking, voice-to-text, and AI insights to help process thoughts and emotions.',
+    'memory': 'View how TraI learns and remembers your personality, preferences, and conversation patterns to provide more personalized support.',
+    'analytics': 'Comprehensive wellness analytics showing mood trends, journal insights, goal progress, and therapeutic outcomes over time.',
+    'rewards': 'Wellness point system where you earn rewards for therapeutic activities and can unlock achievements, themes, and premium content.',
+    'community': 'Connect with peer support groups, wellness challenges, and therapeutic forums in a safe, moderated environment.',
+    'vr': 'Virtual reality guided meditation, exposure therapy, and immersive therapeutic environments for enhanced mental wellness.',
+    'health': 'Integrate wearable devices to correlate physical health metrics with emotional wellness for comprehensive health insights.',
+    'agents': 'Specialized AI therapists for specific needs: CBT Coach, Mindfulness Guide, Anxiety Specialist, and Self-Compassion Coach.',
+    'adaptive': 'AI learning system that adapts therapeutic approaches based on your responses, progress, and preferred communication style.',
+    'therapy-plans': 'Personalized therapeutic care plans with goals, exercises, progress tracking, and professional guidance recommendations.',
+    'therapist': 'Professional therapist collaboration portal for sharing session summaries, progress reports, and care coordination.',
+    'privacy': 'Advanced privacy controls with zero-knowledge encryption, differential privacy analytics, and GDPR compliance features.',
+    'outcomes': 'Therapeutic outcome tracking with evidence-based metrics, progress indicators, and clinical assessment tools.',
+    'ehr': 'Electronic health record integration with FHIR standards, insurance-eligible session summaries, and clinical data export.',
+    'privacy-policy': 'Complete privacy policy and legal compliance information for TraI mental wellness companion services.'
+  };
   const [showSettings, setShowSettings] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [userQuery, setUserQuery] = useState('');
@@ -967,8 +988,11 @@ const AppLayout = () => {
                     } else if (tab.id === 'voice') {
                       setShowSettings(true);
                     } else if (['journal', 'analytics', 'memory', 'daily', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans'].includes(tab.id)) {
+                      setContentLoading(true);
                       setMobileModalContent(tab.id);
                       setShowMobileModal(true);
+                      // Simulate content loading time
+                      setTimeout(() => setContentLoading(false), 800);
                     } else {
                       setActiveSection(tab.id);
                     }
@@ -1001,9 +1025,12 @@ const AppLayout = () => {
                 <button
                   key={tab.id}
                   onClick={() => {
-                    // Show professional tools in modals too
+                    // Show professional tools in modals too with loading state
+                    setContentLoading(true);
                     setMobileModalContent(tab.id);
                     setShowMobileModal(true);
+                    // Simulate content loading time
+                    setTimeout(() => setContentLoading(false), 800);
                   }}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
@@ -1396,15 +1423,37 @@ const AppLayout = () => {
                 {mobileModalContent.replace('-', ' ')}
               </h3>
               <button
-                onClick={() => setShowMobileModal(false)}
+                onClick={() => {
+                  setShowMobileModal(false);
+                  setContentLoading(false);
+                }}
                 className="w-10 h-10 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white transition-colors"
                 aria-label="Close modal"
               >
                 <X size={20} />
               </button>
             </div>
+            {/* Feature Description */}
+            <div className="mb-4 p-4 theme-surface rounded-lg border border-white/20">
+              <p className="theme-text-secondary text-sm leading-relaxed">
+                {featureDescriptions[mobileModalContent] || 'Loading feature information...'}
+              </p>
+            </div>
+            
+            {/* Content Area */}
             <div className="text-white">
-              {renderMainContent(mobileModalContent)}
+              {contentLoading ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <svg className="animate-spin h-8 w-8 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <p className="theme-text text-center">Loading {mobileModalContent.replace('-', ' ')}...</p>
+                  <p className="theme-text-secondary text-sm text-center mt-2">Preparing your personalized content</p>
+                </div>
+              ) : (
+                renderMainContent(mobileModalContent)
+              )}
             </div>
           </div>
         </div>
