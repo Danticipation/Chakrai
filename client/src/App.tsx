@@ -781,7 +781,7 @@ const AppLayout = () => {
       case 'goals':
         return (
           <div className="p-4 h-full overflow-y-auto bg-[var(--theme-background)]">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Wellness Goals</h2>
+            <h2 className="text-2xl font-bold theme-text mb-4">Wellness Goals</h2>
             <div className="space-y-4">
               {[
                 { name: 'Daily Mindfulness', current: 12, target: 21, color: 'bg-[var(--theme-accent)]' },
@@ -808,7 +808,7 @@ const AppLayout = () => {
       default:
         return (
           <div className="flex items-center justify-center h-full bg-[var(--theme-background)]">
-            <p className="text-gray-600">Select a section to get started</p>
+            <p className="theme-text-secondary">Select a section to get started</p>
           </div>
         );
     }
@@ -906,11 +906,11 @@ const AppLayout = () => {
             {/* Logo Section - Center */}
             <button 
               onClick={() => setActiveSection('logo')}
-              className="bg-[#0a0e1a] rounded-lg p-6 flex flex-col items-center justify-center border-2 border-white hover:border-purple-400 transition-colors cursor-pointer"
+              className="theme-card rounded-lg p-6 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)] hover:border-[var(--theme-secondary)] transition-colors cursor-pointer"
             >
               <img src={traiLogo} alt="TrAI" className="h-48 w-auto mb-4 -mt-2.5" />
-              <p className="text-lg text-white/70 font-bold">TraI Mental Wellness</p>
-              <p className="text-sm text-white/50 mt-2">Click for more info</p>
+              <p className="text-lg theme-text font-bold">TraI Mental Wellness</p>
+              <p className="text-sm theme-text-secondary mt-2">Click for more info</p>
             </button>
             
             {/* Affirmation Section - Expanded */}
