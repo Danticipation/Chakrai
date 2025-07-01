@@ -784,8 +784,8 @@ const AppLayout = () => {
             <h2 className="text-2xl font-bold theme-text mb-4">Wellness Goals</h2>
             <div className="space-y-4">
               {[
-                { name: 'Daily Mindfulness', current: 12, target: 21, color: 'bg-[var(--theme-accent)]' },
-                { name: 'Anxiety Management', current: 8, target: 14, color: 'bg-[var(--theme-primary)]' },
+                { name: 'Daily Mindfulness', current: 12, target: 21, color: 'theme-accent' },
+                { name: 'Anxiety Management', current: 8, target: 14, color: 'theme-primary' },
                 { name: 'Social Connection', current: 3, target: 7, color: 'bg-[var(--theme-secondary)]' }
               ].map((goal, index) => (
                 <div key={index} className="theme-card backdrop-blur-sm rounded-xl p-4">
@@ -858,7 +858,7 @@ const AppLayout = () => {
           <div className="flex gap-2">
             <button 
               onClick={() => setActiveSection('horoscope')}
-              className="flex-1 bg-[var(--theme-primary)]/80 rounded-lg p-2 hover:bg-[var(--theme-primary-light)] transition-colors"
+              className="flex-1 theme-primary/80 rounded-lg p-2 hover:theme-primary-light transition-colors"
             >
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">⭐</span>
@@ -868,7 +868,7 @@ const AppLayout = () => {
             
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="flex-1 bg-[var(--theme-primary)]/80 rounded-lg p-2 hover:bg-[var(--theme-primary-light)] transition-colors"
+              className="flex-1 theme-primary/80 rounded-lg p-2 hover:theme-primary-light transition-colors"
             >
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">✨</span>
@@ -878,7 +878,7 @@ const AppLayout = () => {
             
             <button 
               onClick={() => setShowSettings(true)}
-              className="flex-1 bg-[var(--theme-primary)]/80 rounded-lg p-2 hover:bg-[var(--theme-primary-light)] transition-colors"
+              className="flex-1 theme-primary/80 rounded-lg p-2 hover:theme-primary-light transition-colors"
             >
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">⚙️</span>
@@ -894,7 +894,7 @@ const AppLayout = () => {
             {/* Horoscope Section - Expanded */}
             <button 
               onClick={() => setActiveSection('horoscope')}
-              className="theme-primary rounded-lg p-6 flex flex-col hover:bg-[var(--theme-primary-light)] transition-colors cursor-pointer"
+              className="theme-primary rounded-lg p-6 flex flex-col hover:theme-primary-light transition-colors cursor-pointer"
             >
               <h3 className="text-2xl font-bold theme-text mb-4 underline">Horoscope</h3>
               <p className="text-base theme-text text-left leading-relaxed flex-1">
@@ -916,7 +916,7 @@ const AppLayout = () => {
             {/* Affirmation Section - Expanded */}
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="theme-primary rounded-lg p-6 flex flex-col hover:bg-[var(--theme-primary-light)] transition-colors cursor-pointer"
+              className="theme-primary rounded-lg p-6 flex flex-col hover:theme-primary-light transition-colors cursor-pointer"
             >
               <h3 className="text-2xl font-bold theme-text mb-4 underline">Affirmation</h3>
               <p className="text-base theme-text text-left leading-relaxed flex-1">
@@ -970,7 +970,7 @@ const AppLayout = () => {
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
                       ? 'theme-secondary theme-text shadow-lg transform scale-95 ring-2 ring-white'
-                      : 'theme-primary theme-text hover:bg-[var(--theme-primary-light)] active:scale-95'
+                      : 'theme-primary theme-text hover:theme-primary-light active:scale-95'
                   }`}
                   style={{ minHeight: '60px' }}
                 >
@@ -1002,7 +1002,7 @@ const AppLayout = () => {
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
                       ? 'theme-surface theme-text shadow-lg transform scale-95 ring-2 ring-white'
-                      : 'theme-primary theme-text hover:bg-[var(--theme-primary-light)] active:scale-95'
+                      : 'theme-primary theme-text hover:theme-primary-light active:scale-95'
                   }`}
                   style={{ minHeight: '60px' }}
                 >
@@ -1041,7 +1041,7 @@ const AppLayout = () => {
                 className={`w-full h-16 px-6 text-lg font-bold transition-colors ${
                   activeSection === tab.id
                     ? 'theme-surface theme-text'
-                    : 'bg-[var(--theme-primary)] theme-text hover:bg-[var(--theme-primary-light)]'
+                    : 'theme-primary theme-text hover:theme-primary-light'
                 }`}
               >
                 {tab.label}
@@ -1065,7 +1065,7 @@ const AppLayout = () => {
                 className={`w-full h-16 px-6 text-lg font-bold transition-colors ${
                   activeSection === tab.id
                     ? 'theme-surface theme-text'
-                    : 'bg-[var(--theme-accent)] theme-text hover:bg-[var(--theme-primary-light)]'
+                    : 'theme-accent theme-text hover:theme-primary-light'
                 }`}
               >
                 {tab.label}
@@ -1111,8 +1111,8 @@ const AppLayout = () => {
                       <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[85%] px-4 py-3 rounded-2xl chat-bubble ${
                           message.sender === 'user' 
-                            ? 'bg-[var(--theme-primary)] theme-text rounded-br-md' 
-                            : 'bg-[var(--theme-primary)] theme-text rounded-bl-md'
+                            ? 'theme-primary theme-text rounded-br-md' 
+                            : 'theme-primary theme-text rounded-bl-md'
                         }`}>
                           <p className="mobile-text-sm leading-relaxed">{message.text}</p>
                           <p className="mobile-text-xs mt-2 opacity-70">{message.time}</p>
@@ -1123,7 +1123,7 @@ const AppLayout = () => {
                 )}
                 {loading && (
                   <div className="flex justify-start mt-4">
-                    <div className="bg-[var(--theme-primary)] theme-text px-4 py-3 rounded-2xl rounded-bl-md">
+                    <div className="theme-primary theme-text px-4 py-3 rounded-2xl rounded-bl-md">
                       <div className="flex space-x-1 items-center">
                         <span className="text-xs mr-2">TraI is typing</span>
                         <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
@@ -1165,7 +1165,7 @@ const AppLayout = () => {
                     className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
                       isRecording 
                         ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse scale-110 shadow-lg' 
-                        : 'bg-[var(--theme-primary)] hover:bg-[var(--theme-primary-light)] theme-text hover:scale-110 shadow-md'
+                        : 'theme-primary hover:theme-primary-light theme-text hover:scale-110 shadow-md'
                     }`}
                     disabled={loading}
                     title={isRecording ? "Stop recording" : "Start voice input"}
@@ -1177,7 +1177,7 @@ const AppLayout = () => {
                   <button
                     onClick={sendMessage}
                     disabled={!input.trim() || loading}
-                    className="w-12 h-12 bg-[var(--theme-primary)] hover:bg-[var(--theme-accent)] disabled:opacity-50 disabled:cursor-not-allowed rounded-full theme-text transition-all duration-200 flex items-center justify-center hover:scale-110 shadow-md"
+                    className="w-12 h-12 theme-primary hover:theme-accent disabled:opacity-50 disabled:cursor-not-allowed rounded-full theme-text transition-all duration-200 flex items-center justify-center hover:scale-110 shadow-md"
                   >
                     <Send size={20} />
                   </button>
@@ -1190,7 +1190,7 @@ const AppLayout = () => {
               {/* Return to Chat Button */}
               <button 
                 onClick={() => setActiveSection('chat')}
-                className="absolute top-2 right-2 z-10 bg-[var(--theme-primary)] hover:bg-[var(--theme-primary-light)] theme-text px-3 py-1 rounded-full text-sm font-medium transition-colors flex items-center space-x-1 shadow-lg"
+                className="absolute top-2 right-2 z-10 theme-primary hover:theme-primary-light theme-text px-3 py-1 rounded-full text-sm font-medium transition-colors flex items-center space-x-1 shadow-lg"
               >
                 <MessageCircle size={14} />
                 <span>Chat</span>
@@ -1234,7 +1234,7 @@ const AppLayout = () => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Daily Journaling</div>
               <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
-                <div className="bg-[var(--theme-accent)] h-4 rounded-full" style={{width: '75%'}}></div>
+                <div className="theme-accent h-4 rounded-full" style={{width: '75%'}}></div>
               </div>
               <div className="theme-text text-base">15/20 days this month</div>
             </div>
@@ -1243,7 +1243,7 @@ const AppLayout = () => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Weekly Chat Goal</div>
               <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
-                <div className="bg-[var(--theme-accent)] h-4 rounded-full" style={{width: '60%'}}></div>
+                <div className="theme-accent h-4 rounded-full" style={{width: '60%'}}></div>
               </div>
               <div className="theme-text text-base">3/5 sessions this week</div>
             </div>
@@ -1310,7 +1310,7 @@ const AppLayout = () => {
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => setShowSettings(false)}
-                className="px-4 py-2 bg-[var(--theme-accent)] theme-text rounded-lg hover:bg-[var(--theme-primary)] transition-colors"
+                className="px-4 py-2 theme-accent theme-text rounded-lg hover:theme-primary transition-colors"
               >
                 Close
               </button>

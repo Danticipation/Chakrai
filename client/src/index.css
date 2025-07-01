@@ -622,3 +622,12 @@ button:focus {
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Missing theme classes for dynamic theming */
+.theme-primary-light {
+  background-color: var(--theme-primary-light) !important;
+}
+
+.theme-accent {
+  background-color: var(--theme-accent) !important;
+}
