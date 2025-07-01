@@ -4,6 +4,9 @@ import { storage } from './storage.js';
 import { analyzeEmotionalState } from './emotionalAnalysis.js';
 import { openai } from './openaiRetry.js';
 import { agentSystem } from './agentSystem.js';
+import { TherapeuticAnalyticsSystem } from './therapeuticAnalytics.js';
+
+const analyticsSystem = new TherapeuticAnalyticsSystem();
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -1271,6 +1274,163 @@ router.post('/agents/end-session', async (req, res) => {
   } catch (error) {
     console.error('Failed to end agent session:', error);
     res.status(500).json({ error: 'Failed to end session' });
+  }
+});
+
+// ================================
+// THERAPEUTIC OUTCOME ANALYTICS ENDPOINTS
+// ================================
+
+// Analyze emotional tone of message
+router.post('/api/analytics/emotional-tone', async (req, res) => {
+  try {
+    const { userId, message, sessionId } = req.body;
+    
+    const analysis = await analyticsSystem.analyzeEmotionalTone(
+      userId || 1, 
+      message, 
+      sessionId || Date.now().toString()
+    );
+    
+    res.json(analysis);
+  } catch (error) {
+    console.error('Emotional tone analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze emotional tone' });
+  }
+});
+
+// Track affirmation response
+router.post('/api/analytics/affirmation-response', async (req, res) => {
+  try {
+    const { userId, affirmationType, content, userResponse } = req.body;
+    
+    const efficacy = await analyticsSystem.trackAffirmationResponse(
+      userId || 1,
+      affirmationType,
+      content,
+      userResponse
+    );
+    
+    res.json(efficacy);
+  } catch (error) {
+    console.error('Affirmation tracking error:', error);
+    res.status(500).json({ error: 'Failed to track affirmation response' });
+  }
+});
+
+// Track wellness goal progress
+router.post('/api/analytics/wellness-goal', async (req, res) => {
+  try {
+    const { userId, goalType, description, target, current } = req.body;
+    
+    const progress = await analyticsSystem.trackWellnessGoalProgress(
+      userId || 1,
+      goalType,
+      description,
+      target,
+      current
+    );
+    
+    res.json(progress);
+  } catch (error) {
+    console.error('Wellness goal tracking error:', error);
+    res.status(500).json({ error: 'Failed to track wellness goal' });
+  }
+});
+
+// Track user engagement
+router.post('/api/analytics/engagement', async (req, res) => {
+  try {
+    const { userId, sessionDuration, featuresUsed, interactions } = req.body;
+    
+    await analyticsSystem.trackUserEngagement(
+      userId || 1,
+      sessionDuration,
+      featuresUsed,
+      interactions
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Engagement tracking error:', error);
+    res.status(500).json({ error: 'Failed to track engagement' });
+  }
+});
+
+// Generate therapeutic efficacy report
+router.post('/api/analytics/efficacy-report', async (req, res) => {
+  try {
+    const { reportType, startDate, endDate } = req.body;
+    
+    const report = await analyticsSystem.generateEfficacyReport(
+      reportType || 'monthly',
+      new Date(startDate || Date.now() - 30 * 24 * 60 * 60 * 1000),
+      new Date(endDate || Date.now())
+    );
+    
+    res.json(report);
+  } catch (error) {
+    console.error('Efficacy report generation error:', error);
+    res.status(500).json({ error: 'Failed to generate efficacy report' });
+  }
+});
+
+// Get emotional trends for user
+router.get('/api/analytics/emotional-trends/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const days = parseInt(req.query.days as string) || 30;
+    
+    const trends = await analyticsSystem.getEmotionalTrends(userId, days);
+    
+    res.json(trends);
+  } catch (error) {
+    console.error('Emotional trends error:', error);
+    res.status(500).json({ error: 'Failed to get emotional trends' });
+  }
+});
+
+// Get most effective affirmations for user
+router.get('/api/analytics/effective-affirmations/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    const affirmations = await analyticsSystem.getMostEffectiveAffirmations(userId);
+    
+    res.json(affirmations);
+  } catch (error) {
+    console.error('Effective affirmations error:', error);
+    res.status(500).json({ error: 'Failed to get effective affirmations' });
+  }
+});
+
+// Get analytics dashboard overview
+router.get('/api/analytics/dashboard/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    // Get comprehensive analytics overview
+    const [emotionalTrends, effectiveAffirmations] = await Promise.all([
+      analyticsSystem.getEmotionalTrends(userId, 7), // Last 7 days
+      analyticsSystem.getMostEffectiveAffirmations(userId)
+    ]);
+    
+    const dashboard = {
+      emotionalTrends,
+      effectiveAffirmations,
+      summary: {
+        weeklyEmotionalImprovement: emotionalTrends.length > 0 ? 
+          emotionalTrends[emotionalTrends.length - 1]?.avgSentiment || 0 : 0,
+        topAffirmationType: effectiveAffirmations[0]?.affirmationType || 'self-compassion',
+        overallEfficacy: effectiveAffirmations.length > 0 ?
+          effectiveAffirmations.reduce((acc, curr) => acc + (curr.avgEfficacy || 0), 0) / effectiveAffirmations.length : 0.7
+      }
+    };
+    
+    res.json(dashboard);
+  } catch (error) {
+    console.error('Analytics dashboard error:', error);
+    res.status(500).json({ error: 'Failed to get analytics dashboard' });
   }
 });
 

@@ -256,6 +256,21 @@ const AppLayout = () => {
 
         setMessages(prev => [...prev, botMessage]);
 
+        // Track emotional tone analytics
+        try {
+          await fetch('/api/analytics/emotional-tone', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: 1,
+              message: input,
+              sessionId: Date.now().toString()
+            })
+          });
+        } catch (error) {
+          console.error('Analytics tracking failed:', error);
+        }
+
         // Check for potential agent handoff
         try {
           const handoffResponse = await fetch('/api/agents/analyze-handoff', {
