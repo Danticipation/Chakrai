@@ -85,7 +85,60 @@ input, textarea, select, button {
 
 /* Theme-based text elements */
 h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
-  color: var(--theme-text);
+  color: var(--theme-text) !important;
+}
+
+/* Force override any remaining hardcoded blue colors */
+.bg-blue-500, .bg-blue-600, .bg-blue-700 {
+  background-color: var(--theme-primary) !important;
+}
+
+.text-blue-500, .text-blue-600, .text-blue-700, .text-blue-800 {
+  color: var(--theme-text) !important;
+}
+
+.border-blue-200, .border-blue-500 {
+  border-color: var(--theme-accent) !important;
+}
+
+.bg-blue-50, .bg-blue-100 {
+  background-color: var(--theme-surface) !important;
+}
+
+/* Specifically target the main navigation and content areas */
+.theme-background, .theme-background * {
+  background-color: var(--theme-background) !important;
+}
+
+/* Override specific blue backgrounds that are persistent */
+[style*="#3f51b5"], [style*="#1a237e"], [style*="#0a0e1a"] {
+  background-color: var(--theme-primary) !important;
+}
+
+/* Force all navigation buttons to use theme colors */
+nav button, .navigation button, [class*="navigation"] button {
+  background-color: var(--theme-primary) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Nuclear option - override ALL blue backgrounds */
+* {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+button, .btn, [role="button"] {
+  background-color: var(--theme-primary) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Specific override for the exact elements visible in screenshot */
+.hidden.md\\:flex.w-72.flex-col.justify-center.py-8 button {
+  background-color: var(--theme-primary) !important;
+}
+
+.grid.grid-cols-4.gap-2.px-3.pb-2 button {
+  background-color: var(--theme-primary) !important;
 }
 
 /* Additional theme card styling */
