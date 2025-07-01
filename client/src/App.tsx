@@ -844,7 +844,7 @@ const AppLayout = () => {
             <div className="text-white/60 text-xs font-medium px-3 pt-2 pb-1">Wellness Features</div>
             <div className="grid grid-cols-4 gap-2 px-3">
               {[
-                { id: 'chat', label: 'Chat', icon: '💬' },
+                { id: 'chat', label: 'Home', icon: '🏠' },
                 { id: 'daily', label: 'Reflect', icon: '🧠' },
                 { id: 'journal', label: 'Journal', icon: '📝' },
                 { id: 'memory', label: 'Memory', icon: '🎯' },
@@ -910,7 +910,7 @@ const AppLayout = () => {
           <div className="mb-4">
             <div className="text-white/60 text-sm font-medium px-6 pb-2">Wellness Features</div>
             {[
-              { id: 'chat', label: 'Chat' },
+              { id: 'chat', label: 'Home' },
               { id: 'daily', label: 'Reflection' },
               { id: 'journal', label: 'Journal' },
               { id: 'memory', label: 'Memory' },
