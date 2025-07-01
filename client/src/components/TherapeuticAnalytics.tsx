@@ -258,11 +258,11 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
 
   const renderReports = () => (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex items-center justify-between text-white">
             <span className="flex items-center">
-              <Users className="w-5 h-5 mr-2 text-blue-600" />
+              <Users className="w-5 h-5 mr-2 text-white" />
               Therapeutic Efficacy Report
             </span>
             <div className="flex items-center space-x-2">
@@ -287,76 +287,76 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
             <div className="space-y-6">
               {/* Report Summary */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-900">{efficacyReport.totalUsers}</div>
-                  <div className="text-sm text-blue-600">Total Users</div>
+                <div className="text-center p-4 bg-[#3f51b5]/20 rounded-lg">
+                  <div className="text-2xl font-bold text-white">{efficacyReport.totalUsers}</div>
+                  <div className="text-sm text-white/70">Total Users</div>
                 </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-900">
+                <div className="text-center p-4 bg-[#3f51b5]/20 rounded-lg">
+                  <div className="text-2xl font-bold text-white">
                     {(efficacyReport.averageEmotionalImprovement * 100).toFixed(1)}%
                   </div>
-                  <div className="text-sm text-green-600">Emotional Improvement</div>
+                  <div className="text-sm text-white/70">Emotional Improvement</div>
                 </div>
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-900">
+                <div className="text-center p-4 bg-[#3f51b5]/20 rounded-lg">
+                  <div className="text-2xl font-bold text-white">
                     {efficacyReport.goalCompletionRate.toFixed(1)}%
                   </div>
-                  <div className="text-sm text-purple-600">Goal Completion</div>
+                  <div className="text-sm text-white/70">Goal Completion</div>
                 </div>
-                <div className="text-center p-4 bg-orange-50 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-900">
+                <div className="text-center p-4 bg-[#3f51b5]/20 rounded-lg">
+                  <div className="text-2xl font-bold text-white">
                     {(efficacyReport.userRetentionRate * 100).toFixed(1)}%
                   </div>
-                  <div className="text-sm text-orange-600">User Retention</div>
+                  <div className="text-sm text-white/70">User Retention</div>
                 </div>
               </div>
 
               {/* Clinical Metrics */}
-              <Card>
+              <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
                 <CardHeader>
-                  <CardTitle className="text-lg">Clinical Metrics</CardTitle>
+                  <CardTitle className="text-lg text-white">Clinical Metrics</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center">
-                      <div className="text-xl font-bold text-blue-600">
+                      <div className="text-xl font-bold text-white">
                         {(efficacyReport.clinicalMetrics.anxietyReduction * 100).toFixed(1)}%
                       </div>
-                      <div className="text-sm text-gray-600">Anxiety Reduction</div>
+                      <div className="text-sm text-white/70">Anxiety Reduction</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-green-600">
+                      <div className="text-xl font-bold text-white">
                         {(efficacyReport.clinicalMetrics.depressionImprovement * 100).toFixed(1)}%
                       </div>
-                      <div className="text-sm text-gray-600">Depression Improvement</div>
+                      <div className="text-sm text-white/70">Depression Improvement</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-purple-600">
+                      <div className="text-xl font-bold text-white">
                         {(efficacyReport.clinicalMetrics.stressManagement * 100).toFixed(1)}%
                       </div>
-                      <div className="text-sm text-gray-600">Stress Management</div>
+                      <div className="text-sm text-white/70">Stress Management</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-orange-600">
+                      <div className="text-xl font-bold text-white">
                         {(efficacyReport.clinicalMetrics.overallWellness * 100).toFixed(1)}%
                       </div>
-                      <div className="text-sm text-gray-600">Overall Wellness</div>
+                      <div className="text-sm text-white/70">Overall Wellness</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Key Insights */}
-              <Card>
+              <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
                 <CardHeader>
-                  <CardTitle>Key Insights</CardTitle>
+                  <CardTitle className="text-white">Key Insights</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
                     {efficacyReport.keyInsights.map((insight, index) => (
                       <li key={index} className="flex items-start space-x-2">
-                        <Brain className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">{insight}</span>
+                        <Brain className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-white/90">{insight}</span>
                       </li>
                     ))}
                   </ul>
@@ -386,7 +386,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-white/70">
               Click "Generate Report" to create a therapeutic efficacy report
             </div>
           )}
