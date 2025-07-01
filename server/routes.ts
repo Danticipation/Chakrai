@@ -167,7 +167,7 @@ async function analyzeEmotionalPatterns(userId: number, timeframeDays: number): 
 // Main chat endpoint with AI integration
 router.post('/chat', async (req, res) => {
   try {
-    const { message, voice, personalityMode = 'supportive' } = req.body;
+    const { message, voice, personalityMode = 'supportive', deviceFingerprint } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -175,8 +175,10 @@ router.post('/chat', async (req, res) => {
 
     // Get or create anonymous user
     const sessionInfo = userSessionManager.getSessionFromRequest(req);
+    // Use deviceFingerprint from body if provided, otherwise fall back to request headers
+    const fingerprint = deviceFingerprint || sessionInfo.deviceFingerprint;
     const anonymousUser = await userSessionManager.getOrCreateAnonymousUser(
-      sessionInfo.deviceFingerprint, 
+      fingerprint, 
       sessionInfo.sessionId
     );
     const userId = anonymousUser.id;
