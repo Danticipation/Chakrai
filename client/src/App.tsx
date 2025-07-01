@@ -861,9 +861,9 @@ const AppLayout = () => {
   return (
     <div className="min-h-screen theme-background flex flex-col">
       {/* Mobile-Optimized Header */}
-      <div className="theme-background p-2 md:p-4">
-        {/* Mobile: Compact Header */}
-        <div className="block md:hidden">
+      <div className="theme-background">
+        {/* Mobile: Polished Header */}
+        <div className="block md:hidden mobile-polish-header">
           {/* Top Row: Logo and Status */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-3">
@@ -885,31 +885,31 @@ const AppLayout = () => {
           <div className="flex gap-2">
             <button 
               onClick={() => setActiveSection('horoscope')}
-              className="flex-1 theme-primary/80 rounded-lg p-2 hover:theme-primary-light transition-colors"
+              className="mobile-header-btn"
             >
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">⭐</span>
-                <span className="text-xs theme-text font-medium">Horoscope</span>
+                <span className="text-xs font-medium">Horoscope</span>
               </div>
             </button>
             
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="flex-1 theme-primary/80 rounded-lg p-2 hover:theme-primary-light transition-colors"
+              className="mobile-header-btn"
             >
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">✨</span>
-                <span className="text-xs theme-text font-medium">Affirmation</span>
+                <span className="text-xs font-medium">Affirmation</span>
               </div>
             </button>
             
             <button 
               onClick={() => setShowSettings(true)}
-              className="flex-1 theme-primary/80 rounded-lg p-2 hover:theme-primary-light transition-colors"
+              className="mobile-header-btn"
             >
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">⚙️</span>
-                <span className="text-xs theme-text font-medium">Settings</span>
+                <span className="text-xs font-medium">Settings</span>
               </div>
             </button>
           </div>
@@ -1001,8 +1001,8 @@ const AppLayout = () => {
                     activeSection === tab.id ? 'selected' : ''
                   }`}
                 >
-                  <span className="text-lg mb-1">{tab.icon}</span>
-                  <span className="text-xs leading-tight text-center">{tab.label}</span>
+                  <span className="mobile-nav-icon">{tab.icon}</span>
+                  <span className="mobile-nav-label">{tab.label}</span>
                 </button>
               ))}
             </div>
@@ -1029,15 +1029,12 @@ const AppLayout = () => {
                     // Simulate content loading time
                     setTimeout(() => setContentLoading(false), 800);
                   }}
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
-                    activeSection === tab.id
-                      ? 'theme-surface theme-text shadow-lg transform scale-95 ring-2 ring-white'
-                      : 'theme-primary theme-text hover:theme-primary-light active:scale-95'
+                  className={`mobile-nav-btn-polish touch-target ${
+                    activeSection === tab.id ? 'selected' : ''
                   }`}
-                  style={{ minHeight: '60px' }}
                 >
-                  <span className="text-lg mb-1">{tab.icon}</span>
-                  <span className="text-xs leading-tight text-center">{tab.label}</span>
+                  <span className="mobile-nav-icon">{tab.icon}</span>
+                  <span className="mobile-nav-label">{tab.label}</span>
                 </button>
               ))}
             </div>
@@ -1124,7 +1121,7 @@ const AppLayout = () => {
                     setTimeout(() => el.scrollTop = el.scrollHeight, 100);
                   }
                 }}
-                className="flex-1 overflow-y-auto p-4 pb-safe mobile-scroll" 
+                className="mobile-chat-messages" 
                 style={{ minHeight: '0', maxHeight: 'calc(100vh - 280px)' }}
               >
                 {messages.length === 0 ? (
@@ -1139,10 +1136,8 @@ const AppLayout = () => {
                   <div className="space-y-4">
                     {messages.map((message, index) => (
                       <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[85%] px-4 py-3 rounded-2xl chat-bubble ${
-                          message.sender === 'user' 
-                            ? 'theme-primary theme-text rounded-br-md' 
-                            : 'theme-primary theme-text rounded-bl-md'
+                        <div className={`mobile-message-bubble ${
+                          message.sender === 'user' ? 'user' : 'bot'
                         }`}>
                           <p className="mobile-text-sm leading-relaxed">{message.text}</p>
                           <p className="mobile-text-xs mt-2 opacity-70">{message.time}</p>
