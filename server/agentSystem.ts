@@ -210,7 +210,10 @@ Only recommend handoff if there's clear benefit (confidence > 0.7).`;
         temperature: 0.3,
       });
 
-      const analysis = JSON.parse(response.choices[0].message.content || '{}');
+      const rawContent = response.choices[0].message.content || '{}';
+      // Strip markdown code blocks if present
+      const cleanContent = rawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const analysis = JSON.parse(cleanContent);
       return {
         shouldHandoff: analysis.shouldHandoff || false,
         recommendedAgent: analysis.recommendedAgent,
@@ -401,7 +404,10 @@ Transfer back if:
         temperature: 0.3,
       });
 
-      const analysis = JSON.parse(response.choices[0].message.content || '{}');
+      const rawContent = response.choices[0].message.content || '{}';
+      // Strip markdown code blocks if present
+      const cleanContent = rawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const analysis = JSON.parse(cleanContent);
       return {
         shouldTransfer: analysis.shouldTransfer || false,
         reason: analysis.reason,
