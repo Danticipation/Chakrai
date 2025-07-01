@@ -1242,26 +1242,36 @@ const AppLayout = () => {
                 <span>Chat</span>
               </button>
               
-              <div className="theme-card theme-text text-center py-3 border-b border-white/30 font-bold text-lg">
-                {activeSection === 'daily' && 'Personality Reflection'}
-                {activeSection === 'journal' && 'Therapeutic Journal'}
-                {activeSection === 'memory' && 'Memory Dashboard'}
-                {activeSection === 'analytics' && 'Analytics & Reporting'}
-                {activeSection === 'rewards' && 'Wellness Rewards'}
-                {activeSection === 'community' && 'Community & Professional Support'}
-                {activeSection === 'adaptive' && 'Adaptive Learning & Personalization'}
-                {activeSection === 'therapy-plans' && 'Personalized Therapy Plans'}
-                {activeSection === 'agents' && 'AI Therapeutic Specialists'}
-                {activeSection === 'vr' && 'VR/AR Therapy'}
-                {activeSection === 'health' && 'Health Integration'}
-                {activeSection === 'privacy' && 'Privacy & Compliance'}
-                {activeSection === 'horoscope' && 'Horoscope'}
-                {activeSection === 'affirmation' && 'Daily Affirmation'}
-                {activeSection === 'logo' && 'TraI Information'}
-                {activeSection === 'goals' && 'Wellness Goals'}
-                {activeSection === 'outcomes' && 'Therapeutic Outcomes'}
-                {activeSection === 'ehr' && 'EHR Integration'}
-                {activeSection === 'privacy-policy' && 'Privacy Policy & Terms'}
+              <div className="theme-card theme-text border-b border-white/30">
+                <div className="text-center py-3 font-bold text-lg">
+                  {activeSection === 'daily' && 'Personality Reflection'}
+                  {activeSection === 'journal' && 'Therapeutic Journal'}
+                  {activeSection === 'memory' && 'Memory Dashboard'}
+                  {activeSection === 'analytics' && 'Analytics & Reporting'}
+                  {activeSection === 'rewards' && 'Wellness Rewards'}
+                  {activeSection === 'community' && 'Community & Professional Support'}
+                  {activeSection === 'adaptive' && 'Adaptive Learning & Personalization'}
+                  {activeSection === 'therapy-plans' && 'Personalized Therapy Plans'}
+                  {activeSection === 'agents' && 'AI Therapeutic Specialists'}
+                  {activeSection === 'vr' && 'VR/AR Therapy'}
+                  {activeSection === 'health' && 'Health Integration'}
+                  {activeSection === 'privacy' && 'Privacy & Compliance'}
+                  {activeSection === 'horoscope' && 'Horoscope'}
+                  {activeSection === 'affirmation' && 'Daily Affirmation'}
+                  {activeSection === 'logo' && 'TraI Information'}
+                  {activeSection === 'goals' && 'Wellness Goals'}
+                  {activeSection === 'outcomes' && 'Therapeutic Outcomes'}
+                  {activeSection === 'ehr' && 'EHR Integration'}
+                  {activeSection === 'privacy-policy' && 'Privacy Policy & Terms'}
+                </div>
+                {/* Feature Description for Desktop */}
+                {activeSection !== 'chat' && featureDescriptions[activeSection as keyof typeof featureDescriptions] && (
+                  <div className="px-4 pb-3">
+                    <p className="theme-text-secondary text-sm leading-relaxed text-center italic">
+                      {featureDescriptions[activeSection as keyof typeof featureDescriptions]}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="h-full theme-card theme-text p-6 overflow-y-auto mobile-scroll" style={{ minHeight: '0', maxHeight: 'calc(100vh - 200px)' }}>
                 {renderActiveSection()}
@@ -1436,7 +1446,7 @@ const AppLayout = () => {
             {/* Feature Description */}
             <div className="mb-4 p-4 theme-surface rounded-lg border border-white/20">
               <p className="theme-text-secondary text-sm leading-relaxed">
-                {featureDescriptions[mobileModalContent] || 'Loading feature information...'}
+                {featureDescriptions[mobileModalContent as keyof typeof featureDescriptions] || 'Loading feature information...'}
               </p>
             </div>
             
