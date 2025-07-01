@@ -660,7 +660,7 @@ const AppLayout = () => {
         return (
           <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
-              <div className="bg-[#5c6bc0]/30 backdrop-blur-sm rounded-2xl p-8 border border-[#7986cb]/30 shadow-lg">
+              <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg">
                 <h2 className="text-3xl font-bold text-white mb-6 text-center">Voice Settings</h2>
                 <div className="space-y-6">
                   <div>
@@ -723,7 +723,7 @@ const AppLayout = () => {
         return (
           <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
-              <div className="bg-[#5c6bc0]/30 backdrop-blur-sm rounded-2xl p-8 border border-[#7986cb]/30 shadow-lg text-center">
+              <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg text-center">
                 <div className="mb-8">
                   <img src={traiLogo} alt="TrAI" className="h-32 w-auto mx-auto mb-6" />
                   <h1 className="text-4xl font-bold text-white mb-4">TrAI Mental Wellness</h1>
@@ -1111,7 +1111,7 @@ const AppLayout = () => {
                       <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[85%] px-4 py-3 rounded-2xl chat-bubble ${
                           message.sender === 'user' 
-                            ? 'bg-blue-500 text-white rounded-br-md' 
+                            ? 'bg-[var(--theme-primary)] theme-text rounded-br-md' 
                             : 'bg-[var(--theme-primary)] theme-text rounded-bl-md'
                         }`}>
                           <p className="mobile-text-sm leading-relaxed">{message.text}</p>
@@ -1177,7 +1177,7 @@ const AppLayout = () => {
                   <button
                     onClick={sendMessage}
                     disabled={!input.trim() || loading}
-                    className="w-12 h-12 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-full text-white transition-all duration-200 flex items-center justify-center hover:scale-110 shadow-md"
+                    className="w-12 h-12 bg-[var(--theme-primary)] hover:bg-[var(--theme-accent)] disabled:opacity-50 disabled:cursor-not-allowed rounded-full theme-text transition-all duration-200 flex items-center justify-center hover:scale-110 shadow-md"
                   >
                     <Send size={20} />
                   </button>
@@ -1243,7 +1243,7 @@ const AppLayout = () => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Weekly Chat Goal</div>
               <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
-                <div className="bg-blue-400 h-4 rounded-full" style={{width: '60%'}}></div>
+                <div className="bg-[var(--theme-accent)] h-4 rounded-full" style={{width: '60%'}}></div>
               </div>
               <div className="theme-text text-base">3/5 sessions this week</div>
             </div>
