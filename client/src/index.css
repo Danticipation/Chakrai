@@ -85,7 +85,7 @@ input, textarea, select, button {
 
 /* Theme-based text elements */
 h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
-  color: var(--theme-text) !important;
+  color: var(--theme-text);
 }
 
 /* Force override any remaining hardcoded blue colors */
@@ -121,24 +121,15 @@ nav button, .navigation button, [class*="navigation"] button {
   color: var(--theme-text) !important;
 }
 
-/* Nuclear option - override ALL blue backgrounds */
-* {
-  background-color: var(--theme-background) !important;
-  color: var(--theme-text) !important;
-}
-
-button, .btn, [role="button"] {
-  background-color: var(--theme-primary) !important;
-  color: var(--theme-text) !important;
-}
-
-/* Specific override for the exact elements visible in screenshot */
+/* Targeted fixes for persistent blue elements only */
 .hidden.md\\:flex.w-72.flex-col.justify-center.py-8 button {
   background-color: var(--theme-primary) !important;
+  color: var(--theme-text) !important;
 }
 
 .grid.grid-cols-4.gap-2.px-3.pb-2 button {
   background-color: var(--theme-primary) !important;
+  color: var(--theme-text) !important;
 }
 
 /* Additional theme card styling */

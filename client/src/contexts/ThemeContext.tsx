@@ -117,7 +117,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
+  const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]); // Ocean Blue default
 
   useEffect(() => {
     // Load saved theme from localStorage
@@ -128,6 +128,21 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setCurrentTheme(theme);
       }
     }
+  }, []);
+
+  // Force initial theme application immediately
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--theme-primary', currentTheme.colors.primary);
+    root.style.setProperty('--theme-primary-light', currentTheme.colors.primaryLight);
+    root.style.setProperty('--theme-primary-dark', currentTheme.colors.primaryDark);
+    root.style.setProperty('--theme-secondary', currentTheme.colors.secondary);
+    root.style.setProperty('--theme-accent', currentTheme.colors.accent);
+    root.style.setProperty('--theme-background', currentTheme.colors.background);
+    root.style.setProperty('--theme-surface', currentTheme.colors.surface);
+    root.style.setProperty('--theme-text', currentTheme.colors.text);
+    root.style.setProperty('--theme-text-secondary', currentTheme.colors.textSecondary);
+    console.log('Theme applied:', currentTheme.name, currentTheme.colors);
   }, []);
 
   useEffect(() => {
