@@ -11,6 +11,7 @@ import AnalyticsDashboard from './components/AnalyticsDashboard';
 import WellnessRewards from './components/WellnessRewards';
 import CommunitySupport from './components/CommunitySupport';
 import AdaptiveLearning from './components/AdaptiveLearning';
+import { AdaptiveTherapyPlan } from './components/AdaptiveTherapyPlan';
 import VRTherapy from './components/VRTherapy';
 import HealthIntegration from './components/HealthIntegration';
 import PrivacyCompliance from './components/PrivacyCompliance';
@@ -492,6 +493,9 @@ const AppLayout = () => {
       case 'adaptive':
         return <AdaptiveLearning />;
 
+      case 'therapy-plans':
+        return <AdaptiveTherapyPlan userId={1} onPlanUpdate={(plan) => console.log('Plan updated:', plan)} />;
+
       case 'vr':
         return <VRTherapy />;
 
@@ -737,6 +741,7 @@ const AppLayout = () => {
               { id: 'rewards', label: 'Rewards', icon: '🎁' },
               { id: 'community', label: 'Community', icon: '👥' },
               { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
+              { id: 'therapy-plans', label: 'Plans', icon: '📋' },
               { id: 'vr', label: 'VR Therapy', icon: '🥽' },
               { id: 'health', label: 'Health', icon: '💗' },
               { id: 'therapist', label: 'Therapist', icon: '🩺' },
@@ -770,6 +775,7 @@ const AppLayout = () => {
             { id: 'rewards', label: 'Rewards' },
             { id: 'community', label: 'Community' },
             { id: 'adaptive', label: 'AI Learning' },
+            { id: 'therapy-plans', label: 'Therapy Plans' },
             { id: 'vr', label: 'VR Therapy' },
             { id: 'health', label: 'Wearables' },
             { id: 'therapist', label: 'Therapist Portal' }
@@ -918,6 +924,7 @@ const AppLayout = () => {
                 {activeSection === 'rewards' && 'Wellness Rewards'}
                 {activeSection === 'community' && 'Community & Professional Support'}
                 {activeSection === 'adaptive' && 'Adaptive Learning & Personalization'}
+                {activeSection === 'therapy-plans' && 'Personalized Therapy Plans'}
                 {activeSection === 'vr' && 'VR/AR Therapy'}
                 {activeSection === 'health' && 'Health Integration'}
                 {activeSection === 'privacy' && 'Privacy & Compliance'}
