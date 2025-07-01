@@ -999,6 +999,29 @@ button:focus {
     touch-action: pan-y;
   }
   
+  /* Critical mobile scrolling fix - ensure full page area is scrollable */
+  body, html {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: manipulation !important;
+  }
+  
+  /* Remove any CSS that limits touch areas to edges */
+  * {
+    touch-action: auto;
+  }
+  
+  /* Ensure all content areas allow scrolling */
+  .mobile-polish-container, 
+  .theme-background,
+  .flex.flex-col,
+  .h-full,
+  .min-h-screen {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+  
   /* Smooth animations */
   * {
     -webkit-font-smoothing: antialiased;

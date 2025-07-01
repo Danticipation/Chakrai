@@ -859,7 +859,7 @@ const AppLayout = () => {
   }
 
   return (
-    <div className="min-h-screen theme-background flex flex-col">
+    <div className="min-h-screen theme-background flex flex-col mobile-polish-container">
       {/* Mobile-Optimized Header */}
       <div className="theme-background">
         {/* Mobile: Polished Header */}
