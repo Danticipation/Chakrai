@@ -1,6 +1,6 @@
 # Technical Documentation
 
-This document provides comprehensive technical information for developers working on TraI.
+This document provides comprehensive technical information for developers working on TraI - Mental Wellness Companion Application.
 
 ## Architecture Overview
 
@@ -38,9 +38,9 @@ TraI follows a modern full-stack architecture with clear separation of concerns:
 - **Multer** for file upload handling
 
 **AI & External Services**
-- **OpenAI GPT-4o** for conversational AI and analysis
+- **OpenAI GPT-4o** for conversational AI and wellness analysis
 - **OpenAI Whisper** for speech-to-text transcription
-- **ElevenLabs** for text-to-speech synthesis
+- **ElevenLabs** for text-to-speech synthesis with voices: Hope, James, Charlotte, Bronson
 - **Neon Database** for managed PostgreSQL hosting
 
 ## Project Structure

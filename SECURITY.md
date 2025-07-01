@@ -1,6 +1,6 @@
 # Security & Compliance Documentation
 
-This document outlines the comprehensive security measures, privacy protections, and compliance frameworks implemented in TraI.
+This document outlines the comprehensive security measures, privacy protections, and compliance frameworks implemented in TraI - Mental Wellness Companion Application.
 
 ## Security Architecture
 

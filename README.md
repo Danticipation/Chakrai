@@ -1,16 +1,17 @@
-# TraI - Mental Wellness & Therapy Application
+# TraI - Mental Wellness Companion Application
 
-TraI is a comprehensive AI-powered mental wellness companion that provides therapeutic support through intelligent, adaptive interactions and professional-grade features for mental health care.
+TraI is a comprehensive AI-powered mental wellness companion that provides supportive interactions through intelligent, adaptive technology and professional-grade features for mental health and personal growth.
 
 ## Features Overview
 
-- **AI Therapeutic Conversations** - Dynamic personality mirroring with OpenAI GPT-4o
-- **Voice Integration** - ElevenLabs text-to-speech with multiple therapeutic voices
-- **Comprehensive Journaling** - AI-assisted therapeutic journaling with analytics
+- **AI Wellness Conversations** - Dynamic personality mirroring with OpenAI GPT-4o
+- **Voice Integration** - ElevenLabs text-to-speech with multiple calming voices (Hope, James, Charlotte, Bronson)
+- **Comprehensive Journaling** - AI-assisted wellness journaling with analytics
 - **Mood & Emotion Tracking** - Real-time emotional analysis and pattern recognition
 - **Crisis Detection** - Advanced NLP-driven safety monitoring and intervention
-- **Professional Integration** - Therapist collaboration tools and session management
+- **Professional Integration** - Clinical collaboration tools and session management
 - **Privacy & Compliance** - Zero-knowledge architecture with differential privacy
+- **EHR Integration** - FHIR-compliant healthcare data integration for licensed professionals
 
 ## Quick Start
 
@@ -123,4 +124,4 @@ For support, please contact the development team or open an issue in the reposit
 
 ---
 
-**Note**: This application is designed for therapeutic support but is not a replacement for professional mental health care. Always consult with qualified mental health professionals for serious mental health concerns.
+**Important**: This application is designed as a wellness companion and personal growth tool. It is not a replacement for professional mental health care or therapy. Always consult with qualified mental health professionals for serious mental health concerns or clinical treatment.
