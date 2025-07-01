@@ -55,20 +55,20 @@ const CommunitySupport: React.FC = () => {
         {/* Forum Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {forums?.map((forum) => (
-            <div key={forum.id} className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+            <div key={forum.id} className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-white">{forum.name}</h3>
-                <div className="flex items-center space-x-1 text-white/60">
+                <h3 className="text-lg font-semibold theme-text">{forum.name}</h3>
+                <div className="flex items-center space-x-1 theme-text-secondary">
                   <Users className="w-4 h-4" />
                   <span className="text-sm">{forum.member_count}</span>
                 </div>
               </div>
-              <p className="text-white/80 text-sm mb-4">{forum.description}</p>
+              <p className="theme-text-secondary text-sm mb-4">{forum.description}</p>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-white/60 px-2 py-1 bg-white/10 rounded">
+                <span className="text-xs theme-text-secondary px-2 py-1 bg-[var(--theme-accent)] rounded">
                   {forum.category}
                 </span>
-                <button className="text-white hover:text-white/80 text-sm font-medium">
+                <button className="theme-text hover:theme-text-secondary text-sm font-medium">
                   Join Discussion →
                 </button>
               </div>
@@ -77,8 +77,8 @@ const CommunitySupport: React.FC = () => {
         </div>
 
         {/* Recent Posts */}
-        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
-          <h3 className="text-lg font-semibold text-white mb-4">Recent Posts</h3>
+        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <h3 className="text-lg font-semibold theme-text mb-4">Recent Posts</h3>
           <div className="space-y-4">
             {posts?.slice(0, 5).map((post) => (
               <div key={post.id} className="p-4 bg-white/10 rounded-lg">
