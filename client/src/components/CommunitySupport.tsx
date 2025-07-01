@@ -203,10 +203,10 @@ const CommunitySupport: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all border ${
+                className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all font-medium ${
                   activeTab === tab.id
-                    ? 'bg-[var(--theme-primary)] text-white shadow-sm border-white/30'
-                    : 'bg-transparent text-white hover:bg-white/10 border-white/20'
+                    ? 'bg-white text-black shadow-lg' 
+                    : 'bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />

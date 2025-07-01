@@ -155,10 +155,10 @@ export function InteractiveDashboard({ userId }: InteractiveDashboardProps) {
           <button
             key={key}
             onClick={() => setActiveView(key as any)}
-            className={`flex-1 flex items-center justify-center space-x-2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
               activeView === key
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-white text-black shadow-lg'
+                : 'bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm'
             }`}
           >
             <Icon className="w-4 h-4" />

@@ -189,10 +189,10 @@ export function EHRIntegration() {
               key={key}
               variant={activeTab === key ? 'default' : 'outline'}
               onClick={() => setActiveTab(key as any)}
-              className={`${
+              className={`px-6 py-3 rounded-xl transition-all font-medium ${
                 activeTab === key 
-                  ? 'bg-white text-[#1a237e]' 
-                  : 'bg-transparent border-white/30 text-white hover:bg-white/10'
+                  ? 'bg-white text-black shadow-lg' 
+                  : 'bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm border-white/20'
               }`}
             >
               <Icon className="w-4 h-4 mr-2" />

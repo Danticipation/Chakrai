@@ -259,10 +259,10 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all font-medium ${
                   activeTab === tab.id
-                    ? 'theme-primary text-white shadow-sm'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                    ? 'bg-white text-black shadow-lg'
+                    : 'bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
