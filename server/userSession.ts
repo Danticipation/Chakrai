@@ -86,7 +86,8 @@ export class UserSessionManager {
    */
   getSessionFromRequest(req: any): { sessionId?: string; deviceFingerprint: string } {
     const sessionId = req.headers['x-session-id'] || req.query.sessionId;
-    const deviceFingerprint = this.generateDeviceFingerprint(req);
+    // Priority: explicit device fingerprint header > generated from browser headers
+    const deviceFingerprint = req.headers['device-fingerprint'] || this.generateDeviceFingerprint(req);
     
     return { sessionId, deviceFingerprint };
   }
