@@ -145,50 +145,50 @@ export function InteractiveDashboard({ userId }: InteractiveDashboardProps) {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-gray-900 rounded-lg p-2 border border-gray-600">
-        <div className="flex gap-2">
+      <div className="w-full bg-white rounded-lg p-1 shadow-lg">
+        <div className="grid grid-cols-4 gap-1">
           <button
             onClick={() => setActiveView('overview')}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
+            className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
               activeView === 'overview'
-                ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
-                : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
             }`}
           >
-            <BarChart3 className="w-4 h-4" />
+            <BarChart3 className="w-4 h-4 mx-auto mb-1" />
             Overview
           </button>
           <button
             onClick={() => setActiveView('emotions')}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
+            className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
               activeView === 'emotions'
-                ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
-                : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
             }`}
           >
-            <PieChart className="w-4 h-4" />
+            <PieChart className="w-4 h-4 mx-auto mb-1" />
             Emotions
           </button>
           <button
             onClick={() => setActiveView('progress')}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
+            className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
               activeView === 'progress'
-                ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
-                : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
             }`}
           >
-            <Target className="w-4 h-4" />
+            <Target className="w-4 h-4 mx-auto mb-1" />
             Progress
           </button>
           <button
             onClick={() => setActiveView('insights')}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
+            className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
               activeView === 'insights'
-                ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
-                : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
             }`}
           >
-            <Award className="w-4 h-4" />
+            <Award className="w-4 h-4 mx-auto mb-1" />
             Insights
           </button>
         </div>

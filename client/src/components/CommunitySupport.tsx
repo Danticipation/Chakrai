@@ -193,40 +193,40 @@ const CommunitySupport: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-gray-900 rounded-lg p-2 mb-6 border border-gray-600">
-          <div className="flex gap-2">
+        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+          <div className="grid grid-cols-3 gap-1">
             <button
               onClick={() => setActiveTab('forums')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all ${
                 activeTab === 'forums'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
-                  : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              <MessageSquare className="w-4 h-4" />
-              Support Forums
+              <MessageSquare className="w-4 h-4 mx-auto mb-1" />
+              Forums
             </button>
             <button
               onClick={() => setActiveTab('peer')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all ${
                 activeTab === 'peer'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
-                  : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              <Users className="w-4 h-4" />
-              Peer Check-ins
+              <Users className="w-4 h-4 mx-auto mb-1" />
+              Check-ins
             </button>
             <button
               onClick={() => setActiveTab('moderation')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-all border-2 ${
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all ${
                 activeTab === 'moderation'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25'
-                  : 'bg-gray-700 text-gray-200 border-gray-500 hover:bg-gray-600 hover:border-gray-400'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              <Shield className="w-4 h-4" />
-              Community Guidelines
+              <Shield className="w-4 h-4 mx-auto mb-1" />
+              Guidelines
             </button>
           </div>
         </div>
