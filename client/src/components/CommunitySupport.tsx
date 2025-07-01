@@ -68,7 +68,7 @@ const CommunitySupport: React.FC = () => {
                 <span className="text-xs theme-text-secondary px-2 py-1 bg-[var(--theme-accent)] rounded">
                   {forum.category}
                 </span>
-                <button className="theme-text hover:theme-text-secondary text-sm font-medium">
+                <button className="theme-text hover:bg-[var(--theme-accent)]/20 text-sm font-medium px-3 py-1 rounded-lg transition-colors">
                   Join Discussion →
                 </button>
               </div>
@@ -156,24 +156,24 @@ const CommunitySupport: React.FC = () => {
 
         {/* Scheduled Check-ins */}
         <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
-          <h3 className="text-lg font-semibold text-white mb-4">Scheduled Check-ins</h3>
+          <h3 className="text-lg font-semibold theme-text mb-4">Scheduled Check-ins</h3>
           <div className="space-y-3">
             {checkIns?.map((checkIn) => (
-              <div key={checkIn.id} className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+              <div key={checkIn.id} className="flex items-center justify-between p-3 bg-[var(--theme-accent)]/20 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded-full bg-white/20">
-                    <Users className="w-4 h-4 text-white" />
+                  <div className="p-2 rounded-full bg-[var(--theme-accent)]/30">
+                    <Users className="w-4 h-4 theme-text" />
                   </div>
                   <div>
-                    <p className="font-medium text-white">{checkIn.paired_user_name}</p>
-                    <p className="text-sm text-white/60 capitalize">{checkIn.check_in_type} check-in</p>
+                    <p className="font-medium theme-text">{checkIn.paired_user_name}</p>
+                    <p className="text-sm theme-text-secondary capitalize">{checkIn.check_in_type} check-in</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-white font-medium">
+                  <p className="text-sm theme-text font-medium">
                     {new Date(checkIn.scheduled_time).toLocaleDateString()}
                   </p>
-                  <p className="text-xs text-white/60 capitalize">{checkIn.completion_status}</p>
+                  <p className="text-xs theme-text-secondary capitalize">{checkIn.completion_status}</p>
                 </div>
               </div>
             ))}
@@ -184,12 +184,12 @@ const CommunitySupport: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen theme-primary p-4">
+    <div className="min-h-screen theme-background p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white mb-2">Community Support</h1>
-          <p className="text-white/80">Connect with others on their wellness journey</p>
+          <h1 className="text-3xl font-bold theme-text mb-2">Community Support</h1>
+          <p className="theme-text-secondary">Connect with others on their wellness journey</p>
         </div>
 
         {/* Navigation Tabs */}
@@ -205,8 +205,8 @@ const CommunitySupport: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                   activeTab === tab.id
-                    ? 'theme-primary text-white shadow-sm'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                    ? 'bg-[var(--theme-primary)] theme-text shadow-sm'
+                    : 'theme-text-secondary hover:theme-text hover:bg-[var(--theme-accent)]/20'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
@@ -220,7 +220,7 @@ const CommunitySupport: React.FC = () => {
         {activeTab === 'forums' && renderForumsTab()}
         {activeTab === 'peer' && renderPeerSupportTab()}
         {activeTab === 'moderation' && (
-          <div className="text-center py-8 text-white/60">
+          <div className="text-center py-8 theme-text-secondary">
             <Shield className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>Community guidelines and moderation tools coming soon</p>
           </div>

@@ -765,9 +765,9 @@ button:focus {
     padding: 8px;
   }
   
-  /* Navigation container polish - Enhanced Background */
+  /* Navigation container polish - Theme Aware Background */
   .mobile-nav-polish {
-    background: linear-gradient(180deg, #1a237e 0%, #0d1854 100%);
+    background: linear-gradient(180deg, var(--theme-surface) 0%, var(--theme-background) 100%);
     border-bottom: 2px solid rgba(255, 255, 255, 0.2);
     padding: 20px 20px 24px 20px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -802,30 +802,30 @@ button:focus {
     gap: 10px;
   }
 
-  /* Professional Tools Section - Orange Theme */
+  /* Professional Tools Section - Theme Complementary */
   .mobile-nav-section:last-child .mobile-nav-btn-polish {
-    background: linear-gradient(135deg, #ff8a50 0%, #ff6b35 100%);
+    background: linear-gradient(135deg, var(--theme-accent-light) 0%, var(--theme-accent) 100%);
     border: 2px solid rgba(255, 255, 255, 0.4);
   }
 
   .mobile-nav-section:last-child .mobile-nav-btn-polish:hover {
-    background: linear-gradient(135deg, #ffa86b 0%, #ff8a50 100%);
+    background: linear-gradient(135deg, var(--theme-primary-light) 0%, var(--theme-accent-light) 100%);
     border-color: rgba(255, 255, 255, 0.6);
   }
 
   .mobile-nav-section:last-child .mobile-nav-btn-polish.selected {
-    background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-    border-color: #ffffff;
-    box-shadow: 0 6px 24px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(135deg, var(--theme-secondary) 0%, var(--theme-primary-dark) 100%);
+    border-color: var(--theme-text);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
   }
   
-  /* Polished navigation buttons - Enhanced Visibility */
+  /* Polished navigation buttons - Theme Aware */
   .mobile-nav-btn-polish {
-    background: linear-gradient(135deg, #5c6bc0 0%, #3f51b5 100%);
+    background: linear-gradient(135deg, var(--theme-primary-light) 0%, var(--theme-primary) 100%);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 16px;
     padding: 16px 8px;
-    color: #ffffff;
+    color: var(--theme-text);
     font-size: 10px;
     font-weight: 600;
     line-height: 1.2;
@@ -843,7 +843,7 @@ button:focus {
   }
   
   .mobile-nav-btn-polish:hover {
-    background: linear-gradient(135deg, #7986cb 0%, #5c6bc0 100%);
+    background: linear-gradient(135deg, var(--theme-accent-light) 0%, var(--theme-primary-light) 100%);
     border-color: rgba(255, 255, 255, 0.5);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
@@ -856,11 +856,11 @@ button:focus {
   }
   
   .mobile-nav-btn-polish.selected {
-    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-    border-color: #ffffff;
-    box-shadow: 0 6px 24px rgba(255, 107, 53, 0.4);
+    background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-secondary) 100%);
+    border-color: var(--theme-text);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
     transform: translateY(-2px);
-    color: #ffffff;
+    color: var(--theme-text);
   }
   
   /* Navigation icon styling - Enhanced Visibility */
