@@ -786,77 +786,128 @@ const AppLayout = () => {
 
       {/* Main Content Area - Mobile Responsive */}
       <div className="flex-1 flex flex-col md:flex-row bg-[#0a0e1a]">
-        {/* Mobile Navigation - Improved Grid Layout */}
+        {/* Mobile Navigation - Separated User Features & Internal Tools */}
         <div className="md:hidden bg-[#1a237e] border-b border-white/20">
-          <div className="grid grid-cols-4 gap-2 p-3">
-            {[
-              { id: 'chat', label: 'Chat', icon: '💬' },
-              { id: 'daily', label: 'Reflect', icon: '🧠' },
-              { id: 'journal', label: 'Journal', icon: '📝' },
-              { id: 'memory', label: 'Memory', icon: '🎯' },
-              { id: 'analytics', label: 'Analytics', icon: '📊' },
-              { id: 'rewards', label: 'Rewards', icon: '🎁' },
-              { id: 'community', label: 'Community', icon: '👥' },
-              { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
-              { id: 'therapy-plans', label: 'Plans', icon: '📋' },
-              { id: 'agents', label: 'Specialists', icon: '🧩' },
-              { id: 'vr', label: 'VR Therapy', icon: '🥽' },
-              { id: 'health', label: 'Health', icon: '💗' },
-              { id: 'therapist', label: 'Therapist', icon: '🩺' },
-              { id: 'privacy', label: 'Privacy', icon: '🔒' },
-              { id: 'outcomes', label: 'Outcomes', icon: '📈' },
-              { id: 'ehr', label: 'EHR', icon: '🏥' },
-              { id: 'privacy-policy', label: 'Legal', icon: '📜' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveSection(tab.id)}
-                className={`flex flex-col items-center justify-center p-4 rounded-xl font-medium transition-all touch-target ${
-                  activeSection === tab.id
-                    ? 'bg-green-500 text-white shadow-lg transform scale-95 ring-2 ring-white'
-                    : 'bg-purple-800/60 text-white/80 hover:bg-purple-700 active:scale-95'
-                }`}
-                style={{ minHeight: '70px' }}
-              >
-                <span className="text-xl mb-2">{tab.icon}</span>
-                <span className="mobile-text-xs leading-tight text-center">{tab.label}</span>
-              </button>
-            ))}
+          {/* User Features Section */}
+          <div className="border-b border-white/10 pb-2">
+            <div className="text-white/60 text-xs font-medium px-3 pt-2 pb-1">Wellness Features</div>
+            <div className="grid grid-cols-4 gap-2 px-3">
+              {[
+                { id: 'chat', label: 'Chat', icon: '💬' },
+                { id: 'daily', label: 'Reflect', icon: '🧠' },
+                { id: 'journal', label: 'Journal', icon: '📝' },
+                { id: 'memory', label: 'Memory', icon: '🎯' },
+                { id: 'analytics', label: 'Analytics', icon: '📊' },
+                { id: 'rewards', label: 'Rewards', icon: '🎁' },
+                { id: 'community', label: 'Community', icon: '👥' },
+                { id: 'vr', label: 'VR Therapy', icon: '🥽' },
+                { id: 'health', label: 'Health', icon: '💗' },
+                { id: 'agents', label: 'Specialists', icon: '🧩' },
+                { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
+                { id: 'therapy-plans', label: 'Plans', icon: '📋' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSection(tab.id)}
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
+                    activeSection === tab.id
+                      ? 'bg-green-500 text-white shadow-lg transform scale-95 ring-2 ring-white'
+                      : 'bg-purple-800/60 text-white/80 hover:bg-purple-700 active:scale-95'
+                  }`}
+                  style={{ minHeight: '60px' }}
+                >
+                  <span className="text-lg mb-1">{tab.icon}</span>
+                  <span className="text-xs leading-tight text-center">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Internal Tools Section */}
+          <div className="pt-2">
+            <div className="text-white/60 text-xs font-medium px-3 pb-1">Professional Tools</div>
+            <div className="grid grid-cols-4 gap-2 px-3 pb-2">
+              {[
+                { id: 'therapist', label: 'Therapist', icon: '🩺' },
+                { id: 'privacy', label: 'Privacy', icon: '🔒' },
+                { id: 'outcomes', label: 'Outcomes', icon: '📈' },
+                { id: 'ehr', label: 'EHR', icon: '🏥' },
+                { id: 'privacy-policy', label: 'Legal', icon: '📜' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSection(tab.id)}
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
+                    activeSection === tab.id
+                      ? 'bg-orange-500 text-white shadow-lg transform scale-95 ring-2 ring-white'
+                      : 'bg-orange-700/60 text-white/80 hover:bg-orange-600 active:scale-95'
+                  }`}
+                  style={{ minHeight: '60px' }}
+                >
+                  <span className="text-lg mb-1">{tab.icon}</span>
+                  <span className="text-xs leading-tight text-center">{tab.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Desktop Left Sidebar Navigation */}
         <div className="hidden md:flex w-72 flex-col justify-center py-8">
-          {[
-            { id: 'chat', label: 'Chat' },
-            { id: 'daily', label: 'Reflection' },
-            { id: 'journal', label: 'Journal' },
-            { id: 'memory', label: 'Memory' },
-            { id: 'analytics', label: 'Analytics' },
-            { id: 'rewards', label: 'Rewards' },
-            { id: 'community', label: 'Community' },
-            { id: 'adaptive', label: 'AI Learning' },
-            { id: 'therapy-plans', label: 'Therapy Plans' },
-            { id: 'agents', label: 'AI Specialists' },
-            { id: 'vr', label: 'VR Therapy' },
-            { id: 'health', label: 'Wearables' },
-            { id: 'therapist', label: 'Therapist Portal' },
-            { id: 'outcomes', label: 'Therapeutic Outcomes' },
-            { id: 'ehr', label: 'EHR Integration' },
-            { id: 'privacy-policy', label: 'Privacy Policy' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveSection(tab.id)}
-              className={`w-full h-20 px-6 text-xl font-bold transition-colors ${
-                activeSection === tab.id
-                  ? 'bg-red-600 text-white'
-                  : 'bg-red-600 text-white hover:bg-red-500'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {/* User Features Section */}
+          <div className="mb-4">
+            <div className="text-white/60 text-sm font-medium px-6 pb-2">Wellness Features</div>
+            {[
+              { id: 'chat', label: 'Chat' },
+              { id: 'daily', label: 'Reflection' },
+              { id: 'journal', label: 'Journal' },
+              { id: 'memory', label: 'Memory' },
+              { id: 'analytics', label: 'Analytics' },
+              { id: 'rewards', label: 'Rewards' },
+              { id: 'community', label: 'Community' },
+              { id: 'adaptive', label: 'AI Learning' },
+              { id: 'therapy-plans', label: 'Therapy Plans' },
+              { id: 'agents', label: 'AI Specialists' },
+              { id: 'vr', label: 'VR Therapy' },
+              { id: 'health', label: 'Wearables' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveSection(tab.id)}
+                className={`w-full h-16 px-6 text-lg font-bold transition-colors ${
+                  activeSection === tab.id
+                    ? 'bg-green-600 text-white'
+                    : 'bg-green-600 text-white hover:bg-green-500'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Internal Tools Section */}
+          <div className="border-t border-white/20 pt-4">
+            <div className="text-white/60 text-sm font-medium px-6 pb-2">Professional Tools</div>
+            {[
+              { id: 'therapist', label: 'Therapist Portal' },
+              { id: 'privacy', label: 'Privacy & Compliance' },
+              { id: 'outcomes', label: 'Therapeutic Outcomes' },
+              { id: 'ehr', label: 'EHR Integration' },
+              { id: 'privacy-policy', label: 'Privacy Policy' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveSection(tab.id)}
+                className={`w-full h-16 px-6 text-lg font-bold transition-colors ${
+                  activeSection === tab.id
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-orange-600 text-white hover:bg-orange-500'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Center Content Area - Mobile Responsive */}
