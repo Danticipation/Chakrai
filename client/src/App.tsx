@@ -1174,7 +1174,7 @@ const AppLayout = () => {
               </div>
               
               {/* Mobile Chat Input Area */}
-              <div className="theme-surface p-4 border-t border-white/20 mobile-input-area">
+              <div className="mobile-input-polish mobile-input-area">
                 {/* Recording Status Indicator */}
                 {isRecording && (
                   <div className="mb-3 flex items-center justify-center">
@@ -1193,17 +1193,15 @@ const AppLayout = () => {
                       onChange={(e) => setInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                       placeholder="Share what's on your mind..."
-                      className="w-full px-5 py-4 theme-surface theme-text border border-[var(--theme-accent)] rounded-2xl text-base placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--theme-secondary)] focus:border-transparent ios-input-fix"
+                      className="mobile-input-field ios-input-fix"
                     />
                   </div>
                   
                   {/* Voice Input Button */}
                   <button
                     onClick={isRecording ? stopRecording : startRecording}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
-                      isRecording 
-                        ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse scale-110 shadow-lg' 
-                        : 'theme-primary hover:theme-primary-light theme-text hover:scale-110 shadow-md'
+                    className={`mobile-action-btn ${
+                      isRecording ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' : ''
                     }`}
                     disabled={loading}
                     title={isRecording ? "Stop recording" : "Start voice input"}
@@ -1215,7 +1213,7 @@ const AppLayout = () => {
                   <button
                     onClick={sendMessage}
                     disabled={!input.trim() || loading}
-                    className="w-12 h-12 theme-primary hover:theme-accent disabled:opacity-50 disabled:cursor-not-allowed rounded-full theme-text transition-all duration-200 flex items-center justify-center hover:scale-110 shadow-md"
+                    className="mobile-action-btn"
                   >
                     <Send size={20} />
                   </button>
