@@ -81,17 +81,17 @@ const CommunitySupport: React.FC = () => {
           <h3 className="text-lg font-semibold theme-text mb-4">Recent Posts</h3>
           <div className="space-y-4">
             {posts?.slice(0, 5).map((post) => (
-              <div key={post.id} className="p-4 bg-white/10 rounded-lg">
+              <div key={post.id} className="p-4 bg-[var(--theme-accent)] rounded-lg">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="font-medium text-white mb-1">{post.title}</h4>
-                    <p className="text-white/80 text-sm mb-2 line-clamp-2">{post.content}</p>
-                    <div className="flex items-center space-x-4 text-xs text-white/60">
+                    <h4 className="font-medium theme-text mb-1">{post.title}</h4>
+                    <p className="theme-text-secondary text-sm mb-2 line-clamp-2">{post.content}</p>
+                    <div className="flex items-center space-x-4 text-xs theme-text-secondary">
                       <span>by {post.author_name}</span>
                       <span>{new Date(post.created_at).toLocaleDateString()}</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2 text-white/60">
+                  <div className="flex items-center space-x-2 theme-text-secondary">
                     <div className="flex items-center space-x-1">
                       <Heart className="w-4 h-4" />
                       <span className="text-sm">{post.heart_count}</span>
@@ -115,40 +115,40 @@ const CommunitySupport: React.FC = () => {
       <div className="space-y-6">
         {/* Peer Check-ins Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-white/80">Active Connections</p>
-                <p className="text-2xl font-bold text-white">{checkIns?.length || 0}</p>
+                <p className="text-sm theme-text-secondary">Active Connections</p>
+                <p className="text-2xl font-bold theme-text">{checkIns?.length || 0}</p>
               </div>
-              <div className="p-3 rounded-full bg-white/20">
-                <UserCheck className="w-6 h-6 text-white" />
+              <div className="p-3 rounded-full bg-[var(--theme-accent)]">
+                <UserCheck className="w-6 h-6 theme-text" />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-white/80">This Week</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-sm theme-text-secondary">This Week</p>
+                <p className="text-2xl font-bold theme-text">
                   {checkIns?.filter(c => c.completion_status === 'completed').length || 0}
                 </p>
               </div>
-              <div className="p-3 rounded-full bg-white/20">
-                <Calendar className="w-6 h-6 text-white" />
+              <div className="p-3 rounded-full bg-[var(--theme-accent)]">
+                <Calendar className="w-6 h-6 theme-text" />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-white/80">Support Score</p>
-                <p className="text-2xl font-bold text-white">4.8</p>
+                <p className="text-sm theme-text-secondary">Support Score</p>
+                <p className="text-2xl font-bold theme-text">4.8</p>
               </div>
-              <div className="p-3 rounded-full bg-white/20">
-                <Star className="w-6 h-6 text-white" />
+              <div className="p-3 rounded-full bg-[var(--theme-accent)]">
+                <Star className="w-6 h-6 theme-text" />
               </div>
             </div>
           </div>

@@ -17,7 +17,7 @@ export default function PrivacyPolicy() {
         </div>
 
         {/* Main Content */}
-        <div className="bg-[#3f51b5]/20 rounded-lg p-6 md:p-8 space-y-8">
+        <div className="theme-card rounded-lg p-6 md:p-8 space-y-8">
           
           {/* Introduction */}
           <section>
