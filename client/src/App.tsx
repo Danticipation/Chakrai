@@ -1325,7 +1325,7 @@ const AppLayout = () => {
       {/* Settings Modal */}
       {showSettings && (
         <div 
-          className="fixed inset-0 bg-black/70 flex items-center justify-center p-6 z-50"
+          className="fixed inset-0 bg-black/70 flex items-center justify-center p-6 z-50 mobile-modal-content"
           style={{ paddingTop: '60px', paddingBottom: '60px' }}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
@@ -1410,14 +1410,14 @@ const AppLayout = () => {
       {/* Mobile Feature Modal */}
       {showMobileModal && (
         <div 
-          className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 mobile-modal-content"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowMobileModal(false);
             }
           }}
         >
-          <div className="theme-card rounded-2xl p-6 w-full max-w-lg border border-[var(--theme-accent)]/30 relative max-h-[90vh] overflow-y-auto">
+          <div className="theme-card rounded-2xl p-6 w-full max-w-lg border border-[var(--theme-accent)]/30 relative max-h-[90vh] overflow-y-auto mobile-content-area">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold theme-text capitalize">
                 {mobileModalContent.replace('-', ' ')}

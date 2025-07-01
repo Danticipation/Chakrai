@@ -691,13 +691,25 @@ button:focus {
 
 /* Enhanced Mobile Interface Polish */
 @media (max-width: 768px) {
+  /* Fix mobile scrolling issues - ensure full page is scrollable */
+  html, body {
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
   /* Professional mobile container */
   .mobile-polish-container {
     min-height: 100vh;
     min-height: 100dvh;
     background: var(--theme-background);
     overflow-x: hidden;
+    overflow-y: auto;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Ensure container is fully scrollable */
+    touch-action: pan-y;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
   }
   
   /* Enhanced mobile header */
@@ -861,12 +873,19 @@ button:focus {
     border-bottom: none;
   }
   
-  /* Chat messages area */
+  /* Chat messages area - Enhanced scrolling */
   .mobile-chat-messages {
     flex: 1;
     padding: 20px 16px;
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    will-change: scroll-position;
+    /* Enhanced touch scrolling for better mobile experience */
+    scroll-behavior: smooth;
+    overscroll-behavior-y: contain;
   }
   
   /* Message bubble improvements */
@@ -961,6 +980,23 @@ button:focus {
   button, .button, [role="button"] {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+  }
+  
+  /* Mobile scrolling fix - ensure entire page area is scrollable */
+  .mobile-content-area, .mobile-modal-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    /* Remove pointer-events restrictions that limit scroll areas */
+    pointer-events: auto;
+  }
+  
+  /* Fix for modal scrolling */
+  .fixed.inset-0 {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
   
   /* Smooth animations */
