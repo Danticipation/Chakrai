@@ -579,7 +579,7 @@ const AppLayout = () => {
                 <div className="mb-8">
                   <img src={traiLogo} alt="TrAI" className="h-32 w-auto mx-auto mb-6" />
                   <h1 className="text-4xl font-bold text-white mb-4">TrAI Mental Wellness</h1>
-                  <p className="text-xl text-white/90 mb-6">Therapeutic AI • Level {botStats?.level || 3}</p>
+                  <p className="text-xl text-white/90 mb-6">AI Wellness Companion</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -608,13 +608,9 @@ const AppLayout = () => {
 
                 <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30">
                   <h3 className="text-lg font-semibold text-white mb-3">Your Progress</h3>
-                  <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="grid grid-cols-2 gap-6 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-white">{botStats?.wordsLearned || 1000}</div>
-                      <div className="text-sm text-white/60">Words Learned</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-white">Level {botStats?.level || 3}</div>
+                      <div className="text-2xl font-bold text-white">Active</div>
                       <div className="text-sm text-white/60">{botStats?.stage || 'Wellness Companion'}</div>
                     </div>
                     <div>

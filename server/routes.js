@@ -215,8 +215,7 @@ Respond with semantic awareness, making natural references to past conversations
       response: aiResponse,
       audioUrl: audioUrl,
       voiceUsed: selectedVoice,
-      wordsLearned: 1000,
-      stage: "Therapist",
+      stage: "Wellness Companion",
       crisisDetected: crisisDetected,
       crisisData: crisisDetected ? crisisData : null,
       personalityMode: personalityMode,
@@ -231,8 +230,7 @@ Respond with semantic awareness, making natural references to past conversations
     res.json({
       message: fallbackResponse,
       response: fallbackResponse,
-      wordsLearned: 1000,
-      stage: "Therapist",
+      stage: "Wellness Companion",
       crisisDetected: false,
       crisisData: null,
       personalityMode: "supportive",
@@ -446,8 +444,7 @@ router.get('/bot-stats/:userId', (req, res) => {
   try {
     res.json({
       level: 3,
-      stage: "Therapist",
-      wordsLearned: 1000
+      stage: "Wellness Companion"
     });
   } catch (error) {
     console.error('Bot stats error:', error);
@@ -565,8 +562,7 @@ router.get('/bot-stats', async (req, res) => {
   try {
     res.json({ 
       level: 3,
-      stage: "Wellness Companion",
-      wordsLearned: 1000
+      stage: "Wellness Companion"
     });
   } catch (error) {
     console.error('Bot stats error:', error);
