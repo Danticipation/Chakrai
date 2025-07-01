@@ -656,6 +656,7 @@ router.post('/mood', async (req, res) => {
 
     const moodEntry = await storage.createMoodEntry({
       userId: anonymousUser.id,
+      emotion: mood, // Map to required emotion field
       mood,
       intensity: parseInt(intensity),
       triggers: triggers || [],
