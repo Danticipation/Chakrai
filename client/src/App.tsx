@@ -1249,28 +1249,28 @@ const AppLayout = () => {
             </div>
 
             {/* Mood Tracking Consistency */}
-            <div className="bg-purple-700 rounded-lg p-6">
-              <div className="text-white text-lg font-bold mb-3">Mood Tracking</div>
-              <div className="bg-[#0a0e1a] rounded-full h-4 mb-3">
+            <div className="theme-card rounded-lg p-6">
+              <div className="theme-text text-lg font-bold mb-3">Mood Tracking</div>
+              <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
                 <div className="bg-yellow-400 h-4 rounded-full" style={{width: '90%'}}></div>
               </div>
-              <div className="text-white text-base">27/30 days tracked</div>
+              <div className="theme-text text-base">27/30 days tracked</div>
             </div>
 
             {/* App Usage Streak */}
-            <div className="bg-purple-700 rounded-lg p-6">
-              <div className="text-white text-lg font-bold mb-3">App Usage Streak</div>
-              <div className="bg-[#0a0e1a] rounded-full h-4 mb-3">
+            <div className="theme-card rounded-lg p-6">
+              <div className="theme-text text-lg font-bold mb-3">App Usage Streak</div>
+              <div className="bg-[var(--theme-background)] rounded-full h-4 mb-3">
                 <div className="bg-purple-400 h-4 rounded-full" style={{width: '85%'}}></div>
               </div>
-              <div className="text-white text-base">17 consecutive days</div>
+              <div className="theme-text text-base">17 consecutive days</div>
             </div>
 
             {/* Overall Wellness Score */}
-            <div className="bg-purple-700 rounded-lg p-6 text-center">
-              <div className="text-white text-lg font-bold mb-3">Overall Wellness</div>
-              <div className="text-white text-3xl font-bold">85%</div>
-              <div className="text-white text-base">This month</div>
+            <div className="theme-card rounded-lg p-6 text-center">
+              <div className="theme-text text-lg font-bold mb-3">Overall Wellness</div>
+              <div className="theme-text text-3xl font-bold">85%</div>
+              <div className="theme-text text-base">This month</div>
             </div>
           </div>
         </div>
