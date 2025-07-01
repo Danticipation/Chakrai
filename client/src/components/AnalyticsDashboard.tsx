@@ -253,10 +253,10 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
           <div className="grid grid-cols-3 gap-1">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all ${
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'overview'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
               }`}
             >
               <BarChart3 className="w-4 h-4 mx-auto mb-1" />
@@ -264,10 +264,10 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
             </button>
             <button
               onClick={() => setActiveTab('reports')}
-              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all ${
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'reports'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
               }`}
             >
               <Calendar className="w-4 h-4 mx-auto mb-1" />
@@ -275,10 +275,10 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
             </button>
             <button
               onClick={() => setActiveTab('trends')}
-              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all ${
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'trends'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
               }`}
             >
               <TrendingUp className="w-4 h-4 mx-auto mb-1" />

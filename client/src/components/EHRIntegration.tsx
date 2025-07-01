@@ -182,10 +182,10 @@ export function EHRIntegration() {
           <div className="grid grid-cols-4 gap-1">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
+              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'overview'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
               }`}
             >
               <Activity className="w-4 h-4 mx-auto mb-1" />
@@ -193,10 +193,10 @@ export function EHRIntegration() {
             </button>
             <button
               onClick={() => setActiveTab('exports')}
-              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
+              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'exports'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
               }`}
             >
               <FileDown className="w-4 h-4 mx-auto mb-1" />
@@ -204,10 +204,10 @@ export function EHRIntegration() {
             </button>
             <button
               onClick={() => setActiveTab('insurance')}
-              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
+              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'insurance'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
               }`}
             >
               <CreditCard className="w-4 h-4 mx-auto mb-1" />
@@ -215,10 +215,10 @@ export function EHRIntegration() {
             </button>
             <button
               onClick={() => setActiveTab('compliance')}
-              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
+              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'compliance'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
               }`}
             >
               <Shield className="w-4 h-4 mx-auto mb-1" />
