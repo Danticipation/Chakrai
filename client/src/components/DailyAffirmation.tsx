@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, RefreshCw, Volume2, VolumeX } from 'lucide-react';
+import { Heart, RefreshCw, Volume2, VolumeX, Loader2 } from 'lucide-react';
 
 interface AffirmationData {
   affirmation: string;

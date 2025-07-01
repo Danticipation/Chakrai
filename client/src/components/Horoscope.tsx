@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Sparkles, RefreshCw, Volume2, VolumeX } from 'lucide-react';
+import { Star, Sparkles, RefreshCw, Volume2, VolumeX, Loader2 } from 'lucide-react';
 
 interface HoroscopeData {
   sign: string;
@@ -22,6 +22,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
 
   const fetchHoroscope = async (sign: string) => {
@@ -75,7 +76,8 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
     }
 
     try {
-      setIsPlaying(true);
+      setIsLoadingAudio(true);
+      setError(null);
       
       // Call the text-to-speech API
       const response = await fetch('/api/text-to-speech', {
@@ -116,12 +118,15 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
           setError('Audio playback failed');
         };
         
+        setIsLoadingAudio(false);
+        setIsPlaying(true);
         await audio.play();
       } else {
         throw new Error('No audio data received');
       }
     } catch (error) {
       console.error('Voice synthesis error:', error);
+      setIsLoadingAudio(false);
       setIsPlaying(false);
       setCurrentAudio(null);
       setError('Voice reading failed. Please try again.');
@@ -212,17 +217,19 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
                   </div>
                   <button
                     onClick={handleVoiceToggle}
-                    disabled={loading}
+                    disabled={loading || isLoadingAudio}
                     className="p-2 rounded-lg theme-primary/50 hover:theme-primary/70 transition-colors disabled:opacity-50 flex items-center space-x-2"
-                    title={isPlaying ? "Stop reading" : "Read aloud"}
+                    title={isLoadingAudio ? "Loading audio..." : isPlaying ? "Stop reading" : "Read aloud"}
                   >
-                    {isPlaying ? (
+                    {isLoadingAudio ? (
+                      <Loader2 className="text-white animate-spin" size={20} />
+                    ) : isPlaying ? (
                       <VolumeX className="text-white" size={20} />
                     ) : (
                       <Volume2 className="text-white" size={20} />
                     )}
                     <span className="text-sm text-white hidden sm:inline">
-                      {isPlaying ? "Stop" : "Listen"}
+                      {isLoadingAudio ? "Loading..." : isPlaying ? "Stop" : "Listen"}
                     </span>
                   </button>
                 </div>
