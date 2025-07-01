@@ -88,7 +88,7 @@ const AppLayout = () => {
   
   // Mobile modal states
   const [showMobileModal, setShowMobileModal] = useState(false);
-  const [mobileModalContent, setMobileModalContent] = useState('');
+  const [mobileModalContent, setMobileModalContent] = useState('journal');
   const [showThemeModal, setShowThemeModal] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -516,6 +516,73 @@ const AppLayout = () => {
     } catch (error) {
       console.error('Error transcribing audio:', error);
       alert('Failed to transcribe audio. Please check your internet connection and try again.');
+    }
+  };
+
+  // Function to render main content (shared between modal and main view)
+  const renderMainContent = (section: string) => {
+    switch (section) {
+      case 'daily':
+        return <PersonalityReflection userId={1} />;
+
+      case 'journal':
+        return (
+          <TherapeuticJournal 
+            userId={1} 
+            onEntryCreated={(entry) => {
+              console.log('New journal entry created:', entry);
+            }}
+          />
+        );
+
+      case 'memory':
+        return <MemoryDashboard />;
+
+      case 'analytics':
+        return <AnalyticsDashboard userId={1} />;
+
+      case 'rewards':
+        return <WellnessRewards />;
+
+      case 'community':
+        return <CommunitySupport />;
+
+      case 'adaptive':
+        return <AdaptiveLearning />;
+
+      case 'therapy-plans':
+        return <AdaptiveTherapyPlan userId={1} onPlanUpdate={(plan) => console.log('Plan updated:', plan)} />;
+
+      case 'agents':
+        return <AgentSystem userId={1} />;
+
+      case 'vr':
+        return <VRTherapy />;
+
+      case 'health':
+        return <HealthIntegration />;
+
+      case 'privacy':
+        return <PrivacyCompliance />;
+
+      case 'therapist':
+        return <AIPerformanceMonitoring />;
+
+      case 'outcomes':
+        return <TherapeuticAnalytics userId={1} />;
+
+      case 'ehr':
+        return <EHRIntegration />;
+
+      case 'privacy-policy':
+        return <PrivacyCompliance />;
+
+      default:
+        return (
+          <div className="flex items-center justify-center h-64 text-white/60">
+            <p>Feature coming soon...</p>
+          </div>
+        );
     }
   };
 
