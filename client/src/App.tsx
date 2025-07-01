@@ -957,12 +957,12 @@ const AppLayout = () => {
 
       {/* Main Content Area - Mobile Responsive */}
       <div className="flex-1 flex flex-col md:flex-row theme-background">
-        {/* Mobile Navigation - Separated User Features & Internal Tools */}
-        <div className="md:hidden theme-surface border-b border-white/20">
+        {/* Mobile Navigation - Polished Professional Design */}
+        <div className="md:hidden mobile-nav-polish">
           {/* User Features Section */}
-          <div className="border-b border-white/10 pb-2">
-            <div className="theme-text-secondary text-xs font-medium px-3 pt-2 pb-1">Wellness Features</div>
-            <div className="grid grid-cols-4 gap-2 px-3">
+          <div className="mobile-nav-section">
+            <div className="mobile-nav-section-title">Wellness Features</div>
+            <div className="mobile-nav-grid-polish">
               {[
                 { id: 'chat', label: 'Home', icon: '🏠' },
                 { id: 'daily', label: 'Reflect', icon: '🧠' },
@@ -997,12 +997,9 @@ const AppLayout = () => {
                       setActiveSection(tab.id);
                     }
                   }}
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
-                    activeSection === tab.id
-                      ? 'theme-secondary theme-text shadow-lg transform scale-95 ring-2 ring-white'
-                      : 'theme-primary theme-text hover:theme-primary-light active:scale-95'
+                  className={`mobile-nav-btn-polish touch-target ${
+                    activeSection === tab.id ? 'selected' : ''
                   }`}
-                  style={{ minHeight: '60px' }}
                 >
                   <span className="text-lg mb-1">{tab.icon}</span>
                   <span className="text-xs leading-tight text-center">{tab.label}</span>
@@ -1012,9 +1009,9 @@ const AppLayout = () => {
           </div>
 
           {/* Internal Tools Section */}
-          <div className="pt-2">
-            <div className="theme-text-secondary text-xs font-medium px-3 pb-1">Professional Tools</div>
-            <div className="grid grid-cols-4 gap-2 px-3 pb-2">
+          <div className="mobile-nav-section">
+            <div className="mobile-nav-section-title">Professional Tools</div>
+            <div className="mobile-nav-grid-polish">
               {[
                 { id: 'therapist', label: 'Therapist', icon: '🩺' },
                 { id: 'privacy', label: 'Privacy', icon: '🔒' },
