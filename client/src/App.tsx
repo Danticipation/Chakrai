@@ -757,7 +757,7 @@ const AppLayout = () => {
             {/* Quick Stats */}
             <div className="text-right">
               <p className="text-white/90 text-sm font-medium">Level {botStats?.level || 3}</p>
-              <p className="text-white/60 text-xs">{botStats?.stage || 'Therapist'}</p>
+              <p className="text-white/60 text-xs">{botStats?.stage || 'Wellness Companion'}</p>
             </div>
           </div>
           
