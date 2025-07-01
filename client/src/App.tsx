@@ -569,6 +569,57 @@ const AppLayout = () => {
       case 'privacy-policy':
         return <PrivacyPolicy />;
 
+      case 'voice':
+        return (
+          <div className="h-full bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-6 overflow-y-auto">
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-[#5c6bc0]/30 backdrop-blur-sm rounded-2xl p-8 border border-[#7986cb]/30 shadow-lg">
+                <h2 className="text-3xl font-bold text-white mb-6 text-center">Voice Settings</h2>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-white/90 text-lg font-medium mb-4">Select AI Voice Companion</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {[
+                        { id: 'hope', name: 'Hope', description: 'Warm and encouraging voice for daily support' },
+                        { id: 'james', name: 'James', description: 'Professional and calming therapeutic voice' },
+                        { id: 'charlotte', name: 'Charlotte', description: 'Gentle and empathetic companion voice' },
+                        { id: 'bronson', name: 'Bronson', description: 'Confident and reassuring wellness guide' }
+                      ].map((voice) => (
+                        <button
+                          key={voice.id}
+                          onClick={() => setSelectedVoice(voice.id)}
+                          className={`p-4 rounded-xl border-2 transition-all text-left ${
+                            selectedVoice === voice.id
+                              ? 'border-white bg-white/20 shadow-lg scale-105'
+                              : 'border-white/30 bg-white/10 hover:border-white/50 hover:bg-white/15'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-white font-semibold text-lg">{voice.name}</h3>
+                            {selectedVoice === voice.id && (
+                              <div className="w-3 h-3 bg-white rounded-full"></div>
+                            )}
+                          </div>
+                          <p className="text-white/80 text-sm">{voice.description}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="text-center pt-4">
+                    <p className="text-white/70 text-sm">
+                      Current voice: <span className="font-semibold text-white">{selectedVoice.charAt(0).toUpperCase() + selectedVoice.slice(1)}</span>
+                    </p>
+                    <p className="text-white/60 text-xs mt-2">
+                      Voice changes will apply to all AI responses and wellness features
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       case 'horoscope':
         return <Horoscope />;
 
@@ -798,6 +849,7 @@ const AppLayout = () => {
                 { id: 'journal', label: 'Journal', icon: '📝' },
                 { id: 'memory', label: 'Memory', icon: '🎯' },
                 { id: 'analytics', label: 'Analytics', icon: '📊' },
+                { id: 'voice', label: 'Voice', icon: '🎤' },
                 { id: 'rewards', label: 'Rewards', icon: '🎁' },
                 { id: 'community', label: 'Community', icon: '👥' },
                 { id: 'vr', label: 'VR Therapy', icon: '🥽' },
@@ -863,6 +915,7 @@ const AppLayout = () => {
               { id: 'journal', label: 'Journal' },
               { id: 'memory', label: 'Memory' },
               { id: 'analytics', label: 'Analytics' },
+              { id: 'voice', label: 'Voice Settings' },
               { id: 'rewards', label: 'Rewards' },
               { id: 'community', label: 'Community' },
               { id: 'adaptive', label: 'AI Learning' },
