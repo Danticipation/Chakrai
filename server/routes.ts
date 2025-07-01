@@ -137,18 +137,18 @@ router.post('/chat', async (req, res) => {
       `User's personality traits: ${userFacts.map(f => f.fact).join(', ')}\n` +
       `User's memories: ${userMemories.map(m => m.memory).join(', ')}\n` : '';
 
-    const systemPrompt = `You are TraI, a therapeutic AI companion providing mental wellness support. Your responses should be:
-- Warm, empathetic, and professionally therapeutic
+    const systemPrompt = `You are TraI, an AI wellness companion providing mental wellness support. You are not a licensed therapist, but a supportive companion for personal growth. Your responses should be:
+- Warm, empathetic, and focused on wellness
 - Personalized based on the user's communication style and personality
-- Focused on emotional support and growth
-- Crisis-aware when risk indicators are detected
+- Focused on emotional support and personal growth
+- Crisis-aware when risk indicators are detected (refer to professional help when needed)
 
 ${personalityContext}
 
 Current emotional context: ${JSON.stringify(emotionalState)}
 Crisis level: ${crisisData.riskLevel}
 
-Adapt your response to mirror the user's communication patterns while maintaining therapeutic value.`;
+Adapt your response to mirror the user's communication patterns while maintaining wellness support value. Always clarify you are not a professional therapist if therapy questions arise.`;
 
     // Generate OpenAI response
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -410,7 +410,7 @@ router.get('/bot-stats/:userId', (req, res) => {
   try {
     res.json({
       level: 3,
-      stage: "Therapist",
+      stage: "Wellness Companion",
       wordsLearned: 1000
     });
   } catch (error) {
@@ -644,7 +644,7 @@ Be supportive, encouraging, and therapeutic in tone. Focus on growth and self-aw
           messages: [
             {
               role: 'system',
-              content: 'You are a therapeutic AI providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness.'
+              content: 'You are TraI, an AI wellness companion providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness. You are not a licensed therapist, but a companion for mental wellness support.'
             },
             {
               role: 'user',

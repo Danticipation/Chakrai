@@ -615,7 +615,7 @@ const AppLayout = () => {
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-white">Level {botStats?.level || 3}</div>
-                      <div className="text-sm text-white/60">{botStats?.stage || 'Therapist'}</div>
+                      <div className="text-sm text-white/60">{botStats?.stage || 'Wellness Companion'}</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-white">95%</div>
@@ -626,7 +626,7 @@ const AppLayout = () => {
 
                 <div className="mt-8 text-center">
                   <p className="text-sm text-white/60">
-                    Your trusted AI companion for mental wellness and therapeutic support
+                    Your trusted AI companion for mental wellness and personal growth
                   </p>
                 </div>
               </div>

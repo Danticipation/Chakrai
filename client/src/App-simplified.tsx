@@ -292,8 +292,8 @@ function TraiApp() {
             <div className="flex items-center space-x-3 mb-3">
               <Brain className="w-8 h-8 text-blue-300" />
               <div>
-                <h3 className="text-white font-semibold">AI Therapist</h3>
-                <p className="text-white/60 text-sm">{botStats?.stage || 'Therapist'}</p>
+                <h3 className="text-white font-semibold">AI Wellness Companion</h3>
+                <p className="text-white/60 text-sm">{botStats?.stage || 'Wellness Companion'}</p>
               </div>
             </div>
             <div className="space-y-2">

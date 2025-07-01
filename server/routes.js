@@ -565,7 +565,7 @@ router.get('/bot-stats', async (req, res) => {
   try {
     res.json({ 
       level: 3,
-      stage: "Therapist",
+      stage: "Wellness Companion",
       wordsLearned: 1000
     });
   } catch (error) {
