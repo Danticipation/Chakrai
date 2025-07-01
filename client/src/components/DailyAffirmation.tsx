@@ -7,7 +7,11 @@ interface AffirmationData {
   date: string;
 }
 
-export default function DailyAffirmation() {
+interface DailyAffirmationProps {
+  onBack?: () => void;
+}
+
+export default function DailyAffirmation({ onBack }: DailyAffirmationProps) {
   const [affirmationData, setAffirmationData] = useState<AffirmationData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,13 +102,24 @@ export default function DailyAffirmation() {
               <Heart className="text-green-300" size={32} />
               <h1 className="text-2xl font-bold text-white">Daily Affirmation</h1>
             </div>
-            <button
-              onClick={handleRefresh}
-              disabled={loading}
-              className="p-2 rounded-lg bg-[#7986cb]/50 hover:bg-[#7986cb]/70 transition-colors disabled:opacity-50"
-            >
-              <RefreshCw className={`text-white ${loading ? 'animate-spin' : ''}`} size={20} />
-            </button>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="p-2 rounded-lg bg-[#7986cb]/50 hover:bg-[#7986cb]/70 transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`text-white ${loading ? 'animate-spin' : ''}`} size={20} />
+              </button>
+              {onBack && (
+                <button
+                  onClick={onBack}
+                  className="p-3 rounded-xl bg-red-600/20 hover:bg-red-600/40 transition-all duration-200 border border-red-400/20 hover:border-red-400/40"
+                  title="Back to Home"
+                >
+                  <span className="text-white text-xl">×</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Affirmation Display */}

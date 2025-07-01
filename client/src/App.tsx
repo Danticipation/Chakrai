@@ -621,10 +621,10 @@ const AppLayout = () => {
         );
 
       case 'horoscope':
-        return <Horoscope />;
+        return <Horoscope onBack={() => setActiveSection('chat')} />;
 
       case 'affirmation':
-        return <DailyAffirmation />;
+        return <DailyAffirmation onBack={() => setActiveSection('chat')} />;
 
       case 'logo':
         return (

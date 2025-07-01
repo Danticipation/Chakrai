@@ -12,7 +12,11 @@ const zodiacSigns = [
   'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'
 ];
 
-export default function Horoscope() {
+interface HoroscopeProps {
+  onBack?: () => void;
+}
+
+export default function Horoscope({ onBack }: HoroscopeProps) {
   const [selectedSign, setSelectedSign] = useState<string>('aries');
   const [horoscopeData, setHoroscopeData] = useState<HoroscopeData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -148,8 +152,9 @@ export default function Horoscope() {
                   <RefreshCw className={`text-white ${loading ? 'animate-spin' : ''}`} size={20} />
                 </button>
                 <button
-                  onClick={() => window.history.back()}
+                  onClick={onBack || (() => window.history.back())}
                   className="p-3 rounded-xl bg-red-600/20 hover:bg-red-600/40 transition-all duration-200 border border-red-400/20 hover:border-red-400/40"
+                  title="Back to Home"
                 >
                   <span className="text-white text-xl">×</span>
                 </button>
