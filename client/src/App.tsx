@@ -86,6 +86,11 @@ const AppLayout = () => {
   const [microSessionType, setMicroSessionType] = useState<'journal' | 'mood' | 'gratitude'>('journal');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   
+  // Mobile modal states
+  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [mobileModalContent, setMobileModalContent] = useState('');
+  const [showThemeModal, setShowThemeModal] = useState(false);
+  
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
@@ -104,6 +109,10 @@ const AppLayout = () => {
       if (event.key === 'Escape') {
         if (showSettings) {
           setShowSettings(false);
+        } else if (showThemeModal) {
+          setShowThemeModal(false);
+        } else if (showMobileModal) {
+          setShowMobileModal(false);
         }
       }
     };
@@ -112,7 +121,7 @@ const AppLayout = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [showSettings]);
+  }, [showSettings, showThemeModal, showMobileModal]);
 
   useEffect(() => {
     fetchBotStats();
@@ -878,7 +887,19 @@ const AppLayout = () => {
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveSection(tab.id)}
+                  onClick={() => {
+                    // Special modal handling for certain sections on mobile
+                    if (tab.id === 'themes') {
+                      setShowThemeModal(true);
+                    } else if (tab.id === 'voice') {
+                      setShowSettings(true);
+                    } else if (['journal', 'analytics', 'memory', 'daily', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans'].includes(tab.id)) {
+                      setMobileModalContent(tab.id);
+                      setShowMobileModal(true);
+                    } else {
+                      setActiveSection(tab.id);
+                    }
+                  }}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
                       ? 'bg-green-500 text-white shadow-lg transform scale-95 ring-2 ring-white'
@@ -906,7 +927,11 @@ const AppLayout = () => {
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveSection(tab.id)}
+                  onClick={() => {
+                    // Show professional tools in modals too
+                    setMobileModalContent(tab.id);
+                    setShowMobileModal(true);
+                  }}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
                       ? 'bg-orange-500 text-white shadow-lg transform scale-95 ring-2 ring-white'
@@ -1242,6 +1267,62 @@ const AppLayout = () => {
           setShowMicroSession(false);
         }}
       />
+
+      {/* Theme Selection Modal */}
+      {showThemeModal && (
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowThemeModal(false);
+            }
+          }}
+        >
+          <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-md border border-[#3949ab]/30 relative max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-white">Choose Your Theme</h3>
+              <button
+                onClick={() => setShowThemeModal(false)}
+                className="w-10 h-10 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white transition-colors"
+                aria-label="Close theme modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <ThemeSelector />
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Feature Modal */}
+      {showMobileModal && (
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowMobileModal(false);
+            }
+          }}
+        >
+          <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-lg border border-[#3949ab]/30 relative max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-white capitalize">
+                {mobileModalContent.replace('-', ' ')}
+              </h3>
+              <button
+                onClick={() => setShowMobileModal(false)}
+                className="w-10 h-10 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white transition-colors"
+                aria-label="Close modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="text-white">
+              {renderMainContent(mobileModalContent)}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
