@@ -731,9 +731,9 @@ const AppLayout = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30">
-                    <h3 className="text-lg font-semibold text-white mb-3">AI Capabilities</h3>
-                    <ul className="text-sm text-white/80 space-y-2 text-left">
+                  <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]/30">
+                    <h3 className="text-lg font-semibold theme-text mb-3">AI Capabilities</h3>
+                    <ul className="text-sm theme-text opacity-80 space-y-2 text-left">
                       <li>• OpenAI GPT-4o powered conversations</li>
                       <li>• ElevenLabs voice synthesis</li>
                       <li>• Personality mirroring & learning</li>
@@ -742,9 +742,9 @@ const AppLayout = () => {
                     </ul>
                   </div>
 
-                  <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30">
-                    <h3 className="text-lg font-semibold text-white mb-3">Wellness Features</h3>
-                    <ul className="text-sm text-white/80 space-y-2 text-left">
+                  <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]/30">
+                    <h3 className="text-lg font-semibold theme-text mb-3">Wellness Features</h3>
+                    <ul className="text-sm theme-text opacity-80 space-y-2 text-left">
                       <li>• Mood tracking & analytics</li>
                       <li>• VR therapeutic experiences</li>
                       <li>• Community peer support</li>
@@ -754,16 +754,16 @@ const AppLayout = () => {
                   </div>
                 </div>
 
-                <div className="bg-[#1a237e]/50 rounded-xl p-6 border border-[#3949ab]/30">
-                  <h3 className="text-lg font-semibold text-white mb-3">Your Progress</h3>
+                <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]/30">
+                  <h3 className="text-lg font-semibold theme-text mb-3">Your Progress</h3>
                   <div className="grid grid-cols-2 gap-6 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-white">{botStats?.stage || 'Wellness Companion'}</div>
-                      <div className="text-sm text-white/60">Level {botStats?.level || 3}</div>
+                      <div className="text-2xl font-bold theme-text">{botStats?.stage || 'Wellness Companion'}</div>
+                      <div className="text-sm theme-text opacity-60">Level {botStats?.level || 3}</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-white">95%</div>
-                      <div className="text-sm text-white/60">Wellness Score</div>
+                      <div className="text-2xl font-bold theme-text">95%</div>
+                      <div className="text-sm theme-text opacity-60">Wellness Score</div>
                     </div>
                   </div>
                 </div>
@@ -788,12 +788,12 @@ const AppLayout = () => {
                 { name: 'Anxiety Management', current: 8, target: 14, color: 'bg-[var(--theme-primary)]' },
                 { name: 'Social Connection', current: 3, target: 7, color: 'bg-[var(--theme-secondary)]' }
               ].map((goal, index) => (
-                <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-4">
+                <div key={index} className="theme-card backdrop-blur-sm rounded-xl p-4">
                   <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-semibold text-gray-800">{goal.name}</h3>
-                    <span className="text-sm text-gray-600">{goal.current}/{goal.target} days</span>
+                    <h3 className="font-semibold theme-text">{goal.name}</h3>
+                    <span className="text-sm theme-text opacity-60">{goal.current}/{goal.target} days</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="w-full bg-[var(--theme-secondary)] rounded-full h-3">
                     <div 
                       className={`${goal.color} h-3 rounded-full transition-all duration-300`}
                       style={{ width: `${(goal.current / goal.target) * 100}%` }}
@@ -1310,7 +1310,7 @@ const AppLayout = () => {
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => setShowSettings(false)}
-                className="px-4 py-2 bg-[#7986cb] text-white rounded-lg hover:bg-[#9fa8da] transition-colors"
+                className="px-4 py-2 bg-[var(--theme-accent)] theme-text rounded-lg hover:bg-[var(--theme-primary)] transition-colors"
               >
                 Close
               </button>
@@ -1345,9 +1345,9 @@ const AppLayout = () => {
             }
           }}
         >
-          <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-md border border-[#3949ab]/30 relative max-h-[90vh] overflow-y-auto">
+          <div className="theme-card rounded-2xl p-6 w-full max-w-md border border-[var(--theme-accent)]/30 relative max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-white">Choose Your Theme</h3>
+              <h3 className="text-lg font-semibold theme-text">Choose Your Theme</h3>
               <button
                 onClick={() => setShowThemeModal(false)}
                 className="w-10 h-10 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white transition-colors"
@@ -1371,7 +1371,7 @@ const AppLayout = () => {
             }
           }}
         >
-          <div className="bg-[#1a237e] rounded-2xl p-6 w-full max-w-lg border border-[#3949ab]/30 relative max-h-[90vh] overflow-y-auto">
+          <div className="theme-card rounded-2xl p-6 w-full max-w-lg border border-[var(--theme-accent)]/30 relative max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-white capitalize">
                 {mobileModalContent.replace('-', ' ')}
