@@ -969,8 +969,8 @@ const AppLayout = () => {
                   }}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
-                      ? 'bg-[var(--theme-accent)] theme-text shadow-lg transform scale-95 ring-2 ring-white'
-                      : 'bg-[var(--theme-primary)]/60 theme-text/80 hover:bg-[var(--theme-primary)] active:scale-95'
+                      ? 'theme-secondary theme-text shadow-lg transform scale-95 ring-2 ring-white'
+                      : 'theme-primary theme-text hover:bg-[var(--theme-primary-light)] active:scale-95'
                   }`}
                   style={{ minHeight: '60px' }}
                 >
@@ -1002,7 +1002,7 @@ const AppLayout = () => {
                   className={`flex flex-col items-center justify-center p-3 rounded-xl font-medium transition-all touch-target ${
                     activeSection === tab.id
                       ? 'theme-surface theme-text shadow-lg transform scale-95 ring-2 ring-white'
-                      : 'theme-primary theme-text hover:theme-primary-light active:scale-95'
+                      : 'theme-primary theme-text hover:bg-[var(--theme-primary-light)] active:scale-95'
                   }`}
                   style={{ minHeight: '60px' }}
                 >
