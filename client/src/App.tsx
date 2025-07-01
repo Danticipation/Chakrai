@@ -1373,7 +1373,7 @@ const AppLayout = () => {
         >
           <div className="theme-card rounded-2xl p-6 w-full max-w-lg border border-[var(--theme-accent)]/30 relative max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-white capitalize">
+              <h3 className="text-lg font-semibold theme-text capitalize">
                 {mobileModalContent.replace('-', ' ')}
               </h3>
               <button
