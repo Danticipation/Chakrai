@@ -562,6 +562,9 @@ const AppLayout = () => {
       case 'outcomes':
         return <TherapeuticAnalytics userId={1} />;
 
+      case 'ehr':
+        return <EHRIntegration />;
+
       case 'horoscope':
         return <Horoscope />;
 
@@ -801,7 +804,8 @@ const AppLayout = () => {
               { id: 'health', label: 'Health', icon: '💗' },
               { id: 'therapist', label: 'Therapist', icon: '🩺' },
               { id: 'privacy', label: 'Privacy', icon: '🔒' },
-              { id: 'outcomes', label: 'Outcomes', icon: '📈' }
+              { id: 'outcomes', label: 'Outcomes', icon: '📈' },
+              { id: 'ehr', label: 'EHR', icon: '🏥' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -993,6 +997,7 @@ const AppLayout = () => {
                 {activeSection === 'logo' && 'TraI Information'}
                 {activeSection === 'goals' && 'Wellness Goals'}
                 {activeSection === 'outcomes' && 'Therapeutic Outcomes'}
+                {activeSection === 'ehr' && 'EHR Integration'}
               </div>
               <div className="h-full bg-[#3f51b5] text-white p-6 overflow-y-auto mobile-scroll" style={{ minHeight: '0', maxHeight: 'calc(100vh - 200px)' }}>
                 {renderActiveSection()}
