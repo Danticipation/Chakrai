@@ -495,7 +495,7 @@ Be supportive, encouraging, and therapeutic in tone. Focus on growth and self-aw
           messages: [
             {
               role: 'system',
-              content: 'You are a therapeutic AI providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness.'
+              content: 'You are TraI, an AI wellness companion providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness. You are not a licensed therapist, but a companion for mental wellness support.'
             },
             {
               role: 'user',
