@@ -430,9 +430,7 @@ router.get('/stats/:userId?', (req, res) => {
   try {
     res.json({
       level: 3,
-      stage: "Therapist", 
-      wordsLearned: 1000,
-      wordCount: 1000
+      stage: "Wellness Companion"
     });
   } catch (error) {
     console.error('Stats error:', error);
