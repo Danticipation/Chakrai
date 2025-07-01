@@ -153,11 +153,11 @@ function AgentSystem({ userId }: AgentSystemProps) {
   }
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 p-4 theme-background min-h-screen">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold text-white">Therapeutic Agent System</h2>
-        <p className="text-white/80 text-sm">
+        <h2 className="text-2xl font-bold theme-text">Therapeutic Agent System</h2>
+        <p className="theme-text-secondary text-sm">
           Connect with specialized AI agents for targeted therapeutic support
         </p>
       </div>
@@ -204,7 +204,7 @@ function AgentSystem({ userId }: AgentSystemProps) {
           <div className="text-center">
             <Button 
               onClick={() => setShowAgentSelection(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
+              className="theme-primary hover:theme-accent theme-text px-8 py-3"
             >
               <Brain className="w-5 h-5 mr-2" />
               Connect with Specialist
@@ -212,15 +212,15 @@ function AgentSystem({ userId }: AgentSystemProps) {
           </div>
 
           {showAgentSelection && (
-            <Card className="bg-white/10 border-white/20">
+            <Card className="theme-card border-[var(--theme-accent)]">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-white">Choose Your Therapeutic Specialist</CardTitle>
+                  <CardTitle className="theme-text">Choose Your Therapeutic Specialist</CardTitle>
                   <Button 
                     variant="outline" 
                     size="sm" 
                     onClick={() => setShowAgentSelection(false)}
-                    className="text-white hover:bg-white/10 border-white/20"
+                    className="theme-text hover:theme-secondary border-[var(--theme-accent)]"
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -231,10 +231,10 @@ function AgentSystem({ userId }: AgentSystemProps) {
                   {agents.map((agent) => (
                     <Card 
                       key={agent.id}
-                      className={`cursor-pointer transition-all ${
+                      className={`cursor-pointer transition-all theme-card border-2 ${
                         selectedAgent === agent.type 
-                          ? 'ring-2 ring-blue-400 bg-blue-50' 
-                          : 'hover:bg-gray-50'
+                          ? 'ring-2 ring-[var(--theme-accent)] border-[var(--theme-accent)]' 
+                          : 'border-[var(--theme-surface)] hover:border-[var(--theme-secondary)]'
                       }`}
                       onClick={() => handleAgentSelection(agent.type)}
                     >
@@ -244,10 +244,10 @@ function AgentSystem({ userId }: AgentSystemProps) {
                             {getAgentIcon(agent.type)}
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900 mb-1">
+                            <h3 className="font-semibold theme-text mb-1">
                               {agent.name}
                             </h3>
-                            <p className="text-sm text-gray-600 mb-3">
+                            <p className="text-sm theme-text-secondary mb-3">
                               {agent.description}
                             </p>
                             <div className="flex flex-wrap gap-1">
@@ -255,7 +255,7 @@ function AgentSystem({ userId }: AgentSystemProps) {
                                 <Badge 
                                   key={index} 
                                   variant="secondary" 
-                                  className="text-xs"
+                                  className="text-xs theme-surface theme-text border-[var(--theme-accent)]"
                                 >
                                   {spec.replace('_', ' ')}
                                 </Badge>
@@ -263,7 +263,7 @@ function AgentSystem({ userId }: AgentSystemProps) {
                             </div>
                           </div>
                           {selectedAgent === agent.type && (
-                            <CheckCircle className="w-6 h-6 text-blue-600" />
+                            <CheckCircle className="w-6 h-6 text-[var(--theme-accent)]" />
                           )}
                         </div>
                       </CardContent>
@@ -272,30 +272,30 @@ function AgentSystem({ userId }: AgentSystemProps) {
                 </div>
 
                 {selectedAgent && (
-                  <div className="space-y-4 pt-4 border-t border-gray-200">
+                  <div className="space-y-4 pt-4 border-t border-[var(--theme-accent)]/30">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium theme-text mb-2">
                         What would you like to work on?
                       </label>
                       <textarea
                         value={objective}
                         onChange={(e) => setObjective(e.target.value)}
                         placeholder="Describe what you'd like to focus on in this session..."
-                        className="w-full p-3 border border-gray-300 rounded-lg resize-none h-20 text-gray-900"
+                        className="w-full p-3 border border-[var(--theme-accent)] rounded-lg resize-none h-20 theme-surface theme-text placeholder:theme-text-secondary focus:outline-none focus:ring-2 focus:ring-[var(--theme-secondary)]"
                       />
                     </div>
                     <div className="flex justify-end space-x-3">
                       <Button 
                         variant="outline" 
                         onClick={() => setSelectedAgent(null)}
-                        className="text-gray-700 border-gray-300"
+                        className="theme-text border-[var(--theme-accent)] hover:theme-secondary-light"
                       >
                         Back
                       </Button>
                       <Button 
                         onClick={() => startAgentSession(selectedAgent, objective)}
                         disabled={!objective.trim() || sessionLoading}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        className="theme-primary hover:theme-accent theme-text"
                       >
                         {sessionLoading ? (
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -316,20 +316,20 @@ function AgentSystem({ userId }: AgentSystemProps) {
       {/* Available Agents Overview */}
       {!activeSession && !showAgentSelection && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Available Specialists</h3>
+          <h3 className="text-lg font-semibold theme-text">Available Specialists</h3>
           <div className="grid gap-4">
             {agents.map((agent) => (
-              <Card key={agent.id} className="bg-white/10 border-white/20">
+              <Card key={agent.id} className="theme-card border-[var(--theme-accent)]">
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-4">
                     <div className={`p-3 rounded-lg ${getAgentColorClass(agent.type)}`}>
                       {getAgentIcon(agent.type)}
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-white mb-1">
+                      <h4 className="font-semibold theme-text mb-1">
                         {agent.name}
                       </h4>
-                      <p className="text-sm text-white/80 mb-3">
+                      <p className="text-sm theme-text-secondary mb-3">
                         {agent.description}
                       </p>
                       <div className="flex flex-wrap gap-1">
@@ -337,13 +337,13 @@ function AgentSystem({ userId }: AgentSystemProps) {
                           <Badge 
                             key={index} 
                             variant="secondary" 
-                            className="text-xs bg-white/20 text-white"
+                            className="text-xs theme-surface theme-text border-[var(--theme-accent)]"
                           >
                             {spec.replace('_', ' ')}
                           </Badge>
                         ))}
                         {agent.specializations.length > 3 && (
-                          <Badge variant="secondary" className="text-xs bg-white/20 text-white">
+                          <Badge variant="secondary" className="text-xs theme-surface theme-text border-[var(--theme-accent)]">
                             +{agent.specializations.length - 3} more
                           </Badge>
                         )}
@@ -359,24 +359,24 @@ function AgentSystem({ userId }: AgentSystemProps) {
 
       {/* How It Works */}
       {!activeSession && (
-        <Card className="bg-white/10 border-white/20">
+        <Card className="theme-card border-[var(--theme-accent)]">
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">How the Agent System Works</h3>
-            <div className="space-y-3 text-sm text-white/80">
+            <h3 className="text-lg font-semibold theme-text mb-4">How the Agent System Works</h3>
+            <div className="space-y-3 text-sm theme-text-secondary">
               <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">1</div>
+                <div className="w-6 h-6 rounded-full theme-primary theme-text flex items-center justify-center text-xs font-bold">1</div>
                 <p>The main bot analyzes your messages and suggests connecting with specialists when beneficial</p>
               </div>
               <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">2</div>
+                <div className="w-6 h-6 rounded-full theme-primary theme-text flex items-center justify-center text-xs font-bold">2</div>
                 <p>Choose a specialist based on your needs (CBT, mindfulness, self-compassion, or anxiety)</p>
               </div>
               <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">3</div>
+                <div className="w-6 h-6 rounded-full theme-primary theme-text flex items-center justify-center text-xs font-bold">3</div>
                 <p>Work one-on-one with the specialist through focused therapeutic conversations</p>
               </div>
               <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">4</div>
+                <div className="w-6 h-6 rounded-full theme-primary theme-text flex items-center justify-center text-xs font-bold">4</div>
                 <p>The specialist automatically transfers you back to the main bot when objectives are met</p>
               </div>
             </div>
