@@ -97,46 +97,46 @@ const WellnessRewards: React.FC = () => {
       <div className="space-y-6">
         {/* Points Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-white/80">Available Points</p>
-                <p className="text-2xl font-bold text-white">{wellnessPoints?.availablePoints || 0}</p>
+                <p className="text-sm theme-text-secondary">Available Points</p>
+                <p className="text-2xl font-bold theme-text">{wellnessPoints?.availablePoints || 0}</p>
               </div>
-              <div className="p-3 rounded-full bg-white/20">
-                <Star className="w-6 h-6 text-white" />
+              <div className="p-3 rounded-full bg-[var(--theme-accent)]">
+                <Star className="w-6 h-6 theme-text" />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-white/80">Current Level</p>
-                <p className="text-2xl font-bold text-white">{wellnessPoints?.currentLevel || 1}</p>
+                <p className="text-sm theme-text-secondary">Current Level</p>
+                <p className="text-2xl font-bold theme-text">{wellnessPoints?.currentLevel || 1}</p>
               </div>
-              <div className="p-3 rounded-full bg-white/20">
-                <Trophy className="w-6 h-6 text-white" />
+              <div className="p-3 rounded-full bg-[var(--theme-accent)]">
+                <Trophy className="w-6 h-6 theme-text" />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
+          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-white/80">Lifetime Points</p>
-                <p className="text-2xl font-bold text-white">{wellnessPoints?.lifetimePoints || 0}</p>
+                <p className="text-sm theme-text-secondary">Lifetime Points</p>
+                <p className="text-2xl font-bold theme-text">{wellnessPoints?.lifetimePoints || 0}</p>
               </div>
-              <div className="p-3 rounded-full bg-white/20">
-                <Award className="w-6 h-6 text-white" />
+              <div className="p-3 rounded-full bg-[var(--theme-accent)]">
+                <Award className="w-6 h-6 theme-text" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Recent Achievements */}
-        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
-          <h3 className="text-lg font-semibold text-white mb-4">Recent Achievements</h3>
+        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <h3 className="text-lg font-semibold theme-text mb-4">Recent Achievements</h3>
           <div className="space-y-3">
             {Array.isArray(achievements) && achievements.length > 0 ? (
               achievements.slice(0, 3).map((achievement) => {
@@ -163,8 +163,8 @@ const WellnessRewards: React.FC = () => {
         </div>
 
         {/* Active Streaks */}
-        <div className="bg-[#3f51b5] rounded-xl p-6 border border-white/20">
-          <h3 className="text-lg font-semibold text-white mb-4">Active Streaks</h3>
+        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <h3 className="text-lg font-semibold theme-text mb-4">Active Streaks</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Array.isArray(streaks) && streaks.length > 0 ? (
               streaks.map((streak) => (

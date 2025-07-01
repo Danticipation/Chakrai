@@ -151,7 +151,7 @@ export default function PrivacyPolicy() {
         </div>
 
         {/* Terms of Service Section */}
-        <div className="bg-[#3f51b5]/20 rounded-lg p-6 md:p-8 mt-8 space-y-8">
+        <div className="theme-card rounded-lg p-6 md:p-8 mt-8 space-y-8">
           
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-blue-200">Terms of Service</h1>
