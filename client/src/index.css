@@ -655,3 +655,36 @@ button:focus {
 .progress-low { background-color: var(--progress-start) !important; }
 .progress-medium { background-color: var(--progress-middle) !important; }
 .progress-high { background-color: var(--progress-end) !important; }
+
+/* iPhone 15 Pro Mobile Input Area Fix */
+.mobile-input-area {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom) + 1rem) !important;
+}
+
+/* Enhanced iOS keyboard handling for iPhone 15 Pro */
+@supports (-webkit-touch-callout: none) {
+  .mobile-input-area {
+    padding-bottom: max(env(safe-area-inset-bottom, 1rem), 2rem) !important;
+    background-color: var(--theme-surface) !important;
+  }
+  
+  /* Prevent input area from being hidden by keyboard */
+  .ios-input-fix {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+}
+
+/* Dynamic viewport height support for modern browsers */
+@supports (height: 100dvh) {
+  .mobile-input-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+  }
+}

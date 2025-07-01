@@ -19,6 +19,7 @@ import VRTherapy from './components/VRTherapy';
 import HealthIntegration from './components/HealthIntegration';
 import PrivacyCompliance from './components/PrivacyCompliance';
 import TherapistPortal from './components/TherapistPortal';
+import AiPerformanceMonitoringDashboard from './components/AiPerformanceMonitoringDashboard';
 import Horoscope from './components/Horoscope';
 import DailyAffirmation from './components/DailyAffirmation';
 import PWAManager from './components/PWAManager';
@@ -566,7 +567,7 @@ const AppLayout = () => {
         return <PrivacyCompliance />;
 
       case 'therapist':
-        return <AIPerformanceMonitoring />;
+        return <AiPerformanceMonitoringDashboard />;
 
       case 'outcomes':
         return <TherapeuticAnalytics userId={1} />;
@@ -1136,7 +1137,7 @@ const AppLayout = () => {
               </div>
               
               {/* Mobile Chat Input Area */}
-              <div className="theme-surface p-4 border-t border-white/20" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem) + 80px)' }}>
+              <div className="theme-surface p-4 border-t border-white/20 mobile-input-area">
                 {/* Recording Status Indicator */}
                 {isRecording && (
                   <div className="mb-3 flex items-center justify-center">
