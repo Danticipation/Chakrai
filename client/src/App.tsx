@@ -894,7 +894,7 @@ const AppLayout = () => {
             {/* Horoscope Section - Expanded */}
             <button 
               onClick={() => setActiveSection('horoscope')}
-              className="bg-[var(--theme-primary)] rounded-lg p-6 flex flex-col hover:bg-[var(--theme-primary-light)] transition-colors cursor-pointer"
+              className="theme-primary rounded-lg p-6 flex flex-col hover:bg-[var(--theme-primary-light)] transition-colors cursor-pointer"
             >
               <h3 className="text-2xl font-bold theme-text mb-4 underline">Horoscope</h3>
               <p className="text-base theme-text text-left leading-relaxed flex-1">
@@ -916,7 +916,7 @@ const AppLayout = () => {
             {/* Affirmation Section - Expanded */}
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="bg-[var(--theme-primary)] rounded-lg p-6 flex flex-col hover:bg-[var(--theme-primary-light)] transition-colors cursor-pointer"
+              className="theme-primary rounded-lg p-6 flex flex-col hover:bg-[var(--theme-primary-light)] transition-colors cursor-pointer"
             >
               <h3 className="text-2xl font-bold theme-text mb-4 underline">Affirmation</h3>
               <p className="text-base theme-text text-left leading-relaxed flex-1">
