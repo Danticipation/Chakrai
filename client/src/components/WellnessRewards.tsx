@@ -200,8 +200,8 @@ const WellnessRewards: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="theme-card rounded-xl p-1 mb-6 border border-[var(--theme-accent)]">
-          <div className="flex space-x-1">
+        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+          <div className="grid grid-cols-4 gap-1">
             {[
               { id: 'overview', label: 'Overview', icon: TrendingUp },
               { id: 'rewards', label: 'Rewards Shop', icon: Gift },
@@ -211,14 +211,14 @@ const WellnessRewards: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
-                    ? 'theme-primary text-white shadow-sm'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                    ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                    : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
                 }`}
               >
-                <tab.icon className="w-4 h-4" />
-                <span className="font-medium">{tab.label}</span>
+                <tab.icon className="w-4 h-4 mx-auto mb-1" />
+                <div className="text-xs">{tab.label}</div>
               </button>
             ))}
           </div>

@@ -405,26 +405,28 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 mb-6 bg-white/10 p-1 rounded-lg">
-          {[
-            { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-            { id: 'reports', label: 'Efficacy Reports', icon: Users },
-            { id: 'trends', label: 'Trends', icon: TrendingUp },
-            { id: 'optimization', label: 'Optimization', icon: Target }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === tab.id
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              <span>{tab.label}</span>
-            </button>
-          ))}
+        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+          <div className="grid grid-cols-4 gap-1">
+            {[
+              { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+              { id: 'reports', label: 'Efficacy Reports', icon: Users },
+              { id: 'trends', label: 'Trends', icon: TrendingUp },
+              { id: 'optimization', label: 'Optimization', icon: Target }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+                  activeTab === tab.id
+                    ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                    : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                }`}
+              >
+                <tab.icon className="w-4 h-4 mx-auto mb-1" />
+                <div className="text-xs">{tab.label}</div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Content */}
