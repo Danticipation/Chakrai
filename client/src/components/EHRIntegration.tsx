@@ -178,7 +178,7 @@ export function EHRIntegration() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+        <div className="w-full bg-[var(--theme-surface)] rounded-lg p-1 mb-6 shadow-lg border-2 border-[var(--theme-accent)]">
           <div className="grid grid-cols-4 gap-1">
             <button
               onClick={() => setActiveTab('overview')}
