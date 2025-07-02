@@ -199,9 +199,14 @@ const CommunitySupport: React.FC = () => {
               onClick={() => setActiveTab('forums')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'forums'
-                  ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
-                  : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
+                  ? 'text-white shadow-lg border-2 border-silver animate-shimmer'
+                  : 'text-white hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
               }`}
+              style={{
+                background: 'linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%)',
+                backgroundColor: '#f97316',
+                opacity: 1
+              }}
             >
               <MessageSquare 
                 className="w-4 h-4 mx-auto mb-1" 
@@ -224,9 +229,14 @@ const CommunitySupport: React.FC = () => {
               onClick={() => setActiveTab('peer')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'peer'
-                  ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
-                  : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
+                  ? 'text-white shadow-lg border-2 border-silver animate-shimmer'
+                  : 'text-white hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
               }`}
+              style={{
+                background: 'linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%)',
+                backgroundColor: '#f97316',
+                opacity: 1
+              }}
             >
               <Users 
                 className="w-4 h-4 mx-auto mb-1" 
@@ -249,9 +259,14 @@ const CommunitySupport: React.FC = () => {
               onClick={() => setActiveTab('moderation')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'moderation'
-                  ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
-                  : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
+                  ? 'text-white shadow-lg border-2 border-silver animate-shimmer'
+                  : 'text-white hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
               }`}
+              style={{
+                background: 'linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%)',
+                backgroundColor: '#f97316',
+                opacity: 1
+              }}
             >
               <Shield 
                 className="w-4 h-4 mx-auto mb-1" 

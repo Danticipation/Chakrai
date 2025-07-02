@@ -52,13 +52,14 @@
 
 .theme-tab-active, .theme-tab-inactive, button, .btn {
   background: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%) !important;
+  background-color: #f97316 !important;
   color: #ffffff !important;
-  border: 2px solid !important;
-  border-image: linear-gradient(45deg, #c0c0c0, #e5e5e5, #c0c0c0) 1 !important;
+  border: 2px solid #c0c0c0 !important;
   font-weight: 600 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
   position: relative !important;
   overflow: hidden !important;
+  opacity: 1 !important;
 }
 
 .theme-tab-active::before, .theme-tab-inactive::before, button::before, .btn::before {
@@ -170,6 +171,26 @@ input[type="search"], textarea, select {
 .bg-black, .bg-gray-900, .bg-gray-800, .bg-gray-700, .bg-slate-900, .bg-slate-800 {
   background-color: var(--theme-surface) !important;
   background: var(--theme-surface) !important;
+}
+
+/* Specific tab button overrides to ensure solid backgrounds */
+button[role="tab"], .tab, [class*="tab-"], div[class*="bg-"] button,
+.px-4.py-2, .px-6.py-3, .rounded, .rounded-lg, .rounded-md {
+  background: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%) !important;
+  background-color: #f97316 !important;
+  opacity: 1 !important;
+}
+
+/* Remove any semi-transparent overlays or backgrounds */
+*::before, *::after {
+  opacity: 1 !important;
+}
+
+/* Force all button-like elements to have solid orange backgrounds */
+[class*="bg-orange"], [class*="bg-amber"], [style*="background"], 
+div > button, span > button, .flex button, .grid button {
+  background: #f97316 !important;
+  background-color: #f97316 !important;
 }
 
 /* Mobile optimizations */
