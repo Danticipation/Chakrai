@@ -1314,27 +1314,37 @@ button[class*="bg-blue-600"] {
   color: #ffffff !important; /* Ensure white text */
 }
 
-/* ULTRA-SPECIFIC VR THERAPY BUTTON FIX */
+/* CLEAN PROFESSIONAL TAB BUTTON FIX - AMBER THEME COMPATIBLE */
 .grid.grid-cols-4 button,
 div.grid-cols-4 button,
 div[class*="grid-cols-4"] > button,
 div.bg-white .grid.grid-cols-4 button,
-.bg-white .grid-cols-4 button {
-  background-color: #111827 !important; /* Very dark background */
-  color: #ffffff !important; /* Pure white text */
-  border: 3px solid #3b82f6 !important; /* Blue border */
-  font-weight: bold !important;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important; /* Strong shadow for visibility */
+.bg-white .grid-cols-4 button,
+div[class*="bg-white"] div[class*="grid-cols-4"] button {
+  background-color: #374151 !important; /* Clean dark gray background */
+  color: #ffffff !important; /* White text for contrast */
+  border: 1px solid #6b7280 !important; /* Subtle gray border */
+  font-weight: 600 !important; /* Medium bold text */
+  border-radius: 8px !important; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; /* Subtle shadow */
+  transition: all 0.2s ease !important; /* Smooth transitions */
 }
 
-/* EXTREME FORCE FOR VR THERAPY TABS */
-div[class*="bg-white"] div[class*="grid-cols-4"] button {
-  background-color: #0f172a !important; /* Ultra dark navy */
-  color: #ffffff !important; /* Pure white text */
-  border: 4px solid #60a5fa !important; /* Bright blue thick border */
-  font-weight: 900 !important; /* Extra bold text */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 1) !important; /* Strong text shadow */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6) !important; /* Very strong shadow */
-  min-height: 48px !important; /* Ensure good size */
+/* Hover state for professional interaction */
+.grid.grid-cols-4 button:hover,
+div.grid-cols-4 button:hover,
+div[class*="grid-cols-4"] > button:hover,
+div.bg-white .grid.grid-cols-4 button:hover,
+.bg-white .grid-cols-4 button:hover,
+div[class*="bg-white"] div[class*="grid-cols-4"] button:hover {
+  background-color: #4b5563 !important; /* Slightly lighter on hover */
+  transform: translateY(-1px) !important; /* Subtle lift effect */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important; /* Enhanced shadow on hover */
+}
+
+/* Active/selected state */
+.grid.grid-cols-4 button.bg-blue-600,
+div[class*="bg-white"] div[class*="grid-cols-4"] button.bg-blue-600 {
+  background-color: #1f2937 !important; /* Darker for selected state */
+  border-color: #9ca3af !important; /* Lighter border for selected */
 }
