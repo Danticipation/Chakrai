@@ -29,20 +29,20 @@
   --silver-light: #e5e5e5;
 }
 
-.theme-background { background-color: var(--theme-background) !important; }
-.theme-surface { background-color: var(--theme-surface) !important; }
-.theme-primary { background-color: var(--theme-primary) !important; }
-.theme-primary-mid { background-color: var(--theme-primary-mid) !important; }
-.theme-primary-light { background-color: var(--theme-primary-light) !important; }
-.theme-primary-dark { background-color: var(--theme-primary-dark) !important; }
-.theme-secondary { background-color: var(--theme-secondary) !important; }
-.theme-secondary-light { background-color: var(--theme-secondary-light) !important; }
-.theme-secondary-dark { background-color: var(--theme-secondary-dark) !important; }
-.theme-accent { background-color: var(--theme-accent) !important; }
-.theme-accent-light { background-color: var(--theme-accent-light) !important; }
-.theme-surface-light { background-color: var(--theme-surface-light) !important; }
-.theme-text { color: var(--theme-text) !important; }
-.theme-text-secondary { color: var(--theme-text-secondary) !important; }
+.theme-background { background-color: var(--theme-background); }
+.theme-surface { background-color: var(--theme-surface); }
+.theme-primary { background-color: var(--theme-primary); }
+.theme-primary-mid { background-color: var(--theme-primary-mid); }
+.theme-primary-light { background-color: var(--theme-primary-light); }
+.theme-primary-dark { background-color: var(--theme-primary-dark); }
+.theme-secondary { background-color: var(--theme-secondary); }
+.theme-secondary-light { background-color: var(--theme-secondary-light); }
+.theme-secondary-dark { background-color: var(--theme-secondary-dark); }
+.theme-accent { background-color: var(--theme-accent); }
+.theme-accent-light { background-color: var(--theme-accent-light); }
+.theme-surface-light { background-color: var(--theme-surface-light); }
+.theme-text { color: var(--theme-text); }
+.theme-text-secondary { color: var(--theme-text-secondary); }
 .border-theme-accent { border-color: var(--theme-accent); }
 
 /* Universal gradient button styling with silver shimmering borders */
@@ -88,100 +88,21 @@
 
 /* Global theme application */
 html, body, #root {
-  background-color: var(--theme-background) !important;
-  color: var(--theme-text) !important;
-  min-height: 100vh !important;
+  min-height: 100vh;
 }
 
 /* Theme card styling */
 .theme-card {
-  background-color: var(--theme-primary) !important;
-  border: 1px solid var(--theme-accent) !important;
+  background-color: var(--theme-surface);
+  border: 1px solid var(--theme-accent);
 }
 
-/* Eliminate ALL white backgrounds */
-.bg-white, *[class*="bg-white"], div[style*="background-color: white"], 
-div[style*="background-color: #ffffff"], div[style*="background-color: #fff"],
-.bg-gray-50, .bg-gray-100, input, textarea, select {
-  background-color: var(--theme-surface) !important;
-  background: var(--theme-surface) !important;
-  color: var(--theme-text) !important;
+/* Basic form styling */
+input, textarea, select {
+  border-radius: 0.5rem;
 }
 
-/* Force all content areas to use orange theme */
-.w-full, .h-full, .flex, .grid, .space-y-4, .space-y-6,
-.p-4, .p-6, .p-8, .px-4, .px-6, .py-4, .py-6,
-.rounded, .rounded-lg, .rounded-xl, .border, .shadow {
-  background-color: var(--theme-surface) !important;
-}
 
-/* Override any remaining white or light backgrounds */
-[style*="background"], [style*="backgroundColor"] {
-  background-color: var(--theme-surface) !important;
-  background: var(--theme-surface) !important;
-}
-
-/* Ensure text inputs and form elements have orange backgrounds */
-input[type="text"], input[type="email"], input[type="password"], 
-input[type="search"], textarea, select {
-  background-color: var(--theme-primary) !important;
-  background: var(--theme-primary) !important;
-  color: var(--theme-text) !important;
-  border: 2px solid var(--silver) !important;
-}
-
-/* Eliminate all blue color overrides with extreme force */
-*[class*="bg-blue"], .bg-blue-50, .bg-blue-100, .bg-blue-200, .bg-blue-300, 
-.bg-blue-400, .bg-blue-500, .bg-blue-600, .bg-blue-700, .bg-blue-800, .bg-blue-900,
-.hover\\:bg-blue-50:hover, .hover\\:bg-blue-100:hover, .hover\\:bg-blue-500:hover,
-.hover\\:bg-blue-600:hover, .hover\\:bg-blue-700:hover {
-  background-color: var(--theme-surface) !important;
-  background: var(--theme-surface) !important;
-}
-
-*[class*="text-blue"], .text-blue-50, .text-blue-100, .text-blue-200, .text-blue-300,
-.text-blue-400, .text-blue-500, .text-blue-600, .text-blue-700, .text-blue-800, .text-blue-900 {
-  color: var(--theme-text) !important;
-}
-
-*[class*="border-blue"], .border-blue-50, .border-blue-100, .border-blue-200, .border-blue-300,
-.border-blue-400, .border-blue-500, .border-blue-600, .border-blue-700, .border-blue-800, .border-blue-900 {
-  border-color: var(--silver) !important;
-}
-
-/* Force any hardcoded blue colors to orange */
-[style*="background-color: #3b82f6"], [style*="background-color: #2563eb"],
-[style*="background-color: #1d4ed8"], [style*="background-color: #1e40af"],
-[style*="background-color: #1e3a8a"], [style*="background-color: blue"] {
-  background-color: var(--theme-surface) !important;
-  background: var(--theme-surface) !important;
-}
-
-/* Force black backgrounds to orange */
-.bg-black, .bg-gray-900, .bg-gray-800, .bg-gray-700, .bg-slate-900, .bg-slate-800 {
-  background-color: var(--theme-surface) !important;
-  background: var(--theme-surface) !important;
-}
-
-/* Specific tab button overrides to ensure solid backgrounds */
-button[role="tab"], .tab, [class*="tab-"], div[class*="bg-"] button,
-.px-4.py-2, .px-6.py-3, .rounded, .rounded-lg, .rounded-md {
-  background: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%) !important;
-  background-color: #f97316 !important;
-  opacity: 1 !important;
-}
-
-/* Remove any semi-transparent overlays or backgrounds */
-*::before, *::after {
-  opacity: 1 !important;
-}
-
-/* Force all button-like elements to have solid orange backgrounds */
-[class*="bg-orange"], [class*="bg-amber"], [style*="background"], 
-div > button, span > button, .flex button, .grid button {
-  background: #f97316 !important;
-  background-color: #f97316 !important;
-}
 
 /* Mobile optimizations */
 @media (max-width: 768px) {
