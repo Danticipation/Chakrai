@@ -217,8 +217,25 @@ const WellnessRewards: React.FC = () => {
                     : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
                 }`}
               >
-                <tab.icon className="w-4 h-4 mx-auto mb-1" />
-                <div className="text-xs">{tab.label}</div>
+                <tab.icon 
+                  className="w-4 h-4 mx-auto mb-1" 
+                  style={{ 
+                    background: 'none',
+                    backgroundColor: 'transparent',
+                    color: 'white',
+                    fill: 'white'
+                  }}
+                />
+                <div 
+                  className="text-xs"
+                  style={{ 
+                    background: 'none',
+                    backgroundColor: 'transparent',
+                    color: 'white'
+                  }}
+                >
+                  {tab.label}
+                </div>
               </button>
             ))}
           </div>

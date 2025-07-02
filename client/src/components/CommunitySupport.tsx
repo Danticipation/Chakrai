@@ -203,8 +203,22 @@ const CommunitySupport: React.FC = () => {
                   : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
               }`}
             >
-              <MessageSquare className="w-4 h-4 mx-auto mb-1" />
-              <span>Forums</span>
+              <MessageSquare 
+                className="w-4 h-4 mx-auto mb-1" 
+                style={{ 
+                  background: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'white',
+                  fill: 'white'
+                }}
+              />
+              <span
+                style={{ 
+                  background: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'white'
+                }}
+              >Forums</span>
             </button>
             <button
               onClick={() => setActiveTab('peer')}
@@ -214,8 +228,22 @@ const CommunitySupport: React.FC = () => {
                   : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
               }`}
             >
-              <Users className="w-4 h-4 mx-auto mb-1" />
-              <span>Check-ins</span>
+              <Users 
+                className="w-4 h-4 mx-auto mb-1" 
+                style={{ 
+                  background: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'white',
+                  fill: 'white'
+                }}
+              />
+              <span
+                style={{ 
+                  background: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'white'
+                }}
+              >Check-ins</span>
             </button>
             <button
               onClick={() => setActiveTab('moderation')}
@@ -225,8 +253,22 @@ const CommunitySupport: React.FC = () => {
                   : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
               }`}
             >
-              <Shield className="w-4 h-4 mx-auto mb-1" />
-              <span>Guidelines</span>
+              <Shield 
+                className="w-4 h-4 mx-auto mb-1" 
+                style={{ 
+                  background: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'white',
+                  fill: 'white'
+                }}
+              />
+              <span
+                style={{ 
+                  background: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'white'
+                }}
+              >Guidelines</span>
             </button>
           </div>
         </div>

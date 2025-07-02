@@ -365,8 +365,25 @@ const VRTherapy: React.FC = () => {
                     : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
                 }`}
               >
-                <tab.icon className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{tab.label}</span>
+                <tab.icon 
+                  className="w-4 h-4 flex-shrink-0" 
+                  style={{ 
+                    background: 'none',
+                    backgroundColor: 'transparent',
+                    color: 'white',
+                    fill: 'white'
+                  }}
+                />
+                <span 
+                  className="truncate"
+                  style={{ 
+                    background: 'none',
+                    backgroundColor: 'transparent',
+                    color: 'white'
+                  }}
+                >
+                  {tab.label}
+                </span>
               </button>
             ))}
           </div>
