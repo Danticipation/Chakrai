@@ -375,7 +375,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 text-white font-medium text-sm ${
+                className={`flex-1 flex flex-col items-center justify-center gap-1 px-3 py-3 rounded-lg transition-all duration-200 text-white font-medium text-xs ${
                   activeTab === tab.id
                     ? 'shadow-lg border-2 border-silver animate-shimmer'
                     : 'hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
@@ -384,12 +384,12 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   background: activeTab === tab.id 
                     ? 'linear-gradient(to right, var(--theme-primary), var(--theme-accent))'
                     : 'linear-gradient(to right, var(--theme-primary-light), var(--theme-surface))',
-                  minHeight: '40px',
-                  maxHeight: '40px'
+                  minHeight: '60px',
+                  maxHeight: '60px'
                 }}
               >
-                <tab.icon className="w-4 h-4 flex-shrink-0" />
-                <span className="font-medium truncate">{tab.label}</span>
+                <tab.icon className="w-5 h-5 flex-shrink-0" />
+                <span className="font-medium text-center leading-tight">{tab.label}</span>
               </button>
             ))}
           </div>
