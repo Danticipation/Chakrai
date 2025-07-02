@@ -2042,4 +2042,297 @@ router.get('/api/ehr/audit-logs/:userId', async (req, res) => {
   }
 });
 
+// ================================
+// VR THERAPY SYSTEM ENDPOINTS
+// ================================
+
+// Get VR environments
+router.get('/api/vr/environments', async (req, res) => {
+  try {
+    const environments = [
+      {
+        id: 1,
+        name: "Tranquil Forest",
+        description: "Walk through a peaceful forest with gentle sounds of nature",
+        category: "mindfulness",
+        difficulty: "beginner",
+        duration: 15,
+        environmentType: "nature",
+        scenePath: "/scenes/forest.unity3d",
+        instructions: ["Put on your VR headset", "Follow the guided path", "Focus on your breathing"],
+        therapeuticGoals: ["stress reduction", "mindfulness practice"],
+        contraindications: ["motion sensitivity", "claustrophobia"],
+        tags: ["nature", "calming", "breathing"]
+      },
+      {
+        id: 2,
+        name: "Ocean Meditation",
+        description: "Sit by the ocean and practice mindful breathing with wave sounds",
+        category: "mindfulness",
+        difficulty: "beginner",
+        duration: 20,
+        environmentType: "ocean",
+        scenePath: "/scenes/ocean.unity3d",
+        instructions: ["Sit comfortably", "Listen to the waves", "Breathe with the rhythm"],
+        therapeuticGoals: ["anxiety reduction", "emotional regulation"],
+        contraindications: ["fear of water"],
+        tags: ["ocean", "meditation", "breathing"]
+      },
+      {
+        id: 3,
+        name: "Mountain Peak",
+        description: "Experience a sense of achievement at a beautiful mountain summit",
+        category: "relaxation",
+        difficulty: "intermediate",
+        duration: 25,
+        environmentType: "mountain",
+        scenePath: "/scenes/mountain.unity3d",
+        instructions: ["Take your time", "Enjoy the view", "Practice gratitude"],
+        therapeuticGoals: ["confidence building", "perspective taking"],
+        contraindications: ["height phobia", "motion sickness"],
+        tags: ["achievement", "perspective", "confidence"]
+      },
+      {
+        id: 4,
+        name: "Safe Space Room",
+        description: "A customizable safe space for processing difficult emotions",
+        category: "grounding",
+        difficulty: "beginner",
+        duration: 10,
+        environmentType: "indoor",
+        scenePath: "/scenes/safespace.unity3d",
+        instructions: ["Create your safe space", "Practice grounding techniques", "Take your time"],
+        therapeuticGoals: ["trauma processing", "emotional safety"],
+        contraindications: ["severe PTSD episodes"],
+        tags: ["safety", "grounding", "customizable"]
+      },
+      {
+        id: 5,
+        name: "Social Café",
+        description: "Practice social interactions in a friendly café environment",
+        category: "exposure",
+        difficulty: "intermediate",
+        duration: 30,
+        environmentType: "social",
+        scenePath: "/scenes/cafe.unity3d",
+        instructions: ["Start with observation", "Practice conversations", "Take breaks as needed"],
+        therapeuticGoals: ["social anxiety", "communication skills"],
+        contraindications: ["severe social phobia"],
+        tags: ["social", "exposure", "conversation"]
+      }
+    ];
+
+    res.json({ environments });
+  } catch (error) {
+    console.error('VR environments error:', error);
+    res.status(500).json({ error: 'Failed to get VR environments' });
+  }
+});
+
+// Get user VR sessions
+router.get('/api/vr/sessions/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    const sessions = [
+      {
+        id: 1,
+        userId,
+        environmentId: 1,
+        startTime: new Date(Date.now() - 3600000).toISOString(),
+        endTime: new Date(Date.now() - 2700000).toISOString(),
+        duration: 900,
+        completionStatus: "completed",
+        effectiveness: 8,
+        stressLevel: { before: 7, after: 3 },
+        heartRate: { average: 68, peak: 75 },
+        sessionGoals: ["stress reduction", "relaxation"],
+        personalizedSettings: { motionSensitivity: "low" },
+        notes: "Very relaxing session, felt much calmer afterward"
+      },
+      {
+        id: 2,
+        userId,
+        environmentId: 2,
+        startTime: new Date(Date.now() - 86400000).toISOString(),
+        endTime: new Date(Date.now() - 85200000).toISOString(),
+        duration: 1200,
+        completionStatus: "completed",
+        effectiveness: 9,
+        stressLevel: { before: 8, after: 4 },
+        heartRate: { average: 72, peak: 78 },
+        sessionGoals: ["anxiety management"],
+        personalizedSettings: { motionSensitivity: "medium" },
+        notes: "Ocean sounds were perfect for meditation"
+      }
+    ];
+
+    res.json({ sessions });
+  } catch (error) {
+    console.error('VR sessions error:', error);
+    res.status(500).json({ error: 'Failed to get VR sessions' });
+  }
+});
+
+// Get user VR progress
+router.get('/api/vr/progress/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    const progress = [
+      {
+        environmentId: 1,
+        environmentName: "Tranquil Forest",
+        sessionsCompleted: 5,
+        totalDuration: 4500,
+        averageEffectiveness: 8.2,
+        lastSession: new Date(Date.now() - 3600000).toISOString(),
+        progressTrend: "improving"
+      },
+      {
+        environmentId: 2,
+        environmentName: "Ocean Meditation",
+        sessionsCompleted: 3,
+        totalDuration: 3600,
+        averageEffectiveness: 8.7,
+        lastSession: new Date(Date.now() - 86400000).toISOString(),
+        progressTrend: "stable"
+      }
+    ];
+
+    res.json({ progress });
+  } catch (error) {
+    console.error('VR progress error:', error);
+    res.status(500).json({ error: 'Failed to get VR progress' });
+  }
+});
+
+// Get VR therapeutic plans
+router.get('/api/vr/therapeutic-plans/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    const plans = [
+      {
+        id: 1,
+        userId,
+        planName: "Anxiety Management Program",
+        therapeuticGoal: "Reduce anxiety through gradual exposure and mindfulness",
+        environments: [1, 2, 4],
+        totalStages: 8,
+        estimatedDuration: 6, // weeks
+        adaptiveSettings: {
+          progressionCriteria: "effectiveness >= 7",
+          difficultyAdjustment: "automatic"
+        }
+      }
+    ];
+
+    res.json({ plans });
+  } catch (error) {
+    console.error('VR therapeutic plans error:', error);
+    res.status(500).json({ error: 'Failed to get VR therapeutic plans' });
+  }
+});
+
+// Get accessibility profile
+router.get('/api/vr/accessibility-profile/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || 1;
+    
+    const profile = {
+      id: 1,
+      userId,
+      motionSensitivity: "medium",
+      comfortSettings: {
+        snapTurning: true,
+        comfortVignette: true,
+        teleportMovement: true
+      },
+      visualAdjustments: {
+        brightness: 0.8,
+        contrast: 1.0,
+        colorblindSupport: false
+      },
+      audioPreferences: {
+        volume: 0.7,
+        spatialAudio: true,
+        voiceGuidance: true
+      }
+    };
+
+    res.json({ profile });
+  } catch (error) {
+    console.error('VR accessibility profile error:', error);
+    res.status(500).json({ error: 'Failed to get VR accessibility profile' });
+  }
+});
+
+// Start VR session
+router.post('/api/vr/sessions', async (req, res) => {
+  try {
+    const { userId, environmentId, sessionGoals, personalizedSettings } = req.body;
+    
+    const session = {
+      id: Math.floor(Math.random() * 1000) + 100,
+      userId,
+      environmentId,
+      startTime: new Date().toISOString(),
+      completionStatus: "in_progress",
+      sessionGoals: sessionGoals || [],
+      personalizedSettings: personalizedSettings || {}
+    };
+
+    res.json({ session });
+  } catch (error) {
+    console.error('Start VR session error:', error);
+    res.status(500).json({ error: 'Failed to start VR session' });
+  }
+});
+
+// Complete VR session
+router.post('/api/vr/sessions/:sessionId/complete', async (req, res) => {
+  try {
+    const sessionId = parseInt(req.params.sessionId);
+    const { effectiveness, notes, stressLevel, heartRate, interactions, sideEffects } = req.body;
+    
+    const completedSession = {
+      id: sessionId,
+      endTime: new Date().toISOString(),
+      completionStatus: "completed",
+      effectiveness,
+      notes,
+      stressLevel,
+      heartRate,
+      interactions: interactions || [],
+      sideEffects: sideEffects || []
+    };
+
+    res.json({ session: completedSession });
+  } catch (error) {
+    console.error('Complete VR session error:', error);
+    res.status(500).json({ error: 'Failed to complete VR session' });
+  }
+});
+
+// Save accessibility profile
+router.post('/api/vr/accessibility-profile/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const profileData = req.body;
+    
+    const profile = {
+      id: 1,
+      userId,
+      ...profileData,
+      updatedAt: new Date().toISOString()
+    };
+
+    res.json({ profile });
+  } catch (error) {
+    console.error('Save VR accessibility profile error:', error);
+    res.status(500).json({ error: 'Failed to save VR accessibility profile' });
+  }
+});
+
 export default router;
