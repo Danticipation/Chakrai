@@ -375,10 +375,10 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white shadow-lg border-2 border-blue-400'
-                    : 'bg-gray-700 text-white/80 hover:bg-gray-600 hover:text-white border-2 border-gray-600'
+                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
+                    : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
