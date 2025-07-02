@@ -237,14 +237,18 @@ const EnhancedGamificationDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+                className={`w-full px-4 py-4 text-sm font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                    : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                    ? 'bg-blue-600 border-blue-400 shadow-lg'
+                    : 'bg-orange-500 border-orange-400 hover:bg-orange-600'
                 }`}
+                style={{
+                  color: '#FFFFFF !important',
+                  backgroundColor: activeTab === tab.id ? '#2563eb !important' : '#f97316 !important'
+                }}
               >
-                <span className="text-lg">{tab.icon}</span>
-                <div className="text-xs mt-1">{tab.label}</div>
+                <span className="text-lg" style={{ color: '#FFFFFF !important' }}>{tab.icon}</span>
+                <div className="text-sm mt-1" style={{ color: '#FFFFFF !important' }}>{tab.label}</div>
               </button>
             ))}
           </div>

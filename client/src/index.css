@@ -119,6 +119,26 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
   border-color: #60a5fa !important;
 }
 
+/* Force white text on orange and blue navigation buttons */
+.bg-orange-500, .bg-orange-500 *, .bg-orange-600, .bg-orange-600 *,
+.bg-blue-600, .bg-blue-600 *, button[class*="bg-orange-"], button[class*="bg-blue-"] {
+  color: #FFFFFF !important;
+}
+
+/* Specific fixes for tab navigation text visibility */
+button[class*="bg-orange-"] span,
+button[class*="bg-blue-"] span,
+button[class*="bg-orange-"] div,
+button[class*="bg-blue-"] div {
+  color: #FFFFFF !important;
+}
+
+/* Icons in orange/blue buttons should be white */
+button[class*="bg-orange-"] svg,
+button[class*="bg-blue-"] svg {
+  color: #FFFFFF !important;
+}
+
 .hover\:bg-orange-600:hover {
   background-color: #ea580c !important;
 }

@@ -197,36 +197,48 @@ const CommunitySupport: React.FC = () => {
           <div className="grid grid-cols-3 gap-1">
             <button
               onClick={() => setActiveTab('forums')}
-              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
+              className={`w-full px-4 py-4 text-sm font-bold rounded-md transition-all border-2 ${
                 activeTab === 'forums'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  ? 'bg-blue-600 border-blue-400 shadow-lg'
+                  : 'bg-orange-500 border-orange-400 hover:bg-orange-600'
               }`}
+              style={{
+                color: '#FFFFFF !important',
+                backgroundColor: activeTab === 'forums' ? '#2563eb !important' : '#f97316 !important'
+              }}
             >
-              <MessageSquare className="w-4 h-4 mx-auto mb-1" />
-              Forums
+              <MessageSquare className="w-4 h-4 mx-auto mb-1" style={{ color: '#FFFFFF !important' }} />
+              <span style={{ color: '#FFFFFF !important' }}>Forums</span>
             </button>
             <button
               onClick={() => setActiveTab('peer')}
-              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
+              className={`w-full px-4 py-4 text-sm font-bold rounded-md transition-all border-2 ${
                 activeTab === 'peer'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  ? 'bg-blue-600 border-blue-400 shadow-lg'
+                  : 'bg-orange-500 border-orange-400 hover:bg-orange-600'
               }`}
+              style={{
+                color: '#FFFFFF !important',
+                backgroundColor: activeTab === 'peer' ? '#2563eb !important' : '#f97316 !important'
+              }}
             >
-              <Users className="w-4 h-4 mx-auto mb-1" />
-              Check-ins
+              <Users className="w-4 h-4 mx-auto mb-1" style={{ color: '#FFFFFF !important' }} />
+              <span style={{ color: '#FFFFFF !important' }}>Check-ins</span>
             </button>
             <button
               onClick={() => setActiveTab('moderation')}
-              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
+              className={`w-full px-4 py-4 text-sm font-bold rounded-md transition-all border-2 ${
                 activeTab === 'moderation'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  ? 'bg-blue-600 border-blue-400 shadow-lg'
+                  : 'bg-orange-500 border-orange-400 hover:bg-orange-600'
               }`}
+              style={{
+                color: '#FFFFFF !important',
+                backgroundColor: activeTab === 'moderation' ? '#2563eb !important' : '#f97316 !important'
+              }}
             >
-              <Shield className="w-4 h-4 mx-auto mb-1" />
-              Guidelines
+              <Shield className="w-4 h-4 mx-auto mb-1" style={{ color: '#FFFFFF !important' }} />
+              <span style={{ color: '#FFFFFF !important' }}>Guidelines</span>
             </button>
           </div>
         </div>
