@@ -304,7 +304,7 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
               className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeView === 'list'
                   ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
               }`}
             >
               <BookOpen className="w-4 h-4 mx-auto mb-1" />
@@ -315,7 +315,7 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
               className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeView === 'analytics'
                   ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
               }`}
             >
               <TrendingUp className="w-4 h-4 mx-auto mb-1" />
@@ -326,7 +326,7 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
               className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeView === 'editor'
                   ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
               }`}
             >
               <Plus className="w-4 h-4 mx-auto mb-1" />
@@ -337,7 +337,7 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
               className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeView === 'export'
                   ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
               }`}
             >
               <Download className="w-4 h-4 mx-auto mb-1" />

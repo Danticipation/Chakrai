@@ -419,7 +419,7 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
                 className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
                     ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                    : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                    : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
                 }`}
               >
                 <tab.icon className="w-4 h-4 mx-auto mb-1" />
