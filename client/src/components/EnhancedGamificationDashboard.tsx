@@ -240,11 +240,11 @@ const EnhancedGamificationDashboard: React.FC = () => {
                 className={`w-full px-4 py-4 text-sm font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
                     ? 'bg-blue-600 border-blue-400 shadow-lg'
-                    : 'bg-orange-500 border-orange-400 hover:bg-orange-600'
+                    : 'bg-gray-700 border-gray-600 hover:bg-gray-800'
                 }`}
                 style={{
                   color: '#FFFFFF !important',
-                  backgroundColor: activeTab === tab.id ? '#2563eb !important' : '#f97316 !important'
+                  backgroundColor: activeTab === tab.id ? '#2563eb !important' : '#374151 !important'
                 }}
               >
                 <span className="text-lg" style={{ color: '#FFFFFF !important' }}>{tab.icon}</span>
