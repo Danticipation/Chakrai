@@ -98,58 +98,83 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
 /* Allow tab navigation buttons to use their own colors */
 /* Removed conflicting button overrides to enable orange/blue tab navigation system */
 
-/* FORCE BUTTON VISIBILITY - Override ALL other styles */
+/* THEME-AWARE TAB BUTTON SYSTEM - Works across all 6 color schemes */
+
+/* Theme-aware inactive tab buttons - provides contrast against any theme background */
+.theme-tab-inactive {
+  background-color: var(--theme-secondary-light) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-accent) !important;
+  border-width: 2px;
+}
+
+.theme-tab-inactive:hover {
+  background-color: var(--theme-secondary) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Theme-aware active tab buttons - uses accent color for visibility */
+.theme-tab-active {
+  background-color: var(--theme-accent) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-accent-light) !important;
+  border-width: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Fallback system for any remaining orange/gray buttons */
 button.bg-orange-500,
 .bg-orange-500,
 *[class*="bg-orange-500"],
 button[class*="bg-orange-"],
-*[style*="background-color: #f97316"] {
-  background-color: #1f2937 !important; /* Dark gray so buttons are visible against orange background */
+button.bg-gray-700,
+.bg-gray-700,
+*[class*="bg-gray-700"] {
+  background-color: var(--theme-secondary-light) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-accent) !important;
 }
 
 button.bg-orange-600,
 .bg-orange-600,
 *[class*="bg-orange-600"],
 button[class*="bg-orange-"]:hover,
-*[style*="background-color: #ea580c"] {
-  background-color: #111827 !important; /* Darker gray for hover state */
+button.bg-gray-800,
+.bg-gray-800,
+*[class*="bg-gray-800"] {
+  background-color: var(--theme-secondary) !important;
+  color: var(--theme-text) !important;
 }
 
 button.bg-blue-600,
 .bg-blue-600,
 *[class*="bg-blue-600"] {
-  background-color: #2563eb !important;
+  background-color: var(--theme-accent) !important;
+  color: var(--theme-text) !important;
 }
 
-.border-orange-400 {
-  border-color: #374151 !important; /* Dark gray border to match button */
+.border-orange-400,
+.border-gray-600 {
+  border-color: var(--theme-accent) !important;
 }
 
 .border-blue-400 {
-  border-color: #60a5fa !important;
+  border-color: var(--theme-accent-light) !important;
 }
 
-/* Force white text on orange and blue navigation buttons */
-.bg-orange-500, .bg-orange-500 *, .bg-orange-600, .bg-orange-600 *,
-.bg-blue-600, .bg-blue-600 *, button[class*="bg-orange-"], button[class*="bg-blue-"] {
-  color: #FFFFFF !important;
+/* Ensure text visibility across all themes */
+.theme-tab-inactive *, .theme-tab-active *,
+.bg-orange-500 *, .bg-orange-600 *, .bg-gray-700 *, .bg-gray-800 *,
+.bg-blue-600 *, button[class*="bg-orange-"] *, button[class*="bg-gray-"] *, button[class*="bg-blue-"] * {
+  color: var(--theme-text) !important;
 }
 
-/* Specific fixes for tab navigation text visibility */
-button[class*="bg-orange-"] span,
-button[class*="bg-blue-"] span,
-button[class*="bg-orange-"] div,
-button[class*="bg-blue-"] div {
-  color: #FFFFFF !important;
+/* Icons inherit proper colors */
+.theme-tab-inactive svg, .theme-tab-active svg,
+button[class*="bg-orange-"] svg, button[class*="bg-gray-"] svg, button[class*="bg-blue-"] svg {
+  color: var(--theme-text) !important;
 }
-
-/* Icons in orange/blue buttons should be white */
-button[class*="bg-orange-"] svg,
-button[class*="bg-blue-"] svg {
-  color: #FFFFFF !important;
-}
-
-/* Allow natural hover states */
 
 /* Theme card styling */
 .theme-card {
