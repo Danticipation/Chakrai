@@ -222,6 +222,12 @@ button[class*="bg-orange-"] svg, button[class*="bg-gray-"] svg, button[class*="b
   color: var(--theme-text) !important;
 }
 
+/* Remove any unwanted backgrounds from button content */
+button svg, button span {
+  background: none !important;
+  background-color: transparent !important;
+}
+
 /* Theme card styling */
 .theme-card {
   background-color: var(--theme-primary) !important;
