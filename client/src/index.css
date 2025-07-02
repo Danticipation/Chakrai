@@ -255,29 +255,10 @@ button[class*="bg-orange-"] svg, button[class*="bg-gray-"] svg, button[class*="b
   color: var(--theme-text) !important;
 }
 
-/* AGGRESSIVE: Remove ALL backgrounds from button content */
-button svg, button span, button * {
+/* Clean button content styling - no background interference */
+button svg, button span {
   background: none !important;
   background-color: transparent !important;
-  background-image: none !important;
-}
-
-/* Target TherapeuticJournal buttons specifically */
-.therapeutic-journal-tabs button svg,
-.therapeutic-journal-tabs button span,
-.therapeutic-journal-tabs button *,
-button[class*="flex-1"] svg,
-button[class*="flex-1"] span,
-button[class*="flex-1"] * {
-  background: none !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  box-shadow: none !important;
-}
-
-/* Force transparent backgrounds on all nested elements */
-* svg, * span {
-  background: transparent !important;
 }
 
 /* Theme card styling */

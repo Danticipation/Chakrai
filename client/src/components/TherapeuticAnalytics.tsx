@@ -447,11 +447,11 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="bg-gradient-to-br from-[var(--theme-surface)] to-[var(--theme-primary)] rounded-xl shadow-lg p-6 border-2 border-[var(--theme-accent)]">
           {loading && (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-2 text-gray-600">Loading analytics...</span>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--theme-accent)]"></div>
+              <span className="ml-2 text-white">Loading analytics...</span>
             </div>
           )}
 
