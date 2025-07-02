@@ -207,47 +207,47 @@ const HealthIntegration: React.FC = () => {
   const successfulSyncsCount = Array.isArray(syncLogs) ? syncLogs.filter(l => l.syncStatus === 'success').length : 0;
 
   return (
-    <div className="h-full bg-gradient-to-br from-[#E6E6FA] to-[#ADD8E6] p-4 overflow-y-auto">
+    <div className="h-full theme-background p-4 overflow-y-auto">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 mb-6 border border-white/20">
+        <div className="theme-surface rounded-xl p-6 mb-6 border-2 border-theme-accent">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <Activity className="text-green-600" />
+              <h1 className="text-2xl font-bold theme-text flex items-center gap-2">
+                <Activity className="theme-accent" />
                 Health Integration & Wearables
               </h1>
-              <p className="text-gray-600 mt-2">Connect your devices and discover health-emotion correlations</p>
+              <p className="theme-text-secondary mt-2">Connect your devices and discover health-emotion correlations</p>
             </div>
             <div className="text-right">
-              <div className="text-lg font-semibold text-green-600">{connectedDevicesCount} Connected</div>
-              <div className="text-sm text-gray-600">Active Devices</div>
+              <div className="text-lg font-semibold theme-accent">{connectedDevicesCount} Connected</div>
+              <div className="text-sm theme-text-secondary">Active Devices</div>
             </div>
           </div>
           
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-blue-600">{healthMetrics.length}</div>
-              <div className="text-xs text-gray-600">Health Metrics</div>
+            <div className="theme-card rounded-lg p-3 text-center">
+              <div className="text-xl font-bold theme-primary">{healthMetrics.length}</div>
+              <div className="text-xs theme-text-secondary">Health Metrics</div>
             </div>
-            <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-purple-600">{correlations.length}</div>
-              <div className="text-xs text-gray-600">Correlations Found</div>
+            <div className="theme-card rounded-lg p-3 text-center">
+              <div className="text-xl font-bold theme-accent">{correlations.length}</div>
+              <div className="text-xs theme-text-secondary">Correlations Found</div>
             </div>
-            <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-orange-600">{unreadInsightsCount}</div>
-              <div className="text-xs text-gray-600">New Insights</div>
+            <div className="theme-card rounded-lg p-3 text-center">
+              <div className="text-xl font-bold theme-primary-light">{unreadInsightsCount}</div>
+              <div className="text-xs theme-text-secondary">New Insights</div>
             </div>
-            <div className="bg-white/40 rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-green-600">{successfulSyncsCount}</div>
-              <div className="text-xs text-gray-600">Successful Syncs</div>
+            <div className="theme-card rounded-lg p-3 text-center">
+              <div className="text-xl font-bold theme-accent">{successfulSyncsCount}</div>
+              <div className="text-xs theme-text-secondary">Successful Syncs</div>
             </div>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+        <div className="w-full theme-surface rounded-lg p-1 mb-6 shadow-lg border-2 border-theme-accent">
           <div className="grid grid-cols-5 gap-1">
             {[
               { id: 'devices', label: 'My Devices', icon: Smartphone },
@@ -261,10 +261,10 @@ const HealthIntegration: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+                  className={`shimmer-border theme-button w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                     activeTab === tab.id
-                      ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
-                      : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
+                      ? 'shadow-lg border-2 animate-shimmer'
+                      : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'
                   }`}
                 >
                   <IconComponent className="w-4 h-4 mx-auto mb-1" />
@@ -279,19 +279,19 @@ const HealthIntegration: React.FC = () => {
         {activeTab === 'devices' && (
           <div className="space-y-6">
             {/* Connected Devices */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Connected Devices</h3>
+            <div className="theme-surface rounded-xl p-6 border-2 border-theme-accent">
+              <h3 className="text-lg font-semibold theme-text mb-4">Connected Devices</h3>
               <div className="space-y-4">
                 {Array.isArray(devices) && devices.map((device) => {
                   const StatusIcon = getStatusIcon(device.syncStatus);
                   return (
-                    <div key={device.id} className="bg-white/40 rounded-lg p-4">
+                    <div key={device.id} className="theme-card rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <span className="text-2xl">{getDeviceIcon(device.deviceType)}</span>
                           <div>
-                            <h4 className="font-medium text-gray-800">{device.deviceName}</h4>
-                            <p className="text-sm text-gray-600 capitalize">{device.deviceType.replace('_', ' ')}</p>
+                            <h4 className="font-medium theme-text">{device.deviceName}</h4>
+                            <p className="text-sm theme-text-secondary capitalize">{device.deviceType.replace('_', ' ')}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -303,7 +303,7 @@ const HealthIntegration: React.FC = () => {
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm theme-text-secondary">
                           Last sync: {new Date(device.lastSyncTime).toLocaleString()}
                         </div>
                         <div className="flex gap-2">
@@ -313,7 +313,7 @@ const HealthIntegration: React.FC = () => {
                           <button
                             onClick={() => syncDevice(device.id)}
                             disabled={syncingDevice === device.id || device.syncStatus === 'disconnected'}
-                            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                            className="px-3 py-1 theme-primary theme-text rounded text-sm hover:shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                           >
                             {syncingDevice === device.id ? 'Syncing...' : 'Sync Now'}
                           </button>
@@ -326,8 +326,8 @@ const HealthIntegration: React.FC = () => {
             </div>
 
             {/* Add New Device */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Connect New Device</h3>
+            <div className="theme-surface rounded-xl p-6 border-2 border-theme-accent">
+              <h3 className="text-lg font-semibold theme-text mb-4">Connect New Device</h3>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
                   { type: 'apple_watch', name: 'Apple Watch', icon: '⌚' },
@@ -339,10 +339,10 @@ const HealthIntegration: React.FC = () => {
                   <button
                     key={deviceType.type}
                     onClick={() => connectDevice(deviceType.type)}
-                    className="p-4 bg-white/40 rounded-lg hover:bg-white/60 transition-colors text-center"
+                    className="p-4 theme-card rounded-lg hover:shadow-md transition-colors text-center"
                   >
                     <div className="text-2xl mb-2">{deviceType.icon}</div>
-                    <div className="text-sm font-medium text-gray-800">{deviceType.name}</div>
+                    <div className="text-sm font-medium theme-text">{deviceType.name}</div>
                   </button>
                 ))}
               </div>

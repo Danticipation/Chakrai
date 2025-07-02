@@ -396,16 +396,16 @@ const PrivacyCompliance: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen theme-primary p-4">
+    <div className="min-h-screen theme-background p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold theme-text mb-2">Privacy & Compliance</h1>
-          <p className="theme-text/80">Advanced privacy protection and regulatory compliance</p>
+          <p className="theme-text-secondary">Advanced privacy protection and regulatory compliance</p>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+        <div className="w-full theme-surface rounded-lg p-1 mb-6 shadow-lg border-2 border-theme-accent">
           <div className="grid grid-cols-4 gap-1">
             {[
               { id: 'encryption', label: 'Data Encryption', icon: Lock },
@@ -416,10 +416,10 @@ const PrivacyCompliance: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+                className={`shimmer-border theme-button w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
-                    : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
+                    ? 'shadow-lg border-2 animate-shimmer'
+                    : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'
                 }`}
               >
                 <tab.icon className="w-4 h-4 mx-auto mb-1" />

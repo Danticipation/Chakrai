@@ -75,30 +75,30 @@ const AdaptiveLearning: React.FC = () => {
       <div className="space-y-6">
         {/* Communication Preferences */}
         <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
-          <h3 className="text-lg font-semibold text-white mb-4">Communication Preferences</h3>
+          <h3 className="text-lg font-semibold theme-text mb-4">Communication Preferences</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm text-white/80">Communication Style</label>
+              <label className="text-sm theme-text-secondary">Communication Style</label>
               <div className="p-3 bg-white/10 rounded-lg">
-                <span className="text-white capitalize">{preferences?.communicationStyle || 'Not set'}</span>
+                <span className="theme-text capitalize">{preferences?.communicationStyle || 'Not set'}</span>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-white/80">Response Length</label>
+              <label className="text-sm theme-text-secondary">Response Length</label>
               <div className="p-3 bg-white/10 rounded-lg">
-                <span className="text-white capitalize">{preferences?.responseLength || 'Not set'}</span>
+                <span className="theme-text capitalize">{preferences?.responseLength || 'Not set'}</span>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-white/80">Emotional Support</label>
+              <label className="text-sm theme-text-secondary">Emotional Support</label>
               <div className="p-3 bg-white/10 rounded-lg">
-                <span className="text-white capitalize">{preferences?.emotionalSupport || 'Not set'}</span>
+                <span className="theme-text capitalize">{preferences?.emotionalSupport || 'Not set'}</span>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-white/80">Session Timing</label>
+              <label className="text-sm theme-text-secondary">Session Timing</label>
               <div className="p-3 bg-white/10 rounded-lg">
-                <span className="text-white capitalize">{preferences?.sessionTiming || 'Not set'}</span>
+                <span className="theme-text capitalize">{preferences?.sessionTiming || 'Not set'}</span>
               </div>
             </div>
           </div>
@@ -106,11 +106,11 @@ const AdaptiveLearning: React.FC = () => {
 
         {/* Adaptation Level */}
         <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
-          <h3 className="text-lg font-semibold text-white mb-4">Learning Adaptation</h3>
+          <h3 className="text-lg font-semibold theme-text mb-4">Learning Adaptation</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-white/80">Adaptation Level</span>
-              <span className="text-white font-bold">{Math.round((preferences?.adaptationLevel || 0) * 100)}%</span>
+              <span className="theme-text-secondary">Adaptation Level</span>
+              <span className="theme-text font-bold">{Math.round((preferences?.adaptationLevel || 0) * 100)}%</span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-3">
               <div 
@@ -118,7 +118,7 @@ const AdaptiveLearning: React.FC = () => {
                 style={{ width: `${(preferences?.adaptationLevel || 0) * 100}%` }}
               ></div>
             </div>
-            <p className="text-white/60 text-sm">
+            <p className="theme-text-secondary text-sm">
               Higher levels mean more personalized responses based on your interaction patterns
             </p>
           </div>
@@ -127,23 +127,23 @@ const AdaptiveLearning: React.FC = () => {
         {/* Topics */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
-            <h4 className="font-semibold text-white mb-3">Preferred Topics</h4>
+            <h4 className="font-semibold theme-text mb-3">Preferred Topics</h4>
             <div className="flex flex-wrap gap-2">
               {preferences?.preferredTopics?.map((topic, index) => (
-                <span key={index} className="px-2 py-1 bg-white/20 rounded text-white text-sm">
+                <span key={index} className="px-2 py-1 bg-white/20 rounded theme-text text-sm">
                   {topic}
                 </span>
-              )) || <span className="text-white/60">No preferences set</span>}
+              )) || <span className="theme-text-secondary">No preferences set</span>}
             </div>
           </div>
           <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
-            <h4 className="font-semibold text-white mb-3">Exercise Preferences</h4>
+            <h4 className="font-semibold theme-text mb-3">Exercise Preferences</h4>
             <div className="flex flex-wrap gap-2">
               {preferences?.exercisePreferences?.map((exercise, index) => (
-                <span key={index} className="px-2 py-1 bg-white/20 rounded text-white text-sm">
+                <span key={index} className="px-2 py-1 bg-white/20 rounded theme-text text-sm">
                   {exercise}
                 </span>
-              )) || <span className="text-white/60">No preferences set</span>}
+              )) || <span className="theme-text-secondary">No preferences set</span>}
             </div>
           </div>
         </div>
@@ -156,24 +156,24 @@ const AdaptiveLearning: React.FC = () => {
       <div className="space-y-6">
         {/* Conversation Patterns */}
         <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
-          <h3 className="text-lg font-semibold text-white mb-4">Conversation Patterns</h3>
+          <h3 className="text-lg font-semibold theme-text mb-4">Conversation Patterns</h3>
           <div className="space-y-4">
             {patterns?.map((pattern) => (
               <div key={pattern.id} className="p-4 bg-white/10 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white font-medium capitalize">{pattern.category}</span>
+                  <span className="theme-text font-medium capitalize">{pattern.category}</span>
                   <div className="flex items-center space-x-2">
-                    <span className="text-white/60 text-sm">Effectiveness:</span>
-                    <span className="text-white font-bold">{Math.round(pattern.effectiveness * 100)}%</span>
+                    <span className="theme-text-secondary text-sm">Effectiveness:</span>
+                    <span className="theme-text font-bold">{Math.round(pattern.effectiveness * 100)}%</span>
                   </div>
                 </div>
-                <p className="text-white/80 text-sm mb-2">{pattern.pattern}</p>
-                <div className="flex items-center justify-between text-xs text-white/60">
+                <p className="theme-text-secondary text-sm mb-2">{pattern.pattern}</p>
+                <div className="flex items-center justify-between text-xs theme-text-secondary">
                   <span>Used {pattern.frequency} times</span>
                   <span>Last used: {new Date(pattern.lastUsed).toLocaleDateString()}</span>
                 </div>
               </div>
-            )) || <p className="text-white/60">No patterns learned yet</p>}
+            )) || <p className="theme-text-secondary">No patterns learned yet</p>}
           </div>
         </div>
       </div>
@@ -191,17 +191,17 @@ const AdaptiveLearning: React.FC = () => {
               <div key={rec.id} className="p-4 bg-white/10 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-white font-medium">{rec.name}</h4>
-                  <span className="text-xs text-white/60 px-2 py-1 bg-white/20 rounded capitalize">
+                  <span className="text-xs theme-text-secondary px-2 py-1 bg-white/20 rounded capitalize">
                     {rec.difficulty}
                   </span>
                 </div>
-                <p className="text-white/80 text-sm mb-2">{rec.description}</p>
-                <p className="text-white/60 text-xs mb-2 italic">Why for you: {rec.personalizedReason}</p>
+                <p className="theme-text-secondary text-sm mb-2">{rec.description}</p>
+                <p className="theme-text-secondary text-xs mb-2 italic">Why for you: {rec.personalizedReason}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-white/60 text-xs">{rec.duration} min</span>
+                  <span className="theme-text-secondary text-xs">{rec.duration} min</span>
                   <div className="flex items-center space-x-1">
-                    <span className="text-white/60 text-xs">Confidence:</span>
-                    <span className="text-white font-bold text-xs">{Math.round(rec.confidence * 100)}%</span>
+                    <span className="theme-text-secondary text-xs">Confidence:</span>
+                    <span className="theme-text font-bold text-xs">{Math.round(rec.confidence * 100)}%</span>
                   </div>
                 </div>
               </div>
@@ -293,16 +293,16 @@ const AdaptiveLearning: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen theme-primary p-4">
+    <div className="min-h-screen theme-background p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white mb-2">Adaptive Learning</h1>
-          <p className="text-white/80">AI-powered personalization and learning insights</p>
+          <h1 className="text-3xl font-bold theme-text mb-2">Adaptive Learning</h1>
+          <p className="theme-text-secondary">AI-powered personalization and learning insights</p>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+        <div className="w-full theme-surface rounded-lg p-1 mb-6 shadow-lg border-2 border-theme-accent">
           <div className="grid grid-cols-4 gap-1">
             {[
               { id: 'preferences', label: 'Preferences', icon: Settings },
@@ -313,10 +313,10 @@ const AdaptiveLearning: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+                className={`shimmer-border theme-button w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
-                    : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
+                    ? 'shadow-lg border-2 animate-shimmer'
+                    : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'
                 }`}
               >
                 <tab.icon className="w-4 h-4 mx-auto mb-1" />
