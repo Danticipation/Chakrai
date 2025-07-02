@@ -416,16 +416,11 @@ export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalytic
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                className={`theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'text-white shadow-lg border-2 border-silver animate-shimmer'
-                    : 'text-white hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
+                    ? 'shadow-lg border-2 animate-shimmer'
+                    : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'
                 }`}
-                style={{
-                  background: 'linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%)',
-                  backgroundColor: '#f97316',
-                  opacity: 1
-                }}
               >
                 <tab.icon 
                   className="w-4 h-4 mx-auto mb-1" 

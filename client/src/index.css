@@ -3,20 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --theme-background: #ea580c;
-  --theme-surface: #f97316;
-  --theme-primary: #f97316;
-  --theme-primary-mid: #ea580c;
-  --theme-primary-light: #fb923c;
-  --theme-primary-dark: #c2410c;
-  --theme-secondary: #ea580c;
-  --theme-secondary-light: #fb923c;
-  --theme-secondary-dark: #c2410c;
-  --theme-accent: #f59e0b;
-  --theme-accent-light: #fbbf24;
+  /* Default theme - these will be overridden by ThemeContext */
+  --theme-background: #0a0e1a;
+  --theme-surface: #1a237e;
+  --theme-primary: #3f51b5;
+  --theme-primary-mid: #303f9f;
+  --theme-primary-light: #5c6bc0;
+  --theme-primary-dark: #1a237e;
+  --theme-secondary: #0a0e1a;
+  --theme-secondary-light: #1e2a3a;
+  --theme-secondary-dark: #050810;
+  --theme-accent: #7986cb;
+  --theme-accent-light: #9fa8da;
   --theme-text: #ffffff;
-  --theme-text-secondary: #fed7aa;
-  --theme-surface-light: #fb923c;
+  --theme-text-secondary: #ffffff99;
+  --theme-surface-light: #2c3e8a;
   
   /* Progress bars - red to yellow to green */
   --progress-start: #ef4444;
@@ -50,50 +51,39 @@
   100% { background-position: 200px 0; }
 }
 
-.theme-tab-active, .theme-tab-inactive, button, .btn {
-  background: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%) !important;
-  background-color: #f97316 !important;
-  color: #ffffff !important;
-  border: 2px solid #c0c0c0 !important;
-  font-weight: 600 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-  position: relative !important;
-  overflow: hidden !important;
-  opacity: 1 !important;
+/* Theme-aware button styling - respects individual theme colors */
+.theme-button {
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-mid) 50%, var(--theme-accent) 100%);
+  color: var(--theme-text);
+  border: 2px solid var(--silver);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  opacity: 1;
 }
 
-.theme-tab-active::before, .theme-tab-inactive::before, button::before, .btn::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: -100% !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(192, 192, 192, 0.4), transparent) !important;
-  animation: shimmer 2s infinite !important;
-  z-index: 1 !important;
+.theme-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(192, 192, 192, 0.4), transparent);
+  animation: shimmer 2s infinite;
+  z-index: 1;
 }
 
-.theme-tab-active *, .theme-tab-inactive *, button *, .btn * {
-  position: relative !important;
-  z-index: 2 !important;
+.theme-button * {
+  position: relative;
+  z-index: 2;
 }
 
-.theme-tab-active:hover, .theme-tab-inactive:hover, button:hover, .btn:hover {
-  background: linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fb923c 100%) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* Clean button content - no background interference */
-button svg, button span {
-  background: none !important;
-  background-color: transparent !important;
-}
-
-/* Ensure text is always visible */
-.theme-tab-active *, .theme-tab-inactive * {
-  color: inherit !important;
+.theme-button:hover {
+  background: linear-gradient(135deg, var(--theme-primary-dark) 0%, var(--theme-primary) 50%, var(--theme-primary-mid) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Global theme application */

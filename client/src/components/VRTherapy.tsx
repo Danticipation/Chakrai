@@ -359,34 +359,14 @@ const VRTherapy: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center justify-center space-x-1 px-3 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
+                className={`theme-button flex items-center justify-center space-x-1 px-3 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
                   activeTab === tab.id
-                    ? 'text-white shadow-lg border-2 border-silver animate-shimmer'
-                    : 'text-white hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
+                    ? 'shadow-lg border-2 animate-shimmer'
+                    : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'
                 }`}
-                style={{
-                  background: 'linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%)',
-                  backgroundColor: '#f97316',
-                  opacity: 1
-                }}
               >
-                <tab.icon 
-                  className="w-4 h-4 flex-shrink-0" 
-                  style={{ 
-                    background: 'none',
-                    backgroundColor: 'transparent',
-                    color: 'white',
-                    fill: 'white'
-                  }}
-                />
-                <span 
-                  className="truncate"
-                  style={{ 
-                    background: 'none',
-                    backgroundColor: 'transparent',
-                    color: 'white'
-                  }}
-                >
+                <tab.icon className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">
                   {tab.label}
                 </span>
               </button>
