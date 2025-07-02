@@ -365,7 +365,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
           <p className="text-white/70">Express your thoughts and feelings in a safe, private space</p>
           
           {/* Navigation Tabs */}
-          <div className="flex space-x-1 mt-4 theme-primary/100 rounded-xl p-1">
+          <div className="flex gap-2 mt-4">
             {[
               { id: 'write', label: 'Write Entry', icon: FileText },
               { id: 'analytics', label: 'Analytics', icon: BarChart3 },
@@ -375,7 +375,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center space-x-2 px-6 py-3 transition-all duration-200 text-white font-medium ${
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 text-white font-medium text-sm ${
                   activeTab === tab.id
                     ? 'shadow-lg border-2 border-silver animate-shimmer'
                     : 'hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
@@ -383,11 +383,13 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                 style={{
                   background: activeTab === tab.id 
                     ? 'linear-gradient(to right, var(--theme-primary), var(--theme-accent))'
-                    : 'linear-gradient(to right, var(--theme-primary-light), var(--theme-surface))'
+                    : 'linear-gradient(to right, var(--theme-primary-light), var(--theme-surface))',
+                  minHeight: '40px',
+                  maxHeight: '40px'
                 }}
               >
-                <tab.icon className="w-4 h-4" />
-                <span className="font-medium">{tab.label}</span>
+                <tab.icon className="w-4 h-4 flex-shrink-0" />
+                <span className="font-medium truncate">{tab.label}</span>
               </button>
             ))}
           </div>
