@@ -169,7 +169,7 @@ export function EHRIntegration() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a237e] to-[#3949ab] p-4">
+    <div className="min-h-screen theme-background p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -231,7 +231,7 @@ export function EHRIntegration() {
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* EHR Integration Status */}
-            <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+            <Card className="theme-surface border-theme-accent/30">
               <CardHeader>
                 <CardTitle className="flex items-center text-white">
                   <Database className="w-5 h-5 mr-2" />
@@ -263,7 +263,7 @@ export function EHRIntegration() {
             </Card>
 
             {/* Insurance Status */}
-            <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+            <Card className="theme-surface border-theme-accent/30">
               <CardHeader>
                 <CardTitle className="flex items-center text-white">
                   <CreditCard className="w-5 h-5 mr-2" />
@@ -292,7 +292,7 @@ export function EHRIntegration() {
             </Card>
 
             {/* FHIR Resources */}
-            <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+            <Card className="theme-surface border-theme-accent/30">
               <CardHeader>
                 <CardTitle className="flex items-center text-white">
                   <FileText className="w-5 h-5 mr-2" />
@@ -303,7 +303,7 @@ export function EHRIntegration() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-white/90">Patient Records</span>
-                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                    <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
                       Active
                     </Badge>
                   </div>
@@ -329,7 +329,7 @@ export function EHRIntegration() {
         {activeTab === 'exports' && (
           <div className="space-y-6">
             {/* Export Generation */}
-            <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+            <Card className="theme-surface border-theme-accent/30">
               <CardHeader>
                 <CardTitle className="text-white">Generate Clinical Export</CardTitle>
               </CardHeader>
@@ -377,7 +377,7 @@ export function EHRIntegration() {
             </Card>
 
             {/* Recent Exports */}
-            <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+            <Card className="theme-surface border-theme-accent/30">
               <CardHeader>
                 <CardTitle className="text-white">Recent Exports</CardTitle>
               </CardHeader>
@@ -419,7 +419,7 @@ export function EHRIntegration() {
         {activeTab === 'insurance' && (
           <div className="space-y-6">
             {/* Insurance Verification */}
-            <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+            <Card className="theme-surface border-theme-accent/30">
               <CardHeader>
                 <CardTitle className="text-white">Insurance Eligibility Verification</CardTitle>
               </CardHeader>
@@ -455,7 +455,7 @@ export function EHRIntegration() {
             </Card>
 
             {/* Session Billing */}
-            <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+            <Card className="theme-surface border-theme-accent/30">
               <CardHeader>
                 <CardTitle className="text-white">Insurance-Eligible Session Summary</CardTitle>
               </CardHeader>
@@ -515,7 +515,7 @@ export function EHRIntegration() {
         {activeTab === 'compliance' && (
           <div className="space-y-6">
             {/* Compliance Dashboard */}
-            <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+            <Card className="theme-surface border-theme-accent/30">
               <CardHeader>
                 <CardTitle className="text-white">HIPAA Compliance Status</CardTitle>
               </CardHeader>
@@ -547,7 +547,7 @@ export function EHRIntegration() {
             </Card>
 
             {/* Audit Logs */}
-            <Card className="bg-gradient-to-br from-[#1a237e] to-[#3949ab] border-[#7986cb]/30">
+            <Card className="theme-surface border-theme-accent/30">
               <CardHeader>
                 <CardTitle className="text-white">Recent Audit Activity</CardTitle>
               </CardHeader>
