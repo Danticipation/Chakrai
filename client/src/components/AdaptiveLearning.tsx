@@ -315,7 +315,7 @@ const AdaptiveLearning: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                    ? 'bg-gray-800 text-white shadow-lg'
                     : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
                 }`}
               >

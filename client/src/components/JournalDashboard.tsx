@@ -303,8 +303,8 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
               onClick={() => setActiveView('list')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeView === 'list'
-                  ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-md'
+                  ? 'bg-gray-800 text-white shadow-lg'
+                  : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
               }`}
             >
               <BookOpen className="w-4 h-4 mx-auto mb-1" />
@@ -314,8 +314,8 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
               onClick={() => setActiveView('analytics')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeView === 'analytics'
-                  ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-md'
+                  ? 'bg-gray-800 text-white shadow-lg'
+                  : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
               }`}
             >
               <TrendingUp className="w-4 h-4 mx-auto mb-1" />
@@ -325,8 +325,8 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
               onClick={handleNewEntry}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeView === 'editor'
-                  ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-md'
+                  ? 'bg-gray-800 text-white shadow-lg'
+                  : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
               }`}
             >
               <Plus className="w-4 h-4 mx-auto mb-1" />
@@ -336,8 +336,8 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
               onClick={() => setActiveView('export')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeView === 'export'
-                  ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-md'
+                  ? 'bg-gray-800 text-white shadow-lg'
+                  : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
               }`}
             >
               <Download className="w-4 h-4 mx-auto mb-1" />
