@@ -159,7 +159,7 @@ export function EHRIntegration() {
         return 'bg-green-500/20 text-green-300 border-green-500/30';
       case 'pending':
       case 'pending_verification':
-        return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
+        return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
       case 'error':
       case 'not_eligible':
         return 'bg-red-500/20 text-red-300 border-red-500/30';

@@ -325,12 +325,12 @@ const VRTherapy: React.FC = () => {
               <p className="text-red-200 text-sm mt-1">Instantly return to safe environment</p>
             </button>
 
-            <button className="w-full p-4 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/40 rounded-lg theme-text">
+            <button className="w-full p-4 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-gray-700 hover:shadow-md transition-all duration-200">
               <div className="flex items-center justify-center space-x-2">
                 <Stethoscope className="w-5 h-5" />
                 <span className="font-medium">Grounding Exercise</span>
               </div>
-              <p className="text-yellow-200 text-sm mt-1">Quick calming technique</p>
+              <p className="text-gray-600 text-sm mt-1">Quick calming technique</p>
             </button>
           </div>
         </div>
