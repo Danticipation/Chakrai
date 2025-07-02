@@ -171,10 +171,10 @@ export function InteractiveDashboard({ userId }: InteractiveDashboardProps) {
           </button>
           <button
             onClick={() => setActiveView('progress')}
-            className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+            className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
               activeView === 'progress'
-                ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
+                ? 'theme-tab-active'
+                : 'theme-tab-inactive'
             }`}
           >
             <Target className="w-4 h-4 mx-auto mb-1" />
@@ -182,10 +182,10 @@ export function InteractiveDashboard({ userId }: InteractiveDashboardProps) {
           </button>
           <button
             onClick={() => setActiveView('insights')}
-            className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+            className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all ${
               activeView === 'insights'
-                ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
+                ? 'theme-tab-active'
+                : 'theme-tab-inactive'
             }`}
           >
             <Award className="w-4 h-4 mx-auto mb-1" />
