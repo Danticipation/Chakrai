@@ -213,8 +213,8 @@ const WellnessRewards: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-md'
+                    ? 'bg-gray-800 text-white shadow-lg'
+                    : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
                 }`}
               >
                 <tab.icon className="w-4 h-4 mx-auto mb-1" />
