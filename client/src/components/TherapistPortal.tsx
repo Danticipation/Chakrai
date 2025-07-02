@@ -141,7 +141,7 @@ const TherapistPortal: React.FC = () => {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical': return 'bg-red-500';
-      case 'high': return 'bg-orange-500';
+      case 'high': return 'bg-amber-600';
       case 'medium': return 'bg-yellow-500';
       case 'low': return 'bg-blue-500';
       default: return 'bg-gray-500';

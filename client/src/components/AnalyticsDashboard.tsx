@@ -256,7 +256,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
               className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'overview'
                   ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
               }`}
             >
               <BarChart3 className="w-4 h-4 mx-auto mb-1" />
@@ -267,7 +267,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
               className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'reports'
                   ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
               }`}
             >
               <Calendar className="w-4 h-4 mx-auto mb-1" />
@@ -278,7 +278,7 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
               className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'trends'
                   ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
               }`}
             >
               <TrendingUp className="w-4 h-4 mx-auto mb-1" />

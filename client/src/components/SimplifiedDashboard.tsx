@@ -35,7 +35,7 @@ export default function SimplifiedDashboard({ userId }: SimplifiedDashboardProps
               <h3 className="text-white font-semibold">Chat</h3>
               <p className="text-white/80 text-sm">Talk to your AI therapist</p>
             </div>
-            <div className="bg-orange-500/20 p-4 rounded-lg">
+            <div className="bg-indigo-500/20 p-4 rounded-lg">
               <h3 className="text-white font-semibold">Progress</h3>
               <p className="text-white/80 text-sm">View your wellness journey</p>
             </div>
