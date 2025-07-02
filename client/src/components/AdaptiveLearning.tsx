@@ -74,7 +74,7 @@ const AdaptiveLearning: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Communication Preferences */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold text-white mb-4">Communication Preferences</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -105,7 +105,7 @@ const AdaptiveLearning: React.FC = () => {
         </div>
 
         {/* Adaptation Level */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold text-white mb-4">Learning Adaptation</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -126,7 +126,7 @@ const AdaptiveLearning: React.FC = () => {
 
         {/* Topics */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <h4 className="font-semibold text-white mb-3">Preferred Topics</h4>
             <div className="flex flex-wrap gap-2">
               {preferences?.preferredTopics?.map((topic, index) => (
@@ -136,7 +136,7 @@ const AdaptiveLearning: React.FC = () => {
               )) || <span className="text-white/60">No preferences set</span>}
             </div>
           </div>
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <h4 className="font-semibold text-white mb-3">Exercise Preferences</h4>
             <div className="flex flex-wrap gap-2">
               {preferences?.exercisePreferences?.map((exercise, index) => (
@@ -155,7 +155,7 @@ const AdaptiveLearning: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Conversation Patterns */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold text-white mb-4">Conversation Patterns</h3>
           <div className="space-y-4">
             {patterns?.map((pattern) => (
@@ -184,7 +184,7 @@ const AdaptiveLearning: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Personalized Recommendations */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold text-white mb-4">Personalized Recommendations</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {recommendations?.map((rec) => (
@@ -217,7 +217,7 @@ const AdaptiveLearning: React.FC = () => {
       <div className="space-y-6">
         {/* Learning Insights */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/80">Learning Progress</p>
@@ -229,7 +229,7 @@ const AdaptiveLearning: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/80">Confidence Score</p>
@@ -243,7 +243,7 @@ const AdaptiveLearning: React.FC = () => {
         </div>
 
         {/* Detailed Insights */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold text-white mb-4">AI Learning Insights</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -315,7 +315,7 @@ const AdaptiveLearning: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-[var(--theme-accent)]'
+                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
                     : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
                 }`}
               >

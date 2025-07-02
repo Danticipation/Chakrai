@@ -281,7 +281,7 @@ function AgentSystem({ userId }: AgentSystemProps) {
                         value={objective}
                         onChange={(e) => setObjective(e.target.value)}
                         placeholder="Describe what you'd like to focus on in this session..."
-                        className="w-full p-3 border border-[var(--theme-accent)] rounded-lg resize-none h-20 theme-surface theme-text placeholder:theme-text-secondary focus:outline-none focus:ring-2 focus:ring-[var(--theme-secondary)]"
+                        className="w-full p-3 border border-silver hover:border-2 hover:animate-shimmer rounded-lg resize-none h-20 theme-surface theme-text placeholder:theme-text-secondary focus:outline-none focus:ring-2 focus:ring-[var(--theme-secondary)]"
                       />
                     </div>
                     <div className="flex justify-end space-x-3">

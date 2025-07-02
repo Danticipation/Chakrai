@@ -55,7 +55,7 @@ const CommunitySupport: React.FC = () => {
         {/* Forum Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {forums?.map((forum) => (
-            <div key={forum.id} className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+            <div key={forum.id} className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-semibold theme-text">{forum.name}</h3>
                 <div className="flex items-center space-x-1 theme-text-secondary">
@@ -77,7 +77,7 @@ const CommunitySupport: React.FC = () => {
         </div>
 
         {/* Recent Posts */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Recent Posts</h3>
           <div className="space-y-4">
             {posts?.slice(0, 5).map((post) => (
@@ -115,7 +115,7 @@ const CommunitySupport: React.FC = () => {
       <div className="space-y-6">
         {/* Peer Check-ins Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text-secondary">Active Connections</p>
@@ -127,7 +127,7 @@ const CommunitySupport: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text-secondary">This Week</p>
@@ -141,7 +141,7 @@ const CommunitySupport: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text-secondary">Support Score</p>
@@ -155,7 +155,7 @@ const CommunitySupport: React.FC = () => {
         </div>
 
         {/* Scheduled Check-ins */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Scheduled Check-ins</h3>
           <div className="space-y-3">
             {checkIns?.map((checkIn) => (
@@ -199,8 +199,8 @@ const CommunitySupport: React.FC = () => {
               onClick={() => setActiveTab('forums')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'forums'
-                  ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-[var(--theme-accent)]'
-                  : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-[var(--theme-accent)]'
+                  ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
+                  : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
               }`}
             >
               <MessageSquare className="w-4 h-4 mx-auto mb-1" />
@@ -210,8 +210,8 @@ const CommunitySupport: React.FC = () => {
               onClick={() => setActiveTab('peer')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'peer'
-                  ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-[var(--theme-accent)]'
-                  : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-[var(--theme-accent)]'
+                  ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
+                  : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
               }`}
             >
               <Users className="w-4 h-4 mx-auto mb-1" />
@@ -221,8 +221,8 @@ const CommunitySupport: React.FC = () => {
               onClick={() => setActiveTab('moderation')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'moderation'
-                  ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-[var(--theme-accent)]'
-                  : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-[var(--theme-accent)]'
+                  ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
+                  : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
               }`}
             >
               <Shield className="w-4 h-4 mx-auto mb-1" />

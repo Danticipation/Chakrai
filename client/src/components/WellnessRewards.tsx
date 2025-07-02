@@ -97,7 +97,7 @@ const WellnessRewards: React.FC = () => {
       <div className="space-y-6">
         {/* Points Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text-secondary">Available Points</p>
@@ -109,7 +109,7 @@ const WellnessRewards: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text-secondary">Current Level</p>
@@ -121,7 +121,7 @@ const WellnessRewards: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text-secondary">Lifetime Points</p>
@@ -135,7 +135,7 @@ const WellnessRewards: React.FC = () => {
         </div>
 
         {/* Recent Achievements */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Recent Achievements</h3>
           <div className="space-y-3">
             {Array.isArray(achievements) && achievements.length > 0 ? (
@@ -163,7 +163,7 @@ const WellnessRewards: React.FC = () => {
         </div>
 
         {/* Active Streaks */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Active Streaks</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Array.isArray(streaks) && streaks.length > 0 ? (
@@ -213,8 +213,8 @@ const WellnessRewards: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-[var(--theme-accent)]'
-                    : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-[var(--theme-accent)]'
+                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
+                    : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
                 }`}
               >
                 <tab.icon className="w-4 h-4 mx-auto mb-1" />

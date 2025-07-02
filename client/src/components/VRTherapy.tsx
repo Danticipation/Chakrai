@@ -59,7 +59,7 @@ const VRTherapy: React.FC = () => {
         {/* Environment Gallery */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {environments?.map((env) => (
-            <div key={env.id} className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+            <div key={env.id} className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-semibold theme-text">{env.name}</h3>
                 <div className="flex items-center space-x-1">
@@ -121,7 +121,7 @@ const VRTherapy: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Session History */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Recent Sessions</h3>
           <div className="space-y-4">
             {sessions?.map((session) => (
@@ -173,7 +173,7 @@ const VRTherapy: React.FC = () => {
       <div className="space-y-6">
         {/* Progress Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text/80">Total Sessions</p>
@@ -185,7 +185,7 @@ const VRTherapy: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text/80">Total Duration</p>
@@ -198,7 +198,7 @@ const VRTherapy: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text/80">Avg Effectiveness</p>
@@ -211,7 +211,7 @@ const VRTherapy: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text/80">Stress Reduction</p>
@@ -225,7 +225,7 @@ const VRTherapy: React.FC = () => {
         </div>
 
         {/* Skill Development */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Skill Development</h3>
           <div className="flex items-center justify-between mb-4">
             <span className="theme-text/80">Current Level</span>
@@ -247,7 +247,7 @@ const VRTherapy: React.FC = () => {
         </div>
 
         {/* Milestones */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Milestones Achieved</h3>
           <div className="space-y-2">
             {progress?.milestones_achieved?.map((milestone, index) => (
@@ -268,7 +268,7 @@ const VRTherapy: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Accessibility Settings */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Accessibility Features</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
@@ -314,7 +314,7 @@ const VRTherapy: React.FC = () => {
         </div>
 
         {/* Emergency Features */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Emergency Features</h3>
           <div className="space-y-3">
             <button className="w-full p-4 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 rounded-lg theme-text">
@@ -348,7 +348,7 @@ const VRTherapy: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="theme-card rounded-xl p-2 mb-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-2 mb-6 border border-silver hover:border-2 hover:animate-shimmer">
           <div className="grid grid-cols-2 gap-2 md:flex md:space-x-2">
             {[
               { id: 'environments', label: 'Environments', icon: Headphones },
@@ -361,8 +361,8 @@ const VRTherapy: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center justify-center space-x-1 px-3 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-[var(--theme-accent)]'
-                    : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-[var(--theme-accent)]'
+                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
+                    : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'
                 }`}
               >
                 <tab.icon className="w-4 h-4 flex-shrink-0" />

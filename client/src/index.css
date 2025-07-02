@@ -1348,3 +1348,27 @@ div[class*="bg-white"] div[class*="grid-cols-4"] button.bg-blue-600 {
   background-color: #1f2937 !important; /* Darker for selected state */
   border-color: #9ca3af !important; /* Lighter border for selected */
 }
+
+/* Silver border and shimmer animation */
+.border-silver {
+  border-color: #c0c0c0;
+}
+
+@keyframes shimmer {
+  0% {
+    border-color: #c0c0c0;
+    box-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+  }
+  50% {
+    border-color: #e8e8e8;
+    box-shadow: 0 0 15px rgba(232, 232, 232, 0.8);
+  }
+  100% {
+    border-color: #c0c0c0;
+    box-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}

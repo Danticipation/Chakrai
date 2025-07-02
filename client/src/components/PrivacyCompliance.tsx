@@ -68,7 +68,7 @@ const PrivacyCompliance: React.FC = () => {
       <div className="space-y-6">
         {/* Encryption Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text/80">Encryption Method</p>
@@ -80,7 +80,7 @@ const PrivacyCompliance: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text/80">Key Derivation</p>
@@ -92,7 +92,7 @@ const PrivacyCompliance: React.FC = () => {
             </div>
           </div>
 
-          <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+          <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm theme-text/80">Client-Side Only</p>
@@ -106,7 +106,7 @@ const PrivacyCompliance: React.FC = () => {
         </div>
 
         {/* Encryption Details */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Zero-Knowledge Architecture</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
@@ -144,7 +144,7 @@ const PrivacyCompliance: React.FC = () => {
         </div>
 
         {/* Privacy Controls */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Privacy Controls</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button className="p-4 bg-white/10 hover:bg-white/20 rounded-lg text-left transition-all">
@@ -176,7 +176,7 @@ const PrivacyCompliance: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Differential Privacy Settings */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Differential Privacy Analytics</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="p-4 bg-white/10 rounded-lg">
@@ -230,7 +230,7 @@ const PrivacyCompliance: React.FC = () => {
         </div>
 
         {/* Privacy Status */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Privacy Status</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-green-500/20 rounded-lg border border-green-500/40">
@@ -271,7 +271,7 @@ const PrivacyCompliance: React.FC = () => {
         {/* Backup List */}
         <div className="space-y-4">
           {backups?.map((backup) => (
-            <div key={backup.id} className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+            <div key={backup.id} className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="theme-text font-medium">Backup #{backup.id}</p>
@@ -316,7 +316,7 @@ const PrivacyCompliance: React.FC = () => {
         </div>
 
         {/* Backup Settings */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Backup Settings</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
@@ -346,7 +346,7 @@ const PrivacyCompliance: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Compliance Score */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Compliance Score</h3>
           <div className="text-center">
             <div className="text-4xl font-bold theme-text mb-2">98%</div>
@@ -358,7 +358,7 @@ const PrivacyCompliance: React.FC = () => {
         </div>
 
         {/* Recent Audit Logs */}
-        <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]">
+        <div className="theme-card rounded-xl p-6 border border-silver hover:border-2 hover:animate-shimmer">
           <h3 className="text-lg font-semibold theme-text mb-4">Recent Privacy Operations</h3>
           <div className="space-y-3">
             {auditLogs?.slice(0, 5).map((log) => (
@@ -418,7 +418,7 @@ const PrivacyCompliance: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-[var(--theme-accent)]'
+                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
                     : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
                 }`}
               >

@@ -259,7 +259,7 @@ export default function PWAManager({ onNotificationPermissionChange }: PWAManage
     <>
       {/* Install App Prompt */}
       {showInstallPrompt && isInstallable && !isInstalled && (
-        <div className="fixed top-4 left-4 right-4 z-50 theme-card text-white rounded-lg p-4 shadow-lg border border-[var(--theme-accent)]">
+        <div className="fixed top-4 left-4 right-4 z-50 theme-card text-white rounded-lg p-4 shadow-lg border border-silver hover:border-2 hover:animate-shimmer">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
               <Download className="w-6 h-6 text-white" />
