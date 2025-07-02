@@ -211,7 +211,7 @@ const WellnessRewards: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                className={`shimmer-border theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
                     ? 'shadow-lg border-2 animate-shimmer'
                     : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'

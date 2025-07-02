@@ -197,7 +197,7 @@ const CommunitySupport: React.FC = () => {
           <div className="grid grid-cols-3 gap-1">
             <button
               onClick={() => setActiveTab('forums')}
-              className={`theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              className={`shimmer-border theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'forums'
                   ? 'shadow-lg border-2 animate-shimmer'
                   : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'
@@ -222,7 +222,7 @@ const CommunitySupport: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('peer')}
-              className={`theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              className={`shimmer-border theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'peer'
                   ? 'shadow-lg border-2 animate-shimmer'
                   : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'
@@ -247,7 +247,7 @@ const CommunitySupport: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('moderation')}
-              className={`theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              className={`shimmer-border theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'moderation'
                   ? 'shadow-lg border-2 animate-shimmer'
                   : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'

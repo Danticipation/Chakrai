@@ -238,8 +238,8 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
     return (
       <div className="text-center p-8">
         <Brain className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Create Your Adaptive Therapy Plan</h2>
-        <p className="text-gray-600 mb-6">Get a personalized therapeutic plan that adapts to your progress and needs</p>
+        <h2 className="text-xl font-semibold text-white-800 mb-2">Create Your Adaptive Therapy Plan</h2>
+        <p className="text-white-600 mb-6">Get a personalized therapeutic plan that adapts to your progress and needs</p>
         <div className="space-x-4">
           <Button onClick={() => generateNewPlan('daily')}>Daily Plan</Button>
           <Button onClick={() => generateNewPlan('weekly')} variant="outline">Weekly Plan</Button>

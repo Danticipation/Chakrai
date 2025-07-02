@@ -182,7 +182,7 @@ export function EHRIntegration() {
           <div className="grid grid-cols-4 gap-1">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+              className={`shimmer-border w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'overview'
                   ? 'theme-primary text-white border-theme-accent shadow-lg'
                   : 'theme-surface text-white border-theme-accent hover:theme-primary-light'
@@ -193,7 +193,7 @@ export function EHRIntegration() {
             </button>
             <button
               onClick={() => setActiveTab('exports')}
-              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+              className={`shimmer-border w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'exports'
                   ? 'theme-primary text-white border-theme-accent shadow-lg'
                   : 'theme-surface text-white border-theme-accent hover:theme-primary-light'
@@ -204,7 +204,7 @@ export function EHRIntegration() {
             </button>
             <button
               onClick={() => setActiveTab('insurance')}
-              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+              className={`shimmer-border w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'insurance'
                   ? 'theme-primary text-white border-theme-accent shadow-lg'
                   : 'theme-surface text-white border-theme-accent hover:theme-primary-light'
@@ -215,7 +215,7 @@ export function EHRIntegration() {
             </button>
             <button
               onClick={() => setActiveTab('compliance')}
-              className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
+              className={`shimmer-border w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'compliance'
                   ? 'theme-primary text-white border-theme-accent shadow-lg'
                   : 'theme-surface text-white border-theme-accent hover:theme-primary-light'

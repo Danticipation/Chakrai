@@ -147,6 +147,7 @@ const HealthIntegration: React.FC = () => {
   const getDeviceIcon = (deviceType: string) => {
     switch (deviceType) {
       case 'apple_watch': return '⌚';
+      case 'Pixel_watch': return '⌚'; 
       case 'fitbit': return '📱';
       case 'garmin': return '🏃';
       case 'samsung_health': return '📲';

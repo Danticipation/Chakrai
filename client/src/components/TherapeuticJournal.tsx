@@ -375,7 +375,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex flex-col items-center justify-center gap-1 px-3 py-3 rounded-lg transition-all duration-200 text-white font-medium text-xs ${
+                className={`shimmer-border flex-1 flex flex-col items-center justify-center gap-1 px-3 py-3 rounded-lg transition-all duration-200 text-white font-medium text-xs ${
                   activeTab === tab.id
                     ? 'shadow-lg border-2 border-silver animate-shimmer'
                     : 'hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'

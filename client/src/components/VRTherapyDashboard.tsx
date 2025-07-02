@@ -248,7 +248,7 @@ export default function VRTherapyDashboard() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full px-2 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                className={`shimmer-border w-full px-2 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
                     ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-silver animate-shimmer'
                     : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-silver hover:border-2 hover:animate-shimmer'

@@ -180,3 +180,44 @@ input:focus, button:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgb(133, 35, 35, 0.5);
 }
+
+/* Shimmering silver border animation for clickable elements */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.shimmer-border {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #c0c0c0 !important;
+}
+
+.shimmer-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(192, 192, 192, 0.8),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shimmer-border > * {
+  position: relative;
+  z-index: 1;
+}
