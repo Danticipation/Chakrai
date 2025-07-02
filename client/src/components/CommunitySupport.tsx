@@ -197,48 +197,36 @@ const CommunitySupport: React.FC = () => {
           <div className="grid grid-cols-3 gap-1">
             <button
               onClick={() => setActiveTab('forums')}
-              className={`w-full px-4 py-4 text-sm font-bold rounded-md transition-all border-2 ${
+              className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'forums'
-                  ? 'bg-blue-600 border-blue-400 shadow-lg'
-                  : 'bg-gray-700 border-gray-600 hover:bg-gray-800'
+                  ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-md'
               }`}
-              style={{
-                color: '#FFFFFF !important',
-                backgroundColor: activeTab === 'forums' ? '#2563eb !important' : '#374151 !important'
-              }}
             >
-              <MessageSquare className="w-4 h-4 mx-auto mb-1" style={{ color: '#FFFFFF !important' }} />
-              <span style={{ color: '#FFFFFF !important' }}>Forums</span>
+              <MessageSquare className="w-4 h-4 mx-auto mb-1" />
+              <span>Forums</span>
             </button>
             <button
               onClick={() => setActiveTab('peer')}
-              className={`w-full px-4 py-4 text-sm font-bold rounded-md transition-all border-2 ${
+              className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'peer'
-                  ? 'bg-blue-600 border-blue-400 shadow-lg'
-                  : 'bg-gray-700 border-gray-600 hover:bg-gray-800'
+                  ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-md'
               }`}
-              style={{
-                color: '#FFFFFF !important',
-                backgroundColor: activeTab === 'peer' ? '#2563eb !important' : '#374151 !important'
-              }}
             >
-              <Users className="w-4 h-4 mx-auto mb-1" style={{ color: '#FFFFFF !important' }} />
-              <span style={{ color: '#FFFFFF !important' }}>Check-ins</span>
+              <Users className="w-4 h-4 mx-auto mb-1" />
+              <span>Check-ins</span>
             </button>
             <button
               onClick={() => setActiveTab('moderation')}
-              className={`w-full px-4 py-4 text-sm font-bold rounded-md transition-all border-2 ${
+              className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'moderation'
-                  ? 'bg-blue-600 border-blue-400 shadow-lg'
-                  : 'bg-gray-700 border-gray-600 hover:bg-gray-800'
+                  ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-md'
               }`}
-              style={{
-                color: '#FFFFFF !important',
-                backgroundColor: activeTab === 'moderation' ? '#2563eb !important' : '#374151 !important'
-              }}
             >
-              <Shield className="w-4 h-4 mx-auto mb-1" style={{ color: '#FFFFFF !important' }} />
-              <span style={{ color: '#FFFFFF !important' }}>Guidelines</span>
+              <Shield className="w-4 h-4 mx-auto mb-1" />
+              <span>Guidelines</span>
             </button>
           </div>
         </div>
