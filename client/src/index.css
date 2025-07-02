@@ -902,29 +902,34 @@ button:focus {
   }
 
   /* Professional Tools Section - Theme Complementary */
+  /* Professional Tools Section - High Contrast Orange Styling */
   .mobile-nav-section:last-child .mobile-nav-btn-polish {
-    background: linear-gradient(135deg, var(--theme-accent-light) 0%, var(--theme-accent) 100%);
+    background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
     border: 2px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
   }
 
   .mobile-nav-section:last-child .mobile-nav-btn-polish:hover {
-    background: linear-gradient(135deg, var(--theme-primary-light) 0%, var(--theme-accent-light) 100%);
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     border-color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
   }
 
   .mobile-nav-section:last-child .mobile-nav-btn-polish.selected {
-    background: linear-gradient(135deg, var(--theme-secondary) 0%, var(--theme-primary-dark) 100%);
-    border-color: var(--theme-text);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    border: 2px solid #fbbf24;
+    box-shadow: 0 6px 24px rgba(220, 38, 38, 0.4);
+    color: #ffffff;
   }
   
-  /* Polished navigation buttons - Theme Aware */
+  /* High-Contrast Mobile Navigation Buttons - Professional & Visible Across All Themes */
   .mobile-nav-btn-polish {
-    background: linear-gradient(135deg, var(--theme-primary-light) 0%, var(--theme-primary) 100%);
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    /* Use dark neutral colors that contrast with any theme background */
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 16px;
     padding: 16px 8px;
-    color: var(--theme-text);
+    color: #ffffff;
     font-size: 10px;
     font-weight: 600;
     line-height: 1.2;
@@ -937,29 +942,30 @@ button:focus {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
   }
   
   .mobile-nav-btn-polish:hover {
-    background: linear-gradient(135deg, var(--theme-accent-light) 0%, var(--theme-primary-light) 100%);
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
     border-color: rgba(255, 255, 255, 0.5);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
   }
   
   .mobile-nav-btn-polish:active {
     transform: translateY(-1px);
     transition: transform 0.1s ease;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
   }
   
   .mobile-nav-btn-polish.selected {
-    background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-secondary) 100%);
-    border-color: var(--theme-text);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+    border: 2px solid #60a5fa;
+    box-shadow: 0 6px 24px rgba(30, 64, 175, 0.4);
     transform: translateY(-2px);
-    color: var(--theme-text);
+    color: #ffffff;
   }
   
   /* Navigation icon styling - Enhanced Visibility */

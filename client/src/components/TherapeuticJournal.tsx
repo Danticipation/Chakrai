@@ -377,8 +377,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                   activeTab === tab.id
-                    ? 'theme-primary text-white shadow-sm'
-                    : 'text-white/60 hover:text-white/90'
+                    ? 'bg-blue-600 text-white shadow-lg border-2 border-blue-400'
+                    : 'bg-gray-700 text-white/80 hover:bg-gray-600 hover:text-white border-2 border-gray-600'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
