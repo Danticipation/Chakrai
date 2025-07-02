@@ -388,8 +388,25 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   maxHeight: '60px'
                 }}
               >
-                <tab.icon className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium text-center leading-tight">{tab.label}</span>
+                <tab.icon 
+                  className="w-5 h-5 flex-shrink-0" 
+                  style={{ 
+                    background: 'none',
+                    backgroundColor: 'transparent',
+                    color: 'white',
+                    fill: 'white'
+                  }}
+                />
+                <span 
+                  className="font-medium text-center leading-tight"
+                  style={{ 
+                    background: 'none',
+                    backgroundColor: 'transparent',
+                    color: 'white'
+                  }}
+                >
+                  {tab.label}
+                </span>
               </button>
             ))}
           </div>
