@@ -633,6 +633,35 @@ Make it supportive, detailed, and therapeutically valuable. Write complete sente
   }
 });
 
+// General horoscope endpoint (without sign parameter)
+router.get('/horoscope', async (req, res) => {
+  try {
+    // Default to Aries for general horoscope
+    if (process.env.OPENAI_API_KEY) {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{
+          role: "system",
+          content: "You are a therapeutic astrologer providing comprehensive wellness guidance."
+        }, {
+          role: "user",
+          content: "Generate a general therapeutic horoscope focused on mental wellness, emotional healing, and personal growth. Make it supportive and encouraging for anyone reading it today."
+        }],
+        max_tokens: 300,
+        temperature: 0.7
+      });
+      
+      const horoscope = response.choices[0].message.content?.trim() || "Today brings opportunities for personal growth and emotional healing.";
+      res.json({ horoscope });
+    } else {
+      res.json({ horoscope: "Today is a wonderful day for self-reflection, growth, and positive change in your life." });
+    }
+  } catch (error) {
+    console.error('General horoscope error:', error);
+    res.json({ horoscope: "Today holds potential for growth, healing, and positive change in your life." });
+  }
+});
+
 // ====================
 // MOOD & WELLNESS ENDPOINTS
 // ====================
