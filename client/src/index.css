@@ -79,22 +79,8 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
   color: var(--theme-text);
 }
 
-/* Force override any remaining hardcoded blue colors */
-.bg-blue-500, .bg-blue-600, .bg-blue-700 {
-  background-color: var(--theme-primary) !important;
-}
-
-.text-blue-500, .text-blue-600, .text-blue-700, .text-blue-800 {
-  color: var(--theme-text) !important;
-}
-
-.border-blue-200, .border-blue-500 {
-  border-color: var(--theme-accent) !important;
-}
-
-.bg-blue-50, .bg-blue-100 {
-  background-color: var(--theme-surface) !important;
-}
+/* Allow natural blue colors for navigation buttons - DON'T override these */
+/* Removed conflicting overrides for .bg-blue-600 to allow orange/blue navigation system */
 
 /* Specifically target the main navigation and content areas */
 .theme-background, .theme-background * {
@@ -106,21 +92,35 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
   background-color: var(--theme-primary) !important;
 }
 
-/* Force all navigation buttons to use theme colors */
-nav button, .navigation button, [class*="navigation"] button {
-  background-color: var(--theme-primary) !important;
-  color: var(--theme-text) !important;
+/* Allow navigation buttons to use their own styling - DON'T force theme colors */
+/* Removed conflicting navigation button overrides to allow orange/blue system */
+
+/* Allow tab navigation buttons to use their own colors */
+/* Removed conflicting button overrides to enable orange/blue tab navigation system */
+
+/* Ensure orange and blue buttons work properly */
+.bg-orange-500 {
+  background-color: #f97316 !important;
 }
 
-/* Targeted fixes for persistent blue elements only */
-.hidden.md\\:flex.w-72.flex-col.justify-center.py-8 button {
-  background-color: var(--theme-primary) !important;
-  color: var(--theme-text) !important;
+.bg-orange-600 {
+  background-color: #ea580c !important;
 }
 
-.grid.grid-cols-4.gap-2.px-3.pb-2 button {
-  background-color: var(--theme-primary) !important;
-  color: var(--theme-text) !important;
+.bg-blue-600 {
+  background-color: #2563eb !important;
+}
+
+.border-orange-400 {
+  border-color: #fb923c !important;
+}
+
+.border-blue-400 {
+  border-color: #60a5fa !important;
+}
+
+.hover\:bg-orange-600:hover {
+  background-color: #ea580c !important;
 }
 
 /* Additional theme card styling */
