@@ -365,7 +365,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
           <p className="text-white/70">Express your thoughts and feelings in a safe, private space</p>
           
           {/* Navigation Tabs */}
-          <div className="flex gap-2 mt-4">
+          <div className="therapeutic-journal-tabs flex gap-2 mt-4">
             {[
               { id: 'write', label: 'Write Entry', icon: FileText },
               { id: 'analytics', label: 'Analytics', icon: BarChart3 },
