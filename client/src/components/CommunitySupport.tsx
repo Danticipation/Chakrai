@@ -199,8 +199,8 @@ const CommunitySupport: React.FC = () => {
               onClick={() => setActiveTab('forums')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'forums'
-                  ? 'bg-gray-800 text-white shadow-lg'
-                  : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
+                  ? 'bg-white text-gray-900 shadow-lg border-2 border-blue-500'
+                  : 'bg-gray-100 text-gray-800 hover:bg-white hover:shadow-md border border-gray-300'
               }`}
             >
               <MessageSquare className="w-4 h-4 mx-auto mb-1" />
@@ -210,8 +210,8 @@ const CommunitySupport: React.FC = () => {
               onClick={() => setActiveTab('peer')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'peer'
-                  ? 'bg-gray-800 text-white shadow-lg'
-                  : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
+                  ? 'bg-white text-gray-900 shadow-lg border-2 border-blue-500'
+                  : 'bg-gray-100 text-gray-800 hover:bg-white hover:shadow-md border border-gray-300'
               }`}
             >
               <Users className="w-4 h-4 mx-auto mb-1" />
@@ -221,8 +221,8 @@ const CommunitySupport: React.FC = () => {
               onClick={() => setActiveTab('moderation')}
               className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 activeTab === 'moderation'
-                  ? 'bg-gray-800 text-white shadow-lg'
-                  : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
+                  ? 'bg-white text-gray-900 shadow-lg border-2 border-blue-500'
+                  : 'bg-gray-100 text-gray-800 hover:bg-white hover:shadow-md border border-gray-300'
               }`}
             >
               <Shield className="w-4 h-4 mx-auto mb-1" />

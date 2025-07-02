@@ -348,25 +348,25 @@ const VRTherapy: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="theme-card rounded-xl p-1 mb-6 border border-[var(--theme-accent)]">
-          <div className="flex space-x-1">
+        <div className="theme-card rounded-xl p-2 mb-6 border border-[var(--theme-accent)]">
+          <div className="grid grid-cols-2 gap-2 md:flex md:space-x-2">
             {[
-              { id: 'environments', label: 'VR Environments', icon: Headphones },
-              { id: 'sessions', label: 'Session History', icon: Play },
-              { id: 'progress', label: 'Progress Tracking', icon: Star },
-              { id: 'accessibility', label: 'Accessibility', icon: Eye },
+              { id: 'environments', label: 'Environments', icon: Headphones },
+              { id: 'sessions', label: 'History', icon: Play },
+              { id: 'progress', label: 'Progress', icon: Star },
+              { id: 'accessibility', label: 'Access', icon: Eye },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-center justify-center space-x-1 px-3 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
                   activeTab === tab.id
-                    ? 'bg-gray-800 text-white shadow-lg'
-                    : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
+                    ? 'bg-white text-gray-900 shadow-lg border-2 border-blue-500'
+                    : 'bg-gray-100 text-gray-800 hover:bg-white hover:shadow-md border border-gray-300'
                 }`}
               >
-                <tab.icon className="w-4 h-4" />
-                <span className="font-medium">{tab.label}</span>
+                <tab.icon className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">{tab.label}</span>
               </button>
             ))}
           </div>

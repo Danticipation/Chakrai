@@ -250,8 +250,8 @@ export default function VRTherapyDashboard() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full px-2 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'bg-gray-800 text-white shadow-lg'
-                    : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
+                    ? 'bg-white text-gray-900 shadow-lg border-2 border-blue-500'
+                    : 'bg-gray-100 text-gray-800 hover:bg-white hover:shadow-md border border-gray-300'
                 }`}
               >
                 <div className="text-lg mb-1">{tab.icon}</div>
