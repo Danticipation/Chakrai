@@ -3,25 +3,29 @@
 @tailwind utilities;
 
 :root {
-  --theme-background: #0f172a;
-  --theme-surface: #1e293b;
-  --theme-primary: #3b82f6;
-  --theme-primary-mid: #2563eb;
-  --theme-primary-light: #60a5fa;
-  --theme-primary-dark: #1d4ed8;
-  --theme-secondary: #64748b;
-  --theme-secondary-light: #94a3b8;
-  --theme-secondary-dark: #475569;
+  --theme-background: #ea580c;
+  --theme-surface: #f97316;
+  --theme-primary: #f97316;
+  --theme-primary-mid: #ea580c;
+  --theme-primary-light: #fb923c;
+  --theme-primary-dark: #c2410c;
+  --theme-secondary: #ea580c;
+  --theme-secondary-light: #fb923c;
+  --theme-secondary-dark: #c2410c;
   --theme-accent: #f59e0b;
   --theme-accent-light: #fbbf24;
   --theme-text: #ffffff;
-  --theme-text-secondary: #cbd5e1;
-  --theme-surface-light: #334155;
+  --theme-text-secondary: #fed7aa;
+  --theme-surface-light: #fb923c;
   
   /* Progress bars - red to yellow to green */
   --progress-start: #ef4444;
   --progress-middle: #eab308;
   --progress-end: #22c55e;
+  
+  /* Silver shimmering border */
+  --silver: #c0c0c0;
+  --silver-light: #e5e5e5;
 }
 
 .theme-background { background-color: var(--theme-background) !important; }
@@ -40,27 +44,44 @@
 .theme-text-secondary { color: var(--theme-text-secondary) !important; }
 .border-theme-accent { border-color: var(--theme-accent); }
 
-/* Clean theme-aware tab navigation system */
-.theme-tab-active {
-  background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-light) 100%) !important;
+/* Universal gradient button styling with silver shimmering borders */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+
+.theme-tab-active, .theme-tab-inactive, button, .btn {
+  background: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%) !important;
   color: #ffffff !important;
-  border: 2px solid var(--theme-accent-light) !important;
-  font-weight: 700 !important;
+  border: 2px solid !important;
+  border-image: linear-gradient(45deg, #c0c0c0, #e5e5e5, #c0c0c0) 1 !important;
+  font-weight: 600 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.theme-tab-active::before, .theme-tab-inactive::before, button::before, .btn::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(192, 192, 192, 0.4), transparent) !important;
+  animation: shimmer 2s infinite !important;
+  z-index: 1 !important;
+}
+
+.theme-tab-active *, .theme-tab-inactive *, button *, .btn * {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.theme-tab-active:hover, .theme-tab-inactive:hover, button:hover, .btn:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fb923c 100%) !important;
   transform: translateY(-1px) !important;
-}
-
-.theme-tab-inactive {
-  background: var(--theme-secondary) !important;
-  color: var(--theme-text) !important;
-  border: 2px solid var(--theme-secondary-light) !important;
-  font-weight: 500 !important;
-}
-
-.theme-tab-inactive:hover {
-  background: var(--theme-secondary-light) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Clean button content - no background interference */
@@ -85,6 +106,70 @@ html, body, #root {
 .theme-card {
   background-color: var(--theme-primary) !important;
   border: 1px solid var(--theme-accent) !important;
+}
+
+/* Eliminate ALL white backgrounds */
+.bg-white, *[class*="bg-white"], div[style*="background-color: white"], 
+div[style*="background-color: #ffffff"], div[style*="background-color: #fff"],
+.bg-gray-50, .bg-gray-100, input, textarea, select {
+  background-color: var(--theme-surface) !important;
+  background: var(--theme-surface) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Force all content areas to use orange theme */
+.w-full, .h-full, .flex, .grid, .space-y-4, .space-y-6,
+.p-4, .p-6, .p-8, .px-4, .px-6, .py-4, .py-6,
+.rounded, .rounded-lg, .rounded-xl, .border, .shadow {
+  background-color: var(--theme-surface) !important;
+}
+
+/* Override any remaining white or light backgrounds */
+[style*="background"], [style*="backgroundColor"] {
+  background-color: var(--theme-surface) !important;
+  background: var(--theme-surface) !important;
+}
+
+/* Ensure text inputs and form elements have orange backgrounds */
+input[type="text"], input[type="email"], input[type="password"], 
+input[type="search"], textarea, select {
+  background-color: var(--theme-primary) !important;
+  background: var(--theme-primary) !important;
+  color: var(--theme-text) !important;
+  border: 2px solid var(--silver) !important;
+}
+
+/* Eliminate all blue color overrides with extreme force */
+*[class*="bg-blue"], .bg-blue-50, .bg-blue-100, .bg-blue-200, .bg-blue-300, 
+.bg-blue-400, .bg-blue-500, .bg-blue-600, .bg-blue-700, .bg-blue-800, .bg-blue-900,
+.hover\\:bg-blue-50:hover, .hover\\:bg-blue-100:hover, .hover\\:bg-blue-500:hover,
+.hover\\:bg-blue-600:hover, .hover\\:bg-blue-700:hover {
+  background-color: var(--theme-surface) !important;
+  background: var(--theme-surface) !important;
+}
+
+*[class*="text-blue"], .text-blue-50, .text-blue-100, .text-blue-200, .text-blue-300,
+.text-blue-400, .text-blue-500, .text-blue-600, .text-blue-700, .text-blue-800, .text-blue-900 {
+  color: var(--theme-text) !important;
+}
+
+*[class*="border-blue"], .border-blue-50, .border-blue-100, .border-blue-200, .border-blue-300,
+.border-blue-400, .border-blue-500, .border-blue-600, .border-blue-700, .border-blue-800, .border-blue-900 {
+  border-color: var(--silver) !important;
+}
+
+/* Force any hardcoded blue colors to orange */
+[style*="background-color: #3b82f6"], [style*="background-color: #2563eb"],
+[style*="background-color: #1d4ed8"], [style*="background-color: #1e40af"],
+[style*="background-color: #1e3a8a"], [style*="background-color: blue"] {
+  background-color: var(--theme-surface) !important;
+  background: var(--theme-surface) !important;
+}
+
+/* Force black backgrounds to orange */
+.bg-black, .bg-gray-900, .bg-gray-800, .bg-gray-700, .bg-slate-900, .bg-slate-800 {
+  background-color: var(--theme-surface) !important;
+  background: var(--theme-surface) !important;
 }
 
 /* Mobile optimizations */
