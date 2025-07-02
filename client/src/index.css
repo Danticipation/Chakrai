@@ -100,11 +100,11 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
 
 /* Ensure orange and blue buttons work properly */
 .bg-orange-500 {
-  background-color: #f97316 !important;
+  background-color: #1f2937 !important; /* Dark gray so buttons are visible against orange background */
 }
 
 .bg-orange-600 {
-  background-color: #ea580c !important;
+  background-color: #111827 !important; /* Darker gray for hover state */
 }
 
 .bg-blue-600 {
@@ -140,7 +140,7 @@ button[class*="bg-blue-"] svg {
 }
 
 .hover\:bg-orange-600:hover {
-  background-color: #ea580c !important;
+  background-color: #111827 !important; /* Dark gray hover state */
 }
 
 /* Additional theme card styling */
