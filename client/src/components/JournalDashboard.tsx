@@ -297,27 +297,53 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveView('list')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 ${
-              activeView === 'list' 
-                ? 'bg-blue-600 text-white border-blue-400 shadow-lg' 
-                : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
-            }`}
-          >
-            Entries ({entries.length})
-          </button>
-          <button
-            onClick={() => setActiveView('analytics')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 ${
-              activeView === 'analytics' 
-                ? 'bg-blue-600 text-white border-blue-400 shadow-lg' 
-                : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
-            }`}
-          >
-            Analytics
-          </button>
+        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+          <div className="grid grid-cols-4 gap-1">
+            <button
+              onClick={() => setActiveView('list')}
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
+                activeView === 'list'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+              }`}
+            >
+              <BookOpen className="w-4 h-4 mx-auto mb-1" />
+              Entries
+            </button>
+            <button
+              onClick={() => setActiveView('analytics')}
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
+                activeView === 'analytics'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+              }`}
+            >
+              <TrendingUp className="w-4 h-4 mx-auto mb-1" />
+              Analytics
+            </button>
+            <button
+              onClick={handleNewEntry}
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
+                activeView === 'editor'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+              }`}
+            >
+              <Plus className="w-4 h-4 mx-auto mb-1" />
+              New Entry
+            </button>
+            <button
+              onClick={() => setActiveView('export')}
+              className={`w-full px-3 py-4 text-xs font-bold rounded-md transition-all border-2 ${
+                activeView === 'export'
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
+                  : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
+              }`}
+            >
+              <Download className="w-4 h-4 mx-auto mb-1" />
+              Export
+            </button>
+          </div>
         </div>
       </div>
 

@@ -253,14 +253,9 @@ export default function VRTherapyDashboard() {
                     ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
                     : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
                 }`}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors border-2 rounded-md ${
-                  activeTab === tab.id
-                    ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                    : 'bg-orange-500 text-white border-orange-400 hover:bg-orange-600'
-                }`}
               >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
+                <span className="text-lg">{tab.icon}</span>
+                <div className="text-xs mt-1">{tab.label}</div>
               </button>
             ))}
           </div>
