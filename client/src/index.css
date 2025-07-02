@@ -1259,25 +1259,82 @@ button:focus {
     -moz-osx-font-smoothing: grayscale;
   }
 }
-/* FINAL NUCLEAR OPTION - FORCE ALL TAB BUTTONS TO BE VISIBLE */
+/* EMERGENCY BUTTON VISIBILITY FIX - FORCE MAXIMUM CONTRAST */
 button[class*="theme-tab-inactive"],
 .bg-gray-700,
-*[class*="bg-gray-700"] {
-  background-color: #374151 !important; /* Dark gray */
-  color: #ffffff !important; /* White text */
-  border: 2px solid #4b5563 !important; /* Gray border */
+*[class*="bg-gray-700"],
+button[class*="bg-white"],
+*[class*="bg-white"],
+button[class*="text-gray-700"],
+*[class*="text-gray-700"] {
+  background-color: #1f2937 !important; /* Very dark gray */
+  color: #ffffff !important; /* Pure white text */
+  border: 3px solid #60a5fa !important; /* Bright blue border */
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5) !important; /* Blue glow */
 }
 
 button[class*="theme-tab-inactive"]:hover,
 .bg-gray-700:hover,
-*[class*="bg-gray-700"]:hover {
-  background-color: #1f2937 !important; /* Darker gray on hover */
+*[class*="bg-gray-700"]:hover,
+button[class*="bg-white"]:hover,
+*[class*="bg-white"]:hover {
+  background-color: #111827 !important; /* Even darker on hover */
+  border-color: #3b82f6 !important;
+  transform: translateY(-1px) !important;
 }
 
 button[class*="theme-tab-active"],
-*[class*="theme-tab-active"] {
-  background-color: #1e40af !important; /* Blue for active */
+*[class*="theme-tab-active"],
+button[class*="bg-blue-600"],
+*[class*="bg-blue-600"] {
+  background-color: #1e40af !important; /* Bright blue for active */
+  color: #ffffff !important; /* Pure white text */
+  border: 3px solid #fbbf24 !important; /* Gold border for maximum contrast */
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.6) !important; /* Strong blue shadow */
+  transform: translateY(-2px) !important; /* Elevated appearance */
+}
+
+/* FORCE VR THERAPY BUTTONS TO BE VISIBLE */
+div[class*="bg-white"] button,
+div[class*="rounded-lg"] button,
+button[class*="bg-white"],
+button[class*="text-gray-700"],
+div[class*="grid-cols-4"] button {
+  background-color: #1f2937 !important; /* Dark background */
   color: #ffffff !important; /* White text */
-  border: 2px solid #3b82f6 !important; /* Blue border */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  border: 3px solid #60a5fa !important; /* Bright blue border */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important; /* Strong shadow */
+}
+
+div[class*="bg-white"] button[class*="bg-blue-600"],
+button[class*="bg-blue-600"][class*="text-white"],
+button[class*="bg-blue-600"] {
+  background-color: #1e40af !important; /* Keep blue for selected */
+  border-color: #fbbf24 !important; /* Gold border */
+  color: #ffffff !important; /* Ensure white text */
+}
+
+/* ULTRA-SPECIFIC VR THERAPY BUTTON FIX */
+.grid.grid-cols-4 button,
+div.grid-cols-4 button,
+div[class*="grid-cols-4"] > button,
+div.bg-white .grid.grid-cols-4 button,
+.bg-white .grid-cols-4 button {
+  background-color: #111827 !important; /* Very dark background */
+  color: #ffffff !important; /* Pure white text */
+  border: 3px solid #3b82f6 !important; /* Blue border */
+  font-weight: bold !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important; /* Strong shadow for visibility */
+}
+
+/* EXTREME FORCE FOR VR THERAPY TABS */
+div[class*="bg-white"] div[class*="grid-cols-4"] button {
+  background-color: #0f172a !important; /* Ultra dark navy */
+  color: #ffffff !important; /* Pure white text */
+  border: 4px solid #60a5fa !important; /* Bright blue thick border */
+  font-weight: 900 !important; /* Extra bold text */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 1) !important; /* Strong text shadow */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6) !important; /* Very strong shadow */
+  min-height: 48px !important; /* Ensure good size */
 }
