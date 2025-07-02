@@ -184,8 +184,8 @@ export function EHRIntegration() {
               onClick={() => setActiveTab('overview')}
               className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'overview'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
+                  ? 'theme-primary text-white border-theme-accent shadow-lg'
+                  : 'theme-surface text-white border-theme-accent hover:theme-primary-light'
               }`}
             >
               <Activity className="w-4 h-4 mx-auto mb-1" />
@@ -195,8 +195,8 @@ export function EHRIntegration() {
               onClick={() => setActiveTab('exports')}
               className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'exports'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
+                  ? 'theme-primary text-white border-theme-accent shadow-lg'
+                  : 'theme-surface text-white border-theme-accent hover:theme-primary-light'
               }`}
             >
               <FileDown className="w-4 h-4 mx-auto mb-1" />
@@ -206,8 +206,8 @@ export function EHRIntegration() {
               onClick={() => setActiveTab('insurance')}
               className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'insurance'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
+                  ? 'theme-primary text-white border-theme-accent shadow-lg'
+                  : 'theme-surface text-white border-theme-accent hover:theme-primary-light'
               }`}
             >
               <CreditCard className="w-4 h-4 mx-auto mb-1" />
@@ -217,8 +217,8 @@ export function EHRIntegration() {
               onClick={() => setActiveTab('compliance')}
               className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                 activeTab === 'compliance'
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-lg'
-                  : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
+                  ? 'theme-primary text-white border-theme-accent shadow-lg'
+                  : 'theme-surface text-white border-theme-accent hover:theme-primary-light'
               }`}
             >
               <Shield className="w-4 h-4 mx-auto mb-1" />

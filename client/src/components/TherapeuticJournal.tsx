@@ -349,7 +349,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   const selectedMood = moodOptions.find(mood => mood.value === entry.mood) || moodOptions[2];
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-[#0a0e1a] to-[#1a237e] p-4">
+    <div className="h-full flex flex-col theme-background p-4">
       {/* Success Message */}
       {showSuccess && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center">
@@ -489,8 +489,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   onClick={() => setEntry(prev => ({ ...prev, mood: mood.value }))}
                   className={`p-3 rounded-xl border-2 transition-all text-center relative ${
                     entry.mood === mood.value
-                      ? 'border-[#000000] theme-primary/100 shadow-lg ring-2 ring-[#7986cb]/50 scale-105'
-                      : 'border-[#000000]/100 theme-primary/100 hover:border-[#5c6bc0] hover:theme-primary/100'
+                      ? 'border-theme-accent theme-primary shadow-lg ring-2 ring-theme-accent/50 scale-105'
+                      : 'border-theme-accent/50 theme-surface hover:border-theme-accent hover:theme-primary-light'
                   }`}
                 >
                   {entry.mood === mood.value && (
