@@ -418,7 +418,7 @@ const PrivacyCompliance: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full px-2 py-3 text-xs font-bold rounded-md transition-all border-2 ${
                   activeTab === tab.id
-                    ? 'bg-white text-gray-900 shadow-lg border-2 border-blue-500'
+                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-[var(--theme-accent)]'
                     : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-800'
                 }`}
               >

@@ -361,8 +361,8 @@ const VRTherapy: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center justify-center space-x-1 px-3 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
                   activeTab === tab.id
-                    ? 'bg-white text-gray-900 shadow-lg border-2 border-blue-500'
-                    : 'bg-gray-100 text-gray-800 hover:bg-white hover:shadow-md border border-gray-300'
+                    ? 'bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)] text-white shadow-lg border-2 border-[var(--theme-accent)]'
+                    : 'bg-gradient-to-r from-[var(--theme-primary-light)] to-[var(--theme-surface)] text-white hover:from-[var(--theme-primary)] hover:to-[var(--theme-accent)] hover:shadow-md border border-[var(--theme-accent)]'
                 }`}
               >
                 <tab.icon className="w-4 h-4 flex-shrink-0" />
