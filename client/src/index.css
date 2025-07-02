@@ -149,55 +149,12 @@ button[class*="bg-blue-"] svg {
   color: #FFFFFF !important;
 }
 
-/* FORCE HOVER STATES - Override all hover styles */
-.hover\:bg-orange-600:hover,
-button.hover\:bg-orange-600:hover,
-button[class*="hover:bg-orange-"]:hover,
-*[class*="hover:bg-orange-"]:hover {
-  background-color: #111827 !important; /* Dark gray hover state */
-}
+/* Allow natural hover states */
 
-/* NUCLEAR OVERRIDE - Force button visibility at ALL costs */
+/* Theme card styling */
 .theme-card {
   background-color: var(--theme-primary) !important;
   border: 1px solid var(--theme-accent) !important;
-}
-
-/* ULTIMATE OVERRIDE - Last resort for button visibility */
-body button[class*="bg-orange"],
-body div[class*="bg-orange"],
-body .bg-orange-500,
-body .bg-orange-600 {
-  background-color: #1f2937 !important;
-  color: #ffffff !important;
-}
-
-body button[class*="bg-orange"]:hover,
-body div[class*="bg-orange"]:hover,
-body .bg-orange-500:hover,
-body .bg-orange-600:hover {
-  background-color: #111827 !important;
-  color: #ffffff !important;
-}
-
-/* SPECIFIC OVERRIDE FOR TAB NAVIGATION BUTTONS - Nuclear approach */
-button.w-full.px-2.py-3.text-xs.font-bold.rounded-md.transition-all.border-2.bg-orange-500,
-button[class*="bg-orange-500"][class*="transition-all"],
-.grid button[class*="bg-orange-500"],
-div[class*="grid"] button[class*="bg-orange"] {
-  background-color: #1f2937 !important;
-  color: #ffffff !important;
-  border-color: #374151 !important;
-}
-
-button.w-full.px-2.py-3.text-xs.font-bold.rounded-md.transition-all.border-2.bg-orange-500:hover,
-button[class*="bg-orange-500"][class*="transition-all"]:hover,
-.grid button[class*="bg-orange-500"]:hover,
-div[class*="grid"] button[class*="bg-orange"]:hover,
-button[class*="hover:bg-orange-600"]:hover {
-  background-color: #111827 !important;
-  color: #ffffff !important;
-  border-color: #374151 !important;
 }
 
 /* Ensure theme variables are properly applied */
