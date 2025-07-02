@@ -240,22 +240,22 @@ export default function VRTherapyDashboard() {
         <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
           <div className="grid grid-cols-4 gap-1">
             {[
-              { id: 'environments', label: 'VR Environments', icon: '🌟' },
-              { id: 'sessions', label: 'My Sessions', icon: '📊' },
+              { id: 'environments', label: 'Environments', icon: '🌟' },
+              { id: 'sessions', label: 'Sessions', icon: '📊' },
               { id: 'progress', label: 'Progress', icon: '📈' },
-              { id: 'plans', label: 'Therapy Plans', icon: '🎯' }
+              { id: 'plans', label: 'Plans', icon: '🎯' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                className={`w-full px-2 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-md'
+                    ? 'bg-gray-800 text-white shadow-lg'
+                    : 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-md'
                 }`}
               >
-                <span className="text-lg">{tab.icon}</span>
-                <div className="text-xs mt-1">{tab.label}</div>
+                <div className="text-lg mb-1">{tab.icon}</div>
+                <div className="text-xs leading-tight">{tab.label}</div>
               </button>
             ))}
           </div>
