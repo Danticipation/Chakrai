@@ -51,6 +51,9 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
 
+  console.log('Horoscope component rendered');
+  console.log('zodiacSigns array:', zodiacSigns);
+
   const fetchHoroscope = async (sign: string) => {
     setLoading(true);
     setError(null);
