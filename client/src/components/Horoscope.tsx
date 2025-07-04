@@ -262,8 +262,8 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-br from-[#0f172a] to-[#1e293b] overflow-y-auto">
       <div className="min-h-full p-4 py-8">
-        <div className="max-w-4xl mx-auto theme-primary/80 backdrop-blur-xl rounded-2xl border border-[#7986cb]/30 shadow-2xl mb-8">
-          <div className="sticky top-0 theme-primary/90 backdrop-blur-xl p-6 border-b border-[#7986cb]/20 mb-6">
+        <div className="max-w-4xl mx-auto bg-[#1a237e]/80 backdrop-blur-xl rounded-2xl border border-[#7986cb]/30 shadow-2xl mb-8">
+          <div className="sticky top-0 bg-[#1a237e]/90 backdrop-blur-xl p-6 border-b border-[#7986cb]/20 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="p-3 rounded-full bg-gradient-to-r from-[#3f51b5] to-[#5c6bc0] shadow-lg">
@@ -278,7 +278,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
                 <button
                   onClick={handleRefresh}
                   disabled={loading}
-                  className="p-3 rounded-xl theme-primary/60 hover:theme-primary/80 transition-all duration-200 disabled:opacity-50 border border-[#7986cb]/20 hover:border-[#7986cb]/40"
+                  className="p-3 rounded-xl bg-[#1a237e]/60 hover:bg-[#1a237e]/80 transition-all duration-200 disabled:opacity-50 border border-[#7986cb]/20 hover:border-[#7986cb]/40"
                 >
                   <RefreshCw className={`text-white ${loading ? 'animate-spin' : ''}`} size={20} />
                 </button>
@@ -294,7 +294,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
           </div>
 
           {/* Animated Zodiac Sign Selector with Constellation Backgrounds */}
-          <div className="mb-8">
+          <div className="mb-8 px-6">
             <h3 className="text-xl font-light text-white mb-6 tracking-wide text-center">
               ✨ Select Your Zodiac Sign ✨
             </h3>
