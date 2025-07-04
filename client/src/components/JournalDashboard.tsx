@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, BookOpen, TrendingUp, Download, Calendar, Search, Filter } from 'lucide-react';
 import JournalEditor from './JournalEditor';
 // import JournalExportModal from './JournalExportModal';
@@ -15,9 +15,18 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [moodFilter, setMoodFilter] = useState('all');
+  const queryClient = useQueryClient();
 
   // Check if this is a fresh start 
   const isFreshStart = localStorage.getItem('freshStart') === 'true';
+
+  // Clear cache when fresh start is detected
+  useEffect(() => {
+    if (isFreshStart) {
+      queryClient.removeQueries({ queryKey: ['/api/journal'] });
+      queryClient.removeQueries({ queryKey: ['/api/journal/analytics'] });
+    }
+  }, [isFreshStart, queryClient]);
 
   const { data: entries = [], isLoading: entriesLoading } = useQuery({
     queryKey: ['/api/journal', userId],
@@ -249,6 +258,30 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
             }}
           >
             Back to Journal
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show fresh start message if this is a fresh start
+  if (isFreshStart) {
+    return (
+      <div className="w-full p-6 bg-theme-surface rounded-lg border border-theme-accent/30">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🌟</div>
+          <h2 className="text-2xl font-bold text-theme-text mb-2">Fresh Start!</h2>
+          <p className="text-theme-text-secondary mb-4">
+            Your journal is ready for new entries. All previous data has been cleared. Start writing to begin your wellness journey!
+          </p>
+          <button
+            onClick={() => {
+              localStorage.removeItem('freshStart');
+              setActiveView('editor');
+            }}
+            className="bg-theme-primary text-white px-6 py-2 rounded-lg hover:bg-theme-primary-dark transition-colors"
+          >
+            Write Your First Entry
           </button>
         </div>
       </div>

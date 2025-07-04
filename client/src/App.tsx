@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, BarChart3, Gift, Headphones, Shield, X, Palette } from 'lucide-react';
 import axios from 'axios';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -60,6 +60,7 @@ interface Goal {
 
 const AppLayout = () => {
   const [activeSection, setActiveSection] = useState('chat');
+  const queryClient = useQueryClient();
   
   // Debug logging for activeSection changes
   useEffect(() => {
@@ -575,8 +576,11 @@ const AppLayout = () => {
   const clearAllUserData = async () => {
     if (confirm('This will clear ALL your data (messages, journal entries, mood tracking, etc.) and give you a fresh start. Are you sure?')) {
       try {
-        // Clear all localStorage data immediately (since backend API is intercepted by Vite)
+        // Clear all localStorage data immediately
         localStorage.clear();
+        
+        // Clear all React Query cache
+        queryClient.clear();
         
         // Generate a new device fingerprint
         const userAgent = navigator.userAgent;
@@ -597,6 +601,9 @@ const AppLayout = () => {
         localStorage.setItem('deviceFingerprint', newDeviceId);
         localStorage.setItem('freshStart', 'true');
         localStorage.setItem('freshStartTime', Date.now().toString());
+        
+        // Clear messages state immediately
+        setMessages([]);
         
         // Show success message and refresh
         alert('All data cleared successfully! Starting fresh...');
