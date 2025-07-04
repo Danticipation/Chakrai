@@ -92,6 +92,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
   };
 
   const handleSignChange = (sign: string) => {
+    console.log('Zodiac sign clicked:', sign);
     setSelectedSign(sign);
     fetchHoroscope(sign);
   };
