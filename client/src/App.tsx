@@ -576,7 +576,27 @@ const AppLayout = () => {
   const clearAllUserData = async () => {
     if (confirm('This will clear ALL your data (messages, journal entries, mood tracking, etc.) and give you a fresh start. Are you sure?')) {
       try {
-        // Clear all localStorage data immediately
+        // Get current device fingerprint
+        const currentDeviceFingerprint = localStorage.getItem('deviceFingerprint');
+        
+        // Call backend to clear all database data
+        if (currentDeviceFingerprint) {
+          const response = await fetch('/clear-user-data', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              deviceFingerprint: currentDeviceFingerprint
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to clear server data');
+          }
+        }
+        
+        // Clear all localStorage data
         localStorage.clear();
         
         // Clear all React Query cache

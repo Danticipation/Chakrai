@@ -17,6 +17,9 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // CRITICAL: Priority API endpoints MUST come before ANY other middleware to prevent Vite interception
 
+// Import storage for database operations
+import { storage } from './storage.js';
+
 // WORKAROUND: Use non-API path to bypass Vite middleware interception
 app.post('/clear-user-data', async (req, res) => {
   try {
@@ -27,7 +30,27 @@ app.post('/clear-user-data', async (req, res) => {
       return res.status(400).json({ error: 'Device fingerprint is required' });
     }
 
-    // For now, just return success - we'll implement actual data clearing later
+    // Get user ID by device fingerprint
+    const user = await storage.getUserByDeviceFingerprint(deviceFingerprint);
+    if (!user) {
+      return res.json({ success: true, message: 'No data found for this device' });
+    }
+
+    const userId = user.id;
+    console.log('Clearing data for user ID:', userId);
+
+    // Clear all user-related data
+    await Promise.all([
+      storage.clearUserMessages(userId),
+      storage.clearUserJournalEntries(userId),
+      storage.clearUserMoodEntries(userId),
+      storage.clearUserMemories(userId),
+      storage.clearUserGoals(userId),
+      storage.clearUserAchievements(userId),
+      storage.clearUserAnalytics(userId)
+    ]);
+
+    console.log('All user data cleared successfully for user:', userId);
     res.json({ success: true, message: 'All user data cleared successfully' });
   } catch (error) {
     console.error('Error clearing user data:', error);
