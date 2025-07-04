@@ -37,8 +37,13 @@ async function detectCrisisSignals(message, userId) {
 }
 
 // ====================
-// USER DATA MANAGEMENT
+// USER DATA MANAGEMENT  
 // ====================
+
+// Test endpoint to verify routes are working
+router.get('/test', (req, res) => {
+  res.json({ message: 'Routes are working!', timestamp: new Date().toISOString() });
+});
 
 // Clear all user data for fresh start
 router.post('/clear-user-data', async (req, res) => {

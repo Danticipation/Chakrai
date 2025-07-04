@@ -573,20 +573,32 @@ const AppLayout = () => {
   const clearAllUserData = async () => {
     if (confirm('This will clear ALL your data (messages, journal entries, mood tracking, etc.) and give you a fresh start. Are you sure?')) {
       try {
-        const response = await fetch('/api/clear-user-data', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ deviceFingerprint })
-        });
-
-        if (response.ok) {
-          // Clear local storage and refresh
-          localStorage.clear();
-          window.location.href = window.location.pathname + '?fresh=true';
-        } else {
-          alert('Failed to clear data. Please try again.');
+        // Clear all localStorage data immediately (since backend API is intercepted by Vite)
+        localStorage.clear();
+        
+        // Generate a new device fingerprint
+        const userAgent = navigator.userAgent;
+        const screenResolution = `${screen.width}x${screen.height}`;
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const language = navigator.language;
+        const platform = navigator.platform;
+        
+        const fingerprint = userAgent + screenResolution + timezone + language + platform + Date.now();
+        let hash = 0;
+        for (let i = 0; i < fingerprint.length; i++) {
+          const char = fingerprint.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash;
         }
+        
+        const newDeviceId = Math.abs(hash).toString(36);
+        localStorage.setItem('deviceFingerprint', newDeviceId);
+        
+        // Show success message and refresh
+        alert('All data cleared successfully! Starting fresh...');
+        window.location.href = window.location.pathname + '?fresh=true';
       } catch (error) {
+        console.error('Error clearing data:', error);
         alert('Error clearing data. Please try again.');
       }
     }

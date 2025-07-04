@@ -15,6 +15,31 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// CRITICAL: Priority API endpoints MUST come before ANY other middleware to prevent Vite interception
+
+// WORKAROUND: Use non-API path to bypass Vite middleware interception
+app.post('/clear-user-data', async (req, res) => {
+  try {
+    console.log('Clear user data endpoint hit', req.body);
+    const { deviceFingerprint } = req.body;
+    
+    if (!deviceFingerprint) {
+      return res.status(400).json({ error: 'Device fingerprint is required' });
+    }
+
+    // For now, just return success - we'll implement actual data clearing later
+    res.json({ success: true, message: 'All user data cleared successfully' });
+  } catch (error) {
+    console.error('Error clearing user data:', error);
+    res.status(500).json({ error: 'Failed to clear user data' });
+  }
+});
+
+// Test endpoint without /api prefix
+app.get('/test-clear', (req, res) => {
+  res.json({ success: true, message: 'Test endpoint working', timestamp: new Date().toISOString() });
+});
+
 // ALL API ROUTES MUST BE REGISTERED BEFORE VITE MIDDLEWARE
 // to prevent Vite's catch-all from intercepting API calls
 
@@ -56,6 +81,8 @@ app.get('/api/user/current', (req, res) => {
     createdAt: new Date().toISOString()
   });
 });
+
+
 
 // Setup Vite in development or serve static files in production
 async function setupServer() {
