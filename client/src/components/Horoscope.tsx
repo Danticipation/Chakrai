@@ -56,18 +56,32 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
     setError(null);
     
     try {
+      console.log(`Fetching horoscope for sign: ${sign}`);
       // Use the correct GET endpoint with sign as parameter
       const response = await fetch(`/api/horoscope/${sign}`);
+      console.log('Horoscope response status:', response.status);
+      console.log('Horoscope response headers:', response.headers.get('content-type'));
 
       if (response.ok) {
-        const data = await response.json();
-        setHoroscopeData({
-          sign: sign.charAt(0).toUpperCase() + sign.slice(1),
-          horoscope: data.horoscope,
-          date: new Date().toLocaleDateString()
-        });
+        const responseText = await response.text();
+        console.log('Raw response:', responseText.substring(0, 200));
+        
+        try {
+          const data = JSON.parse(responseText);
+          console.log('Parsed horoscope data:', data);
+          setHoroscopeData({
+            sign: sign.charAt(0).toUpperCase() + sign.slice(1),
+            horoscope: data.horoscope,
+            date: new Date().toLocaleDateString()
+          });
+        } catch (parseError) {
+          console.error('JSON parse error:', parseError);
+          setError('Invalid response format from server.');
+        }
       } else {
-        throw new Error('API failed');
+        const errorText = await response.text();
+        console.error('API error response:', errorText.substring(0, 200));
+        throw new Error(`API failed with status ${response.status}`);
       }
     } catch (error) {
       console.error('Horoscope API failed:', error);
