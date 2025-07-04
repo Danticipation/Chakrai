@@ -1243,166 +1243,153 @@ const AppLayout = () => {
         {/* Center Content Area - Mobile Responsive */}
         <div className="flex-1 mobile-content-scroll-area">
           {activeSection === 'chat' ? (
-            /* Mobile-Optimized Chat Panel - Full Width */
-            <div className="w-full flex flex-col theme-card mobile-chat-container">
-              {/* Chat Header */}
-              <div className="theme-surface theme-text text-center py-3 border-b border-white/20">
-                <div className="flex items-center justify-center space-x-2">
-                  <MessageCircle size={20} />
-                  <span className="font-bold text-lg">Chat with TraI</span>
+            /* Home Dashboard - Wellness Overview */
+            <div className="w-full h-full theme-background p-6 overflow-y-auto">
+              <div className="max-w-4xl mx-auto space-y-6">
+                
+                {/* Welcome Section */}
+                <div className="theme-card backdrop-blur-sm rounded-2xl p-6 border border-[var(--theme-accent)]/30 shadow-lg text-center">
+                  <h1 className="text-3xl font-bold theme-text mb-2">Welcome to Your Wellness Journey</h1>
+                  <p className="theme-text-secondary text-lg">Your AI companion is here to support your mental health and personal growth</p>
+                  
+                  {/* Quick Access Chat Button */}
+                  <button
+                    onClick={() => setIsFloatingChatOpen(true)}
+                    className="mt-4 px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  >
+                    💬 Start Conversation with TraI
+                  </button>
                 </div>
-              </div>
-              
-              {/* Chat Messages Area - Mobile Optimized */}
-              <div 
-                ref={(el) => {
-                  if (el && messages.length > 0) {
-                    setTimeout(() => el.scrollTop = el.scrollHeight, 100);
-                  }
-                }}
-                className="mobile-chat-messages-scroll"
-              >
-                {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full theme-text">
-                    <MessageCircle size={48} className="mb-4 opacity-60" />
-                    <p className="text-lg font-medium mb-2">Welcome to TraI</p>
-                    <p className="mobile-text-sm opacity-80 text-center px-4">
-                      Your AI companion for mental wellness. Start by sharing what's on your mind or use voice input.
-                    </p>
+
+                {/* Quick Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg text-center">
+                    <div className="text-3xl mb-2">🧠</div>
+                    <h3 className="text-xl font-semibold theme-text mb-1">Mind & Mood</h3>
+                    <p className="theme-text-secondary">Track your emotional wellness</p>
+                    <button
+                      onClick={() => setActiveSection('daily')}
+                      className="mt-3 px-4 py-2 theme-primary theme-text rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
+                    >
+                      View Reflection
+                    </button>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {messages.map((message, index) => (
-                      <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`mobile-message-bubble ${
-                          message.sender === 'user' ? 'user' : 'bot'
-                        }`}>
-                          <p className="mobile-text-sm leading-relaxed">{message.text}</p>
-                          <p className="mobile-text-xs mt-2 opacity-70">{message.time}</p>
-                        </div>
-                      </div>
+
+                  <div className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg text-center">
+                    <div className="text-3xl mb-2">📝</div>
+                    <h3 className="text-xl font-semibold theme-text mb-1">Journal</h3>
+                    <p className="theme-text-secondary">Express your thoughts freely</p>
+                    <button
+                      onClick={() => setActiveSection('journal')}
+                      className="mt-3 px-4 py-2 theme-primary theme-text rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
+                    >
+                      Write Entry
+                    </button>
+                  </div>
+
+                  <div className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg text-center">
+                    <div className="text-3xl mb-2">📊</div>
+                    <h3 className="text-xl font-semibold theme-text mb-1">Analytics</h3>
+                    <p className="theme-text-secondary">View your progress insights</p>
+                    <button
+                      onClick={() => setActiveSection('analytics')}
+                      className="mt-3 px-4 py-2 theme-primary theme-text rounded-lg text-sm font-medium hover:opacity-80 transition-opacity"
+                    >
+                      View Analytics
+                    </button>
+                  </div>
+                </div>
+
+                {/* Daily Inspiration Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg">
+                    <h3 className="text-xl font-semibold theme-text mb-3 flex items-center">
+                      <Star className="mr-2" size={20} />
+                      Daily Affirmation
+                    </h3>
+                    <p className="theme-text text-sm leading-relaxed mb-4">{dailyAffirmation}</p>
+                    <button
+                      onClick={() => setActiveSection('affirmation')}
+                      className="text-sm theme-accent hover:underline"
+                    >
+                      Read Full Affirmation →
+                    </button>
+                  </div>
+
+                  <div className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg">
+                    <h3 className="text-xl font-semibold theme-text mb-3 flex items-center">
+                      <Sun className="mr-2" size={20} />
+                      Wellness Insights
+                    </h3>
+                    <p className="theme-text text-sm leading-relaxed mb-4">
+                      Your wellness journey is unique. Take time today to practice self-compassion and mindful awareness.
+                    </p>
+                    <button
+                      onClick={() => setActiveSection('horoscope')}
+                      className="text-sm theme-accent hover:underline"
+                    >
+                      View Today's Guidance →
+                    </button>
+                  </div>
+                </div>
+
+                {/* Feature Shortcuts */}
+                <div className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg">
+                  <h3 className="text-xl font-semibold theme-text mb-4">Quick Access</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { id: 'memory', label: 'Memory', icon: '🎯' },
+                      { id: 'rewards', label: 'Rewards', icon: '🎁' },
+                      { id: 'community', label: 'Community', icon: '👥' },
+                      { id: 'agents', label: 'AI Specialists', icon: '🧩' }
+                    ].map((feature) => (
+                      <button
+                        key={feature.id}
+                        onClick={() => setActiveSection(feature.id)}
+                        className="flex flex-col items-center p-4 theme-surface rounded-lg hover:opacity-80 transition-opacity"
+                      >
+                        <span className="text-2xl mb-2">{feature.icon}</span>
+                        <span className="theme-text text-sm font-medium">{feature.label}</span>
+                      </button>
                     ))}
                   </div>
-                )}
-                {loading && (
-                  <div className="flex justify-start mt-4">
-                    <div className="theme-primary theme-text px-4 py-3 rounded-2xl rounded-bl-md">
-                      <div className="flex space-x-1 items-center">
-                        <span className="text-xs mr-2">TraI is typing</span>
-                        <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {isLoadingVoice && !loading && (
-                  <div className="flex justify-start mt-4">
-                    <div className="theme-primary theme-text px-4 py-3 rounded-2xl rounded-bl-md">
-                      <div className="flex space-x-2 items-center">
-                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span className="text-xs">Preparing voice audio...</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Mobile Chat Input Area */}
-              <div className="mobile-input-polish mobile-input-area">
-                {/* Recording Status Indicator */}
-                {isRecording && (
-                  <div className="mb-3 flex items-center justify-center">
-                    <div className="bg-red-500 text-white px-4 py-2 rounded-full mobile-text-sm font-medium flex items-center shadow-lg">
-                      <div className="w-3 h-3 bg-white rounded-full animate-pulse mr-3"></div>
-                      <span>Recording... Tap mic to stop</span>
-                    </div>
-                  </div>
-                )}
-                
-                <div className="flex space-x-3 items-end">
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      placeholder="Share what's on your mind..."
-                      className="mobile-input-field ios-input-fix"
-                    />
-                  </div>
-                  
-                  {/* Voice Input Button */}
-                  <button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    className={`mobile-action-btn ${
-                      isRecording ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' : ''
-                    }`}
-                    disabled={loading}
-                    title={isRecording ? "Stop recording" : "Start voice input"}
-                  >
-                    {isRecording ? <Square size={20} /> : <Mic size={20} />}
-                  </button>
-                  
-                  {/* Send Button */}
-                  <button
-                    onClick={sendMessage}
-                    disabled={!input.trim() || loading}
-                    className="mobile-action-btn"
-                  >
-                    <Send size={20} />
-                  </button>
                 </div>
+
               </div>
             </div>
           ) : (
             /* Separate Full Panels for Other Sections */
-            <div className="w-full h-full mx-2 md:mx-8 theme-card rounded-lg border border-white overflow-hidden relative">
-              {/* Return to Chat Button */}
-              <button 
-                onClick={() => setActiveSection('chat')}
-                className="absolute top-2 right-2 z-10 theme-primary hover:theme-primary-light theme-text px-3 py-1 rounded-full text-sm font-medium transition-colors flex items-center space-x-1 shadow-lg"
-              >
-                <MessageCircle size={14} />
-                <span>Chat</span>
-              </button>
-              
-              <div className="theme-card theme-text border-b border-white/30">
-                <div className="text-center py-3 font-bold text-lg">
-                  {activeSection === 'daily' && 'Personality Reflection'}
-                  {activeSection === 'journal' && 'Therapeutic Journal'}
-                  {activeSection === 'memory' && 'Memory Dashboard'}
-                  {activeSection === 'analytics' && 'Analytics & Reporting'}
-                  {activeSection === 'rewards' && 'Wellness Rewards'}
-                  {activeSection === 'community' && 'Community & Professional Support'}
-                  {activeSection === 'adaptive' && 'Adaptive Learning & Personalization'}
-                  {activeSection === 'therapy-plans' && 'Personalized Therapy Plans'}
-                  {activeSection === 'agents' && 'AI Therapeutic Specialists'}
-                  {activeSection === 'vr' && 'VR/AR Therapy'}
-                  {activeSection === 'health' && 'Health Integration'}
-                  {activeSection === 'privacy' && 'Privacy & Compliance'}
-                  {activeSection === 'horoscope' && 'Horoscope'}
-                  {activeSection === 'affirmation' && 'Daily Affirmation'}
-                  {activeSection === 'logo' && 'TraI Information'}
-                  {activeSection === 'goals' && 'Wellness Goals'}
-                  {activeSection === 'outcomes' && 'Therapeutic Outcomes'}
-                  {activeSection === 'ehr' && 'EHR Integration'}
-                  {activeSection === 'privacy-policy' && 'Privacy Policy & Terms'}
+            <div className="w-full h-full theme-background p-6 overflow-y-auto">
+              <div className="max-w-4xl mx-auto">
+                {/* Feature Header */}
+                <div className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg mb-6">
+                  <h2 className="text-2xl font-bold theme-text text-center">
+                    {activeSection === 'daily' && 'Personality Reflection'}
+                    {activeSection === 'journal' && 'Therapeutic Journal'}
+                    {activeSection === 'memory' && 'Memory Dashboard'}
+                    {activeSection === 'analytics' && 'Analytics & Reporting'}
+                    {activeSection === 'rewards' && 'Wellness Rewards'}
+                    {activeSection === 'community' && 'Community & Professional Support'}
+                    {activeSection === 'adaptive' && 'Adaptive Learning & Personalization'}
+                    {activeSection === 'therapy-plans' && 'Personalized Therapy Plans'}
+                    {activeSection === 'agents' && 'AI Therapeutic Specialists'}
+                    {activeSection === 'vr' && 'VR/AR Therapy'}
+                    {activeSection === 'health' && 'Health Integration'}
+                    {activeSection === 'privacy' && 'Privacy & Compliance'}
+                    {activeSection === 'horoscope' && 'Horoscope'}
+                    {activeSection === 'affirmation' && 'Daily Affirmation'}
+                    {activeSection === 'logo' && 'TraI Information'}
+                    {activeSection === 'goals' && 'Wellness Goals'}
+                    {activeSection === 'outcomes' && 'Therapeutic Outcomes'}
+                    {activeSection === 'ehr' && 'EHR Integration'}
+                    {activeSection === 'privacy-policy' && 'Privacy Policy & Terms'}
+                  </h2>
                 </div>
-                {/* Feature Description for Desktop */}
-                {activeSection !== 'chat' && featureDescriptions[activeSection as keyof typeof featureDescriptions] && (
-                  <div className="px-4 pb-3">
-                    <p className="theme-text-secondary text-sm leading-relaxed text-center italic">
-                      {featureDescriptions[activeSection as keyof typeof featureDescriptions]}
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div className="h-full theme-card theme-text p-6 overflow-y-auto mobile-scroll" style={{ minHeight: '0', maxHeight: 'calc(100vh - 200px)' }}>
-                {renderActiveSection()}
+                
+                {/* Feature Content */}
+                <div className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg">
+                  {renderActiveSection()}
+                </div>
               </div>
             </div>
           )}
