@@ -17,7 +17,7 @@ interface HoroscopeProps {
 }
 
 export default function Horoscope({ onBack }: HoroscopeProps) {
-  const [selectedSign, setSelectedSign] = useState<string>('aries');
+  const [selectedSign, setSelectedSign] = useState<string>('');
   const [horoscopeData, setHoroscopeData] = useState<HoroscopeData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,12 +51,9 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
     }
   };
 
-  useEffect(() => {
-    fetchHoroscope(selectedSign);
-  }, [selectedSign]);
-
   const handleSignChange = (sign: string) => {
     setSelectedSign(sign);
+    fetchHoroscope(sign);
   };
 
   const handleRefresh = () => {
@@ -189,7 +186,15 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
 
           {/* Horoscope Display - Mobile Optimized */}
           <div className="bg-[var(--theme-secondary)] rounded-xl p-4 border border-[#3949ab]/30 max-h-[calc(100vh-400px)] overflow-y-auto mobile-scroll">
-            {loading ? (
+            {!selectedSign ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Star className="text-purple-300 mb-4" size={48} />
+                <h3 className="text-xl font-semibold text-white mb-2">Choose Your Zodiac Sign</h3>
+                <p className="text-white/70 max-w-md">
+                  Select your zodiac sign above to receive personalized cosmic guidance and wellness insights tailored to your astrological profile.
+                </p>
+              </div>
+            ) : loading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="flex items-center space-x-3">
                   <Sparkles className="text-purple-300 animate-pulse" size={24} />

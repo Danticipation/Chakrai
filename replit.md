@@ -423,6 +423,15 @@ TraI is a professional mental wellness and therapy application designed for peop
 - **Fresh User Experience**: New users get clean start with device-based anonymous profiles, no account creation required
 - **Production PWA Status**: Mobile interface fully operational for test user downloads with complete navigation functionality
 
+### July 4, 2025 - Horoscope User-Controlled Loading Implemented - No Auto-Load on Entry
+- **User-Controlled Horoscope Loading**: Modified horoscope section to not automatically load content until user selects their zodiac sign
+- **Initial State Enhancement**: Changed default selectedSign from 'aries' to empty string to prevent automatic loading
+- **Removed Automatic useEffect**: Eliminated automatic horoscope fetching on component mount that was loading Aries by default
+- **Sign Selection Required**: Horoscope now only loads when user actively clicks on a zodiac sign button
+- **Enhanced UX Messaging**: Added clear "Choose Your Zodiac Sign" prompt with explanation about personalized cosmic guidance
+- **Proper State Management**: fetchHoroscope now only called from handleSignChange when user makes active selection
+- **User Privacy Improvement**: Prevents unwanted data loading and gives users complete control over when horoscope content is generated
+
 ### July 2, 2025 - Universal Shimmering Silver Border Implementation Completed - All Navigation Tab Buttons Enhanced
 - **Complete Shimmer Border Implementation**: Successfully implemented shimmering silver borders on ALL clickable elements within tab navigation buttons across entire application
 - **Universal Component Coverage**: Applied shimmer-border class to navigation buttons in EHRIntegration, VRTherapyDashboard, TherapeuticAnalytics, WellnessRewards, JournalDashboard, TherapeuticJournal, and CommunitySupport components
