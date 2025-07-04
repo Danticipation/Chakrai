@@ -262,7 +262,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-br from-[#0f172a] to-[#1e293b] overflow-y-auto">
       <div className="min-h-full p-4 py-8">
-        <div className="max-w-4xl mx-auto bg-[#1a237e]/80 backdrop-blur-xl rounded-2xl border border-[#7986cb]/30 shadow-2xl mb-8">
+        <div className="max-w-7xl mx-auto bg-[#1a237e]/80 backdrop-blur-xl rounded-2xl border border-[#7986cb]/30 shadow-2xl mb-8">
           <div className="sticky top-0 bg-[#1a237e]/90 backdrop-blur-xl p-6 border-b border-[#7986cb]/20 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -298,15 +298,6 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
             <h3 className="text-xl font-light text-white mb-6 tracking-wide text-center">
               ✨ Select Your Zodiac Sign ✨
             </h3>
-            <div className="text-white mb-4">Debug: zodiacSigns length = {zodiacSigns.length}</div>
-            
-            {/* Test buttons to see if grid displays */}
-            <div className="mb-4">
-              <button className="bg-red-500 text-white p-2 m-2">Test Button 1</button>
-              <button className="bg-green-500 text-white p-2 m-2">Test Button 2</button>
-              <button className="bg-blue-500 text-white p-2 m-2">Test Button 3</button>
-            </div>
-            
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {zodiacSigns.map((sign) => (
                 <button
