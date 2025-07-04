@@ -48,6 +48,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   const [recentEntries, setRecentEntries] = useState<JournalEntry[]>([]);
   const [newTag, setNewTag] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isFreshStart, setIsFreshStart] = useState(false);
   const [activeTab, setActiveTab] = useState('write');
   const [analytics, setAnalytics] = useState<JournalAnalytics | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -74,10 +75,26 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   ];
 
   useEffect(() => {
+    // Check for fresh start flag
+    const freshStart = localStorage.getItem('freshStart');
+    if (freshStart) {
+      setIsFreshStart(true);
+      setRecentEntries([]);
+      // Clear the flag after checking
+      localStorage.removeItem('freshStart');
+      return;
+    }
+    
     fetchRecentEntries();
   }, [userId]);
 
   const fetchRecentEntries = async () => {
+    // Don't fetch if this is a fresh start
+    if (isFreshStart) {
+      setRecentEntries([]);
+      return;
+    }
+    
     try {
       const response = await fetch(`/api/journal/entries/${userId}`);
       if (response.ok) {
@@ -86,6 +103,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
       }
     } catch (error) {
       console.error('Failed to fetch recent entries:', error);
+      setRecentEntries([]);
     }
   };
 
@@ -624,43 +642,56 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
         </div>
         )}
 
-        {/* Recent Entries (shown only on write tab) */}
-        {activeTab === 'write' && recentEntries.length > 0 && (
-          <div className="theme-card/20 backdrop-blur-sm rounded-2xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-              <Calendar className="w-5 h-5 mr-2" />
-              Recent Entries
-            </h3>
-            <div className="space-y-3">
-              {recentEntries.map((recentEntry, index) => (
-                <div key={index} className="theme-primary/30 rounded-lg p-4 border border-[#000000]/30">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-white">
-                      {recentEntry.title || `Entry ${index + 1}`}
-                    </h4>
-                    <span className="text-xs text-white/60">
-                      {new Date(recentEntry.createdAt || '').toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="text-white/80 text-sm line-clamp-2">
-                    {recentEntry.content.substring(0, 100)}...
-                  </p>
-                  <div className="flex items-center mt-2 text-xs">
-                    <span className={`px-2 py-1 rounded-full ${
-                      moodOptions.find(m => m.value === recentEntry.mood)?.color || 'theme-primary text-white'
-                    }`}>
-                      {moodOptions.find(m => m.value === recentEntry.mood)?.label || 'Unknown'}
-                    </span>
-                    {recentEntry.tags.length > 0 && (
-                      <span className="ml-2 text-white/60">
-                        +{recentEntry.tags.length} tags
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+        {/* Recent Entries or Fresh Start Message (shown only on write tab) */}
+        {activeTab === 'write' && (
+          isFreshStart ? (
+            <div className="theme-card/20 backdrop-blur-sm rounded-2xl shadow-lg p-6 text-center">
+              <div className="text-6xl mb-4">🌟</div>
+              <h3 className="text-2xl font-bold text-white mb-3">Fresh Start!</h3>
+              <p className="text-white/80 text-lg mb-4">
+                Your data has been completely cleared. Begin your therapeutic journey with a clean slate.
+              </p>
+              <p className="text-white/60 text-sm">
+                Start by writing your first journal entry above. This space will show your recent entries as you continue your wellness journey.
+              </p>
             </div>
-          </div>
+          ) : recentEntries.length > 0 && (
+            <div className="theme-card/20 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                <Calendar className="w-5 h-5 mr-2" />
+                Recent Entries
+              </h3>
+              <div className="space-y-3">
+                {recentEntries.map((recentEntry, index) => (
+                  <div key={index} className="theme-primary/30 rounded-lg p-4 border border-[#000000]/30">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium text-white">
+                        {recentEntry.title || `Entry ${index + 1}`}
+                      </h4>
+                      <span className="text-xs text-white/60">
+                        {new Date(recentEntry.createdAt || '').toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-white/80 text-sm line-clamp-2">
+                      {recentEntry.content.substring(0, 100)}...
+                    </p>
+                    <div className="flex items-center mt-2 text-xs">
+                      <span className={`px-2 py-1 rounded-full ${
+                        moodOptions.find(m => m.value === recentEntry.mood)?.color || 'theme-primary text-white'
+                      }`}>
+                        {moodOptions.find(m => m.value === recentEntry.mood)?.label || 'Unknown'}
+                      </span>
+                      {recentEntry.tags.length > 0 && (
+                        <span className="ml-2 text-white/60">
+                          +{recentEntry.tags.length} tags
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
         )}
 
         {/* Analytics Tab */}
