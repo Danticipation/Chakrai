@@ -56,6 +56,15 @@ export interface IStorage {
   updateUserLastActive(id: number): Promise<void>;
   deleteInactiveAnonymousUsers(beforeDate: Date): Promise<void>;
   
+  // Data clearing methods for fresh starts
+  clearUserMessages(userId: number): Promise<void>;
+  clearUserJournalEntries(userId: number): Promise<void>;
+  clearUserMoodEntries(userId: number): Promise<void>;
+  clearUserMemories(userId: number): Promise<void>;
+  clearUserGoals(userId: number): Promise<void>;
+  clearUserAchievements(userId: number): Promise<void>;
+  clearUserAnalytics(userId: number): Promise<void>;
+  
   // Bots
   getBotByUserId(userId: number): Promise<Bot | null>;
   createBot(data: InsertBot): Promise<Bot>;
@@ -1291,6 +1300,44 @@ export class DbStorage implements IStorage {
         triggerData: { journalCount: concerningJournals.length }
       });
     }
+  }
+
+  // Data clearing methods for fresh user starts
+  async clearUserMessages(userId: number): Promise<void> {
+    await this.db.delete(messages).where(eq(messages.userId, userId));
+  }
+
+  async clearUserJournalEntries(userId: number): Promise<void> {
+    await this.db.delete(journalEntries).where(eq(journalEntries.userId, userId));
+  }
+
+  async clearUserMoodEntries(userId: number): Promise<void> {
+    await this.db.delete(moodEntries).where(eq(moodEntries.userId, userId));
+  }
+
+  async clearUserMemories(userId: number): Promise<void> {
+    await this.db.delete(userMemories).where(eq(userMemories.userId, userId));
+    await this.db.delete(userFacts).where(eq(userFacts.userId, userId));
+    await this.db.delete(semanticMemories).where(eq(semanticMemories.userId, userId));
+  }
+
+  async clearUserGoals(userId: number): Promise<void> {
+    await this.db.delete(therapeuticGoals).where(eq(therapeuticGoals.userId, userId));
+  }
+
+  async clearUserAchievements(userId: number): Promise<void> {
+    await this.db.delete(userAchievements).where(eq(userAchievements.userId, userId));
+    await this.db.delete(pointsTransactions).where(eq(pointsTransactions.userId, userId));
+    await this.db.delete(userPurchases).where(eq(userPurchases.userId, userId));
+  }
+
+  async clearUserAnalytics(userId: number): Promise<void> {
+    await this.db.delete(analyticsMetrics).where(eq(analyticsMetrics.userId, userId));
+    await this.db.delete(emotionalPatterns).where(eq(emotionalPatterns.userId, userId));
+    await this.db.delete(moodForecasts).where(eq(moodForecasts.userId, userId));
+    await this.db.delete(emotionalContexts).where(eq(emotionalContexts.userId, userId));
+    await this.db.delete(predictiveInsights).where(eq(predictiveInsights.userId, userId));
+    await this.db.delete(crisisDetectionLogs).where(eq(crisisDetectionLogs.userId, userId));
   }
 }
 

@@ -37,6 +37,45 @@ async function detectCrisisSignals(message, userId) {
 }
 
 // ====================
+// USER DATA MANAGEMENT
+// ====================
+
+// Clear all user data for fresh start
+router.post('/clear-user-data', async (req, res) => {
+  try {
+    const { deviceFingerprint } = req.body;
+    
+    if (!deviceFingerprint) {
+      return res.status(400).json({ error: 'Device fingerprint is required' });
+    }
+
+    // Get user ID by device fingerprint
+    const user = await storage.getUserByDeviceFingerprint(deviceFingerprint);
+    if (!user) {
+      return res.json({ success: true, message: 'No data found for this device' });
+    }
+
+    const userId = user.id;
+
+    // Clear all user-related data
+    await Promise.all([
+      storage.clearUserMessages(userId),
+      storage.clearUserJournalEntries(userId),
+      storage.clearUserMoodEntries(userId),
+      storage.clearUserMemories(userId),
+      storage.clearUserGoals(userId),
+      storage.clearUserAchievements(userId),
+      storage.clearUserAnalytics(userId)
+    ]);
+
+    res.json({ success: true, message: 'All user data cleared successfully' });
+  } catch (error) {
+    console.error('Error clearing user data:', error);
+    res.status(500).json({ error: 'Failed to clear user data' });
+  }
+});
+
+// ====================
 // CHAT & AI ENDPOINTS
 // ====================
 

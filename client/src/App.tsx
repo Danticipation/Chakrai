@@ -105,6 +105,25 @@ const AppLayout = () => {
   useEffect(() => {
     // Generate device fingerprint for anonymous user identification
     const generateFingerprint = () => {
+      // Check if user wants a fresh start
+      const urlParams = new URLSearchParams(window.location.search);
+      const freshStart = urlParams.get('fresh') === 'true';
+      
+      if (freshStart) {
+        // Clear all localStorage data for fresh start
+        localStorage.clear();
+        // Generate completely new random ID
+        const randomId = Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        localStorage.setItem('deviceFingerprint', randomId);
+        return randomId;
+      }
+      
+      // Check for existing fingerprint in localStorage
+      const existingFingerprint = localStorage.getItem('deviceFingerprint');
+      if (existingFingerprint) {
+        return existingFingerprint;
+      }
+      
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       ctx!.textBaseline = 'top';
@@ -116,7 +135,9 @@ const AppLayout = () => {
         navigator.language,
         screen.width + 'x' + screen.height,
         new Date().getTimezoneOffset(),
-        canvas.toDataURL()
+        canvas.toDataURL(),
+        Math.random().toString(36), // Add randomness
+        Date.now().toString() // Add timestamp
       ].join('|');
       
       // Create a simple hash of the fingerprint
@@ -127,7 +148,9 @@ const AppLayout = () => {
         hash = hash & hash; // Convert to 32-bit integer
       }
       
-      return Math.abs(hash).toString(36);
+      const deviceId = Math.abs(hash).toString(36);
+      localStorage.setItem('deviceFingerprint', deviceId);
+      return deviceId;
     };
 
     setDeviceFingerprint(generateFingerprint());
@@ -547,6 +570,28 @@ const AppLayout = () => {
     }
   };
 
+  const clearAllUserData = async () => {
+    if (confirm('This will clear ALL your data (messages, journal entries, mood tracking, etc.) and give you a fresh start. Are you sure?')) {
+      try {
+        const response = await fetch('/api/clear-user-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deviceFingerprint })
+        });
+
+        if (response.ok) {
+          // Clear local storage and refresh
+          localStorage.clear();
+          window.location.href = window.location.pathname + '?fresh=true';
+        } else {
+          alert('Failed to clear data. Please try again.');
+        }
+      } catch (error) {
+        alert('Error clearing data. Please try again.');
+      }
+    }
+  };
+
   const sendAudioToWhisper = async (audioBlob: Blob) => {
     try {
       console.log('Sending audio to Whisper API...');
@@ -945,6 +990,17 @@ const AppLayout = () => {
               <div className="flex items-center justify-center space-x-1">
                 <span className="text-lg">⚙️</span>
                 <span className="text-xs font-medium">Settings</span>
+              </div>
+            </button>
+            
+            <button 
+              onClick={clearAllUserData}
+              className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg transition-colors"
+              title="Clear all data for fresh start"
+            >
+              <div className="flex items-center justify-center space-x-1">
+                <span className="text-lg">🔄</span>
+                <span className="text-xs font-medium">Reset</span>
               </div>
             </button>
           </div>
@@ -1351,6 +1407,20 @@ const AppLayout = () => {
               <div className="theme-text text-lg font-bold mb-3">Overall Wellness</div>
               <div className="theme-text text-3xl font-bold">85%</div>
               <div className="theme-text text-base">This month</div>
+            </div>
+
+            {/* Reset Data Button */}
+            <div className="theme-card rounded-lg p-6 text-center">
+              <button 
+                onClick={clearAllUserData}
+                className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg transition-colors font-medium"
+                title="Clear all data for fresh start"
+              >
+                🔄 Reset All Data
+              </button>
+              <div className="theme-text text-xs mt-2 opacity-70">
+                Clears all personal data
+              </div>
             </div>
           </div>
         </div>
