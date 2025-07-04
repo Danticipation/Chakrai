@@ -27,6 +27,7 @@ import MicroSession from './components/MicroSession';
 import TherapeuticAnalytics from './components/TherapeuticAnalytics';
 import { EHRIntegration } from './components/EHRIntegration';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import FloatingChat from './components/FloatingChat';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -162,6 +163,7 @@ const AppLayout = () => {
   const [selectedReflectionVoice, setSelectedReflectionVoice] = useState('hope');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingVoice, setIsLoadingVoice] = useState(false);
+  const [isFloatingChatOpen, setIsFloatingChatOpen] = useState(false);
   const [dailyAffirmation, setDailyAffirmation] = useState('Today is a new opportunity for growth and healing.');
   const [horoscopeText, setHoroscopeText] = useState<string>('');
   const [userZodiacSign, setUserZodiacSign] = useState<string>('aries');
@@ -1099,6 +1101,7 @@ const AppLayout = () => {
             <div className="mobile-nav-grid-polish">
               {[
                 { id: 'chat', label: 'Home', icon: '🏠' },
+                { id: 'floating-chat', label: 'Chat', icon: '💬' },
                 { id: 'daily', label: 'Reflect', icon: '🧠' },
                 { id: 'journal', label: 'Journal', icon: '📝' },
                 { id: 'memory', label: 'Memory', icon: '🎯' },
@@ -1121,6 +1124,8 @@ const AppLayout = () => {
                       setShowThemeModal(true);
                     } else if (tab.id === 'voice') {
                       setShowSettings(true);
+                    } else if (tab.id === 'floating-chat') {
+                      setIsFloatingChatOpen(true);
                     } else if (['journal', 'analytics', 'memory', 'daily', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans'].includes(tab.id)) {
                       setContentLoading(true);
                       setMobileModalContent(tab.id);
@@ -1605,6 +1610,13 @@ const AppLayout = () => {
           </div>
         </div>
       )}
+
+      {/* Floating Chat Component */}
+      <FloatingChat
+        isOpen={isFloatingChatOpen}
+        onToggle={() => setIsFloatingChatOpen(!isFloatingChatOpen)}
+        selectedVoice={selectedVoice}
+      />
     </div>
   );
 };
