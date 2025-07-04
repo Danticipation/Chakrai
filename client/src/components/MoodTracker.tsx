@@ -42,6 +42,9 @@ export default function MoodTracker({ userId = 1 }: { userId?: number }) {
   const [showAnalytics, setShowAnalytics] = useState(false);
   
   const queryClient = useQueryClient();
+  
+  // Check for fresh start and disable data fetching if true
+  const isFreshStart = localStorage.getItem('freshStart') === 'true';
 
   // Fetch recent mood entries
   const { data: moodData } = useQuery({
@@ -51,7 +54,8 @@ export default function MoodTracker({ userId = 1 }: { userId?: number }) {
       if (!response.ok) throw new Error('Failed to fetch mood entries');
       return response.json();
     },
-    staleTime: 60000
+    staleTime: 60000,
+    enabled: !isFreshStart // Don't fetch if fresh start
   });
 
   // Fetch emotional patterns
@@ -62,7 +66,8 @@ export default function MoodTracker({ userId = 1 }: { userId?: number }) {
       if (!response.ok) throw new Error('Failed to fetch emotional patterns');
       return response.json();
     },
-    staleTime: 300000 // 5 minutes
+    staleTime: 300000, // 5 minutes
+    enabled: !isFreshStart // Don't fetch if fresh start
   });
 
   // Log mood entry mutation

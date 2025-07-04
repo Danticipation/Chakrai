@@ -16,9 +16,12 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [moodFilter, setMoodFilter] = useState('all');
 
+  // Check if this is a fresh start 
+  const isFreshStart = localStorage.getItem('freshStart') === 'true';
+
   const { data: entries = [], isLoading: entriesLoading } = useQuery({
     queryKey: ['/api/journal', userId],
-    enabled: !!userId
+    enabled: !!userId && !isFreshStart // Don't fetch if fresh start
   });
 
   const { data: analytics = [] } = useQuery({
@@ -389,7 +392,30 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
             </div>
 
             {/* Entries List */}
-            {entriesLoading ? (
+            {isFreshStart ? (
+              <div className="text-center py-8">
+                <BookOpen className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-secondary)' }} />
+                <p className="mb-4 text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
+                  Fresh Start! 🌟
+                </p>
+                <p className="mb-6 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  Your data has been cleared. Start your therapeutic journey by writing your first entry.
+                </p>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('freshStart');
+                    handleNewEntry();
+                  }}
+                  className="px-6 py-3 rounded-2xl text-sm font-medium shadow-sm"
+                  style={{ 
+                    backgroundColor: 'var(--soft-blue-dark)',
+                    color: 'white'
+                  }}
+                >
+                  Write First Entry
+                </button>
+              </div>
+            ) : entriesLoading ? (
               <div className="text-center py-8">
                 <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
                 <p style={{ color: 'var(--text-secondary)' }}>Loading your entries...</p>

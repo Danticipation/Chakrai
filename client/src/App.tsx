@@ -70,7 +70,9 @@ const AppLayout = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [input, setInput] = useState('');
   const [botStats, setBotStats] = useState<BotStats | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  // Check for fresh start and initialize empty messages
+  const isFreshStart = localStorage.getItem('freshStart') === 'true';
+  const [messages, setMessages] = useState<Message[]>(isFreshStart ? [] : []);
   const [loading, setLoading] = useState(false);
   const [contentLoading, setContentLoading] = useState(false);
   const [weeklySummary, setWeeklySummary] = useState<string>('');
@@ -593,10 +595,12 @@ const AppLayout = () => {
         
         const newDeviceId = Math.abs(hash).toString(36);
         localStorage.setItem('deviceFingerprint', newDeviceId);
+        localStorage.setItem('freshStart', 'true');
+        localStorage.setItem('freshStartTime', Date.now().toString());
         
         // Show success message and refresh
         alert('All data cleared successfully! Starting fresh...');
-        window.location.href = window.location.pathname + '?fresh=true';
+        window.location.reload();
       } catch (error) {
         console.error('Error clearing data:', error);
         alert('Error clearing data. Please try again.');
