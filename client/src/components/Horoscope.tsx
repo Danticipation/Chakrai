@@ -8,9 +8,35 @@ interface HoroscopeData {
 }
 
 const zodiacSigns = [
-  'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
-  'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'
+  { name: 'aries', symbol: '♈', emoji: '🐏', constellation: 'ram' },
+  { name: 'taurus', symbol: '♉', emoji: '🐂', constellation: 'bull' },
+  { name: 'gemini', symbol: '♊', emoji: '👯', constellation: 'twins' },
+  { name: 'cancer', symbol: '♋', emoji: '🦀', constellation: 'crab' },
+  { name: 'leo', symbol: '♌', emoji: '🦁', constellation: 'lion' },
+  { name: 'virgo', symbol: '♍', emoji: '👩', constellation: 'maiden' },
+  { name: 'libra', symbol: '♎', emoji: '⚖️', constellation: 'scales' },
+  { name: 'scorpio', symbol: '♏', emoji: '🦂', constellation: 'scorpion' },
+  { name: 'sagittarius', symbol: '♐', emoji: '🏹', constellation: 'archer' },
+  { name: 'capricorn', symbol: '♑', emoji: '🐐', constellation: 'goat' },
+  { name: 'aquarius', symbol: '♒', emoji: '🏺', constellation: 'water' },
+  { name: 'pisces', symbol: '♓', emoji: '🐟', constellation: 'fish' }
 ];
+
+// Constellation patterns for each zodiac sign
+const constellationPatterns = {
+  aries: [[20, 30], [40, 20], [60, 40], [80, 25]],
+  taurus: [[15, 40], [35, 25], [55, 35], [75, 20], [85, 45]],
+  gemini: [[25, 20], [45, 30], [25, 50], [45, 60], [65, 25], [65, 55]],
+  cancer: [[30, 35], [50, 25], [70, 40], [50, 55]],
+  leo: [[20, 25], [35, 20], [50, 30], [65, 25], [80, 35], [70, 50]],
+  virgo: [[25, 20], [40, 30], [55, 20], [70, 35], [55, 50], [40, 60]],
+  libra: [[30, 30], [50, 20], [70, 30], [50, 50]],
+  scorpio: [[20, 40], [35, 30], [50, 35], [65, 25], [80, 40], [70, 55]],
+  sagittarius: [[25, 45], [40, 30], [55, 35], [70, 20], [85, 30]],
+  capricorn: [[30, 25], [45, 35], [60, 30], [75, 45], [60, 55]],
+  aquarius: [[20, 30], [35, 40], [50, 25], [65, 40], [80, 30]],
+  pisces: [[25, 25], [40, 35], [55, 30], [70, 45], [55, 55], [40, 50]]
+};
 
 interface HoroscopeProps {
   onBack?: () => void;
@@ -54,6 +80,91 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
   const handleSignChange = (sign: string) => {
     setSelectedSign(sign);
     fetchHoroscope(sign);
+  };
+
+  // Constellation component for animated background
+  const ConstellationBackground = ({ signName, isSelected }: { signName: string, isSelected: boolean }) => {
+    const pattern = constellationPatterns[signName as keyof typeof constellationPatterns] || [];
+    
+    return (
+      <div className={`absolute inset-0 transition-all duration-700 ${isSelected ? 'opacity-100' : 'opacity-40'}`}>
+        <svg className="w-full h-full" viewBox="0 0 100 80">
+          {/* Background cosmic dust */}
+          <defs>
+            <radialGradient id={`cosmic-${signName}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(147, 51, 234, 0.1)" />
+              <stop offset="50%" stopColor="rgba(79, 70, 229, 0.05)" />
+              <stop offset="100%" stopColor="transparent" />
+            </radialGradient>
+          </defs>
+          {isSelected && (
+            <circle
+              cx="50"
+              cy="40"
+              r="35"
+              fill={`url(#cosmic-${signName})`}
+              className="transition-all duration-1000"
+            />
+          )}
+          
+          {/* Stars */}
+          {pattern.map((star, index) => (
+            <circle
+              key={`star-${index}`}
+              cx={star[0]}
+              cy={star[1]}
+              r={isSelected ? "2" : "1.5"}
+              className={`fill-white transition-all duration-1000 ${
+                isSelected ? 'constellation-star selected' : 'constellation-star'
+              }`}
+              style={{
+                animationDelay: `${index * 300}ms`,
+                filter: isSelected ? 'drop-shadow(0 0 6px rgba(186,164,240,0.9))' : 'drop-shadow(0 0 2px rgba(255,255,255,0.5))'
+              }}
+            />
+          ))}
+          
+          {/* Constellation lines */}
+          {pattern.length > 1 && pattern.map((star, index) => {
+            if (index === pattern.length - 1) return null;
+            const nextStar = pattern[index + 1];
+            return (
+              <line
+                key={`line-${index}`}
+                x1={star[0]}
+                y1={star[1]}
+                x2={nextStar[0]}
+                y2={nextStar[1]}
+                className={`transition-all duration-1000 ${
+                  isSelected ? 'stroke-purple-300/80 constellation-line selected' : 'stroke-white/30 constellation-line'
+                }`}
+                strokeWidth={isSelected ? "1" : "0.5"}
+                style={{
+                  animationDelay: `${index * 400}ms`
+                }}
+              />
+            );
+          })}
+          
+          {/* Connect last to first for closed constellations */}
+          {pattern.length > 2 && (
+            <line
+              x1={pattern[pattern.length - 1][0]}
+              y1={pattern[pattern.length - 1][1]}
+              x2={pattern[0][0]}
+              y2={pattern[0][1]}
+              className={`transition-all duration-1000 ${
+                isSelected ? 'stroke-purple-300/80 constellation-line selected' : 'stroke-white/30 constellation-line'
+              }`}
+              strokeWidth={isSelected ? "1" : "0.5"}
+              style={{
+                animationDelay: `${pattern.length * 400}ms`
+              }}
+            />
+          )}
+        </svg>
+      </div>
+    );
   };
 
   const handleRefresh = () => {
@@ -164,21 +275,60 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
             </div>
           </div>
 
-          {/* Professional Zodiac Sign Selector */}
+          {/* Animated Zodiac Sign Selector with Constellation Backgrounds */}
           <div className="mb-8">
-            <h3 className="text-xl font-light text-white mb-4 tracking-wide">Select Your Zodiac Sign</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <h3 className="text-xl font-light text-white mb-6 tracking-wide text-center">
+              ✨ Select Your Zodiac Sign ✨
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {zodiacSigns.map((sign) => (
                 <button
-                  key={sign}
-                  onClick={() => handleSignChange(sign)}
-                  className={`py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
-                    selectedSign === sign
-                      ? 'bg-gradient-to-r from-[#3f51b5] to-[#5c6bc0] text-white shadow-lg border border-[#7986cb]/50 scale-105'
-                      : 'theme-primary/60 text-white/80 hover:theme-primary/80 hover:text-white border border-[#7986cb]/20 hover:border-[#7986cb]/40'
+                  key={sign.name}
+                  onClick={() => handleSignChange(sign.name)}
+                  className={`zodiac-card relative overflow-hidden group py-6 px-4 rounded-2xl border-2 constellation-backdrop ${
+                    selectedSign === sign.name
+                      ? 'selected bg-gradient-to-br from-purple-900/90 to-blue-900/90 border-purple-400/80 shadow-2xl shadow-purple-500/50'
+                      : 'bg-gradient-to-br from-gray-900/70 to-gray-800/70 border-gray-500/50 hover:border-purple-400/60 hover:shadow-xl hover:shadow-purple-500/30'
                   }`}
                 >
-                  {sign.charAt(0).toUpperCase() + sign.slice(1)}
+                  {/* Constellation Background */}
+                  <ConstellationBackground signName={sign.name} isSelected={selectedSign === sign.name} />
+                  
+                  {/* Sign Content */}
+                  <div className="relative z-10 flex flex-col items-center space-y-3">
+                    <div className={`text-3xl transition-all duration-500 ${
+                      selectedSign === sign.name ? 'zodiac-emoji selected transform scale-110' : 'zodiac-emoji group-hover:scale-105'
+                    }`}>
+                      {sign.emoji}
+                    </div>
+                    <div className={`text-2xl font-bold transition-all duration-400 ${
+                      selectedSign === sign.name ? 'text-purple-200 drop-shadow-lg' : 'text-white/90 group-hover:text-purple-200'
+                    }`}>
+                      {sign.symbol}
+                    </div>
+                    <div className={`text-sm font-semibold tracking-wider transition-all duration-400 ${
+                      selectedSign === sign.name ? 'text-white drop-shadow-md' : 'text-white/85 group-hover:text-white'
+                    }`}>
+                      {sign.name.charAt(0).toUpperCase() + sign.name.slice(1)}
+                    </div>
+                    <div className={`text-xs font-medium text-center transition-all duration-400 ${
+                      selectedSign === sign.name ? 'text-purple-200/90' : 'text-white/60 group-hover:text-purple-200/80'
+                    }`}>
+                      {sign.constellation}
+                    </div>
+                  </div>
+                  
+                  {/* Enhanced shimmer effect for selected */}
+                  {selectedSign === sign.name && (
+                    <div className="absolute inset-0 bg-gradient-to-45 from-transparent via-purple-300/20 via-blue-300/15 to-transparent animate-pulse opacity-70"></div>
+                  )}
+                  
+                  {/* Hover glow effect */}
+                  <div className={`absolute inset-0 rounded-2xl transition-all duration-500 ${
+                    selectedSign === sign.name 
+                      ? 'bg-gradient-to-br from-purple-500/10 to-blue-500/10' 
+                      : 'group-hover:bg-gradient-to-br group-hover:from-purple-500/5 group-hover:to-blue-500/5'
+                  }`}></div>
                 </button>
               ))}
             </div>
