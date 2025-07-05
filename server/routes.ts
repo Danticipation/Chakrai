@@ -2484,4 +2484,57 @@ router.delete('/api/users/:userId/achievements', async (req, res) => {
   }
 });
 
+// Streak Tracking API Endpoints
+router.get('/api/users/:userId/streaks', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const streaks = await storage.getUserStreaks(userId);
+    res.json({ streaks });
+  } catch (error) {
+    console.error('Get user streaks error:', error);
+    res.status(500).json({ error: 'Failed to get user streaks' });
+  }
+});
+
+router.post('/api/users/:userId/activity', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { activityType } = req.body;
+    
+    // Record activity and update streaks
+    await storage.updateStreakOnActivity(userId, activityType);
+    
+    // Get updated streaks
+    const streaks = await storage.getUserStreaks(userId);
+    
+    res.json({ success: true, streaks });
+  } catch (error) {
+    console.error('Record activity error:', error);
+    res.status(500).json({ error: 'Failed to record activity' });
+  }
+});
+
+// Get real streak statistics for the home page
+router.get('/api/users/:userId/streak-stats', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const streaks = await storage.getUserStreaks(userId);
+    
+    // Get specific streak data
+    const dailyActiveStreak = streaks.find(s => s.streakType === 'app_visit') || { currentStreak: 0 };
+    const journalingStreak = streaks.find(s => s.streakType === 'journal_entry') || { currentStreak: 0 };
+    
+    const stats = {
+      consecutiveDaysActive: dailyActiveStreak.currentStreak,
+      consecutiveDaysJournaling: journalingStreak.currentStreak,
+      totalActiveDays: streaks.reduce((sum, streak) => sum + (streak.totalActiveDays || 0), 0)
+    };
+    
+    res.json(stats);
+  } catch (error) {
+    console.error('Get streak stats error:', error);
+    res.status(500).json({ error: 'Failed to get streak statistics' });
+  }
+});
+
 export default router;

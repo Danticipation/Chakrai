@@ -6,7 +6,7 @@ import {
   moodForecasts, emotionalContexts, predictiveInsights, emotionalResponseAdaptations, crisisDetectionLogs,
   monthlyWellnessReports, analyticsMetrics, progressTracking, riskAssessments, longitudinalTrends,
   userWellnessPoints, pointsTransactions, rewardsShop, userPurchases, achievements,
-  dailyActivities, communityChallenges, userChallengeProgress, userLevels,
+  dailyActivities, communityChallenges, userChallengeProgress, userLevels, userStreaks,
   conversationSummaries, semanticMemories, memoryConnections, memoryInsights,
   therapists, clientTherapistRelationships, clientPrivacySettings, therapistSessionNotes, riskAlerts,
   type User, type InsertUser,
@@ -44,6 +44,8 @@ import {
   type ClientPrivacySettings, type InsertClientPrivacySettings,
   type TherapistSessionNotes, type InsertTherapistSessionNotes,
   type RiskAlert, type InsertRiskAlert,
+  type UserStreak, type InsertUserStreak,
+  type DailyActivity, type InsertDailyActivity,
 } from "@shared/schema";
 import { eq, desc, and, lt } from "drizzle-orm";
 
@@ -224,6 +226,19 @@ export interface IStorage {
   
   getClientDashboardData(therapistId: number, clientUserId: number): Promise<any>;
   generateRiskAlerts(clientUserId: number): Promise<void>;
+
+  // Streak Tracking System
+  createUserStreak(data: InsertUserStreak): Promise<UserStreak>;
+  updateUserStreak(userId: number, streakType: string, updates: Partial<InsertUserStreak>): Promise<void>;
+  getUserStreaks(userId: number): Promise<UserStreak[]>;
+  getUserStreak(userId: number, streakType: string): Promise<UserStreak | null>;
+  
+  recordDailyActivity(data: InsertDailyActivity): Promise<DailyActivity>;
+  getDailyActivities(userId: number, days?: number): Promise<DailyActivity[]>;
+  hasActivityToday(userId: number, activityType: string): Promise<boolean>;
+  
+  calculateStreak(userId: number, streakType: string): Promise<number>;
+  updateStreakOnActivity(userId: number, activityType: string): Promise<void>;
 }
 
 export class DbStorage implements IStorage {
@@ -1384,6 +1399,139 @@ export class DbStorage implements IStorage {
 
   async deleteUserAchievements(userId: number): Promise<void> {
     return this.clearUserAchievements(userId);
+  }
+
+  // Streak Tracking System Implementation
+  async createUserStreak(data: InsertUserStreak): Promise<UserStreak> {
+    const [streak] = await this.db.insert(userStreaks).values(data).returning();
+    return streak;
+  }
+
+  async updateUserStreak(userId: number, streakType: string, updates: Partial<InsertUserStreak>): Promise<void> {
+    await this.db
+      .update(userStreaks)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(and(eq(userStreaks.userId, userId), eq(userStreaks.streakType, streakType)));
+  }
+
+  async getUserStreaks(userId: number): Promise<UserStreak[]> {
+    return await this.db.select().from(userStreaks).where(eq(userStreaks.userId, userId));
+  }
+
+  async getUserStreak(userId: number, streakType: string): Promise<UserStreak | null> {
+    const [streak] = await this.db
+      .select()
+      .from(userStreaks)
+      .where(and(eq(userStreaks.userId, userId), eq(userStreaks.streakType, streakType)));
+    return streak || null;
+  }
+
+  async recordDailyActivity(data: InsertDailyActivity): Promise<DailyActivity> {
+    const [activity] = await this.db.insert(dailyActivities).values(data).returning();
+    return activity;
+  }
+
+  async getDailyActivities(userId: number, days: number = 30): Promise<DailyActivity[]> {
+    const daysAgo = new Date();
+    daysAgo.setDate(daysAgo.getDate() - days);
+    
+    return await this.db
+      .select()
+      .from(dailyActivities)
+      .where(and(
+        eq(dailyActivities.userId, userId),
+        lt(dailyActivities.activityDate, daysAgo)
+      ))
+      .orderBy(desc(dailyActivities.activityDate));
+  }
+
+  async hasActivityToday(userId: number, activityType: string): Promise<boolean> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const [activity] = await this.db
+      .select()
+      .from(dailyActivities)
+      .where(and(
+        eq(dailyActivities.userId, userId),
+        eq(dailyActivities.activityType, activityType),
+        lt(dailyActivities.activityDate, today),
+        lt(dailyActivities.activityDate, tomorrow)
+      ));
+
+    return !!activity;
+  }
+
+  async calculateStreak(userId: number, streakType: string): Promise<number> {
+    const activities = await this.getDailyActivities(userId, 365); // Get up to a year of activities
+    const activityType = streakType.replace('_streak', ''); // Convert 'daily_active_streak' to 'daily_active'
+    
+    let currentStreak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Count consecutive days from today backwards
+    for (let i = 0; i < 365; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(checkDate.getDate() - i);
+      
+      const hasActivity = activities.some(activity => {
+        const activityDate = new Date(activity.activityDate);
+        activityDate.setHours(0, 0, 0, 0);
+        return activityDate.getTime() === checkDate.getTime() && 
+               activity.activityType === activityType;
+      });
+      
+      if (hasActivity) {
+        currentStreak++;
+      } else {
+        break;
+      }
+    }
+    
+    return currentStreak;
+  }
+
+  async updateStreakOnActivity(userId: number, activityType: string): Promise<void> {
+    // Record the activity
+    await this.recordDailyActivity({
+      userId,
+      activityType,
+      activityDate: new Date(),
+      activityCount: 1
+    });
+
+    // Calculate new streak
+    const streakType = `${activityType}_streak`;
+    const newStreak = await this.calculateStreak(userId, streakType);
+    
+    // Get or create user streak record
+    let userStreak = await this.getUserStreak(userId, streakType);
+    
+    if (!userStreak) {
+      // Create new streak record
+      userStreak = await this.createUserStreak({
+        userId,
+        streakType,
+        currentStreak: newStreak,
+        longestStreak: newStreak,
+        lastActivityDate: new Date(),
+        streakStartDate: new Date(),
+        totalActiveDays: 1
+      });
+    } else {
+      // Update existing streak record
+      const updates: Partial<InsertUserStreak> = {
+        currentStreak: newStreak,
+        longestStreak: Math.max(userStreak.longestStreak || 0, newStreak),
+        lastActivityDate: new Date(),
+        totalActiveDays: (userStreak.totalActiveDays || 0) + 1
+      };
+      
+      await this.updateUserStreak(userId, streakType, updates);
+    }
   }
 }
 

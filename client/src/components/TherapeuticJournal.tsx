@@ -28,7 +28,7 @@ interface JournalAnalytics {
 }
 
 interface TherapeuticJournalProps {
-  userId: number;
+  userId: number | null;
   onEntryCreated?: (entry: JournalEntry) => void;
 }
 
@@ -75,6 +75,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   ];
 
   useEffect(() => {
+    if (!userId) return;
+    
     // Check for fresh start flag
     const freshStart = localStorage.getItem('freshStart');
     if (freshStart) {
@@ -94,6 +96,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
       setRecentEntries([]);
       return;
     }
+    
+    if (!userId) return;
     
     try {
       const response = await fetch(`/api/journal/entries/${userId}`);
@@ -214,6 +218,11 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   };
 
   const saveEntry = async () => {
+    if (!userId) {
+      alert('User session not available. Please refresh the page and try again.');
+      return;
+    }
+    
     if (!entry.content.trim()) {
       alert('Please write something before saving your journal entry.');
       return;

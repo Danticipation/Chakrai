@@ -85,6 +85,11 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   const [contentLoading, setContentLoading] = useState(false);
   const [weeklySummary, setWeeklySummary] = useState<string>('');
   const [showReflection, setShowReflection] = useState(false);
+  const [streakStats, setStreakStats] = useState<{
+    consecutiveDaysActive: number;
+    consecutiveDaysJournaling: number;
+    totalActiveDays: number;
+  } | null>(null);
 
   // Feature descriptions for user guidance
   const featureDescriptions: Record<string, string> = {
@@ -220,6 +225,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     fetchHoroscope();
     fetchWeeklySummary();
     loadZodiacData();
+    fetchStreakStats();
+    recordAppVisit();
     
     // User proceeds directly to app after personality quiz
 
@@ -259,6 +266,36 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
       }
     } catch (error) {
       console.error('Failed to fetch bot stats:', error);
+    }
+  };
+
+  const fetchStreakStats = async () => {
+    try {
+      if (currentUserId) {
+        const response = await fetch(`/api/users/${currentUserId}/streak-stats`);
+        if (response.ok) {
+          const data = await response.json();
+          setStreakStats(data);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch streak stats:', error);
+    }
+  };
+
+  const recordAppVisit = async () => {
+    try {
+      if (currentUserId) {
+        await fetch(`/api/users/${currentUserId}/activity`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ activityType: 'app_visit' })
+        });
+        // Refresh streak stats after recording activity
+        fetchStreakStats();
+      }
+    } catch (error) {
+      console.error('Failed to record app visit:', error);
     }
   };
 
@@ -677,14 +714,15 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   const renderMainContent = (section: string) => {
     switch (section) {
       case 'daily':
-        return <PersonalityReflection userId={1} />;
+        return <PersonalityReflection userId={currentUserId || 1} />;
 
       case 'journal':
         return (
           <TherapeuticJournal 
-            userId={1} 
+            userId={currentUserId || 1} 
             onEntryCreated={(entry) => {
               console.log('New journal entry created:', entry);
+              fetchStreakStats();
             }}
           />
         );
@@ -752,9 +790,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
       case 'journal':
         return (
           <TherapeuticJournal 
-            userId={1} 
+            userId={currentUserId || 1} 
             onEntryCreated={(entry) => {
               console.log('New journal entry created:', entry);
+              fetchStreakStats();
             }}
           />
         );
@@ -1284,7 +1323,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                   </div>
                 </div>
 
-                {/* Interactive Feature Cards with Hover Effects */}
+                {/* Real Streak Tracking Cards with Authentic Data */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div 
                     onClick={() => setActiveSection('daily')}
@@ -1293,8 +1332,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     <div className="text-4xl mb-3 group-hover:animate-bounce">🧠</div>
                     <h3 className="text-xl font-semibold theme-text mb-2">Mind & Mood</h3>
                     <p className="theme-text-secondary mb-3">Track your emotional wellness</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                      <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full w-3/4 animate-pulse"></div>
+                    <div className="theme-text-secondary text-sm mb-3">
+                      {streakStats ? `${streakStats.consecutiveDaysActive} consecutive days` : 'No data yet'}
                     </div>
                     <button className="mt-2 px-4 py-2 theme-primary theme-text rounded-lg text-sm font-medium hover:opacity-80 transition-opacity group-hover:scale-110">
                       View Reflection
@@ -1308,8 +1347,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     <div className="text-4xl mb-3 group-hover:animate-pulse">📝</div>
                     <h3 className="text-xl font-semibold theme-text mb-2">Journal</h3>
                     <p className="theme-text-secondary mb-3">Express your thoughts freely</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                      <div className="bg-gradient-to-r from-green-500 to-teal-500 h-2 rounded-full w-2/3 animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                    <div className="theme-text-secondary text-sm mb-3">
+                      {streakStats ? `${streakStats.consecutiveDaysJournaling} consecutive days` : 'No entries yet'}
                     </div>
                     <button className="mt-2 px-4 py-2 theme-primary theme-text rounded-lg text-sm font-medium hover:opacity-80 transition-opacity group-hover:scale-110">
                       Write Entry
@@ -1323,14 +1362,38 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     <div className="text-4xl mb-3 group-hover:animate-spin">📊</div>
                     <h3 className="text-xl font-semibold theme-text mb-2">Analytics</h3>
                     <p className="theme-text-secondary mb-3">View your progress insights</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                      <div className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full w-4/5 animate-pulse" style={{animationDelay: '1s'}}></div>
+                    <div className="theme-text-secondary text-sm mb-3">
+                      {streakStats ? `${streakStats.totalActiveDays} total active days` : 'No data yet'}
                     </div>
                     <button className="mt-2 px-4 py-2 theme-primary theme-text rounded-lg text-sm font-medium hover:opacity-80 transition-opacity group-hover:scale-110">
                       View Analytics
                     </button>
                   </div>
                 </div>
+
+                {/* Real Streak Statistics Section */}
+                {streakStats && (
+                  <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg">
+                    <h2 className="text-2xl font-bold theme-text mb-6 text-center">🔥 Your Wellness Streaks</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold theme-text mb-2">{streakStats.consecutiveDaysActive}</div>
+                        <div className="theme-text-secondary">Consecutive Days Active</div>
+                        <div className="text-sm theme-text opacity-60 mt-1">Keep visiting daily!</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold theme-text mb-2">{streakStats.consecutiveDaysJournaling}</div>
+                        <div className="theme-text-secondary">Journal Streak</div>
+                        <div className="text-sm theme-text opacity-60 mt-1">Express your thoughts daily</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold theme-text mb-2">{streakStats.totalActiveDays}</div>
+                        <div className="theme-text-secondary">Total Active Days</div>
+                        <div className="text-sm theme-text opacity-60 mt-1">Your wellness journey</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Daily Inspiration Section with Enhanced Animations */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

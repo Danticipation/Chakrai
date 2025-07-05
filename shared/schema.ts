@@ -89,6 +89,30 @@ export const userFacts = pgTable("user_facts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// User streak tracking for wellness features
+export const userStreaks = pgTable("user_streaks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  streakType: text("streak_type").notNull(), // 'daily_active', 'journaling', 'mood_tracking', 'chat_sessions'
+  currentStreak: integer("current_streak").default(0),
+  longestStreak: integer("longest_streak").default(0),
+  lastActivityDate: timestamp("last_activity_date"),
+  streakStartDate: timestamp("streak_start_date"),
+  totalActiveDays: integer("total_active_days").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Daily activity tracking for streak calculations
+export const dailyActivities = pgTable("daily_activities", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  activityDate: timestamp("activity_date").notNull(),
+  activityType: text("activity_type").notNull(), // 'app_visit', 'journal_entry', 'mood_entry', 'chat_session'
+  activityCount: integer("activity_count").default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Enhanced Memory System with Semantic Recall
 export const conversationSummaries = pgTable("conversation_summaries", {
   id: serial("id").primaryKey(),
@@ -595,19 +619,7 @@ export const wellnessStreaks = pgTable("wellness_streaks", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Daily Activities Tracking
-export const dailyActivities = pgTable("daily_activities", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  activityDate: timestamp("activity_date").defaultNow(),
-  journalEntry: boolean("journal_entry").default(false),
-  moodTracking: boolean("mood_tracking").default(false),
-  chatSession: boolean("chat_session").default(false),
-  goalProgress: boolean("goal_progress").default(false),
-  dailyCheckin: boolean("daily_checkin").default(false),
-  pointsEarned: integer("points_earned").default(0),
-  activitiesCompleted: integer("activities_completed").default(0),
-});
+
 
 // Community Challenges
 export const communityChallenges = pgTable("community_challenges", {
@@ -847,3 +859,20 @@ export type InsertClientTherapistRelationship = z.infer<typeof insertClientThera
 export type InsertClientPrivacySettings = z.infer<typeof insertClientPrivacySettingsSchema>;
 export type InsertTherapistSessionNotes = z.infer<typeof insertTherapistSessionNotesSchema>;
 export type InsertRiskAlert = z.infer<typeof insertRiskAlertSchema>;
+
+// Streak tracking system types
+export const insertUserStreakSchema = createInsertSchema(userStreaks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertDailyActivitySchema = createInsertSchema(dailyActivities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type UserStreak = typeof userStreaks.$inferSelect;
+export type DailyActivity = typeof dailyActivities.$inferSelect;
+export type InsertUserStreak = z.infer<typeof insertUserStreakSchema>;
+export type InsertDailyActivity = z.infer<typeof insertDailyActivitySchema>;
