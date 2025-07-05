@@ -20,7 +20,7 @@ import HealthIntegration from './components/HealthIntegration';
 import PrivacyCompliance from './components/PrivacyCompliance';
 import TherapistPortal from './components/TherapistPortal';
 import AiPerformanceMonitoringDashboard from './components/AiPerformanceMonitoringDashboard';
-import HoroscopeModal from './components/HoroscopeModal';
+import Horoscope from './components/Horoscope';
 import DailyAffirmation from './components/DailyAffirmation';
 import PWAManager from './components/PWAManager';
 import MicroSession from './components/MicroSession';
@@ -866,7 +866,7 @@ const AppLayout = () => {
         );
 
       case 'horoscope':
-        return <HoroscopeModal />;
+        return <Horoscope onBack={() => setActiveSection('chat')} />;
 
       case 'affirmation':
         return <DailyAffirmation onBack={() => setActiveSection('chat')} />;
