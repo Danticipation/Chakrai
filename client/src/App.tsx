@@ -29,6 +29,7 @@ import TherapeuticAnalytics from './components/TherapeuticAnalytics';
 import { EHRIntegration } from './components/EHRIntegration';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import FloatingChat from './components/FloatingChat';
+import ChallengeSystem from './components/ChallengeSystem';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -97,6 +98,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     'journal': 'Private therapeutic journaling with mood tracking, voice-to-text, and AI insights to help process thoughts and emotions.',
     'memory': 'View how TraI learns and remembers your personality, preferences, and conversation patterns to provide more personalized support.',
     'analytics': 'Comprehensive wellness analytics showing mood trends, journal insights, goal progress, and therapeutic outcomes over time.',
+    'challenges': 'Gamified wellness challenges with daily, weekly, streak, and seasonal goals to motivate consistent self-care and mental health practices.',
     'rewards': 'Wellness point system where you earn rewards for therapeutic activities and can unlock achievements, themes, and premium content.',
     'community': 'Connect with peer support groups, wellness challenges, and therapeutic forums in a safe, moderated environment.',
     'vr': 'Virtual reality guided meditation, exposure therapy, and immersive therapeutic environments for enhanced mental wellness.',
@@ -733,6 +735,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
       case 'analytics':
         return <AnalyticsDashboard userId={1} />;
 
+      case 'challenges':
+        return <ChallengeSystem />;
+
       case 'rewards':
         return <WellnessRewards />;
 
@@ -803,6 +808,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
       case 'analytics':
         return <AnalyticsDashboard userId={1} />;
+
+      case 'challenges':
+        return <ChallengeSystem />;
 
       case 'rewards':
         return <WellnessRewards />;
@@ -1134,6 +1142,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 { id: 'analytics', label: 'Analytics', icon: '📊' },
                 { id: 'voice', label: 'Voice', icon: '🎤' },
                 { id: 'themes', label: 'Themes', icon: '🎨' },
+                { id: 'challenges', label: 'Challenges', icon: '🏆' },
                 { id: 'rewards', label: 'Rewards', icon: '🎁' },
                 { id: 'community', label: 'Community', icon: '👥' },
                 { id: 'vr', label: 'VR Therapy', icon: '🥽' },
@@ -1152,7 +1161,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                       setShowSettings(true);
                     } else if (tab.id === 'floating-chat') {
                       setIsFloatingChatOpen(true);
-                    } else if (['journal', 'analytics', 'memory', 'daily', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans'].includes(tab.id)) {
+                    } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans'].includes(tab.id)) {
                       setContentLoading(true);
                       setMobileModalContent(tab.id);
                       setShowMobileModal(true);
@@ -1219,6 +1228,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               { id: 'analytics', label: 'Analytics' },
               { id: 'voice', label: 'Voice Settings' },
               { id: 'themes', label: 'Color Themes' },
+              { id: 'challenges', label: 'Challenges' },
               { id: 'rewards', label: 'Rewards' },
               { id: 'community', label: 'Community' },
               { id: 'adaptive', label: 'AI Learning' },
@@ -1471,6 +1481,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     {activeSection === 'journal' && 'Therapeutic Journal'}
                     {activeSection === 'memory' && 'Memory Dashboard'}
                     {activeSection === 'analytics' && 'Analytics & Reporting'}
+                    {activeSection === 'challenges' && 'Wellness Challenges'}
                     {activeSection === 'rewards' && 'Wellness Rewards'}
                     {activeSection === 'community' && 'Community & Professional Support'}
                     {activeSection === 'adaptive' && 'Adaptive Learning & Personalization'}
