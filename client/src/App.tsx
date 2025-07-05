@@ -1393,24 +1393,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                   </div>
                 </div>
 
-                {/* New Wellness Stats Section */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="theme-card backdrop-blur-sm rounded-xl p-4 border border-[var(--theme-accent)]/30 shadow-lg text-center">
-                    <div className="text-2xl font-bold theme-text">{botStats?.level || 3}</div>
-                    <div className="text-sm theme-text-secondary">Current Level</div>
-                    <div className="text-xs theme-text opacity-60 mt-1">{botStats?.stage || 'Wellness Companion'}</div>
-                  </div>
-                  <div className="theme-card backdrop-blur-sm rounded-xl p-4 border border-[var(--theme-accent)]/30 shadow-lg text-center">
-                    <div className="text-2xl font-bold theme-text">12</div>
-                    <div className="text-sm theme-text-secondary">Days Active</div>
-                    <div className="text-xs theme-text opacity-60 mt-1">Keep up the momentum!</div>
-                  </div>
-                  <div className="theme-card backdrop-blur-sm rounded-xl p-4 border border-[var(--theme-accent)]/30 shadow-lg text-center">
-                    <div className="text-2xl font-bold theme-text">95%</div>
-                    <div className="text-sm theme-text-secondary">Wellness Score</div>
-                    <div className="text-xs theme-text opacity-60 mt-1">Excellent progress!</div>
-                  </div>
-                </div>
+
 
               </div>
             </div>
