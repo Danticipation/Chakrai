@@ -105,6 +105,69 @@ app.get('/api/user/current', (req, res) => {
   });
 });
 
+// Anonymous user management endpoints (direct implementation)
+app.post('/api/users/anonymous', async (req, res) => {
+  try {
+    const { deviceFingerprint } = req.body;
+    
+    if (!deviceFingerprint) {
+      return res.status(400).json({ error: 'Device fingerprint required' });
+    }
+
+    // Check if user already exists with this device fingerprint
+    let user = await storage.getUserByDeviceFingerprint(deviceFingerprint);
+    
+    if (!user) {
+      // Create new anonymous user
+      const userData = {
+        username: `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        email: null,
+        anonymousId: `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        deviceFingerprint,
+        isAnonymous: true,
+        lastActiveAt: new Date()
+      };
+      
+      user = await storage.createUser(userData);
+    } else {
+      // Update last active time
+      await storage.updateUserLastActive(user.id);
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error('Anonymous user creation error:', error);
+    res.status(500).json({ error: 'Failed to create anonymous user' });
+  }
+});
+
+// User profile check endpoint
+app.get('/api/user-profile-check/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const profile = await storage.getUserProfile(userId);
+    
+    res.json({
+      needsQuiz: !profile || !profile.quizCompleted
+    });
+  } catch (error) {
+    console.error('Check user profile error:', error);
+    res.status(500).json({ error: 'Failed to check user profile' });
+  }
+});
+
+// User profile creation endpoint
+app.post('/api/user-profile', async (req, res) => {
+  try {
+    const profileData = req.body;
+    const profile = await storage.createUserProfile(profileData);
+    res.json(profile);
+  } catch (error) {
+    console.error('Create user profile error:', error);
+    res.status(500).json({ error: 'Failed to create user profile' });
+  }
+});
+
 
 
 // Setup Vite in development or serve static files in production
