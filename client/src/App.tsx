@@ -1508,43 +1508,38 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             <div className="theme-card rounded-lg p-6">
               <div className="theme-text text-lg font-bold mb-3">Daily Journaling</div>
               <div className="theme-background rounded-full h-4 mb-3">
-                <div className="progress-high h-4 rounded-full" style={{width: '75%'}}></div>
+                <div className="progress-high h-4 rounded-full" style={{width: streakStats ? `${Math.min(100, (streakStats.consecutiveDaysJournaling / 30) * 100)}%` : '0%'}}></div>
               </div>
-              <div className="theme-text text-base">15/20 days this month</div>
+              <div className="theme-text text-base">{streakStats ? `${streakStats.consecutiveDaysJournaling} day streak` : 'No data yet'}</div>
             </div>
 
             {/* Weekly Chat Sessions */}
             <div className="theme-card rounded-lg p-6">
-              <div className="theme-text text-lg font-bold mb-3">Weekly Chat Goal</div>
+              <div className="theme-text text-lg font-bold mb-3">Chat Activity</div>
               <div className="theme-background rounded-full h-4 mb-3">
-                <div className="progress-medium h-4 rounded-full" style={{width: '60%'}}></div>
+                <div className="progress-medium h-4 rounded-full" style={{width: streakStats ? `${Math.min(100, (streakStats.consecutiveDaysActive / 7) * 100)}%` : '0%'}}></div>
               </div>
-              <div className="theme-text text-base">3/5 sessions this week</div>
+              <div className="theme-text text-base">{streakStats ? `${streakStats.consecutiveDaysActive} active days` : 'No activity yet'}</div>
             </div>
 
-            {/* Mood Tracking Consistency */}
+            {/* Total Active Days */}
             <div className="theme-card rounded-lg p-6">
-              <div className="theme-text text-lg font-bold mb-3">Mood Tracking</div>
+              <div className="theme-text text-lg font-bold mb-3">Total Active Days</div>
               <div className="theme-background rounded-full h-4 mb-3">
-                <div className="progress-high h-4 rounded-full" style={{width: '90%'}}></div>
+                <div className="progress-high h-4 rounded-full" style={{width: streakStats ? `${Math.min(100, (streakStats.totalActiveDays / 30) * 100)}%` : '0%'}}></div>
               </div>
-              <div className="theme-text text-base">27/30 days tracked</div>
+              <div className="theme-text text-base">{streakStats ? `${streakStats.totalActiveDays} days total` : 'No activity yet'}</div>
             </div>
 
-            {/* App Usage Streak */}
-            <div className="theme-card rounded-lg p-6">
-              <div className="theme-text text-lg font-bold mb-3">App Usage Streak</div>
-              <div className="theme-background rounded-full h-4 mb-3">
-                <div className="progress-high h-4 rounded-full" style={{width: '85%'}}></div>
-              </div>
-              <div className="theme-text text-base">17 consecutive days</div>
-            </div>
-
-            {/* Overall Wellness Score */}
+            {/* Wellness Journey */}
             <div className="theme-card rounded-lg p-6 text-center">
-              <div className="theme-text text-lg font-bold mb-3">Overall Wellness</div>
-              <div className="theme-text text-3xl font-bold">85%</div>
-              <div className="theme-text text-base">This month</div>
+              <div className="theme-text text-lg font-bold mb-3">Wellness Journey</div>
+              <div className="theme-text text-2xl font-bold mb-2">
+                {streakStats && streakStats.totalActiveDays > 0 ? `Day ${streakStats.totalActiveDays}` : 'Day 1'}
+              </div>
+              <div className="theme-text-secondary text-sm">
+                {streakStats && streakStats.totalActiveDays > 0 ? 'Keep going strong!' : 'Your journey begins'}
+              </div>
             </div>
 
             {/* Reset Data Button */}
