@@ -46,7 +46,7 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
     },
     breakpoints: {
       "(min-width: 1024px)": {
-        slides: { perView: 'auto' }, // Let desktop show all with scroll
+        slides: { perView: 'auto' },
       }
     }
   });
@@ -118,18 +118,81 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
           setCurrentAudio(null);
           URL.revokeObjectURL(audioUrl);
         };
-        setIsLoadingAudio(false);
+        audio.onerror = () => {
+          setIsPlaying(false);
+          setCurrentAudio(null);
+          URL.revokeObjectURL(audioUrl);
+          setError('Audio playback failed');
+        };
         setIsPlaying(true);
         await audio.play();
       } else {
-        throw new Error('No audio data received');
+        setError('No audio data received');
       }
     } catch (error) {
+      setError('Voice synthesis failed. Please try again.');
+    } finally {
       setIsLoadingAudio(false);
-      setIsPlaying(false);
-      setCurrentAudio(null);
-      setError('Voice reading failed. Please try again.');
     }
+  };
+
+  // Constellation patterns for each zodiac sign
+  const getConstellationPattern = (constellation: string) => {
+    const patterns = {
+      ram: [[20, 30], [40, 20], [60, 35], [80, 25]],
+      bull: [[25, 35], [45, 25], [65, 30], [75, 40]],
+      twins: [[30, 25], [50, 30], [70, 25], [30, 55], [50, 60], [70, 55]],
+      crab: [[35, 30], [50, 25], [65, 30], [40, 45], [60, 45]],
+      lion: [[25, 25], [45, 30], [65, 25], [35, 45], [55, 50], [75, 45]],
+      maiden: [[30, 20], [50, 25], [70, 30], [40, 50], [60, 55]],
+      scales: [[35, 25], [65, 25], [50, 40], [30, 55], [70, 55]],
+      scorpion: [[20, 30], [40, 25], [60, 35], [80, 40], [70, 55]],
+      archer: [[25, 30], [45, 25], [65, 35], [75, 20], [85, 30]],
+      goat: [[30, 25], [50, 30], [70, 25], [45, 45], [65, 50]],
+      water: [[35, 20], [55, 25], [75, 30], [40, 45], [60, 50], [80, 45]],
+      fish: [[25, 30], [45, 25], [65, 35], [30, 50], [50, 55], [70, 50]]
+    };
+    return patterns[constellation as keyof typeof patterns] || patterns.ram;
+  };
+
+  const renderConstellation = (constellation: string) => {
+    const points = getConstellationPattern(constellation);
+    return (
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 80">
+        <defs>
+          <radialGradient id={`starGlow-${constellation}`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8"/>
+            <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.2"/>
+          </radialGradient>
+        </defs>
+        {points.map((point, index) => (
+          <g key={index}>
+            <circle
+              cx={point[0]}
+              cy={point[1]}
+              r="1.5"
+              fill={`url(#starGlow-${constellation})`}
+              className="animate-pulse"
+              style={{
+                animationDelay: `${index * 0.2}s`,
+                animationDuration: '2s'
+              }}
+            />
+            {index < points.length - 1 && (
+              <line
+                x1={point[0]}
+                y1={point[1]}
+                x2={points[index + 1][0]}
+                y2={points[index + 1][1]}
+                stroke="rgba(124, 58, 237, 0.4)"
+                strokeWidth="0.5"
+                className="constellation-line"
+              />
+            )}
+          </g>
+        ))}
+      </svg>
+    );
   };
 
   return (
@@ -166,87 +229,81 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
             </div>
           </div>
 
-          {/* Zodiac Selector - Scroll on desktop, swipe on mobile */}
+          {/* Animated Zodiac Sign Selector with Constellation Backgrounds */}
           <div className="mb-8 px-6">
             <h3 className="text-xl font-light text-white mb-6 tracking-wide text-center">
               ✨ Select Your Zodiac Sign ✨
             </h3>
-            <div
-              ref={sliderRef}
-              className="keen-slider flex overflow-x-auto space-x-4 p-2 no-scrollbar"
-            >
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {zodiacSigns.map((sign) => (
-                <div className="keen-slider__slide flex-shrink-0 w-40" key={sign.name}>
-                  <button
-                    onClick={() => handleSignChange(sign.name)}
-                    className={`zodiac-card relative overflow-hidden group py-6 px-4 rounded-2xl border-2 constellation-backdrop ${
-                      selectedSign === sign.name
-                        ? 'selected bg-gradient-to-br from-purple-900/90 to-blue-900/90 border-purple-400/80 shadow-2xl shadow-purple-500/50'
-                        : 'bg-gradient-to-br from-gray-900/70 to-gray-800/70 border-gray-500/50 hover:border-purple-400/60 hover:shadow-xl hover:shadow-purple-500/30'
-                    }`}
-                  >
-                    <div className="relative z-10 flex flex-col items-center space-y-3">
-                      <div className="text-3xl">{sign.emoji}</div>
-                      <div className="text-2xl font-bold text-white/90">{sign.symbol}</div>
-                      <div className="text-sm text-white/70">{sign.name}</div>
+                <button
+                  key={sign.name}
+                  onClick={() => handleSignChange(sign.name)}
+                  className={`zodiac-card relative overflow-hidden group py-6 px-4 rounded-2xl border-2 constellation-backdrop ${
+                    selectedSign === sign.name
+                      ? 'selected bg-gradient-to-br from-purple-900/90 to-blue-900/90 border-purple-400/80 shadow-2xl shadow-purple-500/50'
+                      : 'bg-gradient-to-br from-gray-900/70 to-gray-800/70 border-gray-500/50 hover:border-purple-400/60 hover:shadow-xl hover:shadow-purple-500/30'
+                  }`}
+                >
+                  {renderConstellation(sign.constellation)}
+                  <div className="relative z-10 text-center space-y-2">
+                    <div className="text-3xl mb-2 zodiac-float">{sign.emoji}</div>
+                    <div className="text-2xl font-light text-white">{sign.symbol}</div>
+                    <div className="text-sm font-medium text-white/90 capitalize tracking-wider">
+                      {sign.name}
                     </div>
-                  </button>
-                </div>
+                    <div className="text-xs text-white/60 capitalize">
+                      {sign.constellation}
+                    </div>
+                  </div>
+                  {selectedSign === sign.name && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-2xl mystical-pulse"></div>
+                  )}
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Horoscope Display */}
-          <div className="bg-[var(--theme-secondary)] rounded-xl p-4 border border-[#3949ab]/30 max-h-[calc(100vh-400px)] overflow-y-auto">
-            {!selectedSign ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Star className="text-purple-300 mb-4" size={48} />
-                <h3 className="text-xl font-semibold text-white mb-2">Choose Your Zodiac Sign</h3>
-                <p className="text-white/70 max-w-md">
-                  Select your zodiac sign above to receive personalized cosmic guidance and wellness insights.
-                </p>
+          {/* Horoscope Content Display */}
+          <div className="px-6">
+            {error && (
+              <div className="bg-red-500/20 border border-red-400/50 rounded-xl p-4 mb-6">
+                <p className="text-red-200 text-center">{error}</p>
               </div>
-            ) : loading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="flex items-center space-x-3">
-                  <Sparkles className="text-purple-300 animate-pulse" size={24} />
-                  <span className="text-white">Reading the stars...</span>
+            )}
+
+            {loading && (
+              <div className="bg-white/5 rounded-xl p-8 mb-6 border border-white/10 backdrop-blur-sm">
+                <div className="flex items-center justify-center space-x-3">
+                  <Loader2 className="animate-spin text-white" size={24} />
+                  <span className="text-white/90">Consulting the stars...</span>
                 </div>
               </div>
-            ) : error ? (
-              <div className="text-center py-8">
-                <p className="text-red-300 mb-4">{error}</p>
-                <button
-                  onClick={handleRefresh}
-                  className="px-4 py-2 theme-primary text-white rounded-lg hover:theme-primary transition-colors"
-                >
-                  Try Again
-                </button>
-              </div>
-            ) : horoscopeData ? (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    <Sparkles className="text-purple-300" size={20} />
-                    <h2 className="text-xl font-bold text-white">
-                      {horoscopeData.sign} - {horoscopeData.date}
+            )}
+
+            {horoscopeData && !loading ? (
+              <div className="space-y-6 mb-8">
+                <div className="flex items-center justify-between bg-white/10 rounded-xl p-4 border border-white/20">
+                  <div>
+                    <h2 className="text-2xl font-light text-white mb-1">
+                      {horoscopeData.sign} Horoscope
                     </h2>
+                    <p className="text-white/60 text-sm">{horoscopeData.date}</p>
                   </div>
                   <button
                     onClick={handleVoiceToggle}
-                    disabled={loading || isLoadingAudio}
-                    className="p-2 rounded-lg theme-primary/50 hover:theme-primary/70 transition-colors disabled:opacity-50 flex items-center space-x-2"
-                    title={isLoadingAudio ? "Loading audio..." : isPlaying ? "Stop reading" : "Read aloud"}
+                    disabled={isLoadingAudio}
+                    className="flex items-center space-x-2 px-4 py-2 bg-[#3f51b5] hover:bg-[#5c6bc0] rounded-lg transition-colors disabled:opacity-50"
                   >
                     {isLoadingAudio ? (
-                      <Loader2 className="text-white animate-spin" size={20} />
+                      <Loader2 className="animate-spin text-white" size={16} />
                     ) : isPlaying ? (
-                      <VolumeX className="text-white" size={20} />
+                      <VolumeX className="text-white" size={16} />
                     ) : (
-                      <Volume2 className="text-white" size={20} />
+                      <Volume2 className="text-white" size={16} />
                     )}
-                    <span className="text-sm text-white hidden sm:inline">
-                      {isLoadingAudio ? "Loading..." : isPlaying ? "Stop" : "Listen"}
+                    <span className="text-white text-sm">
+                      {isLoadingAudio ? 'Loading...' : isPlaying ? 'Stop' : 'Listen'}
                     </span>
                   </button>
                 </div>
@@ -269,4 +326,3 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
     </div>
   );
 }
-
