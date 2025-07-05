@@ -1,4 +1,4 @@
-// Voice Configuration for Reflectibot
+// Voice Configuration for TraI
 
 export const defaultVoiceId = "EkK5I93UQWFDigLMpZcX"; // James
 
