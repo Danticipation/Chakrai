@@ -47,9 +47,9 @@ export const VOICE_CONFIGS: VoiceConfig[] = [
     accent: 'American',
     characteristics: ['warm', 'empathetic', 'caring']
   },
-  // New voices added (4)
+  // New voices added (4) - Updated with working ElevenLabs voice IDs
   {
-    id: 's3WpFb3KxhwHdqCNjxE1',
+    id: '21m00Tcm4TlvDq8ikWAM',
     name: 'Hope',
     description: 'Warm and encouraging',
     gender: 'Female',
@@ -88,7 +88,7 @@ export const VOICE_MAPPING: Record<string, string> = {
   brian: 'nPczCjzI2devNBz1zQrb',
   alexandra: 'kdmDKE6EkgrWrrykO9Qt',
   carla: 'l32B8XDoylOsZKiSdfhE',
-  hope: 's3WpFb3KxhwHdqCNjxE1',
+  hope: '21m00Tcm4TlvDq8ikWAM',
   charlotte: 'XB0fDUnXU5powFXDhCwa',
   bronson: 'Yko7PKHZNXotIFUBG7I9',
   marcus: 'y3kKRaK2dnn3OgKDBckk'
