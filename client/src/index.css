@@ -1,6 +1,14 @@
+/* Import serif fonts with distinctive capital I's */
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Apply serif font globally */
+body {
+  font-family: 'Crimson Text', 'Playfair Display', 'Times New Roman', 'Georgia', serif;
+}
 
 :root {
   /* Default theme - these will be overridden by ThemeContext */
