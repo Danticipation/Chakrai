@@ -252,7 +252,7 @@ Adapt your response to mirror the user's communication patterns while maintainin
       'alexandra': 'kdmDKE6EkgrWrrykO9Qt', // Female
       'carla': 'l32B8XDoylOsZKiSdfhE',  // Female
       // New voices added
-      'hope': '21m00Tcm4TlvDq8ikWAM',   // Female
+      'hope': 'iCrDUkL56s3C8sCRl7wb',   // Female
       'charlotte': 'XB0fDUnXU5powFXDhCwa', // Female
       'bronson': 'Yko7PKHZNXotIFUBG7I9', // Male
       'marcus': 'y3kKRaK2dnn3OgKDBckk'   // Male
@@ -406,7 +406,7 @@ router.post('/text-to-speech', async (req, res) => {
       'alexandra': 'kdmDKE6EkgrWrrykO9Qt', // Female
       'carla': 'l32B8XDoylOsZKiSdfhE',  // Female
       // New voices added
-      'hope': '21m00Tcm4TlvDq8ikWAM',   // Female
+      'hope': 'iCrDUkL56s3C8sCRl7wb',   // Female
       'charlotte': 'XB0fDUnXU5powFXDhCwa', // Female
       'bronson': 'Yko7PKHZNXotIFUBG7I9', // Male
       'marcus': 'y3kKRaK2dnn3OgKDBckk'   // Male

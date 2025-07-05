@@ -88,7 +88,7 @@ export const VOICE_MAPPING: Record<string, string> = {
   brian: 'nPczCjzI2devNBz1zQrb',
   alexandra: 'kdmDKE6EkgrWrrykO9Qt',
   carla: 'l32B8XDoylOsZKiSdfhE',
-  hope: '21m00Tcm4TlvDq8ikWAM',
+  hope: 'iCrDUkL56s3C8sCRl7wb',
   charlotte: 'XB0fDUnXU5powFXDhCwa',
   bronson: 'Yko7PKHZNXotIFUBG7I9',
   marcus: 'y3kKRaK2dnn3OgKDBckk'
