@@ -6,7 +6,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import ThemeSelector from './components/ThemeSelector';
-import OnboardingQuiz from './components/OnboardingQuiz';
+
 import PersonalityQuiz from './components/PersonalityQuiz';
 import TherapeuticJournal from './components/TherapeuticJournal';
 import PersonalityReflection from './components/PersonalityReflection';
@@ -75,7 +75,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   }, [activeSection]);
 
   const [isRecording, setIsRecording] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+
   const [input, setInput] = useState('');
   const [botStats, setBotStats] = useState<BotStats | null>(null);
   // Check for fresh start and initialize empty messages
@@ -221,11 +221,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     fetchWeeklySummary();
     loadZodiacData();
     
-    if (user && user.hasCompletedOnboarding) {
-      // User is onboarded, proceed with app
-    } else {
-      setShowOnboarding(true);
-    }
+    // User proceeds directly to app after personality quiz
 
     // PWA notification event handlers
     const handleMoodTracking = (event: any) => {
@@ -972,22 +968,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     }
   };
 
-  const onOnboardingComplete = () => {
-    console.log('Onboarding completed');
-  };
 
-  const handleCompleteOnboarding = () => {
-    onOnboardingComplete();
-    setShowOnboarding(false);
-  };
-
-  if (showOnboarding) {
-    return (
-      <div className="h-screen theme-background">
-        <OnboardingQuiz onComplete={handleCompleteOnboarding} />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen theme-background flex flex-col mobile-polish-container">
