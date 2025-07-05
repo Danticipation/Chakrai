@@ -2335,4 +2335,153 @@ router.post('/api/vr/accessibility-profile/:userId', async (req, res) => {
   }
 });
 
+// User Personality Profile routes
+router.get('/api/user-profile/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const profile = await storage.getUserProfile(userId);
+    
+    if (!profile) {
+      return res.status(404).json({ error: 'User profile not found' });
+    }
+    
+    res.json({ profile });
+  } catch (error) {
+    console.error('Get user profile error:', error);
+    res.status(500).json({ error: 'Failed to get user profile' });
+  }
+});
+
+router.post('/api/user-profile', async (req, res) => {
+  try {
+    const { userId, ...profileData } = req.body;
+    
+    // Check if profile already exists
+    const existingProfile = await storage.getUserProfile(userId);
+    
+    if (existingProfile) {
+      // Update existing profile
+      const updatedProfile = await storage.updateUserProfile(userId, profileData);
+      res.json({ profile: updatedProfile });
+    } else {
+      // Create new profile
+      const newProfile = await storage.createUserProfile({
+        userId,
+        ...profileData
+      });
+      res.json({ profile: newProfile });
+    }
+  } catch (error) {
+    console.error('Save user profile error:', error);
+    res.status(500).json({ error: 'Failed to save user profile' });
+  }
+});
+
+router.get('/api/user-profile-check/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const profile = await storage.getUserProfile(userId);
+    
+    res.json({ 
+      hasProfile: !!profile,
+      needsQuiz: !profile?.quizCompleted
+    });
+  } catch (error) {
+    console.error('Check user profile error:', error);
+    res.status(500).json({ error: 'Failed to check user profile' });
+  }
+});
+
+// Anonymous user management endpoints
+router.post('/api/users/anonymous', async (req, res) => {
+  try {
+    const { deviceFingerprint } = req.body;
+    
+    if (!deviceFingerprint) {
+      return res.status(400).json({ error: 'Device fingerprint required' });
+    }
+
+    // Check if user already exists with this device fingerprint
+    let user = await storage.getUserByDeviceFingerprint(deviceFingerprint);
+    
+    if (!user) {
+      // Create new anonymous user
+      const userData = {
+        username: `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        email: null,
+        anonymousId: `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        deviceFingerprint,
+        isAnonymous: true,
+        lastActiveAt: new Date()
+      };
+      
+      user = await storage.createUser(userData);
+    } else {
+      // Update last active time
+      await storage.updateUserLastActive(user.id);
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error('Anonymous user creation error:', error);
+    res.status(500).json({ error: 'Failed to create anonymous user' });
+  }
+});
+
+// Data reset endpoints for user isolation
+router.delete('/api/users/:userId/messages', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    await storage.deleteUserMessages(userId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete user messages error:', error);
+    res.status(500).json({ error: 'Failed to delete user messages' });
+  }
+});
+
+router.delete('/api/users/:userId/journal-entries', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    await storage.deleteUserJournalEntries(userId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete user journal entries error:', error);
+    res.status(500).json({ error: 'Failed to delete user journal entries' });
+  }
+});
+
+router.delete('/api/users/:userId/mood-entries', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    await storage.deleteUserMoodEntries(userId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete user mood entries error:', error);
+    res.status(500).json({ error: 'Failed to delete user mood entries' });
+  }
+});
+
+router.delete('/api/users/:userId/goals', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    await storage.deleteUserGoals(userId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete user goals error:', error);
+    res.status(500).json({ error: 'Failed to delete user goals' });
+  }
+});
+
+router.delete('/api/users/:userId/achievements', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    await storage.deleteUserAchievements(userId);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete user achievements error:', error);
+    res.status(500).json({ error: 'Failed to delete user achievements' });
+  }
+});
+
 export default router;

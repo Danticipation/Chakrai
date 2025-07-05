@@ -7,6 +7,7 @@ import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import ThemeSelector from './components/ThemeSelector';
 import OnboardingQuiz from './components/OnboardingQuiz';
+import PersonalityQuiz from './components/PersonalityQuiz';
 import TherapeuticJournal from './components/TherapeuticJournal';
 import PersonalityReflection from './components/PersonalityReflection';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -59,7 +60,12 @@ interface Goal {
   color: string;
 }
 
-const AppLayout = () => {
+interface AppLayoutProps {
+  currentUserId: number | null;
+  onDataReset: () => void;
+}
+
+const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   const [activeSection, setActiveSection] = useState('chat');
   const queryClient = useQueryClient();
   
@@ -1609,7 +1615,123 @@ const AppLayout = () => {
 };
 
 const AppWithOnboarding = () => {
-  return <AppLayout />;
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [showPersonalityQuiz, setShowPersonalityQuiz] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
+  // User session management
+  useEffect(() => {
+    const initializeUser = async () => {
+      try {
+        // Get device fingerprint for anonymous users
+        const deviceFingerprint = await generateDeviceFingerprint();
+        
+        // Check if user exists or create anonymous user
+        const response = await axios.post('/api/users/anonymous', {
+          deviceFingerprint
+        });
+        
+        const userId = response.data.user.id;
+        setCurrentUserId(userId);
+        
+        // Check if user needs personality quiz
+        const profileResponse = await axios.get(`/api/user-profile-check/${userId}`);
+        
+        if (profileResponse.data.needsQuiz) {
+          setShowPersonalityQuiz(true);
+        }
+      } catch (error) {
+        console.error('Failed to initialize user:', error);
+        // Fallback to guest mode
+        setCurrentUserId(1);
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    initializeUser();
+  }, []);
+
+  const generateDeviceFingerprint = async (): Promise<string> => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx?.fillText('TraI Fingerprint', 10, 10);
+    
+    const fingerprint = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width + 'x' + screen.height,
+      new Date().getTimezoneOffset(),
+      canvas.toDataURL()
+    ].join('|');
+    
+    return btoa(fingerprint).slice(0, 32);
+  };
+
+  const handlePersonalityQuizComplete = async (profile: any) => {
+    try {
+      if (currentUserId) {
+        await axios.post('/api/user-profile', {
+          userId: currentUserId,
+          ...profile
+        });
+      }
+      setShowPersonalityQuiz(false);
+    } catch (error) {
+      console.error('Failed to save personality profile:', error);
+    }
+  };
+
+  const handleDataReset = async () => {
+    if (currentUserId) {
+      // Clear user data but keep the user record
+      try {
+        await Promise.all([
+          axios.delete(`/api/users/${currentUserId}/messages`),
+          axios.delete(`/api/users/${currentUserId}/journal-entries`),
+          axios.delete(`/api/users/${currentUserId}/mood-entries`),
+          axios.delete(`/api/users/${currentUserId}/goals`),
+          axios.delete(`/api/users/${currentUserId}/achievements`)
+        ]);
+        
+        // Show personality quiz for fresh start
+        setShowPersonalityQuiz(true);
+        
+        // Clear localStorage
+        localStorage.removeItem('freshStart');
+        localStorage.setItem('freshStart', 'true');
+        
+        // Refresh the page
+        window.location.reload();
+      } catch (error) {
+        console.error('Failed to reset user data:', error);
+      }
+    }
+  };
+
+  // Show loading while initializing
+  if (isLoadingProfile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
+        <div className="text-white text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p>Initializing your wellness companion...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show personality quiz if needed
+  if (showPersonalityQuiz) {
+    return (
+      <PersonalityQuiz 
+        onComplete={handlePersonalityQuizComplete}
+        onSkip={() => setShowPersonalityQuiz(false)}
+      />
+    );
+  }
+
+  return <AppLayout currentUserId={currentUserId} onDataReset={handleDataReset} />;
 };
 
 export default function App() {

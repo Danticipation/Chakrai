@@ -18,6 +18,23 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// User personality profiles from onboarding quiz
+export const userProfiles = pgTable("user_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  communicationStyle: text("communication_style").notNull(), // direct, gentle, encouraging, analytical
+  emotionalSupport: text("emotional_support").notNull(), // high, moderate, minimal
+  preferredTone: text("preferred_tone").notNull(), // casual, professional, warm, straightforward
+  primaryGoals: text("primary_goals").array(), // array of goal strings
+  stressResponses: text("stress_responses").array(), // array of stress response strings
+  motivationFactors: text("motivation_factors").array(), // array of motivation strings
+  sessionPreference: text("session_preference").notNull(), // short, medium, long
+  personalityTraits: text("personality_traits").array(), // array of trait strings
+  quizCompleted: boolean("quiz_completed").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const bots = pgTable("bots", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
@@ -287,6 +304,12 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
+export const insertUserProfileSchema = createInsertSchema(userProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertBotSchema = createInsertSchema(bots).omit({
   id: true,
   createdAt: true,
@@ -398,8 +421,10 @@ export type EmotionalContext = typeof emotionalContexts.$inferSelect;
 export type PredictiveInsight = typeof predictiveInsights.$inferSelect;
 export type EmotionalResponseAdaptation = typeof emotionalResponseAdaptations.$inferSelect;
 export type CrisisDetectionLog = typeof crisisDetectionLogs.$inferSelect;
+export type UserProfile = typeof userProfiles.$inferSelect;
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
 export type InsertBot = z.infer<typeof insertBotSchema>;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type InsertLearnedWord = z.infer<typeof insertLearnedWordSchema>;

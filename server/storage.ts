@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { 
-  users, bots, messages, learnedWords, milestones, userMemories, userFacts,
+  users, userProfiles, bots, messages, learnedWords, milestones, userMemories, userFacts,
   journalEntries, moodEntries, therapeuticGoals, supportForums, forumPosts,
   userAchievements, wellnessStreaks, emotionalPatterns,
   moodForecasts, emotionalContexts, predictiveInsights, emotionalResponseAdaptations, crisisDetectionLogs,
@@ -10,6 +10,7 @@ import {
   conversationSummaries, semanticMemories, memoryConnections, memoryInsights,
   therapists, clientTherapistRelationships, clientPrivacySettings, therapistSessionNotes, riskAlerts,
   type User, type InsertUser,
+  type UserProfile, type InsertUserProfile,
   type Bot, type InsertBot,
   type Message, type InsertMessage,
   type LearnedWord, type InsertLearnedWord,
@@ -55,6 +56,11 @@ export interface IStorage {
   updateUser(id: number, data: Partial<InsertUser>): Promise<User>;
   updateUserLastActive(id: number): Promise<void>;
   deleteInactiveAnonymousUsers(beforeDate: Date): Promise<void>;
+  
+  // User Profiles
+  createUserProfile(data: InsertUserProfile): Promise<UserProfile>;
+  getUserProfile(userId: number): Promise<UserProfile | null>;
+  updateUserProfile(userId: number, data: Partial<InsertUserProfile>): Promise<UserProfile>;
   
   // Data clearing methods for fresh starts
   clearUserMessages(userId: number): Promise<void>;
@@ -270,6 +276,25 @@ export class DbStorage implements IStorage {
   async getBotByUserId(userId: number): Promise<Bot | null> {
     const [bot] = await this.db.select().from(bots).where(eq(bots.userId, userId));
     return bot || null;
+  }
+
+  // User Profiles
+  async createUserProfile(data: InsertUserProfile): Promise<UserProfile> {
+    const [profile] = await this.db.insert(userProfiles).values(data).returning();
+    return profile;
+  }
+
+  async getUserProfile(userId: number): Promise<UserProfile | null> {
+    const profiles = await this.db.select().from(userProfiles).where(eq(userProfiles.userId, userId));
+    return profiles[0] || null;
+  }
+
+  async updateUserProfile(userId: number, data: Partial<InsertUserProfile>): Promise<UserProfile> {
+    const [profile] = await this.db.update(userProfiles)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(userProfiles.userId, userId))
+      .returning();
+    return profile;
   }
 
   async createBot(data: InsertBot): Promise<Bot> {
@@ -1338,6 +1363,27 @@ export class DbStorage implements IStorage {
     await this.db.delete(emotionalContexts).where(eq(emotionalContexts.userId, userId));
     await this.db.delete(predictiveInsights).where(eq(predictiveInsights.userId, userId));
     await this.db.delete(crisisDetectionLogs).where(eq(crisisDetectionLogs.userId, userId));
+  }
+
+  // Alias methods for API compatibility
+  async deleteUserMessages(userId: number): Promise<void> {
+    return this.clearUserMessages(userId);
+  }
+
+  async deleteUserJournalEntries(userId: number): Promise<void> {
+    return this.clearUserJournalEntries(userId);
+  }
+
+  async deleteUserMoodEntries(userId: number): Promise<void> {
+    return this.clearUserMoodEntries(userId);
+  }
+
+  async deleteUserGoals(userId: number): Promise<void> {
+    return this.clearUserGoals(userId);
+  }
+
+  async deleteUserAchievements(userId: number): Promise<void> {
+    return this.clearUserAchievements(userId);
   }
 }
 
