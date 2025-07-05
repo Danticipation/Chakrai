@@ -1,56 +1,53 @@
-import React, { useState } from 'react';
-import Modal from './Modal';
-import HoroscopeModal from './HoroscopeModal';
-import Affirmation from './Affirmation';
-import SettingsModal from './SettingsModal';
+import React from 'react';
 
-export default function Dashboard() {
-  const [isHoroscopeOpen, setIsHoroscopeOpen] = useState(false);
-  const [isAffirmationOpen, setIsAffirmationOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+export default function HoroscopeModal({ onClose }: { onClose: () => void }) {
+  const zodiacSigns = [
+    { name: 'Aries', emoji: '🐏' },
+    { name: 'Taurus', emoji: '🐂' },
+    { name: 'Gemini', emoji: '👯‍♂️' },
+    { name: 'Cancer', emoji: '🦀' },
+    { name: 'Leo', emoji: '🦁' },
+    { name: 'Virgo', emoji: '👩‍🌾' },
+    { name: 'Libra', emoji: '⚖️' },
+    { name: 'Scorpio', emoji: '🦂' },
+    { name: 'Sagittarius', emoji: '🏹' },
+    { name: 'Capricorn', emoji: '🐐' },
+    { name: 'Aquarius', emoji: '🏺' },
+    { name: 'Pisces', emoji: '🐟' }
+  ];
 
   return (
-    <>
-      <div className="dashboard p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div
-            className="dashboard-card cursor-pointer bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-3xl p-6 shadow-xl hover:scale-105 hover:shadow-2xl transition-all duration-300"
-            onClick={() => setIsHoroscopeOpen(true)}
-          >
-            <h3 className="text-2xl font-bold mb-2">🔮 Horoscope</h3>
-            <p className="text-base opacity-80">Explore your daily zodiac insights with elegance.</p>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black bg-opacity-70 backdrop-blur-md animate-fadeIn"
+        onClick={onClose}
+      />
 
-          <div
-            className="dashboard-card cursor-pointer bg-gradient-to-br from-pink-500 to-rose-600 text-white rounded-3xl p-6 shadow-xl hover:scale-105 hover:shadow-2xl transition-all duration-300"
-            onClick={() => setIsAffirmationOpen(true)}
-          >
-            <h3 className="text-2xl font-bold mb-2">💖 Affirmation</h3>
-            <p className="text-base opacity-80">Empower your mind with today’s affirmation.</p>
-          </div>
+      {/* Modal Content */}
+      <div className="relative bg-gradient-to-b from-gray-900 to-gray-800 rounded-3xl shadow-2xl max-w-5xl w-full p-8 animate-scaleIn">
+        <button
+          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors text-2xl"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          ×
+        </button>
 
-          <div
-            className="dashboard-card cursor-pointer bg-gradient-to-br from-gray-700 to-slate-900 text-white rounded-3xl p-6 shadow-xl hover:scale-105 hover:shadow-2xl transition-all duration-300"
-            onClick={() => setIsSettingsOpen(true)}
-          >
-            <h3 className="text-2xl font-bold mb-2">⚙️ Settings</h3>
-            <p className="text-base opacity-80">Tweak your preferences and fine-tune your experience.</p>
-          </div>
+        <h2 className="text-3xl font-extrabold text-center text-white mb-6">✨ Select Your Zodiac Sign ✨</h2>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+          {zodiacSigns.map((sign) => (
+            <div
+              key={sign.name}
+              className="flex flex-col items-center justify-center p-4 bg-gradient-to-tr from-purple-600 to-indigo-700 rounded-xl shadow-lg cursor-pointer hover:scale-105 hover:shadow-2xl transition-transform duration-300"
+            >
+              <span className="text-5xl mb-2">{sign.emoji}</span>
+              <span className="text-lg font-semibold text-white tracking-wide">{sign.name}</span>
+            </div>
+          ))}
         </div>
       </div>
-
-      {/* Premium Reusable Modal System */}
-      <Modal isOpen={isHoroscopeOpen} onClose={() => setIsHoroscopeOpen(false)} title="Daily Horoscope">
-        <HoroscopeModal />
-      </Modal>
-
-      <Modal isOpen={isAffirmationOpen} onClose={() => setIsAffirmationOpen(false)} title="Daily Affirmation">
-        <Affirmation />
-      </Modal>
-
-      <Modal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} title="Settings">
-        <SettingsModal />
-      </Modal>
-    </>
+    </div>
   );
 }
