@@ -252,14 +252,14 @@ Adapt your response to mirror the user's communication patterns while maintainin
       'alexandra': 'kdmDKE6EkgrWrrykO9Qt', // Female
       'carla': 'l32B8XDoylOsZKiSdfhE',  // Female
       // New voices added
-      'hope': 'iCrDUkL56s3C8sCRl7wb',   // Female
+      'hope': 's3WpFb3KxhwHdqCNjxE1',   // Female
       'charlotte': 'XB0fDUnXU5powFXDhCwa', // Female
-      'bronson': 'TsW8a1Lp3kExG3Ny7cUn', // Male
-      'marcus': 'TxGEqnHWrfWFTfGW9XjX'   // Male
+      'bronson': 'Yko7PKHZNXotIFUBG7I9', // Male
+      'marcus': 'y3kKRaK2dnn3OgKDBckk'   // Male
     };
 
-    const selectedVoice = voice || 'hope';
-    const voiceId = voiceMap[selectedVoice] || voiceMap['hope'];
+    const selectedVoice = voice || 'james';
+    const voiceId = voiceMap[selectedVoice] || voiceMap['james'];
     let audioUrl = null;
 
     if (process.env.ELEVENLABS_API_KEY) {
@@ -406,10 +406,10 @@ router.post('/text-to-speech', async (req, res) => {
       'alexandra': 'kdmDKE6EkgrWrrykO9Qt', // Female
       'carla': 'l32B8XDoylOsZKiSdfhE',  // Female
       // New voices added
-      'hope': 'iCrDUkL56s3C8sCRl7wb',   // Female
+      'hope': 's3WpFb3KxhwHdqCNjxE1',   // Female
       'charlotte': 'XB0fDUnXU5powFXDhCwa', // Female
-      'bronson': 'TsW8a1Lp3kExG3Ny7cUn', // Male
-      'marcus': 'TxGEqnHWrfWFTfGW9XjX'   // Male
+      'bronson': 'Yko7PKHZNXotIFUBG7I9', // Male
+      'marcus': 'y3kKRaK2dnn3OgKDBckk'   // Male
     };
 
     const voiceId = voiceMap[voice] || voiceMap['hope'];

@@ -17,7 +17,11 @@ const zodiacSigns = [
   { name: "Pisces", emoji: "♓", date: "Feb 19 – Mar 20" },
 ];
 
-export default function Horoscope() {
+interface HoroscopeProps {
+  onBack?: () => void;
+}
+
+export default function Horoscope({ onBack }: HoroscopeProps) {
   const [selectedSign, setSelectedSign] = useState<string | null>(null);
   const [horoscope, setHoroscope] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
