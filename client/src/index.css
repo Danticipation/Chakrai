@@ -530,3 +530,90 @@ input:focus, button:focus {
 .zodiac-emoji.selected {
   animation: emoji-float 1.5s ease-in-out infinite;
 }
+
+/* Challenge System Animations */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.6); }
+}
+
+@keyframes progress-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes celebration-bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-30px); }
+  60% { transform: translateY(-15px); }
+}
+
+.animate-confetti {
+  animation: confetti-fall 3s linear forwards;
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-progress-pulse {
+  animation: progress-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-celebration-bounce {
+  animation: celebration-bounce 1s ease-in-out;
+}
+
+/* Enhanced progress ring animations */
+.progress-ring-animation {
+  transition: stroke-dashoffset 1s ease-out, stroke 0.3s ease;
+}
+
+/* Challenge card hover animations */
+.challenge-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.challenge-card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Reward tooltip animations */
+.reward-tooltip {
+  animation: sparkle 2s ease-in-out infinite;
+  transition: all 0.2s ease-out;
+}
+
+.reward-tooltip:hover {
+  transform: scale(1.05);
+}
+
+/* Leaderboard rank animations */
+.rank-badge {
+  transition: all 0.3s ease;
+}
+
+.rank-badge:hover {
+  transform: scale(1.1) rotate(5deg);
+}

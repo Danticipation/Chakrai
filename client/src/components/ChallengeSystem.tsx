@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Target, Clock, Calendar, Star, Award, CheckCircle, Timer } from 'lucide-react';
+import { Trophy, Target, Clock, Calendar, Star, Award, CheckCircle, Timer, Users, TrendingUp } from 'lucide-react';
 
 interface Challenge {
   id: string;
@@ -25,6 +25,25 @@ interface Challenge {
   active: boolean;
   startDate: string;
   endDate: string;
+  completed?: boolean;
+  completedAt?: string;
+}
+
+interface LeaderboardEntry {
+  id: string;
+  username: string;
+  totalPoints: number;
+  longestStreak: number;
+  rank: number;
+  avatar?: string;
+}
+
+interface RewardPreview {
+  type: 'badge' | 'theme' | 'avatar' | 'feature';
+  name: string;
+  description: string;
+  preview?: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
 }
 
 const starterChallenges: Challenge[] = [
@@ -230,6 +249,144 @@ const starterChallenges: Challenge[] = [
   }
 ];
 
+// Dynamic Progress Ring Component
+const ProgressRing: React.FC<{
+  progress: number;
+  size?: number;
+  strokeWidth?: number;
+  color?: 'active' | 'near-complete' | 'streak';
+  showPercentage?: boolean;
+  animated?: boolean;
+}> = ({ 
+  progress, 
+  size = 80, 
+  strokeWidth = 8, 
+  color = 'active', 
+  showPercentage = true,
+  animated = true 
+}) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  const colorMap = {
+    active: '#10b981', // green
+    'near-complete': '#f59e0b', // yellow
+    streak: '#ef4444' // red/fire
+  };
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg
+        width={size}
+        height={size}
+        className={`transform -rotate-90 ${animated ? 'transition-all duration-1000 ease-out' : ''}`}
+      >
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          className="text-gray-300 dark:text-gray-600"
+        />
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={colorMap[color]}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={strokeDasharray}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          className={animated ? 'transition-all duration-1000 ease-out' : ''}
+        />
+      </svg>
+      {showPercentage && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-sm font-bold theme-text">
+            {Math.round(progress)}%
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Confetti Animation Component
+const ConfettiAnimation: React.FC<{ show: boolean; onComplete: () => void }> = ({ show, onComplete }) => {
+  useEffect(() => {
+    if (show) {
+      const timer = setTimeout(onComplete, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [show, onComplete]);
+
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {[...Array(50)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-2 h-2 animate-bounce"
+          style={{
+            left: `${Math.random() * 100}%`,
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6'][Math.floor(Math.random() * 5)],
+            animationDelay: `${Math.random() * 2}s`,
+            animationDuration: `${2 + Math.random() * 2}s`
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// Reward Preview Tooltip Component
+const RewardPreview: React.FC<{ reward: RewardPreview; children: React.ReactNode }> = ({ reward, children }) => {
+  const [showPreview, setShowPreview] = useState(false);
+
+  const rarityColors = {
+    common: 'border-gray-400 bg-gray-50',
+    rare: 'border-blue-400 bg-blue-50',
+    epic: 'border-purple-400 bg-purple-50',
+    legendary: 'border-yellow-400 bg-yellow-50'
+  };
+
+  return (
+    <div 
+      className="relative"
+      onMouseEnter={() => setShowPreview(true)}
+      onMouseLeave={() => setShowPreview(false)}
+    >
+      {children}
+      {showPreview && (
+        <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 p-3 rounded-lg border-2 ${rarityColors[reward.rarity]} shadow-lg z-10 min-w-48`}>
+          <div className="text-sm font-bold text-gray-800">{reward.name}</div>
+          <div className="text-xs text-gray-600 mt-1">{reward.description}</div>
+          {reward.preview && (
+            <div className="mt-2 text-xs bg-white rounded p-2 border">
+              {reward.preview}
+            </div>
+          )}
+          <div className={`text-xs mt-1 font-medium ${
+            reward.rarity === 'legendary' ? 'text-yellow-600' :
+            reward.rarity === 'epic' ? 'text-purple-600' :
+            reward.rarity === 'rare' ? 'text-blue-600' : 'text-gray-600'
+          }`}>
+            {reward.rarity.toUpperCase()}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ChallengeSystem: React.FC = () => {
   const [challenges, setChallenges] = useState<Challenge[]>(starterChallenges);
   const [selectedTab, setSelectedTab] = useState('active');
@@ -237,8 +394,45 @@ const ChallengeSystem: React.FC = () => {
     totalPoints: 425,
     level: 3,
     completedChallenges: 12,
-    activeStreaks: 2
+    activeStreaks: 2,
+    longestStreak: 18
   });
+  
+  // Enhanced state for animations and features
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [completionMessage, setCompletionMessage] = useState('');
+  const [leaderboard] = useState<LeaderboardEntry[]>([
+    { id: '1', username: 'MindfulMaven', totalPoints: 1250, longestStreak: 45, rank: 1, avatar: '🧘‍♀️' },
+    { id: '2', username: 'WellnessWarrior', totalPoints: 980, longestStreak: 32, rank: 2, avatar: '💪' },
+    { id: '3', username: 'ZenSeeker', totalPoints: 756, longestStreak: 28, rank: 3, avatar: '🌸' },
+    { id: '4', username: 'You', totalPoints: 425, longestStreak: 18, rank: 4, avatar: '✨' },
+    { id: '5', username: 'CalmCrafter', totalPoints: 220, longestStreak: 15, rank: 5, avatar: '🎨' }
+  ]);
+
+  // Reward previews for interactive tooltips
+  const rewardPreviews: Record<string, RewardPreview> = {
+    'growth-seeker': {
+      type: 'badge',
+      name: 'Growth Seeker Badge',
+      description: 'Unlocked for 7 consecutive days of self-reflection',
+      preview: '🌱 A beautiful growing plant animation',
+      rarity: 'rare'
+    },
+    'zen-garden': {
+      type: 'theme',
+      name: 'Zen Garden Theme',
+      description: 'Peaceful green and earth tones with bamboo accents',
+      preview: '🎋 Soft greens, gentle animations, nature sounds',
+      rarity: 'epic'
+    },
+    'holiday-hero': {
+      type: 'badge',
+      name: 'Holiday Wellness Hero',
+      description: 'Maintained wellness routine during holiday season',
+      preview: '🎄 Festive badge with snowflake animations',
+      rarity: 'legendary'
+    }
+  };
 
   const getTypeIcon = (type: Challenge['type']) => {
     switch (type) {
@@ -264,20 +458,48 @@ const ChallengeSystem: React.FC = () => {
     return Math.min((current / goal) * 100, 100);
   };
 
+  // Enhanced completion with animations and sound
+  const playCompletionSound = () => {
+    try {
+      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApJn+fuwmUnBSN/y+/ckEAKFVyx5++lUxMJR5zl8L1nIAYujdXw2YAxBy13x+/aikAKGV+35++nVBEKSp/j8cNliQU5ijfP8dm5cxOG4A');
+      audio.volume = 0.3;
+      audio.play().catch(() => {}); // Fail silently if audio doesn't work
+    } catch (e) {
+      // Ignore audio errors
+    }
+  };
+
   const handleClaimReward = (challengeId: string) => {
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (!challenge) return;
+
+    // Update challenge completion
     setChallenges(prev => 
-      prev.map(challenge => 
-        challenge.id === challengeId 
-          ? { ...challenge, progress: { ...challenge.progress, current: challenge.progress.goal } }
-          : challenge
+      prev.map(c => 
+        c.id === challengeId 
+          ? { ...c, progress: { ...c.progress, current: c.progress.goal }, completed: true, completedAt: new Date().toISOString() }
+          : c
       )
     );
-    const completedChallenge = challenges.find(c => c.id === challengeId);
+
+    // Update user stats
     setUserStats(prev => ({
       ...prev,
-      totalPoints: prev.totalPoints + (completedChallenge?.reward.points || 0),
+      totalPoints: prev.totalPoints + challenge.reward.points,
       completedChallenges: prev.completedChallenges + 1
     }));
+
+    // Trigger celebration animations
+    setShowConfetti(true);
+    setCompletionMessage(`${challenge.reward.badge || 'Achievement'} Unlocked!`);
+    playCompletionSound();
+  };
+
+  const getProgressColor = (current: number, goal: number, type: Challenge['type']): 'active' | 'near-complete' | 'streak' => {
+    const progress = (current / goal) * 100;
+    if (type === 'streak') return 'streak';
+    if (progress >= 80) return 'near-complete';
+    return 'active';
   };
 
   const activeChallenges = challenges.filter(c => c.active);
@@ -337,18 +559,29 @@ const ChallengeSystem: React.FC = () => {
         </Card>
       </div>
 
-      {/* Challenge Tabs */}
+      {/* Challenge Tabs - Enhanced with Leaderboard */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="active">Active Challenges ({activeChallenges.length})</TabsTrigger>
-          <TabsTrigger value="completed">Completed ({completedChallenges.length})</TabsTrigger>
-          <TabsTrigger value="upcoming">Upcoming ({upcomingChallenges.length})</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsTrigger value="active" className="text-xs md:text-sm">
+            Active ({activeChallenges.length})
+          </TabsTrigger>
+          <TabsTrigger value="completed" className="text-xs md:text-sm">
+            Completed ({completedChallenges.length})
+          </TabsTrigger>
+          <TabsTrigger value="upcoming" className="text-xs md:text-sm">
+            Upcoming ({upcomingChallenges.length})
+          </TabsTrigger>
+          <TabsTrigger value="leaderboard" className="text-xs md:text-sm">
+            <Users className="h-3 w-3 md:h-4 md:w-4 mr-1" />
+            Leaderboard
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Mobile: Single Column Stack */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
             {activeChallenges.map((challenge) => (
-              <Card key={challenge.id} className="theme-surface border-theme-accent/30">
+              <Card key={challenge.id} className="theme-surface border-theme-accent/30 hover:shadow-lg transition-all duration-300">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -372,27 +605,47 @@ const ChallengeSystem: React.FC = () => {
                 </CardHeader>
                 
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="theme-text-secondary">Progress</span>
-                      <span className="theme-text">{challenge.progress.current}/{challenge.progress.goal}</span>
-                    </div>
-                    <Progress 
-                      value={calculateProgress(challenge.progress.current, challenge.progress.goal)} 
-                      className="h-2"
+                  {/* Dynamic Progress Ring with Percentage */}
+                  <div className="flex items-center justify-center">
+                    <ProgressRing
+                      progress={calculateProgress(challenge.progress.current, challenge.progress.goal)}
+                      size={100}
+                      strokeWidth={10}
+                      color={getProgressColor(challenge.progress.current, challenge.progress.goal, challenge.type)}
+                      showPercentage={true}
+                      animated={true}
                     />
                   </div>
                   
+                  <div className="text-center text-sm theme-text-secondary">
+                    {challenge.progress.current} of {challenge.progress.goal} completed
+                  </div>
+                  
+                  {/* Interactive Reward Preview */}
                   {challenge.reward.badge && (
-                    <div className="text-sm theme-text-secondary">
-                      <strong>Reward:</strong> {challenge.reward.badge}
-                    </div>
+                    <RewardPreview reward={rewardPreviews[challenge.id] || {
+                      type: 'badge',
+                      name: challenge.reward.badge,
+                      description: 'Earn this achievement by completing the challenge',
+                      rarity: 'common'
+                    }}>
+                      <div className="text-sm theme-text-secondary cursor-pointer hover:text-purple-500 transition-colors">
+                        <strong>🎁 Reward:</strong> {challenge.reward.badge}
+                      </div>
+                    </RewardPreview>
                   )}
                   
                   {challenge.reward.exclusive && (
-                    <div className="text-sm text-purple-600 dark:text-purple-400">
-                      <strong>Exclusive:</strong> {challenge.reward.exclusive}
-                    </div>
+                    <RewardPreview reward={rewardPreviews[challenge.id] || {
+                      type: 'theme',
+                      name: challenge.reward.exclusive,
+                      description: 'Exclusive unlock available only through this challenge',
+                      rarity: 'legendary'
+                    }}>
+                      <div className="text-sm text-purple-600 dark:text-purple-400 cursor-pointer hover:text-purple-400 transition-colors">
+                        <strong>✨ Exclusive:</strong> {challenge.reward.exclusive}
+                      </div>
+                    </RewardPreview>
                   )}
                   
                   {challenge.progress.streak && (
@@ -493,7 +746,132 @@ const ChallengeSystem: React.FC = () => {
             ))}
           </div>
         </TabsContent>
+
+        {/* Leaderboard Tab */}
+        <TabsContent value="leaderboard" className="space-y-4">
+          <div className="space-y-4">
+            <div className="text-center">
+              <h3 className="text-xl font-bold theme-text">🏆 Top Wellness Champions</h3>
+              <p className="text-sm theme-text-secondary mt-1">Community wellness leaderboard this month</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Top Wellness Points Earners */}
+              <Card className="theme-surface border-theme-accent/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 theme-text">
+                    <TrendingUp className="h-5 w-5 text-yellow-500" />
+                    Top Points Earners
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {leaderboard.slice(0, 5).map((entry, index) => (
+                    <div key={entry.id} className={`flex items-center justify-between p-3 rounded-lg ${
+                      entry.username === 'You' ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'theme-card'
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          index === 0 ? 'bg-yellow-100 text-yellow-800' :
+                          index === 1 ? 'bg-gray-100 text-gray-800' :
+                          index === 2 ? 'bg-orange-100 text-orange-800' :
+                          'bg-gray-50 text-gray-600'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        <span className="text-xl">{entry.avatar}</span>
+                        <div>
+                          <div className={`font-medium ${entry.username === 'You' ? 'text-blue-600 dark:text-blue-400' : 'theme-text'}`}>
+                            {entry.username}
+                          </div>
+                          <div className="text-sm theme-text-secondary">
+                            {entry.totalPoints} points
+                          </div>
+                        </div>
+                      </div>
+                      {index < 3 && (
+                        <div className="text-2xl">
+                          {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Longest Streak Holders */}
+              <Card className="theme-surface border-theme-accent/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 theme-text">
+                    <Target className="h-5 w-5 text-red-500" />
+                    Longest Streaks
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {leaderboard.sort((a, b) => b.longestStreak - a.longestStreak).slice(0, 5).map((entry, index) => (
+                    <div key={entry.id} className={`flex items-center justify-between p-3 rounded-lg ${
+                      entry.username === 'You' ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'theme-card'
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-red-100 text-red-800 flex items-center justify-center text-sm font-bold">
+                          {index + 1}
+                        </div>
+                        <span className="text-xl">{entry.avatar}</span>
+                        <div>
+                          <div className={`font-medium ${entry.username === 'You' ? 'text-blue-600 dark:text-blue-400' : 'theme-text'}`}>
+                            {entry.username}
+                          </div>
+                          <div className="text-sm theme-text-secondary">
+                            {entry.longestStreak} days
+                          </div>
+                        </div>
+                      </div>
+                      {entry.longestStreak >= 30 && (
+                        <div className="text-xl">🔥</div>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Community Challenge Participation */}
+            <Card className="theme-surface border-theme-accent/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 theme-text">
+                  <Users className="h-5 w-5 text-purple-500" />
+                  Community Challenge
+                </CardTitle>
+                <CardDescription className="theme-text-secondary">
+                  Join the monthly community wellness challenge
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-lg font-bold theme-text">Collective Mindfulness Hours</div>
+                  <div className="text-2xl font-bold text-purple-600">847 / 1000</div>
+                </div>
+                <Progress value={84.7} className="h-3 mb-2" />
+                <div className="text-sm theme-text-secondary text-center">
+                  15 days left • {leaderboard.length} participants contributing
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
       </Tabs>
+
+      {/* Confetti Animation */}
+      <ConfettiAnimation 
+        show={showConfetti} 
+        onComplete={() => setShowConfetti(false)} 
+      />
+
+      {/* Completion Message */}
+      {completionMessage && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg text-lg font-bold animate-bounce">
+          {completionMessage}
+        </div>
+      )}
     </div>
   );
 };
