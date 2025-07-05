@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, RefreshCw, Loader2, Volume2, VolumeX, X } from 'lucide-react';
+import { Star, RefreshCw, Loader2, Volume2, VolumeX, X, ArrowLeft } from 'lucide-react';
 
 interface HoroscopeProps {
   onBack?: () => void;
@@ -97,7 +97,7 @@ const constellationPatterns = {
 };
 
 export default function Horoscope({ onBack }: HoroscopeProps) {
-  const [selectedSign, setSelectedSign] = useState<string>('');
+  const [selectedSign, setSelectedSign] = useState<string | null>(null);
   const [horoscopeData, setHoroscopeData] = useState<{ sign: string; horoscope: string; date: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -319,22 +319,34 @@ export default function Horoscope({ onBack }: HoroscopeProps) {
                     <div className="bg-blue-900/40 rounded-xl p-8 border border-blue-400/30">
                       <div className="flex items-center justify-between mb-6">
                         <h4 className="text-xl font-semibold text-blue-200">Your Cosmic Guidance</h4>
-                        <button
-                          onClick={handleVoiceReading}
-                          disabled={isVoiceLoading}
-                          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-lg transition-colors"
-                        >
-                          {isVoiceLoading ? (
-                            <Loader2 className="animate-spin" size={16} />
-                          ) : currentAudio ? (
-                            <VolumeX size={16} />
-                          ) : (
-                            <Volume2 size={16} />
-                          )}
-                          <span className="text-sm">
-                            {isVoiceLoading ? 'Loading...' : currentAudio ? 'Stop' : 'Listen'}
-                          </span>
-                        </button>
+                        <div className="flex items-center space-x-3">
+                          <button
+                            onClick={() => {
+                              setSelectedSign(null);
+                              setHoroscopeData(null);
+                            }}
+                            className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                          >
+                            <ArrowLeft size={16} />
+                            <span className="text-sm">Back to Signs</span>
+                          </button>
+                          <button
+                            onClick={handleVoiceReading}
+                            disabled={isVoiceLoading}
+                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-lg transition-colors"
+                          >
+                            {isVoiceLoading ? (
+                              <Loader2 className="animate-spin" size={16} />
+                            ) : currentAudio ? (
+                              <VolumeX size={16} />
+                            ) : (
+                              <Volume2 size={16} />
+                            )}
+                            <span className="text-sm">
+                              {isVoiceLoading ? 'Loading...' : currentAudio ? 'Stop' : 'Listen'}
+                            </span>
+                          </button>
+                        </div>
                       </div>
                       <div className="text-white leading-8 text-lg space-y-4">
                         {horoscopeData.horoscope.split('\n').map((paragraph, index) => (
