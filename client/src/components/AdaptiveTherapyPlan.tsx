@@ -250,23 +250,23 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
   }
 
   return (
-    <div className="space-y-6 p-4">
-      {/* Plan Header */}
-      <Card className="border-blue-200 bg-blue-50">
-        <CardHeader>
-          <div className="flex items-center justify-between">
+    <div className="w-full h-full overflow-auto space-y-4 p-3 md:p-6">
+      {/* Plan Header - Mobile Optimized */}
+      <Card className="border-luxury glass-luxury gradient-luxury shadow-luxury">
+        <CardHeader className="p-4 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0">
             <div className="flex items-center space-x-3">
               <Brain className="w-6 h-6 text-blue-600" />
-              <div>
-                <CardTitle className="text-blue-800">Your Adaptive Therapy Plan</CardTitle>
-                <p className="text-sm text-blue-600">
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-lg md:text-xl theme-text font-serif truncate">Your Adaptive Therapy Plan</CardTitle>
+                <p className="text-sm theme-text-secondary">
                   {currentPlan.planType.charAt(0).toUpperCase() + currentPlan.planType.slice(1)} Plan • 
                   Confidence: {Math.round(currentPlan.confidenceScore * 100)}%
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="bg-white">
+            <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2">
+              <Badge variant="outline" className="border-soft text-xs">
                 Adaptation Level: {Math.round(currentPlan.adaptationLevel * 100)}%
               </Badge>
               <Button 
@@ -274,6 +274,7 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
                 size="sm" 
                 onClick={() => adaptPlan('user_request')}
                 disabled={adapting}
+                className="border-soft shadow-soft w-full md:w-auto"
               >
                 {adapting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                 {adapting ? 'Adapting...' : 'Adapt Plan'}
@@ -283,52 +284,52 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="activities" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="activities">Daily Activities</TabsTrigger>
-          <TabsTrigger value="goals">Therapeutic Goals</TabsTrigger>
-          <TabsTrigger value="progress">Progress Metrics</TabsTrigger>
-          <TabsTrigger value="milestones">Milestones</TabsTrigger>
+      <Tabs defaultValue="activities" className="w-full space-y-4">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+          <TabsTrigger value="activities" className="text-xs md:text-sm px-2 py-2">Daily Activities</TabsTrigger>
+          <TabsTrigger value="goals" className="text-xs md:text-sm px-2 py-2">Goals</TabsTrigger>
+          <TabsTrigger value="progress" className="text-xs md:text-sm px-2 py-2">Progress</TabsTrigger>
+          <TabsTrigger value="milestones" className="text-xs md:text-sm px-2 py-2">Milestones</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="activities" className="space-y-4">
-          <div className="grid gap-4">
+        <TabsContent value="activities" className="space-y-3">
+          <div className="grid gap-3">
             {currentPlan.dailyActivities.map(activity => (
-              <Card key={activity.id} className="border-l-4 border-l-purple-400">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
+              <Card key={activity.id} className="border-luxury glass-luxury gradient-soft shadow-luxury border-l-4 border-l-purple-400">
+                <CardHeader className="p-3 md:p-4 pb-2">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
+                    <div className="flex items-start space-x-3 min-w-0 flex-1">
                       {getDifficultyIcon(activity.difficulty)}
-                      <div>
-                        <CardTitle className="text-lg">{activity.title}</CardTitle>
-                        <p className="text-sm text-gray-600">{activity.description}</p>
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-base md:text-lg theme-text font-serif leading-tight">{activity.title}</CardTitle>
+                        <p className="text-sm theme-text-secondary mt-1 leading-relaxed">{activity.description}</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant="outline">
+                    <div className="flex items-center space-x-2 flex-wrap">
+                      <Badge variant="outline" className="border-soft text-xs">
                         <Clock className="w-3 h-3 mr-1" />
                         {activity.estimatedDuration} min
                       </Badge>
                       {completedActivities.has(activity.id) ? (
-                        <Badge className="bg-green-100 text-green-800">
+                        <Badge className="bg-green-100 text-green-800 text-xs">
                           <CheckCircle className="w-3 h-3 mr-1" />
                           Completed
                         </Badge>
                       ) : (
-                        <Button size="sm" onClick={() => completeActivity(activity.id)}>
+                        <Button size="sm" onClick={() => completeActivity(activity.id)} className="border-soft shadow-soft text-xs">
                           Complete
                         </Button>
                       )}
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-3 md:p-4 pt-0">
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">Instructions:</p>
-                      <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
+                      <p className="text-sm font-medium theme-text mb-2">Instructions:</p>
+                      <ol className="list-decimal list-inside space-y-1 text-sm theme-text-secondary pl-2">
                         {activity.instructions.map((instruction, index) => (
-                          <li key={index}>{instruction}</li>
+                          <li key={index} className="leading-relaxed">{instruction}</li>
                         ))}
                       </ol>
                     </div>
@@ -336,7 +337,7 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
                     {activity.emotionalFocus && (
                       <div className="flex flex-wrap gap-2">
                         {activity.emotionalFocus.map(focus => (
-                          <Badge key={focus} variant="secondary" className="text-xs">
+                          <Badge key={focus} variant="secondary" className="text-xs border-soft">
                             {focus}
                           </Badge>
                         ))}
@@ -344,17 +345,17 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
                     )}
                     
                     {activity.personalizedReason && (
-                      <div className="bg-blue-50 p-3 rounded-lg">
-                        <p className="text-sm text-blue-800">
-                          <strong>Why this helps:</strong> {activity.personalizedReason}
+                      <div className="glass-luxury gradient-soft p-3 border-soft">
+                        <p className="text-sm theme-text-secondary leading-relaxed">
+                          <strong className="theme-text">Why this helps:</strong> {activity.personalizedReason}
                         </p>
                       </div>
                     )}
                     
                     {activity.adaptationNotes && (
-                      <div className="bg-yellow-50 p-3 rounded-lg">
-                        <p className="text-sm text-yellow-800">
-                          <strong>Adaptation notes:</strong> {activity.adaptationNotes}
+                      <div className="glass-luxury gradient-soft p-3 border-soft border-l-4 border-l-yellow-400">
+                        <p className="text-sm theme-text-secondary leading-relaxed">
+                          <strong className="theme-text">Adaptation notes:</strong> {activity.adaptationNotes}
                         </p>
                       </div>
                     )}
@@ -365,47 +366,47 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
           </div>
         </TabsContent>
 
-        <TabsContent value="goals" className="space-y-4">
-          <div className="grid gap-4">
+        <TabsContent value="goals" className="space-y-3">
+          <div className="grid gap-3">
             {currentPlan.therapeuticGoals.map(goal => (
-              <Card key={goal.id} className="border-l-4 border-l-green-400">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-lg">{goal.title}</CardTitle>
-                      <p className="text-sm text-gray-600">{goal.description}</p>
+              <Card key={goal.id} className="border-luxury glass-luxury gradient-soft shadow-luxury border-l-4 border-l-green-400">
+                <CardHeader className="p-3 md:p-4 pb-2">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="text-base md:text-lg theme-text font-serif leading-tight">{goal.title}</CardTitle>
+                      <p className="text-sm theme-text-secondary mt-1 leading-relaxed">{goal.description}</p>
                     </div>
-                    <Badge className={getPriorityColor(goal.priority)}>
+                    <Badge className={`${getPriorityColor(goal.priority)} text-xs border-soft`}>
                       {goal.priority} priority
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="p-3 md:p-4 pt-0">
+                  <div className="space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Target Completion:</p>
+                      <p className="text-sm font-medium theme-text mb-2">Target Completion:</p>
                       <div className="flex items-center space-x-2">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm">
+                        <Calendar className="w-4 h-4 theme-text-secondary" />
+                        <span className="text-sm theme-text-secondary">
                           {new Date(goal.targetCompletion).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
                     
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Measurable Outcomes:</p>
-                      <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                      <p className="text-sm font-medium theme-text mb-2">Measurable Outcomes:</p>
+                      <ul className="list-disc list-inside space-y-1 text-sm theme-text-secondary pl-2">
                         {goal.measurableOutcomes.map((outcome, index) => (
-                          <li key={index}>{outcome}</li>
+                          <li key={index} className="leading-relaxed">{outcome}</li>
                         ))}
                       </ul>
                     </div>
                     
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Adaptive Strategies:</p>
+                      <p className="text-sm font-medium theme-text mb-2">Adaptive Strategies:</p>
                       <div className="flex flex-wrap gap-2">
                         {goal.adaptiveStrategies.map(strategy => (
-                          <Badge key={strategy} variant="outline" className="text-xs">
+                          <Badge key={strategy} variant="outline" className="text-xs border-soft">
                             {strategy}
                           </Badge>
                         ))}
@@ -418,28 +419,28 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
           </div>
         </TabsContent>
 
-        <TabsContent value="progress" className="space-y-4">
-          <div className="grid gap-4">
+        <TabsContent value="progress" className="space-y-3">
+          <div className="grid gap-3">
             {currentPlan.progressMetrics.map(metric => (
-              <Card key={metric.category}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg capitalize">
+              <Card key={metric.category} className="border-luxury glass-luxury gradient-soft shadow-luxury">
+                <CardHeader className="p-3 md:p-4 pb-2">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
+                    <CardTitle className="text-base md:text-lg theme-text font-serif capitalize leading-tight">
                       {metric.category.replace('_', ' ')}
                     </CardTitle>
                     <div className="flex items-center space-x-2">
                       {getTrendIcon(metric.trend)}
-                      <Badge variant="outline">{metric.trend}</Badge>
+                      <Badge variant="outline" className="border-soft text-xs">{metric.trend}</Badge>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="p-3 md:p-4 pt-0">
+                  <div className="space-y-3">
                     <div>
-                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                      <div className="grid grid-cols-3 text-xs md:text-sm theme-text-secondary mb-2 gap-2">
                         <span>Baseline: {metric.baseline ? metric.baseline.toFixed(1) : '0.0'}</span>
-                        <span>Current: {metric.currentValue ? metric.currentValue.toFixed(1) : '0.0'}</span>
-                        <span>Target: {metric.targetValue ? metric.targetValue.toFixed(1) : '0.0'}</span>
+                        <span className="text-center">Current: {metric.currentValue ? metric.currentValue.toFixed(1) : '0.0'}</span>
+                        <span className="text-right">Target: {metric.targetValue ? metric.targetValue.toFixed(1) : '0.0'}</span>
                       </div>
                       <Progress 
                         value={metric.currentValue && metric.baseline && metric.targetValue ? 
