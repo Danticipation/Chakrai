@@ -1098,38 +1098,38 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         {/* Desktop: Original Layout */}
         <div className="hidden md:flex justify-center">
           <div className="grid grid-cols-3 gap-4 w-[1152px] h-[200px] -ml-[88px]">
-            {/* Horoscope Section - Expanded */}
+            {/* Horoscope Section - Luxury Enhanced */}
             <button 
               onClick={() => setActiveSection('horoscope')}
-              className="theme-primary rounded-lg p-6 flex flex-col hover:theme-primary-light transition-colors cursor-pointer"
+              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-8 flex flex-col cursor-pointer text-luxury"
             >
-              <h3 className="text-2xl font-bold theme-text mb-4 underline">Horoscope</h3>
-              <p className="text-base theme-text text-left leading-relaxed flex-1">
+              <h3 className="text-2xl font-bold theme-text mb-6 underline font-serif">Horoscope</h3>
+              <p className="text-base theme-text text-left leading-relaxed flex-1 font-light">
                 {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
               </p>
-              <p className="text-sm theme-text/70 mt-4 font-semibold">Click to expand</p>
+              <p className="text-sm theme-text/70 mt-6 font-medium tracking-wide">Click to expand</p>
             </button>
             
-            {/* Logo Section - Center */}
+            {/* Logo Section - Luxury Center */}
             <button 
               onClick={() => setActiveSection('logo')}
-              className="theme-card rounded-lg p-6 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)] hover:border-[var(--theme-secondary)] transition-colors cursor-pointer"
+              className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury"
             >
-              <img src={traiLogo} alt="TrAI" className="h-48 w-auto mb-4 -mt-2.5" />
-              <p className="text-lg theme-text font-bold">TraI Mental Wellness</p>
-              <p className="text-sm theme-text-secondary mt-2">Click for more info</p>
+              <img src={traiLogo} alt="TrAI" className="h-48 w-auto mb-6 -mt-2.5 drop-shadow-lg" />
+              <p className="text-xl theme-text font-semibold tracking-wide">TraI Mental Wellness</p>
+              <p className="text-sm theme-text-secondary mt-3 font-light">Click for more info</p>
             </button>
             
-            {/* Affirmation Section - Expanded */}
+            {/* Affirmation Section - Luxury Enhanced */}
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="theme-primary rounded-lg p-6 flex flex-col hover:theme-primary-light transition-colors cursor-pointer"
+              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-8 flex flex-col cursor-pointer text-luxury"
             >
-              <h3 className="text-2xl font-bold theme-text mb-4 underline">Affirmation</h3>
-              <p className="text-base theme-text text-left leading-relaxed flex-1">
+              <h3 className="text-2xl font-bold theme-text mb-6 underline font-serif">Affirmation</h3>
+              <p className="text-base theme-text text-left leading-relaxed flex-1 font-light">
                 {dailyAffirmation.substring(0, 200)}...
               </p>
-              <p className="text-sm theme-text/70 mt-4 font-semibold">Click to here</p>
+              <p className="text-sm theme-text/70 mt-6 font-medium tracking-wide">Click to hear</p>
             </button>
           </div>
         </div>
@@ -1250,10 +1250,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveSection(tab.id)}
-                className={`w-full h-16 px-6 text-lg font-bold transition-colors ${
+                className={`w-full h-16 px-6 text-lg font-medium transition-all border-soft hover-lift text-luxury ${
                   activeSection === tab.id
-                    ? 'theme-surface theme-text'
-                    : 'theme-primary theme-text hover:theme-primary-light'
+                    ? 'theme-surface theme-text glass-luxury shadow-luxury'
+                    : 'theme-primary theme-text hover:theme-primary-light gradient-soft'
                 }`}
               >
                 {tab.label}
@@ -1274,10 +1274,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveSection(tab.id)}
-                className={`w-full h-16 px-6 text-lg font-bold transition-colors ${
+                className={`w-full h-16 px-6 text-lg font-medium transition-all border-soft hover-lift text-luxury ${
                   activeSection === tab.id
-                    ? 'theme-surface theme-text'
-                    : 'theme-accent theme-text hover:theme-primary-light'
+                    ? 'theme-surface theme-text glass-luxury shadow-luxury'
+                    : 'theme-accent theme-text hover:theme-primary-light gradient-soft'
                 }`}
               >
                 {tab.label}
@@ -1302,20 +1302,20 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
               <div className="max-w-6xl mx-auto space-y-8 relative z-10">
                 
-                {/* Hero Welcome Section with Animations */}
-                <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg text-center transform hover:scale-[1.02] transition-all duration-300">
-                  <div className="relative mb-6">
+                {/* Hero Welcome Section - Luxury Enhanced */}
+                <div className="theme-card border-luxury glass-luxury gradient-luxury shadow-deep p-10 text-center hover-lift text-luxury">
+                  <div className="relative mb-8">
                     <img 
                       src={traiLogo} 
                       alt="TrAI" 
-                      className="h-24 w-auto mx-auto transform hover:scale-110 transition-transform duration-300" 
+                      className="h-28 w-auto mx-auto transform hover:scale-110 transition-transform duration-300 drop-shadow-xl" 
                     />
                     <div className="absolute -top-1 -right-1 w-4 h-4 theme-accent rounded-full animate-ping"></div>
                   </div>
-                  <h1 className="text-4xl font-bold theme-text mb-3 bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-secondary)] bg-clip-text text-transparent">
+                  <h1 className="text-5xl font-bold theme-text mb-4 bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-secondary)] bg-clip-text text-transparent font-serif">
                     Welcome to Your Wellness Journey
                   </h1>
-                  <p className="theme-text-secondary text-xl mb-6">Your AI companion is here to support your mental health and personal growth</p>
+                  <p className="theme-text-secondary text-xl mb-8 font-light tracking-wide">Your AI companion is here to support your mental health and personal growth</p>
                   
                   {/* Enhanced Chat Button with Pulse Animation */}
                   <button
@@ -1347,45 +1347,45 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div 
                     onClick={() => setActiveSection('daily')}
-                    className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg text-center cursor-pointer transform hover:scale-105 hover:shadow-xl transition-all duration-300 group"
+                    className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group"
                   >
-                    <div className="text-4xl mb-3 group-hover:animate-bounce">🧠</div>
-                    <h3 className="text-xl font-semibold theme-text mb-2">Mind & Mood</h3>
-                    <p className="theme-text-secondary mb-3">Track your emotional wellness</p>
-                    <div className="theme-text-secondary text-sm mb-3">
+                    <div className="text-5xl mb-4 group-hover:animate-bounce">🧠</div>
+                    <h3 className="text-2xl font-semibold theme-text mb-3 font-serif">Mind & Mood</h3>
+                    <p className="theme-text-secondary mb-4 font-light">Track your emotional wellness</p>
+                    <div className="theme-text-secondary text-sm mb-4 font-medium">
                       {streakStats ? `${streakStats.consecutiveDaysActive} consecutive days` : 'No data yet'}
                     </div>
-                    <button className="mt-2 px-4 py-2 theme-primary theme-text rounded-lg text-sm font-medium hover:opacity-80 transition-opacity group-hover:scale-110">
+                    <button className="mt-3 px-6 py-3 theme-primary theme-text border-soft font-medium hover:opacity-80 transition-all group-hover:scale-110 shadow-soft">
                       View Reflection
                     </button>
                   </div>
 
                   <div 
                     onClick={() => setActiveSection('journal')}
-                    className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg text-center cursor-pointer transform hover:scale-105 hover:shadow-xl transition-all duration-300 group"
+                    className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group"
                   >
-                    <div className="text-4xl mb-3 group-hover:animate-pulse">📝</div>
-                    <h3 className="text-xl font-semibold theme-text mb-2">Journal</h3>
-                    <p className="theme-text-secondary mb-3">Express your thoughts freely</p>
-                    <div className="theme-text-secondary text-sm mb-3">
+                    <div className="text-5xl mb-4 group-hover:animate-pulse">📝</div>
+                    <h3 className="text-2xl font-semibold theme-text mb-3 font-serif">Journal</h3>
+                    <p className="theme-text-secondary mb-4 font-light">Express your thoughts freely</p>
+                    <div className="theme-text-secondary text-sm mb-4 font-medium">
                       {streakStats ? `${streakStats.consecutiveDaysJournaling} consecutive days` : 'No entries yet'}
                     </div>
-                    <button className="mt-2 px-4 py-2 theme-primary theme-text rounded-lg text-sm font-medium hover:opacity-80 transition-opacity group-hover:scale-110">
+                    <button className="mt-3 px-6 py-3 theme-primary theme-text border-soft font-medium hover:opacity-80 transition-all group-hover:scale-110 shadow-soft">
                       Write Entry
                     </button>
                   </div>
 
                   <div 
                     onClick={() => setActiveSection('analytics')}
-                    className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg text-center cursor-pointer transform hover:scale-105 hover:shadow-xl transition-all duration-300 group"
+                    className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group"
                   >
-                    <div className="text-4xl mb-3 group-hover:animate-spin">📊</div>
-                    <h3 className="text-xl font-semibold theme-text mb-2">Analytics</h3>
-                    <p className="theme-text-secondary mb-3">View your progress insights</p>
-                    <div className="theme-text-secondary text-sm mb-3">
+                    <div className="text-5xl mb-4 group-hover:animate-spin">📊</div>
+                    <h3 className="text-2xl font-semibold theme-text mb-3 font-serif">Analytics</h3>
+                    <p className="theme-text-secondary mb-4 font-light">View your progress insights</p>
+                    <div className="theme-text-secondary text-sm mb-4 font-medium">
                       {streakStats ? `${streakStats.totalActiveDays} total active days` : 'No data yet'}
                     </div>
-                    <button className="mt-2 px-4 py-2 theme-primary theme-text rounded-lg text-sm font-medium hover:opacity-80 transition-opacity group-hover:scale-110">
+                    <button className="mt-3 px-6 py-3 theme-primary theme-text border-soft font-medium hover:opacity-80 transition-all group-hover:scale-110 shadow-soft">
                       View Analytics
                     </button>
                   </div>
