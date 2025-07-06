@@ -2235,6 +2235,154 @@ router.get('/api/ehr/audit-logs/:userId', async (req, res) => {
 });
 
 // ================================
+// ADAPTIVE THERAPY PLANS ENDPOINTS
+// ================================
+
+// Get current therapeutic plan for user
+router.get('/api/adaptive-therapy/plan/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    // For now, return null to trigger plan generation
+    res.json({ plan: null });
+  } catch (error) {
+    console.error('Failed to fetch therapeutic plan:', error);
+    res.status(500).json({ error: 'Failed to fetch therapeutic plan' });
+  }
+});
+
+// Generate new adaptive therapeutic plan
+router.post('/api/adaptive-therapy/generate', async (req, res) => {
+  try {
+    const { userId, planType = 'weekly' } = req.body;
+    
+    console.log(`Generating ${planType} therapeutic plan for user ${userId}`);
+    
+    // Generate a sample plan based on the planType
+    const plan = {
+      id: `plan-${userId}-${Date.now()}`,
+      userId,
+      planType,
+      generatedAt: new Date().toISOString(),
+      validUntil: new Date(Date.now() + (planType === 'daily' ? 24 * 60 * 60 * 1000 : planType === 'weekly' ? 7 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000)).toISOString(),
+      adaptationLevel: 1,
+      therapeuticGoals: [
+        {
+          id: 'goal-1',
+          category: 'Emotional Regulation',
+          title: 'Practice Daily Mindfulness',
+          description: 'Develop emotional awareness through mindfulness practices',
+          priority: 'high',
+          targetCompletion: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          measurableOutcomes: ['Complete 10 minutes daily meditation', 'Track mood 3 times daily'],
+          adaptiveStrategies: ['Breathing exercises', 'Body scan meditation', 'Emotional check-ins'],
+          progressIndicators: ['Mood stability score', 'Mindfulness frequency', 'Stress level reduction']
+        },
+        {
+          id: 'goal-2', 
+          category: 'Social Connection',
+          title: 'Build Support Network',
+          description: 'Strengthen relationships and social connections',
+          priority: 'medium',
+          targetCompletion: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+          measurableOutcomes: ['Reach out to 2 friends weekly', 'Join 1 community activity'],
+          adaptiveStrategies: ['Social skill practice', 'Community engagement', 'Communication exercises'],
+          progressIndicators: ['Social interaction frequency', 'Relationship satisfaction', 'Support network size']
+        }
+      ],
+      dailyActivities: [
+        {
+          id: 'activity-1',
+          title: '10-Minute Morning Meditation',
+          description: 'Start your day with mindful breathing and intention setting',
+          category: 'mindfulness',
+          estimatedDuration: 10,
+          difficulty: 'beginner',
+          instructions: ['Find a quiet space', 'Sit comfortably', 'Focus on your breath for 10 minutes', 'Set a positive intention for the day'],
+          adaptiveParameters: { minDuration: 5, maxDuration: 20, difficultyProgression: 'gradual' },
+          completionCriteria: ['Duration completed', 'Mindfulness rating > 6/10'],
+          effectivenessMetrics: ['mood_improvement', 'stress_reduction', 'focus_enhancement']
+        },
+        {
+          id: 'activity-2',
+          title: 'Gratitude Journaling',
+          description: 'Write down 3 things you are grateful for today',
+          category: 'reflection',
+          estimatedDuration: 5,
+          difficulty: 'beginner',
+          instructions: ['Open your journal', 'Write down 3 specific things you are grateful for', 'Reflect on why each one matters to you'],
+          adaptiveParameters: { minEntries: 1, maxEntries: 5, complexity: 'basic' },
+          completionCriteria: ['3 gratitude entries', 'Reflection depth rating > 5/10'],
+          effectivenessMetrics: ['positive_mood', 'life_satisfaction', 'optimism_score']
+        }
+      ],
+      weeklyMilestones: [
+        {
+          id: 'milestone-1',
+          title: 'Establish Daily Routine',
+          description: 'Complete morning meditation 5 out of 7 days',
+          targetWeek: 1,
+          requiredActivities: ['activity-1'],
+          completionThreshold: 5,
+          adaptiveAdjustments: { difficulty: 'maintain', frequency: 'increase', variety: 'expand' },
+          rewardSystem: { points: 50, badge: 'Routine Builder', encouragement: 'Great start on building healthy habits!' }
+        }
+      ],
+      progressMetrics: [
+        {
+          id: 'metric-1',
+          category: 'mood',
+          name: 'Emotional Stability',
+          currentValue: 6.5,
+          targetValue: 8.0,
+          trend: 'improving',
+          lastUpdated: new Date().toISOString(),
+          adaptationTriggers: ['significant_improvement', 'plateau_detected', 'regression_identified']
+        }
+      ],
+      adaptationTriggers: [
+        {
+          id: 'trigger-1',
+          type: 'emotional_spike',
+          threshold: 2.0,
+          action: 'increase_support_activities',
+          enabled: true,
+          priority: 'high',
+          cooldownPeriod: 24
+        }
+      ],
+      confidenceScore: 0.85
+    };
+    
+    console.log(`Generated ${planType} plan:`, plan.id);
+    res.json({ plan, message: `${planType.charAt(0).toUpperCase() + planType.slice(1)} therapeutic plan generated successfully` });
+  } catch (error) {
+    console.error('Failed to generate therapeutic plan:', error);
+    res.status(500).json({ error: 'Failed to generate therapeutic plan' });
+  }
+});
+
+// Monitor plan effectiveness (for adaptation triggers)
+router.get('/api/adaptive-therapy/monitor/:userId/:planId', async (req, res) => {
+  try {
+    const { userId, planId } = req.params;
+    
+    // Simulate monitoring analysis
+    const shouldAdapt = Math.random() > 0.8; // 20% chance plan needs adaptation
+    
+    res.json({ 
+      shouldAdapt,
+      reason: shouldAdapt ? 'User showing excellent progress - ready for increased challenge level' : 'Plan is working well, no adaptation needed',
+      adaptationType: shouldAdapt ? 'difficulty_increase' : null,
+      confidenceScore: 0.9
+    });
+  } catch (error) {
+    console.error('Failed to monitor plan:', error);
+    res.status(500).json({ error: 'Failed to monitor plan effectiveness' });
+  }
+});
+
+// ================================
 // VR THERAPY SYSTEM ENDPOINTS
 // ================================
 
