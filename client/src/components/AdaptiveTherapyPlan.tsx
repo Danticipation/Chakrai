@@ -485,14 +485,16 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
                   <div className="space-y-3">
                     <p className="text-sm text-gray-700">{milestone.description}</p>
                     
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Success Criteria:</p>
-                      <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                        {milestone.successCriteria.map((criteria, index) => (
-                          <li key={index}>{criteria}</li>
-                        ))}
-                      </ul>
-                    </div>
+                    {milestone.successCriteria && milestone.successCriteria.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-2">Success Criteria:</p>
+                        <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                          {milestone.successCriteria.map((criteria, index) => (
+                            <li key={index}>{criteria}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     
                     <div className="bg-orange-50 p-3 rounded-lg">
                       <div className="flex items-center space-x-2">
