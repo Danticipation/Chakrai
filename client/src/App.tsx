@@ -1675,7 +1675,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             }
           }}
         >
-          <div className="theme-card rounded-2xl p-6 w-full max-w-lg border border-[var(--theme-accent)]/30 relative max-h-[90vh] overflow-y-auto mobile-content-area">
+          <div className={`theme-card rounded-2xl p-6 w-full border border-[var(--theme-accent)]/30 relative max-h-[90vh] overflow-y-auto mobile-content-area ${
+            mobileModalContent === 'therapy-plans' ? 'max-w-6xl' : 'max-w-lg'
+          }`}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold theme-text capitalize">
                 {mobileModalContent.replace('-', ' ')}

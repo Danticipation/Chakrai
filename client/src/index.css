@@ -681,3 +681,36 @@ input:focus, button:focus {
 .rank-badge:hover {
   transform: scale(1.1) rotate(5deg);
 }
+
+/* Therapy Plan Mobile Modal Specific Optimizations */
+.mobile-content-area .therapy-plan-container {
+  width: 100% !important;
+  max-width: none !important;
+  overflow-x: hidden;
+}
+
+.mobile-content-area .therapy-plan-container .w-96,
+.mobile-content-area .therapy-plan-container .w-\[576px\],
+.mobile-content-area .therapy-plan-container .w-\[1152px\] {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.mobile-content-area .therapy-plan-container .h-\[480px\],
+.mobile-content-area .therapy-plan-container .h-\[960px\] {
+  height: auto !important;
+  min-height: 400px;
+}
+
+/* Ensure therapy plan tabs are visible on mobile */
+.mobile-content-area .therapy-plan-tabs {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.mobile-content-area .therapy-plan-tabs button {
+  font-size: 12px !important;
+  padding: 8px 12px !important;
+}

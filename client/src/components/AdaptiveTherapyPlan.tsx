@@ -250,7 +250,7 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
   }
 
   return (
-    <div className="w-full h-full overflow-auto space-y-4 p-3 md:p-6">
+    <div className="w-full h-full overflow-auto space-y-4 p-3 md:p-6 therapy-plan-container">
       {/* Plan Header - Mobile Optimized */}
       <Card className="border-luxury glass-luxury gradient-luxury shadow-luxury">
         <CardHeader className="p-4 md:p-6">
@@ -285,7 +285,7 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
       </Card>
 
       <Tabs defaultValue="activities" className="w-full space-y-4">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto therapy-plan-tabs">
           <TabsTrigger value="activities" className="text-xs md:text-sm px-2 py-2">Daily Activities</TabsTrigger>
           <TabsTrigger value="goals" className="text-xs md:text-sm px-2 py-2">Goals</TabsTrigger>
           <TabsTrigger value="progress" className="text-xs md:text-sm px-2 py-2">Progress</TabsTrigger>
