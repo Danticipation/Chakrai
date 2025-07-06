@@ -733,7 +733,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <MemoryDashboard />;
 
       case 'analytics':
-        return <AnalyticsDashboard userId={1} />;
+        return <AnalyticsDashboard userId={currentUserId || 1} />;
 
       case 'challenges':
         return <ChallengeSystem />;
@@ -807,7 +807,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <MemoryDashboard />;
 
       case 'analytics':
-        return <AnalyticsDashboard userId={1} />;
+        return <AnalyticsDashboard userId={currentUserId || 1} />;
 
       case 'challenges':
         return <ChallengeSystem />;

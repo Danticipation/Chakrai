@@ -102,11 +102,11 @@ export interface IStorage {
   
   // Journal Entries
   createJournalEntry(data: InsertJournalEntry): Promise<JournalEntry>;
-  getJournalEntries(userId: number): Promise<JournalEntry[]>;
+  getJournalEntries(userId: number, limit?: number): Promise<JournalEntry[]>;
   
   // Mood Entries
   createMoodEntry(data: InsertMoodEntry): Promise<MoodEntry>;
-  getMoodEntries(userId: number): Promise<MoodEntry[]>;
+  getMoodEntries(userId: number, limit?: number): Promise<MoodEntry[]>;
   
   // Therapeutic Goals
   createTherapeuticGoal(data: InsertTherapeuticGoal): Promise<TherapeuticGoal>;
@@ -377,8 +377,14 @@ export class DbStorage implements IStorage {
     return entry;
   }
   
-  async getJournalEntries(userId: number): Promise<JournalEntry[]> {
-    return await this.db.select().from(journalEntries).where(eq(journalEntries.userId, userId)).orderBy(desc(journalEntries.createdAt));
+  async getJournalEntries(userId: number, limit?: number): Promise<JournalEntry[]> {
+    let query = this.db.select().from(journalEntries).where(eq(journalEntries.userId, userId)).orderBy(desc(journalEntries.createdAt));
+    
+    if (limit) {
+      query = query.limit(limit);
+    }
+    
+    return await query;
   }
   
   // Mood Entries
@@ -387,8 +393,14 @@ export class DbStorage implements IStorage {
     return entry;
   }
   
-  async getMoodEntries(userId: number): Promise<MoodEntry[]> {
-    return await this.db.select().from(moodEntries).where(eq(moodEntries.userId, userId)).orderBy(desc(moodEntries.createdAt));
+  async getMoodEntries(userId: number, limit?: number): Promise<MoodEntry[]> {
+    let query = this.db.select().from(moodEntries).where(eq(moodEntries.userId, userId)).orderBy(desc(moodEntries.createdAt));
+    
+    if (limit) {
+      query = query.limit(limit);
+    }
+    
+    return await query;
   }
   
   // Therapeutic Goals
