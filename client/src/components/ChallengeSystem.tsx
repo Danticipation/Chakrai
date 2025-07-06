@@ -78,7 +78,7 @@ const starterChallenges: Challenge[] = [
       exclusive: null
     },
     progress: {
-      current: 2,
+      current: 0,
       goal: 5,
       streak: false
     },
@@ -98,9 +98,9 @@ const starterChallenges: Challenge[] = [
       exclusive: null
     },
     progress: {
-      current: 4,
+      current: 0,
       goal: 7,
-      streak: true
+      streak: false
     },
     icon: "🔥",
     active: true,
@@ -391,11 +391,11 @@ const ChallengeSystem: React.FC = () => {
   const [challenges, setChallenges] = useState<Challenge[]>(starterChallenges);
   const [selectedTab, setSelectedTab] = useState('active');
   const [userStats, setUserStats] = useState({
-    totalPoints: 425,
-    level: 3,
-    completedChallenges: 12,
-    activeStreaks: 2,
-    longestStreak: 18
+    totalPoints: 0,
+    level: 1,
+    completedChallenges: 0,
+    activeStreaks: 0,
+    longestStreak: 0
   });
   
   // Enhanced state for animations and features
