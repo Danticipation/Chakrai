@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Target, Clock, Calendar, Star, Award, CheckCircle, Timer, Users, TrendingUp } from 'lucide-react';
+import { Trophy, Target, Clock, Calendar, Star, Award, CheckCircle, Timer, Users, TrendingUp, ExternalLink } from 'lucide-react';
 
 interface Challenge {
   id: string;
@@ -387,7 +387,11 @@ const RewardPreview: React.FC<{ reward: RewardPreview; children: React.ReactNode
   );
 };
 
-const ChallengeSystem: React.FC = () => {
+interface ChallengeSystemProps {
+  onNavigate?: (section: string) => void;
+}
+
+const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate }) => {
   const [challenges, setChallenges] = useState<Challenge[]>(starterChallenges);
   const [selectedTab, setSelectedTab] = useState('active');
   const [userStats, setUserStats] = useState({
@@ -397,6 +401,39 @@ const ChallengeSystem: React.FC = () => {
     activeStreaks: 0,
     longestStreak: 0
   });
+
+  // Get navigation target for challenge completion
+  const getChallengeNavigationTarget = (challengeId: string): { section: string; description: string } => {
+    switch (challengeId) {
+      case 'weekly-journal':
+        return { section: 'journal', description: 'Go to Journal' };
+      case 'wellness-warrior':
+        return { section: 'mood', description: 'Track Mood' };
+      case 'mindful-monthly':
+        return { section: 'reflection', description: 'Daily Reflection' };
+      case 'seasonal-self-love':
+        return { section: 'affirmations', description: 'View Affirmations' };
+      case 'daily-gratitude':
+        return { section: 'journal', description: 'Write Gratitude' };
+      case 'weekly-reflection':
+        return { section: 'reflection', description: 'Weekly Reflection' };
+      case 'chat-engagement':
+        return { section: 'chat', description: 'Chat with AI' };
+      case 'goal-tracker':
+        return { section: 'goals', description: 'Set Goals' };
+      case 'holiday-wellness':
+        return { section: 'mood', description: 'Wellness Check-in' };
+      default:
+        return { section: 'journal', description: 'Complete Challenge' };
+    }
+  };
+
+  const handleChallengeNavigation = (challengeId: string) => {
+    const target = getChallengeNavigationTarget(challengeId);
+    if (onNavigate) {
+      onNavigate(target.section);
+    }
+  };
   
   // Enhanced state for animations and features
   const [showConfetti, setShowConfetti] = useState(false);
@@ -666,11 +703,11 @@ const ChallengeSystem: React.FC = () => {
                       </Button>
                     ) : (
                       <Button 
-                        variant="outline" 
-                        className="w-full"
-                        disabled
+                        onClick={() => handleChallengeNavigation(challenge.id)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                       >
-                        In Progress
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        {getChallengeNavigationTarget(challenge.id).description}
                       </Button>
                     )}
                   </div>

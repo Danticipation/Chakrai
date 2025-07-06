@@ -736,7 +736,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <AnalyticsDashboard userId={currentUserId || 1} />;
 
       case 'challenges':
-        return <ChallengeSystem />;
+        return <ChallengeSystem onNavigate={setActiveSection} />;
 
       case 'rewards':
         return <WellnessRewards />;
@@ -810,7 +810,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <AnalyticsDashboard userId={currentUserId || 1} />;
 
       case 'challenges':
-        return <ChallengeSystem />;
+        return <ChallengeSystem onNavigate={setActiveSection} />;
 
       case 'rewards':
         return <WellnessRewards />;
