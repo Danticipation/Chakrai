@@ -431,9 +431,72 @@ const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate }) => {
   const handleChallengeNavigation = (challengeId: string) => {
     const target = getChallengeNavigationTarget(challengeId);
     console.log('Challenge navigation clicked:', challengeId, target);
+    
     if (onNavigate) {
       console.log('Calling onNavigate with section:', target.section);
-      onNavigate(target.section);
+      
+      // Create a prominent visual feedback that navigation is happening
+      const button = document.activeElement as HTMLButtonElement;
+      if (button) {
+        button.style.transform = 'scale(0.95)';
+        button.style.opacity = '0.7';
+        setTimeout(() => {
+          button.style.transform = '';
+          button.style.opacity = '';
+        }, 150);
+      }
+      
+      // Add a slight delay to let user see the button press, then navigate
+      setTimeout(() => {
+        onNavigate(target.section);
+        
+        // Create a prominent navigation notification
+        const notification = document.createElement('div');
+        notification.innerHTML = `🎯 Navigating to ${target.description}...`;
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-weight: bold;
+          z-index: 10000;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+          animation: slideInDown 0.3s ease-out;
+        `;
+        
+        // Add slide animation
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes slideInDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+          }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(notification);
+        
+        // Remove notification after delay
+        setTimeout(() => {
+          notification.style.animation = 'slideInDown 0.3s ease-out reverse';
+          setTimeout(() => {
+            document.body.removeChild(notification);
+            document.head.removeChild(style);
+          }, 300);
+        }, 2000);
+        
+        // Scroll to top to ensure new section is prominently visible
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Force a re-render to bring new section to foreground
+        const mainContent = document.querySelector('[data-main-content]');
+        if (mainContent) {
+          mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
     } else {
       console.error('onNavigate function not available');
     }

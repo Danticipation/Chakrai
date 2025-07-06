@@ -1277,7 +1277,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         </div>
 
         {/* Center Content Area - Mobile Responsive */}
-        <div className="flex-1 mobile-content-scroll-area">
+        <div className="flex-1 mobile-content-scroll-area" data-main-content>
           {activeSection === 'chat' ? (
             /* Enhanced Home Dashboard - Lively Wellness Overview */
             <div className="w-full h-full theme-background p-6 overflow-y-auto relative">
