@@ -437,12 +437,13 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
                   <div className="space-y-4">
                     <div>
                       <div className="flex justify-between text-sm text-gray-600 mb-2">
-                        <span>Baseline: {metric.baseline.toFixed(1)}</span>
-                        <span>Current: {metric.currentValue.toFixed(1)}</span>
-                        <span>Target: {metric.targetValue.toFixed(1)}</span>
+                        <span>Baseline: {metric.baseline ? metric.baseline.toFixed(1) : '0.0'}</span>
+                        <span>Current: {metric.currentValue ? metric.currentValue.toFixed(1) : '0.0'}</span>
+                        <span>Target: {metric.targetValue ? metric.targetValue.toFixed(1) : '0.0'}</span>
                       </div>
                       <Progress 
-                        value={(metric.currentValue - metric.baseline) / (metric.targetValue - metric.baseline) * 100}
+                        value={metric.currentValue && metric.baseline && metric.targetValue ? 
+                          ((metric.currentValue - metric.baseline) / (metric.targetValue - metric.baseline) * 100) : 0}
                         className="h-3"
                       />
                     </div>
