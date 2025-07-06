@@ -430,8 +430,12 @@ const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate }) => {
 
   const handleChallengeNavigation = (challengeId: string) => {
     const target = getChallengeNavigationTarget(challengeId);
+    console.log('Challenge navigation clicked:', challengeId, target);
     if (onNavigate) {
+      console.log('Calling onNavigate with section:', target.section);
       onNavigate(target.section);
+    } else {
+      console.error('onNavigate function not available');
     }
   };
   
