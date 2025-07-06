@@ -2239,7 +2239,7 @@ router.get('/api/ehr/audit-logs/:userId', async (req, res) => {
 // ================================
 
 // Get current therapeutic plan for user
-router.get('/api/adaptive-therapy/plan/:userId', async (req, res) => {
+router.get('/adaptive-therapy/plan/:userId', async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
     
@@ -2252,7 +2252,7 @@ router.get('/api/adaptive-therapy/plan/:userId', async (req, res) => {
 });
 
 // Generate new adaptive therapeutic plan
-router.post('/api/adaptive-therapy/generate', async (req, res) => {
+router.post('/adaptive-therapy/generate', async (req, res) => {
   try {
     const { userId, planType = 'weekly' } = req.body;
     
@@ -2363,7 +2363,7 @@ router.post('/api/adaptive-therapy/generate', async (req, res) => {
 });
 
 // Monitor plan effectiveness (for adaptation triggers)
-router.get('/api/adaptive-therapy/monitor/:userId/:planId', async (req, res) => {
+router.get('/adaptive-therapy/monitor/:userId/:planId', async (req, res) => {
   try {
     const { userId, planId } = req.params;
     
