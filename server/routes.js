@@ -62,16 +62,23 @@ router.post('/clear-user-data', async (req, res) => {
 
     const userId = user.id;
 
-    // Clear all user-related data
-    await Promise.all([
-      storage.clearUserMessages(userId),
-      storage.clearUserJournalEntries(userId),
-      storage.clearUserMoodEntries(userId),
-      storage.clearUserMemories(userId),
-      storage.clearUserGoals(userId),
-      storage.clearUserAchievements(userId),
-      storage.clearUserAnalytics(userId)
-    ]);
+    // Clear all user-related data INCLUDING CHALLENGE PROGRESS - with error resilience
+    const clearOperations = [
+      () => storage.clearUserMessages(userId),
+      () => storage.clearUserJournalEntries(userId),
+      () => storage.clearUserMoodEntries(userId),
+      () => storage.clearUserMemories(userId).catch(e => console.log('clearUserMemories failed:', e.message)),
+      () => storage.clearUserGoals(userId),
+      () => storage.clearUserAchievements(userId),
+      () => storage.clearUserAnalytics(userId).catch(e => console.log('clearUserAnalytics failed:', e.message)),
+      // CRITICAL: Clear challenge progress that was missing
+      () => storage.clearUserChallengeProgress(userId),
+      () => storage.clearUserWellnessPoints(userId),
+      () => storage.clearUserStreaks(userId),
+      () => storage.clearUserCommunityParticipation(userId).catch(e => console.log('clearUserCommunityParticipation failed:', e.message))
+    ];
+    
+    await Promise.all(clearOperations.map(op => op()));
 
     res.json({ success: true, message: 'All user data cleared successfully' });
   } catch (error) {

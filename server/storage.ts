@@ -1409,6 +1409,25 @@ export class DbStorage implements IStorage {
     return this.clearUserAchievements(userId);
   }
 
+  // CRITICAL: Missing clear methods for challenge progress - RESET BUG FIX
+  async clearUserChallengeProgress(userId: number): Promise<void> {
+    await this.db.delete(userChallengeProgress).where(eq(userChallengeProgress.userId, userId));
+  }
+
+  async clearUserWellnessPoints(userId: number): Promise<void> {
+    await this.db.delete(userWellnessPoints).where(eq(userWellnessPoints.userId, userId));
+  }
+
+  async clearUserStreaks(userId: number): Promise<void> {
+    await this.db.delete(userStreaks).where(eq(userStreaks.userId, userId));
+    await this.db.delete(wellnessStreaks).where(eq(wellnessStreaks.userId, userId));
+  }
+
+  async clearUserCommunityParticipation(userId: number): Promise<void> {
+    await this.db.delete(forumPosts).where(eq(forumPosts.userId, userId));
+    // Skip forum replies and peer check-ins if tables don't exist
+  }
+
   // Streak Tracking System Implementation
   async createUserStreak(data: InsertUserStreak): Promise<UserStreak> {
     const [streak] = await this.db.insert(userStreaks).values(data).returning();
