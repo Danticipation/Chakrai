@@ -402,27 +402,27 @@ const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate }) => {
     longestStreak: 0
   });
 
-  // Get navigation target for challenge completion
+  // Get navigation target for challenge completion - fixed to match actual App.tsx sections
   const getChallengeNavigationTarget = (challengeId: string): { section: string; description: string } => {
     switch (challengeId) {
       case 'weekly-journal':
         return { section: 'journal', description: 'Go to Journal' };
       case 'wellness-warrior':
-        return { section: 'mood', description: 'Track Mood' };
+        return { section: 'daily', description: 'Track Mood' }; // 'daily' section contains mood tracking
       case 'mindful-monthly':
-        return { section: 'reflection', description: 'Daily Reflection' };
+        return { section: 'daily', description: 'Daily Reflection' }; // 'daily' section for reflection
       case 'seasonal-self-love':
-        return { section: 'affirmations', description: 'View Affirmations' };
+        return { section: 'daily', description: 'View Affirmations' }; // 'daily' section has affirmations
       case 'daily-gratitude':
         return { section: 'journal', description: 'Write Gratitude' };
       case 'weekly-reflection':
-        return { section: 'reflection', description: 'Weekly Reflection' };
+        return { section: 'daily', description: 'Weekly Reflection' }; // 'daily' section for reflection
       case 'chat-engagement':
         return { section: 'chat', description: 'Chat with AI' };
       case 'goal-tracker':
-        return { section: 'goals', description: 'Set Goals' };
+        return { section: 'analytics', description: 'Set Goals' }; // 'analytics' section has goal tracking
       case 'holiday-wellness':
-        return { section: 'mood', description: 'Wellness Check-in' };
+        return { section: 'daily', description: 'Wellness Check-in' }; // 'daily' section for wellness
       default:
         return { section: 'journal', description: 'Complete Challenge' };
     }
@@ -430,10 +430,11 @@ const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate }) => {
 
   const handleChallengeNavigation = (challengeId: string) => {
     const target = getChallengeNavigationTarget(challengeId);
-    console.log('Challenge navigation clicked:', challengeId, target);
+    console.log('🎯 Challenge navigation clicked:', challengeId, target);
+    console.log('🎯 onNavigate prop available:', !!onNavigate);
     
     if (onNavigate) {
-      console.log('Calling onNavigate with section:', target.section);
+      console.log('🎯 Calling onNavigate with section:', target.section);
       
       // Create a prominent visual feedback that navigation is happening
       const button = document.activeElement as HTMLButtonElement;
@@ -448,7 +449,9 @@ const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate }) => {
       
       // Add a slight delay to let user see the button press, then navigate
       setTimeout(() => {
+        console.log('🎯 About to call onNavigate with section:', target.section);
         onNavigate(target.section);
+        console.log('🎯 onNavigate called successfully');
         
         // Create a prominent navigation notification
         const notification = document.createElement('div');
