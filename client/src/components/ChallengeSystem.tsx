@@ -118,9 +118,9 @@ const starterChallenges: Challenge[] = [
       exclusive: "Zen Garden Theme"
     },
     progress: {
-      current: 12,
+      current: 0,
       goal: 30,
-      streak: true
+      streak: false
     },
     icon: "🧘",
     active: true,
@@ -158,7 +158,7 @@ const starterChallenges: Challenge[] = [
       exclusive: null
     },
     progress: {
-      current: 1,
+      current: 0,
       goal: 1,
       streak: false
     },
@@ -198,7 +198,7 @@ const starterChallenges: Challenge[] = [
       exclusive: null
     },
     progress: {
-      current: 3,
+      current: 0,
       goal: 5,
       streak: false
     },
@@ -218,7 +218,7 @@ const starterChallenges: Challenge[] = [
       exclusive: null
     },
     progress: {
-      current: 1,
+      current: 0,
       goal: 3,
       streak: false
     },
