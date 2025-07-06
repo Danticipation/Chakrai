@@ -75,6 +75,16 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     console.log('Active section changed to:', activeSection);
   }, [activeSection]);
 
+  // Mobile modal navigation handler for challenge navigation
+  const handleMobileModalNavigation = (section: string) => {
+    console.log('📱 Mobile modal navigation triggered for:', section);
+    setContentLoading(true);
+    setMobileModalContent(section);
+    setShowMobileModal(true);
+    // Simulate content loading time
+    setTimeout(() => setContentLoading(false), 800);
+  };
+
   const [isRecording, setIsRecording] = useState(false);
 
   const [input, setInput] = useState('');
@@ -736,7 +746,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <AnalyticsDashboard userId={currentUserId || 1} />;
 
       case 'challenges':
-        return <ChallengeSystem onNavigate={setActiveSection} />;
+        return <ChallengeSystem onNavigate={setActiveSection} onMobileModalNavigate={handleMobileModalNavigation} />;
 
       case 'rewards':
         return <WellnessRewards />;
@@ -810,7 +820,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <AnalyticsDashboard userId={currentUserId || 1} />;
 
       case 'challenges':
-        return <ChallengeSystem onNavigate={setActiveSection} />;
+        return <ChallengeSystem onNavigate={setActiveSection} onMobileModalNavigate={handleMobileModalNavigation} />;
 
       case 'rewards':
         return <WellnessRewards />;

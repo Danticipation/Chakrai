@@ -389,9 +389,10 @@ const RewardPreview: React.FC<{ reward: RewardPreview; children: React.ReactNode
 
 interface ChallengeSystemProps {
   onNavigate?: (section: string) => void;
+  onMobileModalNavigate?: (section: string) => void;
 }
 
-const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate }) => {
+const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate, onMobileModalNavigate }) => {
   const [challenges, setChallenges] = useState<Challenge[]>(starterChallenges);
   const [selectedTab, setSelectedTab] = useState('active');
   const [userStats, setUserStats] = useState({
@@ -432,9 +433,10 @@ const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate }) => {
     const target = getChallengeNavigationTarget(challengeId);
     console.log('🎯 Challenge navigation clicked:', challengeId, target);
     console.log('🎯 onNavigate prop available:', !!onNavigate);
+    console.log('🎯 onMobileModalNavigate prop available:', !!onMobileModalNavigate);
     
     if (onNavigate) {
-      console.log('🎯 Calling onNavigate with section:', target.section);
+      console.log('🎯 Calling navigation with section:', target.section);
       
       // Create a prominent visual feedback that navigation is happening
       const button = document.activeElement as HTMLButtonElement;
@@ -449,9 +451,20 @@ const ChallengeSystem: React.FC<ChallengeSystemProps> = ({ onNavigate }) => {
       
       // Add a slight delay to let user see the button press, then navigate
       setTimeout(() => {
-        console.log('🎯 About to call onNavigate with section:', target.section);
-        onNavigate(target.section);
-        console.log('🎯 onNavigate called successfully');
+        console.log('🎯 About to call navigation with section:', target.section);
+        
+        // Check if we're on mobile and this section should use modal navigation
+        const isMobile = window.innerWidth < 768; // md breakpoint
+        const modalSections = ['journal', 'analytics', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans'];
+        
+        if (isMobile && modalSections.includes(target.section) && onMobileModalNavigate) {
+          console.log('🎯 Using mobile modal navigation for:', target.section);
+          onMobileModalNavigate(target.section);
+        } else {
+          console.log('🎯 Using standard navigation for:', target.section);
+          onNavigate(target.section);
+        }
+        console.log('🎯 Navigation called successfully');
         
         // Create a prominent navigation notification
         const notification = document.createElement('div');
