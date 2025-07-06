@@ -500,7 +500,7 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
                       <div className="flex items-center space-x-2">
                         <Heart className="w-4 h-4 text-orange-600" />
                         <span className="text-sm text-orange-800 font-medium">
-                          Reward: {milestone.rewardType.replace('_', ' ')}
+                          Reward: {milestone.rewardType ? milestone.rewardType.replace('_', ' ') : 'Achievement unlock'}
                         </span>
                       </div>
                     </div>
