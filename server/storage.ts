@@ -378,13 +378,11 @@ export class DbStorage implements IStorage {
   }
   
   async getJournalEntries(userId: number, limit?: number): Promise<JournalEntry[]> {
-    let query = this.db.select().from(journalEntries).where(eq(journalEntries.userId, userId)).orderBy(desc(journalEntries.createdAt));
-    
     if (limit) {
-      query = query.limit(limit);
+      return await this.db.select().from(journalEntries).where(eq(journalEntries.userId, userId)).orderBy(desc(journalEntries.createdAt)).limit(limit);
+    } else {
+      return await this.db.select().from(journalEntries).where(eq(journalEntries.userId, userId)).orderBy(desc(journalEntries.createdAt));
     }
-    
-    return await query;
   }
   
   // Mood Entries
@@ -394,13 +392,11 @@ export class DbStorage implements IStorage {
   }
   
   async getMoodEntries(userId: number, limit?: number): Promise<MoodEntry[]> {
-    let query = this.db.select().from(moodEntries).where(eq(moodEntries.userId, userId)).orderBy(desc(moodEntries.createdAt));
-    
     if (limit) {
-      query = query.limit(limit);
+      return await this.db.select().from(moodEntries).where(eq(moodEntries.userId, userId)).orderBy(desc(moodEntries.createdAt)).limit(limit);
+    } else {
+      return await this.db.select().from(moodEntries).where(eq(moodEntries.userId, userId)).orderBy(desc(moodEntries.createdAt));
     }
-    
-    return await query;
   }
   
   // Therapeutic Goals
