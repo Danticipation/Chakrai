@@ -35,9 +35,9 @@ app.get('/api/streak-stats', (req, res) => {
 // User-specific streak stats endpoint that frontend actually calls
 app.get('/api/users/:userId/streak-stats', (req, res) => {
   res.json({
-    consecutiveDaysActive: 7,
-    consecutiveDaysJournaling: 5,
-    totalActiveDays: 28
+    consecutiveDaysActive: 0,
+    consecutiveDaysJournaling: 0,
+    totalActiveDays: 0
   });
 });
 
