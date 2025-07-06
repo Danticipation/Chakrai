@@ -333,19 +333,23 @@ function AdaptiveTherapyPlan({ userId, onPlanUpdate }: AdaptiveTherapyPlanProps)
                       </ol>
                     </div>
                     
-                    <div className="flex flex-wrap gap-2">
-                      {activity.emotionalFocus.map(focus => (
-                        <Badge key={focus} variant="secondary" className="text-xs">
-                          {focus}
-                        </Badge>
-                      ))}
-                    </div>
+                    {activity.emotionalFocus && (
+                      <div className="flex flex-wrap gap-2">
+                        {activity.emotionalFocus.map(focus => (
+                          <Badge key={focus} variant="secondary" className="text-xs">
+                            {focus}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                     
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <p className="text-sm text-blue-800">
-                        <strong>Why this helps:</strong> {activity.personalizedReason}
-                      </p>
-                    </div>
+                    {activity.personalizedReason && (
+                      <div className="bg-blue-50 p-3 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          <strong>Why this helps:</strong> {activity.personalizedReason}
+                        </p>
+                      </div>
+                    )}
                     
                     {activity.adaptationNotes && (
                       <div className="bg-yellow-50 p-3 rounded-lg">
