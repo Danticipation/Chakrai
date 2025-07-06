@@ -66,61 +66,13 @@ const AnalyticsDashboard: React.FC<{ userId: number }> = ({ userId }) => {
 
   // Fetch dashboard data
   const { data: dashboardData, isLoading: dashboardLoading, refetch: refetchDashboard } = useQuery({
-    queryKey: [`/api/analytics/dashboard/${userId}`],
+    queryKey: [`/api/analytics/simple/${userId}`],
     queryFn: async () => {
-      try {
-        const response = await fetch(`/api/analytics/dashboard/${userId}`);
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        // Fallback to mock data if API fails due to compilation issues
-        console.warn('API failed, using mock data:', error);
-        return {
-          dashboard: {
-            overview: {
-              currentWellnessScore: 75,
-              emotionalVolatility: 30,
-              therapeuticEngagement: 85,
-              totalJournalEntries: 12,
-              totalMoodEntries: 28,
-              averageMood: 7.2
-            },
-            charts: {
-              moodTrend: [
-                { date: '2025-07-01', value: 7, emotion: 'content' },
-                { date: '2025-07-02', value: 6, emotion: 'neutral' },
-                { date: '2025-07-03', value: 8, emotion: 'happy' },
-                { date: '2025-07-04', value: 7, emotion: 'content' },
-                { date: '2025-07-05', value: 9, emotion: 'joyful' },
-                { date: '2025-07-06', value: 7, emotion: 'content' }
-              ],
-              wellnessTrend: [
-                { date: '2025-07-01', value: 72, type: 'overall' },
-                { date: '2025-07-02', value: 74, type: 'overall' },
-                { date: '2025-07-03', value: 76, type: 'overall' },
-                { date: '2025-07-04', value: 75, type: 'overall' },
-                { date: '2025-07-05', value: 78, type: 'overall' },
-                { date: '2025-07-06', value: 75, type: 'overall' }
-              ],
-              emotionDistribution: {
-                content: 35,
-                happy: 25,
-                neutral: 20,
-                anxious: 10,
-                sad: 5,
-                joyful: 5
-              },
-              progressTracking: [
-                { period: 'Week 1', journalEntries: 3, moodEntries: 7, engagement: 70 },
-                { period: 'Week 2', journalEntries: 4, moodEntries: 7, engagement: 80 },
-                { period: 'Week 3', journalEntries: 3, moodEntries: 7, engagement: 75 },
-                { period: 'Week 4', journalEntries: 2, moodEntries: 7, engagement: 85 }
-              ]
-            },
-            insights: "Your wellness journey shows steady progress with consistent engagement. Your mood patterns indicate emotional stability with positive trending. Consider maintaining your current journaling frequency while exploring new therapeutic techniques."
-          }
-        };
+      const response = await fetch(`/api/analytics/simple/${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch real analytics data');
       }
+      return response.json();
     },
   }) as any;
 
