@@ -91,18 +91,30 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   }, [userId]);
 
   const fetchRecentEntries = async () => {
-    if (!userId) return;
+    console.log('fetchRecentEntries called with userId:', userId);
+    if (!userId) {
+      console.log('No userId provided, skipping fetch');
+      return;
+    }
     
     try {
-      const response = await fetch(`/api/journal/entries/${userId}`);
+      const url = `/api/journal/entries/${userId}`;
+      console.log('Fetching from URL:', url);
+      const response = await fetch(url);
+      console.log('Response status:', response.status, response.ok);
+      
       if (response.ok) {
         const entries = await response.json();
+        console.log('Fetched entries:', entries);
         setRecentEntries(entries.slice(0, 5)); // Show 5 most recent
         
         // If we have entries, override fresh start status
         if (entries.length > 0) {
+          console.log('Found entries, removing freshStart flag');
           localStorage.removeItem('freshStart');
         }
+      } else {
+        console.error('Response not ok:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch recent entries:', error);
