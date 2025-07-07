@@ -329,7 +329,16 @@ export class DbStorage implements IStorage {
   }
 
   async createMessage(data: InsertMessage): Promise<Message> {
-    const [message] = await this.db.insert(messages).values(data).returning();
+    // Map content to text field since text is NOT NULL and content is nullable
+    const messageData = {
+      userId: data.userId,
+      text: data.content,
+      content: data.content,
+      isBot: data.isBot || false,
+      timestamp: new Date()
+    };
+    
+    const [message] = await this.db.insert(messages).values(messageData).returning();
     return message;
   }
 
