@@ -340,32 +340,75 @@ input:focus, button:focus {
 .shimmer-border {
   position: relative;
   overflow: hidden;
-  border: 2px solid #c0c0c0 !important;
+  border: 2px solid transparent !important;
+  background: linear-gradient(135deg, 
+    rgba(64, 81, 181, 0.15) 0%, 
+    rgba(103, 110, 203, 0.25) 50%, 
+    rgba(159, 168, 218, 0.15) 100%
+  ) !important;
+  margin: 6px 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.25),
+    inset 0 1px 4px rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(192, 192, 192, 0.3) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  backdrop-filter: blur(10px) !important;
 }
 
 .shimmer-border::before {
   content: '';
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  top: -3px;
+  left: -100%;
+  width: 100%;
+  height: calc(100% + 6px);
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(192, 192, 192, 0.8),
+    rgba(229, 229, 229, 0.9),
+    rgba(255, 255, 255, 1),
+    rgba(192, 192, 192, 0.9),
     transparent
   );
   background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-  border-radius: inherit;
+  animation: shimmer 3s infinite;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.shimmer-border::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg,
+    rgba(192, 192, 192, 0.4) 0%,
+    rgba(229, 229, 229, 0.2) 25%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(229, 229, 229, 0.2) 75%,
+    rgba(192, 192, 192, 0.4) 100%
+  );
+  border-radius: 10px;
   pointer-events: none;
   z-index: 0;
 }
 
 .shimmer-border > * {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+}
+
+.shimmer-border:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.25),
+    0 0 25px rgba(192, 192, 192, 0.5),
+    0 0 0 2px rgba(255, 255, 255, 0.4) !important;
 }
 
 /* Mobile Navigation Polish Styles */
@@ -383,7 +426,11 @@ input:focus, button:focus {
 
 .mobile-header-btn {
   flex: 1;
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-accent) 100%);
+  background: linear-gradient(135deg, 
+    var(--theme-primary) 0%, 
+    var(--theme-accent) 50%,
+    var(--theme-secondary) 100%
+  );
   color: var(--theme-text);
   border: 1px solid var(--silver);
   border-radius: 8px;
@@ -393,6 +440,29 @@ input:focus, button:focus {
   text-align: center;
   transition: all 0.2s ease;
   min-height: 44px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add shimmer border to mobile header buttons */
+.mobile-header-btn::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(90deg, 
+    transparent 20%, 
+    rgba(192, 192, 192, 0.5) 40%, 
+    rgba(255, 255, 255, 0.7) 50%, 
+    rgba(192, 192, 192, 0.5) 60%, 
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 9px;
+  z-index: -1;
 }
 
 .mobile-header-btn:hover {
@@ -433,7 +503,12 @@ input:focus, button:focus {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-accent) 100%);
+  background: linear-gradient(135deg, 
+    var(--theme-primary) 0%, 
+    var(--theme-accent) 40%,
+    var(--theme-secondary) 70%,
+    var(--theme-primary-light) 100%
+  );
   color: var(--theme-text);
   border: 2px solid var(--silver);
   border-radius: 12px;
@@ -447,8 +522,34 @@ input:focus, button:focus {
   overflow: hidden;
 }
 
+/* Add shimmer border animation to mobile navigation buttons */
+.mobile-nav-btn-polish::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(90deg, 
+    transparent 20%, 
+    rgba(192, 192, 192, 0.6) 40%, 
+    rgba(255, 255, 255, 0.8) 50%, 
+    rgba(192, 192, 192, 0.6) 60%, 
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 14px;
+  z-index: -1;
+}
+
 .mobile-nav-btn-polish.selected {
-  background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-primary-light) 100%);
+  background: linear-gradient(135deg, 
+    var(--theme-accent) 0%, 
+    var(--theme-secondary) 30%,
+    var(--theme-primary-light) 60%,
+    var(--theme-accent-light) 100%
+  );
   border-color: var(--silver-light);
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);

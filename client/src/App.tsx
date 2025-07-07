@@ -1250,7 +1250,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveSection(tab.id)}
-                className={`w-full h-16 px-6 text-lg font-medium transition-all border-soft hover-lift text-luxury ${
+                className={`shimmer-border w-full h-16 px-6 text-lg font-medium transition-all border-soft hover-lift text-luxury ${
                   activeSection === tab.id
                     ? 'theme-surface theme-text glass-luxury shadow-luxury'
                     : 'theme-primary theme-text hover:theme-primary-light gradient-soft'
@@ -1274,7 +1274,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveSection(tab.id)}
-                className={`w-full h-16 px-6 text-lg font-medium transition-all border-soft hover-lift text-luxury ${
+                className={`shimmer-border w-full h-16 px-6 text-lg font-medium transition-all border-soft hover-lift text-luxury ${
                   activeSection === tab.id
                     ? 'theme-surface theme-text glass-luxury shadow-luxury'
                     : 'theme-accent theme-text hover:theme-primary-light gradient-soft'
