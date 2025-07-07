@@ -89,7 +89,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
     }
     
     try {
-      const url = `/api/journal/entries/${userId}`;
+      const url = `/api/journal/${userId}`;
       console.log('Fetching from URL:', url);
       const response = await fetch(url);
       console.log('Response status:', response.status, response.ok);
@@ -674,7 +674,20 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
             </h3>
             <div className="space-y-3">
               {recentEntries.map((recentEntry, index) => (
-                <div key={index} className="theme-primary/30 rounded-lg p-4 border border-[#000000]/30">
+                <div 
+                  key={recentEntry.id || index} 
+                  className="theme-primary/30 rounded-lg p-4 border border-[#000000]/30 cursor-pointer hover:bg-opacity-40 transition-all"
+                  onClick={() => {
+                    setEntry({
+                      title: recentEntry.title || '',
+                      content: recentEntry.content,
+                      mood: recentEntry.mood,
+                      moodIntensity: recentEntry.moodIntensity || 5,
+                      tags: recentEntry.tags || [],
+                      isPrivate: recentEntry.isPrivate
+                    });
+                  }}
+                >
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium text-white">
                       {recentEntry.title || `Entry ${index + 1}`}
@@ -686,17 +699,22 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   <p className="text-white/80 text-sm line-clamp-2">
                     {recentEntry.content.substring(0, 100)}...
                   </p>
-                  <div className="flex items-center mt-2 text-xs">
-                    <span className={`px-2 py-1 rounded-full ${
-                      moodOptions.find(m => m.value === recentEntry.mood)?.color || 'theme-primary text-white'
-                    }`}>
-                      {moodOptions.find(m => m.value === recentEntry.mood)?.label || 'Unknown'}
-                    </span>
-                    {recentEntry.tags.length > 0 && (
-                      <span className="ml-2 text-white/60">
-                        +{recentEntry.tags.length} tags
+                  <div className="flex items-center justify-between mt-2 text-xs">
+                    <div className="flex items-center">
+                      <span className={`px-2 py-1 rounded-full ${
+                        moodOptions.find(m => m.value === recentEntry.mood)?.color || 'theme-primary text-white'
+                      }`}>
+                        {moodOptions.find(m => m.value === recentEntry.mood)?.label || 'Unknown'}
                       </span>
-                    )}
+                      {recentEntry.tags.length > 0 && (
+                        <span className="ml-2 text-white/60">
+                          +{recentEntry.tags.length} tags
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-white/50 text-xs">
+                      Click to edit
+                    </span>
                   </div>
                 </div>
               ))}
