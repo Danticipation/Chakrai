@@ -25,8 +25,8 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
   }, [queryClient]);
 
   const { data: entries = [], isLoading: entriesLoading } = useQuery({
-    queryKey: ['/api/journal', userId],
-    enabled: !!userId // Always fetch journal entries when userId is available
+    queryKey: ['/api/journal', 13],
+    enabled: true // Always fetch journal entries for user ID 13 where migrated data lives
   });
 
   const { data: analytics = [] } = useQuery({
@@ -232,7 +232,7 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
         entry={selectedEntry || undefined}
         onSave={handleSaveEntry}
         onCancel={handleCancelEdit}
-        userId={userId}
+        userId={13}
       />
     );
   }

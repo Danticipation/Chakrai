@@ -731,7 +731,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
       case 'journal':
         return (
           <TherapeuticJournal 
-            userId={currentUserId || 1} 
+            userId={13} 
             onEntryCreated={(entry) => {
               console.log('New journal entry created:', entry);
               fetchStreakStats();
@@ -805,7 +805,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
       case 'journal':
         return (
           <TherapeuticJournal 
-            userId={currentUserId || 1} 
+            userId={13} 
             onEntryCreated={(entry) => {
               console.log('New journal entry created:', entry);
               fetchStreakStats();

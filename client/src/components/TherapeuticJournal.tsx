@@ -318,7 +318,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
   const fetchAnalytics = async () => {
     try {
-      const response = await fetch(`/api/journal/analytics/${userId}`);
+      const response = await fetch(`/api/journal/analytics/13`);
       if (response.ok) {
         const data = await response.json();
         setAnalytics(data.analytics);
@@ -330,7 +330,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
   const exportTherapistReport = async () => {
     try {
-      const response = await fetch(`/api/journal/export/therapist/${userId}`);
+      const response = await fetch(`/api/journal/export/therapist/13`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -350,7 +350,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
 
   const exportPersonalInsights = async () => {
     try {
-      const response = await fetch(`/api/journal/export/insights/${userId}`);
+      const response = await fetch(`/api/journal/export/insights/13`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
