@@ -41,6 +41,20 @@ app.get('/api/users/:userId/streak-stats', (req, res) => {
   });
 });
 
+// Journal entries endpoint - MUST BE BEFORE VITE to prevent HTML interception
+app.get('/api/journal/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    console.log('Journal API endpoint hit for user:', userId);
+    const entries = await storage.getJournalEntries(userId);
+    console.log('Retrieved entries:', entries ? entries.length : 0);
+    res.json(entries || []);
+  } catch (error) {
+    console.error('Failed to fetch journal entries:', error);
+    res.status(500).json({ error: 'Failed to fetch journal entries' });
+  }
+});
+
 // WORKAROUND: Use non-API path to bypass Vite middleware interception
 app.post('/clear-user-data', async (req, res) => {
   try {

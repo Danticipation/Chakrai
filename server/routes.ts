@@ -993,6 +993,18 @@ router.get('/emotional-intelligence/patterns/:userId', async (req, res) => {
 });
 
 // Journal API endpoints
+// Add the missing API endpoint for journal entries
+router.get('/api/journal/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const entries = await storage.getJournalEntries(userId);
+    res.json(entries);
+  } catch (error) {
+    console.error('Failed to fetch journal entries:', error);
+    res.status(500).json({ error: 'Failed to fetch journal entries' });
+  }
+});
+
 router.get('/journal/entries/:userId', async (req, res) => {
   try {
     const userId = parseInt(req.params.userId) || 1;
