@@ -3,6 +3,7 @@ import multer from 'multer';
 import { storage } from './storage.js';
 import { analyzeEmotionalState } from './emotionalAnalysis.js';
 import { openai } from './openaiRetry.js';
+import { userSessionManager } from './userSessionManager.js';
 import { 
   analyzeConversationForMemory, 
   getSemanticContext, 
@@ -94,7 +95,15 @@ router.post('/clear-user-data', async (req, res) => {
 // Main chat endpoint with AI integration and semantic memory recall
 router.post('/chat', async (req, res) => {
   try {
-    const { message, voice = 'carla', userId = 1, personalityMode = 'friend' } = req.body;
+    const { message, voice = 'carla', personalityMode = 'friend' } = req.body;
+    
+    // Get or create anonymous user
+    const sessionInfo = userSessionManager.getSessionFromRequest(req);
+    const anonymousUser = await userSessionManager.getOrCreateAnonymousUser(
+      sessionInfo.deviceFingerprint, 
+      sessionInfo.sessionId
+    );
+    const userId = anonymousUser.id;
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -252,6 +261,27 @@ Respond with semantic awareness, making natural references to past conversations
       }
     }
 
+    // Store individual messages for chat history persistence
+    try {
+      // Store user message
+      await storage.createMessage({
+        userId: userId,
+        content: message,
+        isBot: false
+      });
+      
+      // Store bot response
+      await storage.createMessage({
+        userId: userId,
+        content: aiResponse,
+        isBot: true
+      });
+      
+      console.log('Chat messages stored successfully');
+    } catch (error) {
+      console.error('Error storing chat messages:', error);
+    }
+
     // Analyze conversation for semantic memory storage
     try {
       const sessionId = req.headers['x-session-id'] || `session_${Date.now()}`;
@@ -287,6 +317,34 @@ Respond with semantic awareness, making natural references to past conversations
       personalityMode: "supportive",
       timestamp: new Date().toISOString()
     });
+  }
+});
+
+// Chat history endpoint - get stored conversation messages for anonymous users
+router.get('/chat/history/:userId?', async (req, res) => {
+  try {
+    // Get or create anonymous user
+    const sessionInfo = userSessionManager.getSessionFromRequest(req);
+    const anonymousUser = await userSessionManager.getOrCreateAnonymousUser(
+      sessionInfo.deviceFingerprint, 
+      sessionInfo.sessionId
+    );
+    
+    const limit = parseInt(req.query.limit) || 50;
+    const messages = await storage.getMessagesByUserId(anonymousUser.id, limit);
+    
+    // Format messages for frontend
+    const formattedMessages = messages.map(msg => ({
+      sender: msg.isBot ? 'bot' : 'user',
+      text: msg.content,
+      time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: msg.timestamp
+    }));
+    
+    res.json({ messages: formattedMessages, count: formattedMessages.length });
+  } catch (error) {
+    console.error('Error fetching chat history:', error);
+    res.status(500).json({ error: 'Failed to fetch chat history' });
   }
 });
 

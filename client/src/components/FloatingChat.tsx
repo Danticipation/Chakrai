@@ -35,16 +35,38 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
     scrollToBottom();
   }, [messages]);
 
-  // Load initial greeting message
+  // Load chat history when component opens
   useEffect(() => {
-    if (messages.length === 0) {
+    if (isOpen && messages.length === 0) {
+      loadChatHistory();
+    }
+  }, [isOpen]);
+
+  const loadChatHistory = async () => {
+    try {
+      const response = await axios.get('/api/chat/history/1?limit=50');
+      const chatHistory = response.data.messages || [];
+      
+      if (chatHistory.length > 0) {
+        setMessages(chatHistory);
+      } else {
+        // Only show greeting if no chat history exists
+        setMessages([{
+          sender: 'bot',
+          text: 'Hello! I\'m your TrAI wellness companion. How are you feeling today?',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }]);
+      }
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+      // Fallback to greeting message
       setMessages([{
         sender: 'bot',
         text: 'Hello! I\'m your TrAI wellness companion. How are you feeling today?',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     }
-  }, []);
+  };
 
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
