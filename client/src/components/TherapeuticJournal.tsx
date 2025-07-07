@@ -323,7 +323,22 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
       const response = await fetch(`/api/journal/analytics/13`);
       if (response.ok) {
         const data = await response.json();
-        setAnalytics(data.analytics);
+        // Convert the real analytics data to match the expected structure
+        const convertedAnalytics = {
+          emotionalJourney: data.moodTrends?.map((trend: any, index: number) => ({
+            date: trend.date,
+            sentiment: (trend.intensity - 5) / 5, // Convert 1-10 scale to -1 to 1
+            mood: trend.mood
+          })) || [],
+          recurringThemes: Object.entries(data.themes || {}).map(([theme, frequency]) => ({
+            theme,
+            frequency: frequency as number
+          })),
+          sentimentTrend: data.averageMoodIntensity || 0,
+          riskIndicators: [],
+          therapeuticProgress: `Based on ${data.totalEntries} journal entries, you're showing positive engagement with self-reflection. Your average mood intensity is ${data.averageMoodIntensity?.toFixed(1)}. Continue your journaling practice for continued emotional growth.`
+        };
+        setAnalytics(convertedAnalytics);
       }
     } catch (error) {
       console.error('Error fetching analytics:', error);
