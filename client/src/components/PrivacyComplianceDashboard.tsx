@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "../utils/userSession";
 import React, { useState } from 'react';
 import { Shield, Lock, FileText, AlertTriangle, CheckCircle, Download, Upload, Key, Database, Eye, EyeOff } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -61,7 +62,7 @@ export default function PrivacyComplianceDashboard() {
   // Setup encryption mutation
   const setupEncryptionMutation = useMutation({
     mutationFn: ({ userPassword }: { userPassword: string }) =>
-      axios.post('/api/privacy/encryption/setup', { userId: 1, userPassword }),
+      axios.post('/api/privacy/encryption/setup', { userId: getCurrentUserId(), userPassword }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/privacy/encryption/status/1'] });
       setUserPassword('');
@@ -71,7 +72,7 @@ export default function PrivacyComplianceDashboard() {
   // Create backup mutation
   const createBackupMutation = useMutation({
     mutationFn: ({ userPassword }: { userPassword: string }) =>
-      axios.post('/api/privacy/backup/create', { userId: 1, userPassword }),
+      axios.post('/api/privacy/backup/create', { userId: getCurrentUserId(), userPassword }),
     onSuccess: () => {
       setUserPassword('');
     }

@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "../utils/userSession";
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, BookOpen, TrendingUp, Download, Calendar, Search, Filter } from 'lucide-react';

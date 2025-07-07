@@ -30,6 +30,7 @@ import { EHRIntegration } from './components/EHRIntegration';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import FloatingChat from './components/FloatingChat';
 import ChallengeSystem from './components/ChallengeSystem';
+import { getCurrentUserId } from './utils/userSession';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -413,7 +414,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              userId: 1,
+              userId: getCurrentUserId(),
               message: input,
               sessionId: Date.now().toString()
             })
@@ -428,7 +429,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              userId: 1,
+              userId: getCurrentUserId(),
               message: input,
               conversationHistory: messages.slice(-5) // Send last 5 messages for context
             })
@@ -726,12 +727,12 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   const renderMainContent = (section: string) => {
     switch (section) {
       case 'daily':
-        return <PersonalityReflection userId={currentUserId || 1} />;
+        return <PersonalityReflection userId={getCurrentUserId()} />;
 
       case 'journal':
         return (
           <TherapeuticJournal 
-            userId={13} 
+            userId={getCurrentUserId()} 
             onEntryCreated={(entry) => {
               console.log('New journal entry created:', entry);
               fetchStreakStats();
@@ -743,7 +744,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <MemoryDashboard />;
 
       case 'analytics':
-        return <AnalyticsDashboard userId={currentUserId || 1} />;
+        return <AnalyticsDashboard userId={getCurrentUserId()} />;
 
       case 'challenges':
         return <ChallengeSystem onNavigate={setActiveSection} onMobileModalNavigate={handleMobileModalNavigation} />;
@@ -758,10 +759,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <AdaptiveLearning />;
 
       case 'therapy-plans':
-        return <AdaptiveTherapyPlan userId={1} onPlanUpdate={(plan) => console.log('Plan updated:', plan)} />;
+        return <AdaptiveTherapyPlan userId={getCurrentUserId()} onPlanUpdate={(plan) => console.log('Plan updated:', plan)} />;
 
       case 'agents':
-        return <AgentSystem userId={1} />;
+        return <AgentSystem userId={getCurrentUserId()} />;
 
       case 'vr':
         return <VRTherapy />;
@@ -776,7 +777,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <AiPerformanceMonitoringDashboard />;
 
       case 'outcomes':
-        return <TherapeuticAnalytics userId={1} />;
+        return <TherapeuticAnalytics userId={getCurrentUserId()} />;
 
       case 'ehr':
         return <EHRIntegration />;
@@ -800,12 +801,12 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return null;
 
       case 'daily':
-        return <PersonalityReflection userId={1} />;
+        return <PersonalityReflection userId={getCurrentUserId()} />;
 
       case 'journal':
         return (
           <TherapeuticJournal 
-            userId={13} 
+            userId={getCurrentUserId()} 
             onEntryCreated={(entry) => {
               console.log('New journal entry created:', entry);
               fetchStreakStats();
@@ -817,7 +818,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <MemoryDashboard />;
 
       case 'analytics':
-        return <AnalyticsDashboard userId={currentUserId || 1} />;
+        return <AnalyticsDashboard userId={getCurrentUserId()} />;
 
       case 'challenges':
         return <ChallengeSystem onNavigate={setActiveSection} onMobileModalNavigate={handleMobileModalNavigation} />;
@@ -832,10 +833,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <AdaptiveLearning />;
 
       case 'therapy-plans':
-        return <AdaptiveTherapyPlan userId={1} onPlanUpdate={(plan) => console.log('Plan updated:', plan)} />;
+        return <AdaptiveTherapyPlan userId={getCurrentUserId()} onPlanUpdate={(plan) => console.log('Plan updated:', plan)} />;
 
       case 'agents':
-        return <AgentSystem userId={1} />;
+        return <AgentSystem userId={getCurrentUserId()} />;
 
       case 'vr':
         return <VRTherapy />;
@@ -850,7 +851,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <TherapistPortal />;
 
       case 'outcomes':
-        return <TherapeuticAnalytics userId={1} />;
+        return <TherapeuticAnalytics userId={getCurrentUserId()} />;
 
       case 'ehr':
         return <EHRIntegration />;

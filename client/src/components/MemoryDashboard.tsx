@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Brain, RefreshCw, Calendar, MessageCircle, TrendingUp, Users, Clock, Lightbulb } from 'lucide-react';
+import { getCurrentUserId } from '../utils/userSession';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
@@ -45,17 +46,6 @@ export default function MemoryDashboard() {
   const [refreshing, setRefreshing] = useState(false);
 
   // Get current user ID from session context
-  const getCurrentUserId = () => {
-    const fingerprint = `${navigator.userAgent}_${screen.width}x${screen.height}_${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
-    let hash = 0;
-    for (let i = 0; i < fingerprint.length; i++) {
-      const char = fingerprint.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return Math.abs(hash % 1000000);
-  };
-  
   const currentUserId = getCurrentUserId();
 
   const { data: dashboard, isLoading, refetch } = useQuery<MemoryDashboard>({

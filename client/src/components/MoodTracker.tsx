@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "../utils/userSession";
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Heart, Brain, AlertTriangle, TrendingUp, Calendar } from 'lucide-react';
@@ -35,7 +36,7 @@ const EMOTIONS = [
   { name: 'neutral', icon: '😐', color: '#D3D3D3' }
 ];
 
-export default function MoodTracker({ userId = 1 }: { userId?: number }) {
+export default function MoodTracker({ userId: getCurrentUserId()}: { userId?: number }) {
   const [selectedEmotion, setSelectedEmotion] = useState('');
   const [intensity, setIntensity] = useState(50);
   const [context, setContext] = useState('');

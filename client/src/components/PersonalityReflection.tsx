@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { RefreshCw, Brain, TrendingUp, User, RotateCcw } from 'lucide-react';
+import { getCurrentUserId } from '../utils/userSession';
 
 interface PersonalityReflectionData {
   reflection: string;
@@ -18,17 +19,7 @@ interface PersonalityReflectionProps {
 
 const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId }) => {
   // Get current user ID from session context
-  const currentUserId = userId || (() => {
-    const fingerprint = `${navigator.userAgent}_${screen.width}x${screen.height}_${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
-    // Hash the fingerprint to get consistent user ID (same logic as backend)
-    let hash = 0;
-    for (let i = 0; i < fingerprint.length; i++) {
-      const char = fingerprint.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return Math.abs(hash % 1000000);
-  })();
+  const currentUserId = userId || getCurrentUserId();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const { data, isLoading, error, refetch } = useQuery({

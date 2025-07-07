@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "../utils/userSession";
 import React, { useState } from 'react';
 import { Brain, TrendingUp, AlertTriangle, Target, Zap, Clock, Heart, MessageCircle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -50,7 +51,7 @@ interface DashboardOverview {
 }
 
 export default function EmotionalIntelligenceDashboard() {
-  const [userId] = useState(1);
+  const [userId: getCurrentUserId();
   const [activeTab, setActiveTab] = useState('overview');
   const queryClient = useQueryClient();
 

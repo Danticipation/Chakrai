@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { getCurrentUserId } from '../utils/userSession';
 import { 
   Activity, 
   Heart, 
@@ -82,19 +83,21 @@ const HealthIntegration: React.FC = () => {
   const [activeTab, setActiveTab] = useState('devices');
   const [syncingDevice, setSyncingDevice] = useState<number | null>(null);
 
+  const currentUserId = getCurrentUserId();
+
   const { data: devices = [] } = useQuery<WearableDevice[]>({
-    queryKey: ['/api/wearable-devices/1'],
-    queryFn: () => axios.get('/api/wearable-devices/1').then(res => Array.isArray(res.data) ? res.data : [])
+    queryKey: ['/api/wearable-devices', currentUserId],
+    queryFn: () => axios.get(`/api/wearable-devices/${currentUserId}`).then(res => Array.isArray(res.data) ? res.data : [])
   });
 
   const { data: healthMetrics = [] } = useQuery<HealthMetric[]>({
-    queryKey: ['/api/health-metrics/1'],
-    queryFn: () => axios.get('/api/health-metrics/1').then(res => Array.isArray(res.data) ? res.data : [])
+    queryKey: ['/api/health-metrics', currentUserId],
+    queryFn: () => axios.get(`/api/health-metrics/${currentUserId}`).then(res => Array.isArray(res.data) ? res.data : [])
   });
 
   const { data: correlations = [] } = useQuery<HealthCorrelation[]>({
-    queryKey: ['/api/health-correlations/1'],
-    queryFn: () => axios.get('/api/health-correlations/1').then(res => Array.isArray(res.data) ? res.data : [])
+    queryKey: ['/api/health-correlations', currentUserId],
+    queryFn: () => axios.get(`/api/health-correlations/${currentUserId}`).then(res => Array.isArray(res.data) ? res.data : [])
   });
 
   const { data: insights = [] } = useQuery<HealthInsight[]>({
@@ -115,7 +118,7 @@ const HealthIntegration: React.FC = () => {
   const syncDevice = async (deviceId: number) => {
     try {
       setSyncingDevice(deviceId);
-      await axios.post('/api/sync-device', { deviceId, userId: 1 });
+      await axios.post('/api/sync-device', { deviceId, userId: currentUserId });
       setTimeout(() => {
         setSyncingDevice(null);
         window.location.reload();
@@ -137,7 +140,7 @@ const HealthIntegration: React.FC = () => {
 
   const connectDevice = async (deviceType: string) => {
     try {
-      await axios.post('/api/connect-device', { userId: 1, deviceType });
+      await axios.post('/api/connect-device', { userId: currentUserId, deviceType });
       window.location.reload();
     } catch (error) {
       console.error('Failed to connect device:', error);

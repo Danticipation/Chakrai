@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "../utils/userSession";
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -68,7 +69,7 @@ export default function VRTherapyDashboard() {
   });
 
   const queryClient = useQueryClient();
-  const userId = 1; // Would get from auth context
+  const userId: getCurrentUserId() // Would get from auth context
 
   // Fetch VR environments
   const { data: environments = [], isLoading: environmentsLoading } = useQuery({

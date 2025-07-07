@@ -20,6 +20,7 @@ import {
   Lock
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { getCurrentUserId } from '../utils/userSession';
 
 interface EHRIntegration {
   id: number;
@@ -104,8 +105,8 @@ export function EHRIntegration() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          userId: 1,
-          therapistId: 1,
+          userId: getCurrentUserId(),
+          therapistId: getCurrentUserId(),
           dateRange,
           includedData: ['sessions', 'assessments', 'progress_notes']
         })
@@ -130,8 +131,8 @@ export function EHRIntegration() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          userId: 1,
-          therapistId: 1,
+          userId: getCurrentUserId(),
+          therapistId: getCurrentUserId(),
           memberId: 'MEMBER123456',
           insuranceProvider: 'Blue Cross Blue Shield',
           therapistNPI: '1234567890'

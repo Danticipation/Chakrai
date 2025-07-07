@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "../utils/userSession";
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -73,7 +74,7 @@ const EnhancedGamificationDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'rewards' | 'challenges' | 'achievements'>('overview');
   const [selectedChallenge, setSelectedChallenge] = useState<CommunityChallenge | null>(null);
   const [selectedReward, setSelectedReward] = useState<TherapeuticReward | null>(null);
-  const userId = 1; // In production, get from auth context
+  const userId: getCurrentUserId() // In production, get from auth context
   const queryClient = useQueryClient();
 
   // Fetch gamification dashboard data

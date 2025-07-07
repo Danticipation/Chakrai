@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "../utils/userSession";
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -60,7 +61,7 @@ interface TherapeuticAnalyticsProps {
   userId?: number;
 }
 
-export default function TherapeuticAnalytics({ userId = 1 }: TherapeuticAnalyticsProps) {
+export default function TherapeuticAnalytics({ userId = getCurrentUserId() }: TherapeuticAnalyticsProps) {
   const [dashboard, setDashboard] = useState<AnalyticsDashboard | null>(null);
   const [efficacyReport, setEfficacyReport] = useState<EfficacyReport | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'reports' | 'trends' | 'optimization'>('dashboard');
