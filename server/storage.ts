@@ -47,7 +47,7 @@ import {
   type UserStreak, type InsertUserStreak,
   type DailyActivity, type InsertDailyActivity,
 } from "@shared/schema";
-import { eq, desc, and, lt } from "drizzle-orm";
+import { eq, desc, and, lt, ne } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -103,6 +103,7 @@ export interface IStorage {
   // Journal Entries
   createJournalEntry(data: InsertJournalEntry): Promise<JournalEntry>;
   getJournalEntries(userId: number, limit?: number): Promise<JournalEntry[]>;
+  migrateJournalEntries(currentUserId: number): Promise<number>;
   
   // Mood Entries
   createMoodEntry(data: InsertMoodEntry): Promise<MoodEntry>;
@@ -383,6 +384,17 @@ export class DbStorage implements IStorage {
     } else {
       return await this.db.select().from(journalEntries).where(eq(journalEntries.userId, userId)).orderBy(desc(journalEntries.createdAt));
     }
+  }
+
+  // Migrate all journal entries from other users to current user
+  async migrateJournalEntries(currentUserId: number): Promise<number> {
+    // Update all journal entries to belong to the current user
+    const result = await this.db.update(journalEntries)
+      .set({ userId: currentUserId })
+      .where(ne(journalEntries.userId, currentUserId))
+      .returning();
+    
+    return result.length;
   }
   
   // Mood Entries

@@ -1768,19 +1768,21 @@ const AppWithOnboarding = () => {
   }, []);
 
   const generateDeviceFingerprint = async (): Promise<string> => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    ctx?.fillText('TraI Fingerprint', 10, 10);
-    
+    // Use only stable, consistent device characteristics
     const fingerprint = [
       navigator.userAgent,
       navigator.language,
       screen.width + 'x' + screen.height,
       new Date().getTimezoneOffset(),
-      canvas.toDataURL()
+      navigator.platform || 'unknown'
     ].join('|');
     
-    return btoa(fingerprint).slice(0, 32);
+    // Create a hash of the fingerprint for consistent identification
+    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(fingerprint));
+    const hashArray = new Uint8Array(hash);
+    const hashHex = Array.from(hashArray).map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    return hashHex.slice(0, 32);
   };
 
   const handlePersonalityQuizComplete = async (profile: any) => {

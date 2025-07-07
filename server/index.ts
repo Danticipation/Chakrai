@@ -326,6 +326,25 @@ app.post('/api/user-profile', async (req, res) => {
   }
 });
 
+// Journal data migration endpoint - consolidate entries under current user
+app.post('/api/users/:userId/migrate-journal-data', async (req, res) => {
+  try {
+    const currentUserId = parseInt(req.params.userId);
+    
+    // Find all journal entries from other users and move them to current user
+    const migratedCount = await storage.migrateJournalEntries(currentUserId);
+    
+    res.json({ 
+      success: true, 
+      migratedCount,
+      message: `Migrated ${migratedCount} journal entries to current user` 
+    });
+  } catch (error) {
+    console.error('Journal data migration error:', error);
+    res.status(500).json({ error: 'Failed to migrate journal data' });
+  }
+});
+
 
 
 // Setup Vite in development or serve static files in production
