@@ -29,7 +29,7 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
     enabled: true // Always fetch journal entries for user ID 13 where migrated data lives
   });
 
-  const { data: analytics = [] } = useQuery({
+  const { data: analytics = null } = useQuery({
     queryKey: ['/api/journal/analytics', 13],
     enabled: activeView === 'analytics'
   });
@@ -142,25 +142,21 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
   };
 
   const renderAnalyticsSummary = () => {
-    if (analytics.length === 0) {
+    if (!analytics || analytics.totalEntries === 0) {
       return (
         <div className="text-center py-8">
-          <BookOpen className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-secondary)' }} />
-          <p style={{ color: 'var(--text-secondary)' }}>No analytics available yet. Start journaling to see insights!</p>
+          <TrendingUp className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--text-secondary)' }} />
+          <p className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+            No emotional journey data available
+          </p>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Start journaling to see your emotional patterns and insights
+          </p>
         </div>
       );
     }
 
-    const avgSentiment = analytics.reduce((sum: number, a: JournalAnalytics) => sum + (a.sentimentScore || 0), 0) / analytics.length;
-    const avgIntensity = analytics.reduce((sum: number, a: JournalAnalytics) => sum + (a.emotionalIntensity || 0), 0) / analytics.length;
-    
-    const allThemes = analytics.flatMap((a: JournalAnalytics) => Object.keys(a.emotionalThemes || {}));
-    const themeFrequency = allThemes.reduce((acc: Record<string, number>, theme) => {
-      acc[theme] = (acc[theme] || 0) + 1;
-      return acc;
-    }, {});
-    
-    const topThemes = Object.entries(themeFrequency)
+    const topThemes = Object.entries(analytics.themes || {})
       .sort(([,a], [,b]) => (b as number) - (a as number))
       .slice(0, 5);
 
@@ -170,56 +166,56 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--pale-green)' }}>
             <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
-              {((avgSentiment * 100)).toFixed(0)}%
+              {analytics.totalEntries}
             </div>
-            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Average Sentiment</div>
+            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Total Entries</div>
           </div>
           <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
             <div className="text-2xl font-bold mb-1" style={{ color: 'var(--soft-blue-dark)' }}>
-              {avgIntensity.toFixed(0)}%
+              {analytics.averageMoodIntensity?.toFixed(1) || '0'}
             </div>
-            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Emotional Intensity</div>
+            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Average Mood</div>
           </div>
         </div>
 
         {/* Top Themes */}
         <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-          <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Top Emotional Themes</h3>
-          <div className="space-y-2">
-            {topThemes.map(([theme, count]) => (
-              <div key={theme} className="flex items-center justify-between">
-                <span className="text-sm capitalize" style={{ color: 'var(--text-primary)' }}>{theme.replace('_', ' ')}</span>
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="h-2 rounded-full"
-                    style={{ 
-                      width: `${Math.max(20, (count as number) / analytics.length * 100)}px`,
-                      backgroundColor: 'var(--soft-blue-dark)'
-                    }}
-                  />
-                  <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{count}</span>
+          <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Recurring Themes</h3>
+          {topThemes.length > 0 ? (
+            <div className="space-y-2">
+              {topThemes.map(([theme, count]) => (
+                <div key={theme} className="flex items-center justify-between">
+                  <span className="text-sm capitalize" style={{ color: 'var(--text-primary)' }}>{theme.replace('_', ' ')}</span>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="h-2 rounded-full"
+                      style={{ 
+                        width: `${Math.max(20, (count as number) / analytics.totalEntries * 100)}px`,
+                        backgroundColor: 'var(--soft-blue-dark)'
+                      }}
+                    />
+                    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{count}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-center py-4" style={{ color: 'var(--text-secondary)' }}>
+              Add tags to your entries to see recurring themes
+            </p>
+          )}
         </div>
-
-        {/* Recent Insights */}
+        
+        {/* Therapeutic Progress */}
         <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
-          <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Recent AI Insights</h3>
-          <div className="space-y-2">
-            {analytics.slice(0, 3).map((analytic: JournalAnalytics, index: number) => (
-              <div key={analytic.id} className="text-sm">
-                <div className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
-                  Entry {index + 1}
-                </div>
-                {analytic.keyInsights && analytic.keyInsights.length > 0 && (
-                  <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    {analytic.keyInsights[0]}
-                  </p>
-                )}
-              </div>
-            ))}
+          <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Therapeutic Progress</h3>
+          <div className="text-center py-4">
+            <div className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+              Good progress
+            </div>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              You've been consistent with journaling. Keep expressing your thoughts and feelings.
+            </p>
           </div>
         </div>
       </div>

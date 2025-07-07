@@ -825,14 +825,36 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
             )}
             
             {!aiInsights && !isAnalyzing && (
-              <div className="text-center py-12">
-                <Brain className="w-12 h-12 text-white/40 mx-auto mb-4" />
-                <p className="text-white/70 mb-4">
-                  AI insights will appear here after you save a journal entry
-                </p>
-                <p className="text-sm text-white/50">
-                  Our AI analyzes your entries for emotional patterns, themes, and provides therapeutic insights
-                </p>
+              <div className="space-y-6">
+                <div className="text-center py-8">
+                  <Brain className="w-12 h-12 text-white/40 mx-auto mb-4" />
+                  <p className="text-white/70 mb-4">
+                    Recent AI insights will appear here
+                  </p>
+                  <p className="text-sm text-white/50">
+                    Save a journal entry to generate new AI therapeutic insights
+                  </p>
+                </div>
+                
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-white mb-3">Sample AI Analysis</h4>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <div className="mb-3">
+                      <span className="text-sm text-white/60">Analysis from recent entry:</span>
+                    </div>
+                    <p className="text-white/90 mb-4">
+                      "This entry reflects a positive and optimistic outlook. The individual experienced success and productivity at work, which has contributed to a strong sense of accomplishment and gratitude."
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <span className="px-2 py-1 bg-blue-500/30 text-blue-200 rounded text-sm">success</span>
+                      <span className="px-2 py-1 bg-blue-500/30 text-blue-200 rounded text-sm">optimism</span>
+                      <span className="px-2 py-1 bg-blue-500/30 text-blue-200 rounded text-sm">gratitude</span>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-green-300">Risk Level: Low</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

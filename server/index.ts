@@ -77,6 +77,124 @@ app.post('/api/journal', async (req, res) => {
   }
 });
 
+// Journal analytics endpoint - MUST BE BEFORE VITE
+app.get('/api/journal/analytics/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    console.log('Journal analytics endpoint hit for user:', userId);
+    
+    // Get all journal entries for the user
+    const entries = await storage.getJournalEntries(userId);
+    
+    if (!entries || entries.length === 0) {
+      return res.json([]);
+    }
+    
+    // Generate analytics from entries
+    const moodCounts: Record<string, number> = {};
+    const moodTrends: any[] = [];
+    const themes: Record<string, number> = {};
+    
+    entries.forEach((entry, index) => {
+      // Count moods
+      if (entry.mood) {
+        moodCounts[entry.mood] = (moodCounts[entry.mood] || 0) + 1;
+      }
+      
+      // Create mood trends
+      moodTrends.push({
+        date: entry.createdAt || new Date(),
+        mood: entry.mood || 'neutral',
+        intensity: entry.moodIntensity || 5,
+        index: index
+      });
+      
+      // Extract themes from tags
+      if (entry.tags && entry.tags.length > 0) {
+        entry.tags.forEach(tag => {
+          themes[tag] = (themes[tag] || 0) + 1;
+        });
+      }
+    });
+    
+    const analytics = {
+      moodDistribution: moodCounts,
+      moodTrends: moodTrends,
+      themes: themes,
+      totalEntries: entries.length,
+      averageMoodIntensity: moodTrends.reduce((sum, trend) => sum + trend.intensity, 0) / moodTrends.length,
+      entriesThisMonth: entries.filter(entry => {
+        if (!entry.createdAt) return false;
+        const entryDate = new Date(entry.createdAt);
+        const now = new Date();
+        return entryDate.getMonth() === now.getMonth() && entryDate.getFullYear() === now.getFullYear();
+      }).length
+    };
+    
+    res.json(analytics);
+  } catch (error) {
+    console.error('Failed to get journal analytics:', error);
+    res.status(500).json({ error: 'Failed to get journal analytics' });
+  }
+});
+
+// Journal AI analysis endpoint - MUST BE BEFORE VITE
+app.post('/api/journal/analyze', async (req, res) => {
+  try {
+    console.log('Journal AI analysis endpoint hit:', req.body);
+    
+    const { userId, entryId, content, mood, moodIntensity } = req.body;
+    
+    // Use OpenAI to analyze the journal entry
+    const OpenAI = (await import('openai')).default;
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    
+    const analysisPrompt = `Please analyze this journal entry for therapeutic insights:
+    
+Content: "${content}"
+Mood: ${mood}
+Mood Intensity: ${moodIntensity}/10
+
+Please provide:
+1. Key emotional themes
+2. Positive patterns or growth areas
+3. Areas of concern or stress
+4. Therapeutic recommendations
+5. Risk level assessment (low/moderate/high/critical)
+
+Respond in JSON format with: {
+  "insights": "detailed analysis",
+  "themes": ["theme1", "theme2"],
+  "riskLevel": "low/moderate/high/critical",
+  "recommendations": ["rec1", "rec2"]
+}`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "You are a compassionate AI wellness companion providing therapeutic insights. Always be supportive and provide helpful recommendations."
+        },
+        {
+          role: "user",
+          content: analysisPrompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7
+    });
+    
+    const analysis = JSON.parse(completion.choices[0].message.content || '{}');
+    console.log('AI analysis generated:', analysis);
+    
+    res.json(analysis);
+  } catch (error) {
+    console.error('Failed to analyze journal entry:', error);
+    res.status(500).json({ error: 'Failed to analyze journal entry' });
+  }
+});
+
 // WORKAROUND: Use non-API path to bypass Vite middleware interception
 app.post('/clear-user-data', async (req, res) => {
   try {
