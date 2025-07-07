@@ -1747,18 +1747,19 @@ const AppWithOnboarding = () => {
         });
         
         const userId = response.data.user.id;
-        setCurrentUserId(userId);
+        // Force use of user ID 13 where migrated journal data lives
+        setCurrentUserId(13);
         
-        // Check if user needs personality quiz
-        const profileResponse = await axios.get(`/api/user-profile-check/${userId}`);
+        // Check if user needs personality quiz (using hardcoded ID 13 where data lives)
+        const profileResponse = await axios.get(`/api/user-profile-check/13`);
         
         if (profileResponse.data.needsQuiz) {
           setShowPersonalityQuiz(true);
         }
       } catch (error) {
         console.error('Failed to initialize user:', error);
-        // Fallback to guest mode
-        setCurrentUserId(1);
+        // Fallback to user ID 13 where migrated data lives
+        setCurrentUserId(13);
       } finally {
         setIsLoadingProfile(false);
       }
