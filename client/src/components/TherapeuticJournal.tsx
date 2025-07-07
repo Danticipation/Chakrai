@@ -53,6 +53,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   const [analytics, setAnalytics] = useState<JournalAnalytics | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiInsights, setAiInsights] = useState<string>('');
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+  const [viewMode, setViewMode] = useState<'view' | 'edit'>('view');
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -678,14 +680,8 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   key={recentEntry.id || index} 
                   className="theme-primary/30 rounded-lg p-4 border border-[#000000]/30 cursor-pointer hover:bg-opacity-40 transition-all"
                   onClick={() => {
-                    setEntry({
-                      title: recentEntry.title || '',
-                      content: recentEntry.content,
-                      mood: recentEntry.mood,
-                      moodIntensity: recentEntry.moodIntensity || 5,
-                      tags: recentEntry.tags || [],
-                      isPrivate: recentEntry.isPrivate
-                    });
+                    setSelectedEntry(recentEntry);
+                    setViewMode('view');
                   }}
                 >
                   <div className="flex justify-between items-start mb-2">
@@ -713,7 +709,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                       )}
                     </div>
                     <span className="text-white/50 text-xs">
-                      Click to edit
+                      Click to view
                     </span>
                   </div>
                 </div>
@@ -897,6 +893,135 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                 <li>• Personal reports focus on your growth journey and positive patterns</li>
                 <li>• All reports respect your privacy settings and only include data you've chosen to share</li>
               </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Journal Entry Viewer Modal */}
+        {selectedEntry && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold mb-2 text-gray-800">
+                      {selectedEntry.title || 'Untitled Entry'}
+                    </h2>
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <span>{new Date(selectedEntry.createdAt || '').toLocaleDateString()}</span>
+                      {selectedEntry.mood && (
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            moodOptions.find(m => m.value === selectedEntry.mood)?.color || 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {moodOptions.find(m => m.value === selectedEntry.mood)?.icon} {moodOptions.find(m => m.value === selectedEntry.mood)?.label}
+                          </span>
+                        </div>
+                      )}
+                      {selectedEntry.moodIntensity && (
+                        <span className="text-xs text-gray-500">
+                          Intensity: {selectedEntry.moodIntensity}/10
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {viewMode === 'view' && (
+                      <button
+                        onClick={() => {
+                          setEntry({
+                            title: selectedEntry.title || '',
+                            content: selectedEntry.content,
+                            mood: selectedEntry.mood,
+                            moodIntensity: selectedEntry.moodIntensity || 5,
+                            tags: selectedEntry.tags || [],
+                            isPrivate: selectedEntry.isPrivate
+                          });
+                          setSelectedEntry(null);
+                          setActiveTab('write');
+                        }}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                      >
+                        Edit Entry
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="mb-6">
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <div className="prose prose-gray max-w-none">
+                      {selectedEntry.content.split('\n').map((paragraph, index) => (
+                        <p key={index} className="mb-3 text-gray-700 leading-relaxed">
+                          {paragraph || '\u00A0'}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tags */}
+                {selectedEntry.tags && selectedEntry.tags.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3 text-gray-800">Tags</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedEntry.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Privacy Status */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-3 py-1 rounded-full text-sm ${
+                      selectedEntry.isPrivate 
+                        ? 'bg-red-100 text-red-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {selectedEntry.isPrivate ? '🔒 Private' : '🌐 Shared'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* AI Analysis if available */}
+                {selectedEntry.aiAnalysis && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3 text-gray-800">AI Analysis</h3>
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <div className="text-gray-700">
+                        {selectedEntry.aiAnalysis.insights}
+                      </div>
+                      {selectedEntry.aiAnalysis.themes && selectedEntry.aiAnalysis.themes.length > 0 && (
+                        <div className="mt-3">
+                          <h4 className="font-medium text-gray-800 mb-2">Themes:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedEntry.aiAnalysis.themes.map((theme, index) => (
+                              <span key={index} className="px-2 py-1 bg-blue-200 text-blue-800 rounded text-sm">
+                                {theme}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
