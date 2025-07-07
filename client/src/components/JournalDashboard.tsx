@@ -17,20 +17,16 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
   const [moodFilter, setMoodFilter] = useState('all');
   const queryClient = useQueryClient();
 
-  // Check if this is a fresh start 
-  const isFreshStart = localStorage.getItem('freshStart') === 'true';
-
-  // Clear cache when fresh start is detected
+  // Always clear any fresh start flags and load journal entries
   useEffect(() => {
-    if (isFreshStart) {
-      queryClient.removeQueries({ queryKey: ['/api/journal'] });
-      queryClient.removeQueries({ queryKey: ['/api/journal/analytics'] });
-    }
-  }, [isFreshStart, queryClient]);
+    localStorage.removeItem('freshStart');
+    queryClient.removeQueries({ queryKey: ['/api/journal'] });
+    queryClient.removeQueries({ queryKey: ['/api/journal/analytics'] });
+  }, [queryClient]);
 
   const { data: entries = [], isLoading: entriesLoading } = useQuery({
     queryKey: ['/api/journal', userId],
-    enabled: !!userId && !isFreshStart // Don't fetch if fresh start
+    enabled: !!userId // Always fetch journal entries when userId is available
   });
 
   const { data: analytics = [] } = useQuery({

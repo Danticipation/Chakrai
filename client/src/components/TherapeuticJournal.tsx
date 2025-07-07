@@ -77,16 +77,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
   useEffect(() => {
     if (!userId) return;
     
-    // Check for fresh start flag
-    const freshStart = localStorage.getItem('freshStart');
-    if (freshStart) {
-      setIsFreshStart(true);
-      setRecentEntries([]);
-      // Clear the flag after checking
-      localStorage.removeItem('freshStart');
-      return;
-    }
-    
+    // Always fetch recent entries when userId is available
     fetchRecentEntries();
   }, [userId]);
 
