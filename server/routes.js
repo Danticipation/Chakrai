@@ -263,21 +263,25 @@ Respond with semantic awareness, making natural references to past conversations
 
     // Store individual messages for chat history persistence
     try {
+      console.log(`Storing messages for userId: ${userId}`);
+      
       // Store user message
-      await storage.createMessage({
+      const userMessage = await storage.createMessage({
         userId: userId,
         content: message,
         isBot: false
       });
+      console.log('User message stored:', userMessage.id);
       
       // Store bot response
-      await storage.createMessage({
+      const botMessage = await storage.createMessage({
         userId: userId,
         content: aiResponse,
         isBot: true
       });
+      console.log('Bot message stored:', botMessage.id);
       
-      console.log('Chat messages stored successfully');
+      console.log(`Chat messages stored successfully for user ${userId}`);
     } catch (error) {
       console.error('Error storing chat messages:', error);
     }
@@ -330,8 +334,12 @@ router.get('/chat/history/:userId?', async (req, res) => {
       sessionInfo.sessionId
     );
     
+    console.log(`Fetching chat history for userId: ${anonymousUser.id}`);
+    
     const limit = parseInt(req.query.limit) || 50;
     const messages = await storage.getMessagesByUserId(anonymousUser.id, limit);
+    
+    console.log(`Found ${messages.length} messages for user ${anonymousUser.id}`);
     
     // Format messages for frontend
     const formattedMessages = messages.map(msg => ({
@@ -341,6 +349,7 @@ router.get('/chat/history/:userId?', async (req, res) => {
       timestamp: msg.timestamp
     }));
     
+    console.log(`Returning ${formattedMessages.length} formatted messages`);
     res.json({ messages: formattedMessages, count: formattedMessages.length });
   } catch (error) {
     console.error('Error fetching chat history:', error);

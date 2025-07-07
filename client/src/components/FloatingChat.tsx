@@ -44,8 +44,18 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
 
   const loadChatHistory = async () => {
     try {
-      const response = await axios.get('/api/chat/history/1?limit=50');
+      // Generate device fingerprint for anonymous user identification
+      const deviceFingerprint = `browser_${navigator.userAgent.slice(0, 50)}_${screen.width}x${screen.height}_${new Date().getTimezoneOffset()}`;
+      
+      const response = await axios.get('/api/chat/history/1?limit=50', {
+        headers: {
+          'X-Device-Fingerprint': deviceFingerprint,
+          'X-Session-Id': `session_${Date.now()}`
+        }
+      });
       const chatHistory = response.data.messages || [];
+      
+      console.log('Chat history loaded:', chatHistory.length, 'messages');
       
       if (chatHistory.length > 0) {
         setMessages(chatHistory);
@@ -82,9 +92,17 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
     setIsLoading(true);
 
     try {
+      // Generate device fingerprint for anonymous user identification
+      const deviceFingerprint = `browser_${navigator.userAgent.slice(0, 50)}_${screen.width}x${screen.height}_${new Date().getTimezoneOffset()}`;
+      
       const response = await axios.post('/api/chat', {
         message: text.trim(),
         context: 'floating_chat'
+      }, {
+        headers: {
+          'X-Device-Fingerprint': deviceFingerprint,
+          'X-Session-Id': `session_${Date.now()}`
+        }
       });
 
       const botMessage: Message = {
