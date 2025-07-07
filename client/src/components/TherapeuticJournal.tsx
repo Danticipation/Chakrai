@@ -449,7 +449,11 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
               placeholder="Give your entry a title (optional)"
               value={entry.title}
               onChange={(e) => setEntry(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full px-4 py-3 rounded-xl border-2 border-[#000000]/30 focus:border-blue-400 focus:outline-none text-lg font-medium"
+              className="w-full px-4 py-3 rounded-xl border-2 border-[#000000]/30 focus:border-blue-400 focus:outline-none text-lg font-medium text-gray-800 placeholder-gray-500"
+              style={{ 
+                backgroundColor: '#ffffff',
+                color: '#1a202c'
+              }}
             />
           </div>
 
@@ -466,8 +470,12 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                   e.target.style.height = 'auto';
                   e.target.style.height = e.target.scrollHeight + 'px';
                 }}
-                className="w-full min-h-[200px] px-4 py-3 pr-16 rounded-xl border-2 border-[#000000]/30 focus:border-blue-400 focus:outline-none resize-none text-base leading-relaxed"
-                style={{ maxHeight: '400px' }}
+                className="w-full min-h-[200px] px-4 py-3 pr-16 rounded-xl border-2 border-[#000000]/30 focus:border-blue-400 focus:outline-none resize-none text-base leading-relaxed text-gray-800 placeholder-gray-500"
+                style={{ 
+                  maxHeight: '400px',
+                  backgroundColor: '#ffffff',
+                  color: '#1a202c'
+                }}
               />
               
               {/* Voice Recording Button */}
@@ -602,7 +610,11 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addTag(newTag)}
-                className="flex-1 px-3 py-2 rounded-lg border border-[#3949ab]/50 theme-primary/30 text-white placeholder-white/60 focus:border-[#000000] focus:outline-none text-sm"
+                className="flex-1 px-3 py-2 rounded-lg border border-[#3949ab]/50 focus:border-[#000000] focus:outline-none text-sm text-gray-800 placeholder-gray-500"
+                style={{
+                  backgroundColor: '#ffffff',
+                  color: '#1a202c'
+                }}
               />
               <button
                 onClick={() => addTag(newTag)}
@@ -622,7 +634,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                 onChange={(e) => setEntry(prev => ({ ...prev, isPrivate: e.target.checked }))}
                 className="mr-3 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
-              <span className="text-gray-700">Keep this entry private</span>
+              <span className="text-white">Keep this entry private</span>
             </label>
           </div>
 
