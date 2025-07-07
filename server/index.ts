@@ -55,6 +55,28 @@ app.get('/api/journal/:userId', async (req, res) => {
   }
 });
 
+// Create journal entry endpoint - MUST BE BEFORE VITE
+app.post('/api/journal/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    console.log('Create journal entry for user:', userId, req.body);
+    const newEntry = await storage.createJournalEntry({
+      userId,
+      title: req.body.title || null,
+      content: req.body.content,
+      mood: req.body.mood,
+      moodIntensity: req.body.moodIntensity || 5,
+      tags: req.body.tags || [],
+      isPrivate: req.body.isPrivate || false
+    });
+    console.log('Created entry:', newEntry);
+    res.json(newEntry);
+  } catch (error) {
+    console.error('Failed to create journal entry:', error);
+    res.status(500).json({ error: 'Failed to create journal entry' });
+  }
+});
+
 // WORKAROUND: Use non-API path to bypass Vite middleware interception
 app.post('/clear-user-data', async (req, res) => {
   try {
