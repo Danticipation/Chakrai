@@ -16,13 +16,25 @@ interface PersonalityReflectionProps {
   userId?: number;
 }
 
-const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 1 }) => {
+const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId }) => {
+  // Get current user ID from session context
+  const currentUserId = userId || (() => {
+    const fingerprint = `${navigator.userAgent}_${screen.width}x${screen.height}_${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
+    // Hash the fingerprint to get consistent user ID (same logic as backend)
+    let hash = 0;
+    for (let i = 0; i < fingerprint.length; i++) {
+      const char = fingerprint.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash % 1000000);
+  })();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['personality-reflection', userId, refreshTrigger],
+    queryKey: ['personality-reflection', currentUserId, refreshTrigger],
     queryFn: async (): Promise<PersonalityReflectionData> => {
-      const response = await fetch(`/api/personality-reflection/${userId}`);
+      const response = await fetch(`/api/personality-reflection/${currentUserId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch personality reflection');
       }

@@ -44,9 +44,23 @@ interface MemoryDashboard {
 export default function MemoryDashboard() {
   const [refreshing, setRefreshing] = useState(false);
 
+  // Get current user ID from session context
+  const getCurrentUserId = () => {
+    const fingerprint = `${navigator.userAgent}_${screen.width}x${screen.height}_${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
+    let hash = 0;
+    for (let i = 0; i < fingerprint.length; i++) {
+      const char = fingerprint.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash % 1000000);
+  };
+  
+  const currentUserId = getCurrentUserId();
+
   const { data: dashboard, isLoading, refetch } = useQuery<MemoryDashboard>({
-    queryKey: ['/api/memory-dashboard', 1],
-    queryFn: () => fetch('/api/memory-dashboard?userId=1').then(res => res.json())
+    queryKey: ['/api/memory-dashboard', currentUserId],
+    queryFn: () => fetch(`/api/memory-dashboard?userId=${currentUserId}`).then(res => res.json())
   });
 
   const handleRefresh = async () => {

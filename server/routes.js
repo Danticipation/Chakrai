@@ -624,11 +624,22 @@ Be supportive, encouraging, and therapeutic in tone. Focus on growth and self-aw
         const data = await openaiResponse.json();
         const reflection = data.choices[0].message.content;
         
+        // Get conversation count from stored messages
+        const conversations = await storage.getMessagesByUserId(userId).then(messages => {
+          // Count unique conversation sessions (group by date or time gaps)
+          const uniqueDays = new Set();
+          messages.forEach(msg => {
+            const date = new Date(msg.timestamp).toDateString();
+            uniqueDays.add(date);
+          });
+          return uniqueDays.size;
+        }).catch(() => 0);
+
         res.json({
           reflection,
           lastUpdated: new Date().toISOString(),
           dataPoints: {
-            conversations: 0,
+            conversations: conversations,
             journalEntries: journalEntries.length,
             moodEntries: moodEntries.length
           }
