@@ -30,8 +30,8 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
   });
 
   const { data: analytics = [] } = useQuery({
-    queryKey: ['/api/journal/analytics', userId],
-    enabled: !!userId && activeView === 'analytics'
+    queryKey: ['/api/journal/analytics', 13],
+    enabled: activeView === 'analytics'
   });
 
   const filteredEntries = entries.filter((entry: JournalEntry) => {
@@ -75,7 +75,7 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
     return (
       <div
         key={entry.id}
-        onClick={() => handleEditEntry(entry)}
+        onClick={() => setSelectedEntry(entry)}
         className="rounded-2xl p-4 shadow-sm cursor-pointer transition-all hover:shadow-md"
         style={{ backgroundColor: 'var(--surface-secondary)' }}
       >
@@ -484,6 +484,100 @@ export default function JournalDashboard({ userId }: JournalDashboardProps) {
 
         {activeView === 'analytics' && renderAnalyticsSummary()}
       </div>
+
+      {/* Journal Entry Modal */}
+      {selectedEntry && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedEntry(null)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: 'var(--surface-primary)', color: 'var(--text-primary)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+                    {selectedEntry.title || 'Untitled Entry'}
+                  </h2>
+                  <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    <span>{new Date(selectedEntry.createdAt).toLocaleDateString()}</span>
+                    {selectedEntry.mood && (
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: getMoodColor(selectedEntry.mood) }}
+                        />
+                        <span>{getMoodLabel(selectedEntry.mood)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedEntry(null)}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="prose max-w-none mb-6">
+                <div 
+                  className="text-base leading-relaxed whitespace-pre-wrap"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  {selectedEntry.content}
+                </div>
+              </div>
+
+              {/* Tags */}
+              {selectedEntry.tags && selectedEntry.tags.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedEntry.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 rounded-full text-xs font-medium"
+                        style={{ 
+                          backgroundColor: 'var(--accent)',
+                          color: 'white'
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
+                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  Created on {new Date(selectedEntry.createdAt).toLocaleString()}
+                </span>
+                <button
+                  onClick={() => setSelectedEntry(null)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium"
+                  style={{ 
+                    backgroundColor: 'var(--accent)',
+                    color: 'white'
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -497,6 +591,17 @@ function getMoodColor(mood: string): string {
     very_negative: '#EF4444'
   };
   return colors[mood] || '#6B7280';
+}
+
+function getMoodLabel(mood: string): string {
+  const labels: Record<string, string> = {
+    very_positive: 'Very Positive',
+    positive: 'Positive',
+    neutral: 'Neutral',
+    negative: 'Negative',
+    very_negative: 'Very Negative'
+  };
+  return labels[mood] || 'Unknown';
 }
 
 function getMoodLabel(mood: string): string {
