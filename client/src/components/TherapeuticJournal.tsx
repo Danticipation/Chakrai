@@ -930,6 +930,7 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                     {viewMode === 'view' && (
                       <button
                         onClick={() => {
+                          // Load the entry data into the form
                           setEntry({
                             title: selectedEntry.title || '',
                             content: selectedEntry.content,
@@ -938,8 +939,17 @@ const TherapeuticJournal: React.FC<TherapeuticJournalProps> = ({ userId, onEntry
                             tags: selectedEntry.tags || [],
                             isPrivate: selectedEntry.isPrivate
                           });
+                          // Close the modal
                           setSelectedEntry(null);
+                          // Switch to write tab so user can see and edit the content
                           setActiveTab('write');
+                          // Scroll to the top of the form after a brief delay
+                          setTimeout(() => {
+                            const writeTab = document.querySelector('[data-tab="write"]');
+                            if (writeTab) {
+                              writeTab.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }, 100);
                         }}
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                       >
