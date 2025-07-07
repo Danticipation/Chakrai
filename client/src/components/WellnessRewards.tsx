@@ -200,7 +200,7 @@ const WellnessRewards: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="w-full bg-white rounded-lg p-1 mb-6 shadow-lg">
+        <div className="w-full theme-surface rounded-lg p-1 mb-6 shadow-lg border border-silver">
           <div className="grid grid-cols-4 gap-1">
             {[
               { id: 'overview', label: 'Overview', icon: TrendingUp },
@@ -211,29 +211,14 @@ const WellnessRewards: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`shimmer-border theme-button w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                className={`shimmer-border w-full px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-200 theme-text ${
                   activeTab === tab.id
-                    ? 'shadow-lg border-2 animate-shimmer'
-                    : 'hover:shadow-md border hover:border-2 hover:animate-shimmer'
+                    ? 'theme-primary shadow-lg border-2 animate-shimmer'
+                    : 'theme-surface hover:theme-primary-light hover:shadow-md border hover:border-2 hover:animate-shimmer'
                 }`}
               >
-                <tab.icon 
-                  className="w-4 h-4 mx-auto mb-1" 
-                  style={{ 
-                    background: 'none',
-                    backgroundColor: 'transparent',
-                    color: 'white',
-                    fill: 'white'
-                  }}
-                />
-                <div 
-                  className="text-xs"
-                  style={{ 
-                    background: 'none',
-                    backgroundColor: 'transparent',
-                    color: 'white'
-                  }}
-                >
+                <tab.icon className="w-4 h-4 mx-auto mb-1 theme-text" />
+                <div className="text-xs theme-text">
                   {tab.label}
                 </div>
               </button>
