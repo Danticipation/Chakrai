@@ -56,9 +56,9 @@ app.get('/api/journal/:userId', async (req, res) => {
 });
 
 // Create journal entry endpoint - MUST BE BEFORE VITE
-app.post('/api/journal/:userId', async (req, res) => {
+app.post('/api/journal', async (req, res) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = req.body.userId;
     console.log('Create journal entry for user:', userId, req.body);
     const newEntry = await storage.createJournalEntry({
       userId,
