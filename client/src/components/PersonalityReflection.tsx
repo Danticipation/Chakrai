@@ -80,6 +80,19 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
   }
 
   const formatReflectionText = (text: string) => {
+    // If no structured format, just display as paragraphs
+    if (!text.includes('1.') && !text.includes('TRAIT')) {
+      return (
+        <div className="space-y-4 text-white leading-relaxed">
+          {text.split('\n').filter(line => line.trim()).map((paragraph, index) => (
+            <p key={index} className="text-white/90 leading-relaxed">
+              {paragraph.trim()}
+            </p>
+          ))}
+        </div>
+      );
+    }
+
     // Split by numbered sections and format nicely
     const sections = text.split(/(?=\d+\.\s+[A-Z\s]+:)/);
     
@@ -88,7 +101,7 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
       
       const lines = section.trim().split('\n');
       const title = lines[0];
-      const content = lines.slice(1).join('\n').trim();
+      const content = lines.slice(1).join(' ').trim(); // Join with spaces, not newlines
       
       // Check if this is a numbered section
       const isNumberedSection = /^\d+\.\s+[A-Z\s]+:/.test(title);
@@ -96,20 +109,20 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
       if (isNumberedSection) {
         const cleanTitle = title.replace(/^\d+\.\s+/, '').replace(':', '').trim();
         return (
-          <div key={index} className="mb-4">
-            <h3 className="font-semibold text-[#9fa8da] mb-2 flex items-center gap-2 whitespace-nowrap">
+          <div key={index} className="mb-6">
+            <h3 className="font-semibold text-[#9fa8da] mb-3 flex items-center gap-2">
               {cleanTitle.includes('TRAIT') && <User className="w-4 h-4" />}
               {cleanTitle.includes('POSITIVE') && <TrendingUp className="w-4 h-4" />}
               {cleanTitle.includes('GROWTH') && <RotateCcw className="w-4 h-4" />}
               {cleanTitle.includes('EMOTIONAL') && <Brain className="w-4 h-4" />}
-              <span className="whitespace-nowrap">{cleanTitle}</span>
+              <span>{cleanTitle}</span>
             </h3>
-            <p className="text-white/90 leading-relaxed whitespace-pre-wrap">{content}</p>
+            <p className="text-white/90 leading-relaxed">{content}</p>
           </div>
         );
       } else {
         return (
-          <p key={index} className="text-white/90 leading-relaxed whitespace-pre-wrap mb-4">
+          <p key={index} className="text-white/90 leading-relaxed mb-4">
             {section.trim()}
           </p>
         );
@@ -136,15 +149,24 @@ const PersonalityReflection: React.FC<PersonalityReflectionProps> = ({ userId = 
 
       {/* Data Points Summary */}
       <div className="theme-primary/30 backdrop-blur-sm rounded-xl p-4 mb-4 border border-[#9fa8da]/50">
-        <div className="flex justify-between items-center text-sm text-white/80">
-          <span>Analysis based on:</span>
-          <div className="flex gap-4">
-            <span>{data?.dataPoints.conversations || 0} conversations</span>
-            <span>{data?.dataPoints.journalEntries || 0} journal entries</span>
-            <span>{data?.dataPoints.moodEntries || 0} mood entries</span>
+        <div className="text-sm text-white/80 mb-2">
+          <span className="block mb-2">Analysis based on:</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+            <div className="bg-white/10 rounded-lg px-3 py-2 text-center">
+              <div className="font-semibold text-lg text-white">{data?.dataPoints.conversations || 0}</div>
+              <div className="text-white/70">conversations</div>
+            </div>
+            <div className="bg-white/10 rounded-lg px-3 py-2 text-center">
+              <div className="font-semibold text-lg text-white">{data?.dataPoints.journalEntries || 0}</div>
+              <div className="text-white/70">journal entries</div>
+            </div>
+            <div className="bg-white/10 rounded-lg px-3 py-2 text-center">
+              <div className="font-semibold text-lg text-white">{data?.dataPoints.moodEntries || 0}</div>
+              <div className="text-white/70">mood entries</div>
+            </div>
           </div>
         </div>
-        <div className="text-xs text-white/60 mt-1">
+        <div className="text-xs text-white/60 mt-2 text-center">
           Last updated: {data?.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : 'Unknown'}
         </div>
       </div>
