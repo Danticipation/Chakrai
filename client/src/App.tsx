@@ -1160,6 +1160,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 { id: 'journal', label: 'Journal', icon: '📝' },
                 { id: 'memory', label: 'Memory', icon: '🎯' },
                 { id: 'analytics', label: 'Analytics', icon: '📊' },
+                { id: 'feedback', label: 'Feedback', icon: '💡' },
                 { id: 'voice', label: 'Voice', icon: '🎤' },
                 { id: 'themes', label: 'Themes', icon: '🎨' },
                 { id: 'challenges', label: 'Challenges', icon: '🏆' },
@@ -1170,7 +1171,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 { id: 'agents', label: 'Specialists', icon: '🧩' },
                 { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
                 { id: 'therapy-plans', label: 'Plans', icon: '📋' },
-                { id: 'questions', label: 'Questions', icon: '❓' }
+                { id: 'questions', label: 'Questions', icon: '❓' },
+                { id: 'feedback', label: 'Feedback', icon: '💡' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1182,7 +1184,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                       setShowSettings(true);
                     } else if (tab.id === 'floating-chat') {
                       setIsFloatingChatOpen(true);
-                    } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans', 'questions'].includes(tab.id)) {
+                    } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans', 'questions', 'feedback'].includes(tab.id)) {
                       setContentLoading(true);
                       setMobileModalContent(tab.id);
                       setShowMobileModal(true);
@@ -1257,7 +1259,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               { id: 'agents', label: 'AI Specialists' },
               { id: 'vr', label: 'VR Therapy' },
               { id: 'health', label: 'Wearables' },
-              { id: 'questions', label: 'Question Deck' }
+              { id: 'questions', label: 'Question Deck' },
+              { id: 'feedback', label: 'Feedback & Suggestions' }
             ].map((tab) => (
               <button
                 key={tab.id}
