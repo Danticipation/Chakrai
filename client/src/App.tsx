@@ -32,6 +32,7 @@ import { EHRIntegration } from './components/EHRIntegration';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import FloatingChat from './components/FloatingChat';
 import ChallengeSystem from './components/ChallengeSystem';
+import SettingsPanel from './components/SettingsPanel';
 import { getCurrentUserId } from './utils/userSession';
 
 const queryClient = new QueryClient({
@@ -126,7 +127,6 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     'ehr': 'Electronic health record integration with FHIR standards, insurance-eligible session summaries, and clinical data export.',
     'privacy-policy': 'Complete privacy policy and legal compliance information for TraI mental wellness companion services.'
   };
-  const [showSettings, setShowSettings] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [userQuery, setUserQuery] = useState('');
 
@@ -202,6 +202,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [mobileModalContent, setMobileModalContent] = useState('journal');
   const [showThemeModal, setShowThemeModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -1060,49 +1061,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
           </div>
           
-          {/* Bottom Row: Quick Access */}
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setActiveSection('horoscope')}
-              className="mobile-header-btn"
-            >
-              <div className="flex items-center justify-center space-x-1">
-                <span className="text-lg">⭐</span>
-                <span className="text-xs font-medium">Horoscope</span>
-              </div>
-            </button>
-            
-            <button 
-              onClick={() => setActiveSection('affirmation')}
-              className="mobile-header-btn"
-            >
-              <div className="flex items-center justify-center space-x-1">
-                <span className="text-lg">✨</span>
-                <span className="text-xs font-medium">Affirmation</span>
-              </div>
-            </button>
-            
-            <button 
-              onClick={() => setShowSettings(true)}
-              className="mobile-header-btn"
-            >
-              <div className="flex items-center justify-center space-x-1">
-                <span className="text-lg">⚙️</span>
-                <span className="text-xs font-medium">Settings</span>
-              </div>
-            </button>
-            
-            <button 
-              onClick={clearAllUserData}
-              className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg transition-colors"
-              title="Clear all data for fresh start"
-            >
-              <div className="flex items-center justify-center space-x-1">
-                <span className="text-lg">🔄</span>
-                <span className="text-xs font-medium">Reset</span>
-              </div>
-            </button>
-          </div>
+
         </div>
 
         {/* Desktop: Original Layout */}
@@ -1186,6 +1145,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                       setShowSettings(true);
                     } else if (tab.id === 'floating-chat') {
                       setIsFloatingChatOpen(true);
+                    } else if (tab.id === 'settings') {
+                      setShowSettings(true);
                     } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans', 'questions', 'feedback'].includes(tab.id)) {
                       setContentLoading(true);
                       setMobileModalContent(tab.id);
@@ -1262,7 +1223,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               { id: 'vr', label: 'VR Therapy' },
               { id: 'health', label: 'Wearables' },
               { id: 'questions', label: 'Question Deck' },
-              { id: 'feedback', label: 'Feedback & Suggestions' }
+              { id: 'feedback', label: 'Feedback & Suggestions' },
+              { id: 'settings', label: 'Settings' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -1734,6 +1696,18 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Settings Panel Modal */}
+      {showSettings && (
+        <SettingsPanel
+          onClose={() => setShowSettings(false)}
+          onReset={clearAllUserData}
+          selectedVoice={selectedVoice}
+          onVoiceChange={setSelectedVoice}
+          currentTheme={currentTheme}
+          onThemeChange={setCurrentTheme}
+        />
       )}
 
       {/* Floating Chat Component */}
