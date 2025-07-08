@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, BarChart3, Gift, Headphones, Shield, X, Palette } from 'lucide-react';
 import axios from 'axios';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import ThemeSelector from './components/ThemeSelector';
@@ -71,6 +71,7 @@ interface AppLayoutProps {
 }
 
 const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
+  const { currentTheme, changeTheme } = useTheme();
   const [activeSection, setActiveSection] = useState('chat');
   const queryClient = useQueryClient();
   
@@ -1711,8 +1712,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
           onReset={clearAllUserData}
           selectedVoice={selectedVoice}
           onVoiceChange={setSelectedVoice}
-          currentTheme={currentTheme}
-          onThemeChange={setCurrentTheme}
+          currentTheme={currentTheme.id}
+          onThemeChange={changeTheme}
         />
       )}
 
