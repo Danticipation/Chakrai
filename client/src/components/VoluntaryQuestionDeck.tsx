@@ -359,6 +359,7 @@ export default function VoluntaryQuestionDeck() {
             </div>
             <p className="theme-text-secondary text-lg leading-relaxed max-w-2xl mx-auto">
               These optional questions help me understand you better so I can provide more personalized support. 
+              <strong className="theme-text">Click any category below to start answering questions!</strong><br/>
               Answer what you want, when you want - there's no pressure!
             </p>
             
@@ -373,6 +374,31 @@ export default function VoluntaryQuestionDeck() {
                   className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300"
                   style={{ width: `${getTotalProgress()}%` }}
                 ></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sample Questions Preview */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="theme-card rounded-xl p-6 border border-[var(--theme-accent)]/30">
+              <h3 className="text-lg font-semibold theme-text mb-4 text-center">💭 Sample Questions You'll Find:</h3>
+              <div className="space-y-3 text-sm theme-text-secondary">
+                <div className="flex items-start">
+                  <span className="mr-2">❤️</span>
+                  <span>"If your friends had to describe you in 3 words, what would they say?"</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="mr-2">🧠</span>
+                  <span>"When you're stressed, what helps you feel better?"</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="mr-2">🎯</span>
+                  <span>"What's one thing you'd like to change about yourself?"</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="mr-2">☕</span>
+                  <span>"Are you more of a morning person or night owl?"</span>
+                </div>
               </div>
             </div>
           </div>
@@ -414,8 +440,8 @@ export default function VoluntaryQuestionDeck() {
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="theme-accent text-sm group-hover:underline">
-                      {progress === 100 ? 'Review Answers' : 'Start Questions'}
+                    <span className="theme-accent text-sm group-hover:underline font-semibold">
+                      {progress === 100 ? '✓ Review Answers' : '→ Click to Start Questions'}
                     </span>
                     <ChevronRight className="theme-accent group-hover:translate-x-1 transition-transform duration-300" size={16} />
                   </div>
