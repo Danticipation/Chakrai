@@ -895,7 +895,7 @@ export const insertDailyActivitySchema = createInsertSchema(dailyActivities).omi
 export const userFeedback = pgTable("user_feedback", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
-  type: text("type").notNull(), // 'bug', 'feature', 'general'
+  feedbackType: text("feedback_type").notNull(), // 'bug', 'feature', 'general'
   title: text("title").notNull(),
   description: text("description").notNull(),
   priority: text("priority").notNull().default('medium'), // 'low', 'medium', 'high'

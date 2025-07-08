@@ -55,7 +55,7 @@ const FeedbackSystem: React.FC = () => {
       setSubmitting(true);
       const feedbackData = {
         userId,
-        type: feedbackType,
+        feedbackType,
         title: title.trim(),
         description: description.trim(),
         priority,
@@ -92,20 +92,20 @@ const FeedbackSystem: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'submitted': return 'text-gray-500';
-      case 'reviewed': return 'text-blue-500';
-      case 'in_progress': return 'text-yellow-500';
-      case 'resolved': return 'text-green-500';
-      default: return 'text-gray-500';
+      case 'submitted': return 'theme-text-secondary';
+      case 'reviewed': return 'text-blue-400';
+      case 'in_progress': return 'text-yellow-400';
+      case 'resolved': return 'text-green-400';
+      default: return 'theme-text-secondary';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'text-red-500 bg-red-50';
-      case 'medium': return 'text-yellow-600 bg-yellow-50';
-      case 'low': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-500 bg-gray-50';
+      case 'high': return 'text-red-400 bg-red-400/20';
+      case 'medium': return 'text-yellow-400 bg-yellow-400/20';
+      case 'low': return 'text-green-400 bg-green-400/20';
+      default: return 'theme-text-secondary theme-surface';
     }
   };
 
@@ -126,12 +126,12 @@ const FeedbackSystem: React.FC = () => {
 
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex theme-surface rounded-lg p-1 border border-[var(--theme-accent)]/30">
             <button
               onClick={() => setActiveTab('submit')}
               className={`px-6 py-2 rounded-md font-medium transition-all ${
                 activeTab === 'submit'
-                  ? 'bg-white theme-text shadow-sm'
+                  ? 'bg-[var(--theme-accent)] text-white shadow-sm'
                   : 'theme-text-secondary hover:theme-text'
               }`}
             >
@@ -141,7 +141,7 @@ const FeedbackSystem: React.FC = () => {
               onClick={() => setActiveTab('history')}
               className={`px-6 py-2 rounded-md font-medium transition-all ${
                 activeTab === 'history'
-                  ? 'bg-white theme-text shadow-sm'
+                  ? 'bg-[var(--theme-accent)] text-white shadow-sm'
                   : 'theme-text-secondary hover:theme-text'
               }`}
             >
@@ -153,9 +153,9 @@ const FeedbackSystem: React.FC = () => {
         {activeTab === 'submit' && (
           <div className="max-w-2xl mx-auto">
             {submitted && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
-                <CheckCircle className="text-green-500 mr-3" size={20} />
-                <span className="text-green-700">Thank you! Your feedback has been submitted successfully.</span>
+              <div className="mb-6 p-4 theme-surface border border-green-400/50 rounded-lg flex items-center">
+                <CheckCircle className="text-green-400 mr-3" size={20} />
+                <span className="theme-text">Thank you! Your feedback has been submitted successfully.</span>
               </div>
             )}
 
@@ -174,10 +174,10 @@ const FeedbackSystem: React.FC = () => {
                         key={value}
                         type="button"
                         onClick={() => setFeedbackType(value as any)}
-                        className={`p-4 rounded-lg border-2 transition-all text-center ${
+                        className={`p-4 rounded-lg border-2 transition-all text-center theme-surface hover-lift ${
                           feedbackType === value
-                            ? `border-${color}-500 bg-${color}-50`
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-[var(--theme-accent)] bg-[var(--theme-accent)]/20'
+                            : 'border-[var(--theme-accent)]/30 hover:border-[var(--theme-accent)]/50'
                         }`}
                       >
                         <Icon className={`mx-auto mb-2 text-${color}-500`} size={24} />
@@ -202,7 +202,7 @@ const FeedbackSystem: React.FC = () => {
                       feedbackType === 'feature' ? 'What feature would you like to see?' :
                       'What would you like to share?'
                     }
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-[var(--theme-accent)] theme-background theme-text"
+                    className="w-full p-3 rounded-lg border-2 border-[var(--theme-accent)]/30 focus:border-[var(--theme-accent)] theme-surface theme-text"
                     required
                   />
                 </div>
@@ -221,7 +221,7 @@ const FeedbackSystem: React.FC = () => {
                       'Share your thoughts, suggestions, or feedback...'
                     }
                     rows={6}
-                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-[var(--theme-accent)] theme-background theme-text resize-none"
+                    className="w-full p-3 rounded-lg border-2 border-[var(--theme-accent)]/30 focus:border-[var(--theme-accent)] theme-surface theme-text resize-none"
                     required
                   />
                 </div>
@@ -233,7 +233,7 @@ const FeedbackSystem: React.FC = () => {
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value as any)}
-                      className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-[var(--theme-accent)] theme-background theme-text"
+                      className="w-full p-3 rounded-lg border-2 border-[var(--theme-accent)]/30 focus:border-[var(--theme-accent)] theme-surface theme-text"
                     >
                       <option value="low">Low - Minor issue or nice-to-have</option>
                       <option value="medium">Medium - Noticeable issue or useful feature</option>
@@ -256,7 +256,7 @@ const FeedbackSystem: React.FC = () => {
                         >
                           <Star
                             className={`w-8 h-8 ${
-                              star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
+                              star <= rating ? 'text-[var(--theme-accent)] fill-[var(--theme-accent)]' : 'theme-text-secondary'
                             }`}
                           />
                         </button>
@@ -307,7 +307,7 @@ const FeedbackSystem: React.FC = () => {
                   <div key={feedback.id} className="theme-card rounded-lg p-6 border border-[var(--theme-accent)]/30">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center">
-                        {getTypeIcon(feedback.type)}
+                        {getTypeIcon(feedback.feedbackType)}
                         <h3 className="theme-text font-semibold ml-2">{feedback.title}</h3>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -328,7 +328,7 @@ const FeedbackSystem: React.FC = () => {
                         <div className="flex items-center">
                           <span className="mr-1">Rating:</span>
                           {[...Array(feedback.rating)].map((_, i) => (
-                            <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                            <Star key={i} className="w-4 h-4 text-[var(--theme-accent)] fill-[var(--theme-accent)]" />
                           ))}
                         </div>
                       )}

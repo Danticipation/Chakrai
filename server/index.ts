@@ -523,10 +523,10 @@ app.get('/api/feedback/:userId', async (req, res) => {
 
 app.post('/api/feedback', async (req, res) => {
   try {
-    const { userId, type, title, description, priority, rating } = req.body;
+    const { userId, feedbackType, title, description, priority, rating } = req.body;
     const feedback = await storage.createFeedback({
       userId,
-      type,
+      feedbackType,
       title,
       description,
       priority,
