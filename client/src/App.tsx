@@ -1097,49 +1097,49 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         </div>
 
         {/* Desktop: Original Layout */}
-        <div className="hidden md:flex justify-center">
-          <div className="grid grid-cols-3 gap-4 w-[1152px] h-[200px] -ml-[88px]">
+        <div className="flex justify-center px-2 sm:px-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-[1152px] h-[120px] sm:h-[200px]">
             {/* Horoscope Section - Luxury Enhanced */}
             <button 
               onClick={() => setActiveSection('horoscope')}
-              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-8 flex flex-col cursor-pointer text-luxury"
+              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury"
             >
-              <h3 className="text-2xl font-bold theme-text mb-6 underline font-serif">Horoscope</h3>
-              <p className="text-base theme-text text-left leading-relaxed flex-1 font-light">
+              <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Horoscope</h3>
+              <p className="text-sm sm:text-base theme-text text-left leading-relaxed flex-1 font-light">
                 {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
               </p>
-              <p className="text-sm theme-text/70 mt-6 font-medium tracking-wide">Click to expand</p>
+              <p className="text-xs sm:text-sm theme-text/70 mt-3 sm:mt-6 font-medium tracking-wide">Click to expand</p>
             </button>
             
             {/* Logo Section - Luxury Center */}
             <button 
               onClick={() => setActiveSection('logo')}
-              className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury"
+              className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury"
             >
-              <img src={traiLogo} alt="TrAI" className="h-48 w-auto mb-6 -mt-2.5 drop-shadow-lg" />
-              <p className="text-xl theme-text font-semibold tracking-wide">TraI Mental Wellness</p>
-              <p className="text-sm theme-text-secondary mt-3 font-light">Click for more info</p>
+              <img src={traiLogo} alt="TrAI" className="h-20 sm:h-48 w-auto mb-2 sm:mb-6 -mt-1 sm:-mt-2.5 drop-shadow-lg" />
+              <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide">TraI Mental Wellness</p>
+              <p className="text-xs sm:text-sm theme-text-secondary mt-1 sm:mt-3 font-light">Click for more info</p>
             </button>
             
             {/* Affirmation Section - Luxury Enhanced */}
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-8 flex flex-col cursor-pointer text-luxury"
+              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury"
             >
-              <h3 className="text-2xl font-bold theme-text mb-6 underline font-serif">Affirmation</h3>
-              <p className="text-base theme-text text-left leading-relaxed flex-1 font-light">
-                {dailyAffirmation.substring(0, 200)}...
+              <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Affirmation</h3>
+              <p className="text-sm sm:text-base theme-text text-left leading-relaxed flex-1 font-light">
+                {dailyAffirmation.substring(0, 150)}...
               </p>
-              <p className="text-sm theme-text/70 mt-6 font-medium tracking-wide">Click to hear</p>
+              <p className="text-xs sm:text-sm theme-text/70 mt-3 sm:mt-6 font-medium tracking-wide">Click to hear</p>
             </button>
           </div>
         </div>
       </div>
 
       {/* Main Content Area - Mobile Responsive */}
-      <div className="flex-1 flex flex-col md:flex-row theme-background">
-        {/* Mobile Navigation - Polished Professional Design */}
-        <div className="md:hidden mobile-nav-polish">
+      <div className="flex-1 flex flex-col lg:flex-row theme-background">
+        {/* Mobile and iPad Navigation - Polished Professional Design */}
+        <div className="lg:hidden mobile-nav-polish">
           {/* User Features Section */}
           <div className="mobile-nav-section">
             <div className="mobile-nav-section-title">Wellness Features</div>
@@ -1227,7 +1227,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         </div>
 
         {/* Desktop Left Sidebar Navigation */}
-        <div className="hidden md:flex w-72 flex-col justify-center py-8">
+        <div className="hidden lg:flex w-72 flex-col justify-center py-8">
           {/* User Features Section */}
           <div className="mb-4">
             <div className="theme-text-secondary text-sm font-medium px-6 pb-2">Wellness Features</div>
@@ -1521,7 +1521,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         </div>
 
         {/* Right Stats Sidebar - Mobile Responsive */}
-        <div className="hidden md:block w-96 py-8 px-8">
+        <div className="hidden lg:block w-96 py-8 px-8">
           <div className="text-white text-2xl font-bold mb-8 text-center underline">Stats or goal tracking</div>
           
           {/* Real Progress Tracking */}

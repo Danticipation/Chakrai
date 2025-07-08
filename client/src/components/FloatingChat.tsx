@@ -63,7 +63,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
         // Only show greeting if no chat history exists
         setMessages([{
           sender: 'bot',
-          text: 'Hello! I\'m your TrAI wellness companion. How are you feeling today?',
+          text: 'Hello! I\'m TraI, How are you feeling today?',
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }]);
       }
@@ -72,7 +72,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
       // Fallback to greeting message
       setMessages([{
         sender: 'bot',
-        text: 'Hello! I\'m your TrAI wellness companion. How are you feeling today?',
+        text: 'Hello! I\'m TraI, How are you feeling today?',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     }
@@ -289,7 +289,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
             <MessageCircle size={20} className="theme-text" />
           </div>
           <div>
-            <h3 className="theme-text font-semibold">TrAI Companion</h3>
+            <h3 className="theme-text font-semibold">TraI Companion</h3>
             <p className="theme-text-secondary text-xs">Always here to help</p>
           </div>
         </div>
@@ -434,7 +434,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
         
         {isRecording && (
           <p className="text-xs mt-2 text-center animate-pulse" style={{ color: '#ef4444' }}>
-            🎤 Recording... Tap microphone to stop
+            🎤 Recording... Tap the square to stop & send
           </p>
         )}
       </div>
