@@ -1133,7 +1133,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
                 { id: 'therapy-plans', label: 'Plans', icon: '📋' },
                 { id: 'questions', label: 'Questions', icon: '❓' },
-                { id: 'feedback', label: 'Feedback', icon: '💡' }
+                { id: 'settings', label: 'Settings', icon: '⚙️' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1228,7 +1228,13 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveSection(tab.id)}
+                onClick={() => {
+                  if (tab.id === 'settings') {
+                    setShowSettings(true);
+                  } else {
+                    setActiveSection(tab.id);
+                  }
+                }}
                 className={`shimmer-border w-full h-16 px-6 text-lg font-medium transition-all border-soft hover-lift text-luxury ${
                   activeSection === tab.id
                     ? 'theme-surface theme-text glass-luxury shadow-luxury'
