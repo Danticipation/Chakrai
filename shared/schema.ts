@@ -30,7 +30,7 @@ export const userProfiles = pgTable("user_profiles", {
   motivationFactors: text("motivation_factors").array(), // array of motivation strings
   sessionPreference: text("session_preference").notNull(), // short, medium, long
   personalityTraits: text("personality_traits").array(), // array of trait strings
-  quizCompleted: boolean("quiz_completed").default(true),
+  quizCompleted: boolean("quiz_completed").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
