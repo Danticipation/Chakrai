@@ -9,6 +9,7 @@ import ThemeSelector from './components/ThemeSelector';
 
 import PersonalityQuiz from './components/PersonalityQuiz';
 import VoluntaryQuestionDeck from './components/VoluntaryQuestionDeck';
+import FeedbackSystem from './components/FeedbackSystem';
 import TherapeuticJournal from './components/TherapeuticJournal';
 import PersonalityReflection from './components/PersonalityReflection';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -750,6 +751,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
       case 'questions':
         return <VoluntaryQuestionDeck />;
+
+      case 'feedback':
+        return <FeedbackSystem userId={currentUserId || 1} />;
 
       case 'challenges':
         return <ChallengeSystem onNavigate={setActiveSection} onMobileModalNavigate={handleMobileModalNavigation} />;

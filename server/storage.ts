@@ -9,7 +9,7 @@ import {
   dailyActivities, communityChallenges, userChallengeProgress, userLevels, userStreaks,
   conversationSummaries, semanticMemories, memoryConnections, memoryInsights,
   therapists, clientTherapistRelationships, clientPrivacySettings, therapistSessionNotes, riskAlerts,
-  voluntaryQuestions,
+  voluntaryQuestions, userFeedback,
   type User, type InsertUser,
   type UserProfile, type InsertUserProfile,
   type VoluntaryQuestion, type InsertVoluntaryQuestion,
@@ -48,6 +48,7 @@ import {
   type RiskAlert, type InsertRiskAlert,
   type UserStreak, type InsertUserStreak,
   type DailyActivity, type InsertDailyActivity,
+  type UserFeedback, type InsertUserFeedback,
 } from "@shared/schema";
 import { eq, desc, and, lt, ne } from "drizzle-orm";
 
@@ -70,6 +71,10 @@ export interface IStorage {
   createVoluntaryQuestionAnswer(data: InsertVoluntaryQuestion): Promise<VoluntaryQuestion>;
   getVoluntaryQuestionAnswers(userId: number): Promise<VoluntaryQuestion[]>;
   updateVoluntaryQuestionAnswer(userId: number, questionId: string, answer: string): Promise<VoluntaryQuestion>;
+  
+  // Feedback System
+  getUserFeedback(userId: number): Promise<UserFeedback[]>;
+  createFeedback(data: InsertUserFeedback): Promise<UserFeedback>;
   
   // Data clearing methods for fresh starts
   clearUserMessages(userId: number): Promise<void>;
@@ -369,6 +374,26 @@ export class DbStorage implements IStorage {
       ))
       .returning();
     return updated;
+  }
+
+  // Feedback System
+  async getUserFeedback(userId: number): Promise<UserFeedback[]> {
+    return await this.db.select()
+      .from(userFeedback)
+      .where(eq(userFeedback.userId, userId))
+      .orderBy(desc(userFeedback.createdAt));
+  }
+
+  async getUserFeedback(userId: number): Promise<UserFeedback[]> {
+    return await this.db.select()
+      .from(userFeedback)
+      .where(eq(userFeedback.userId, userId))
+      .orderBy(desc(userFeedback.createdAt));
+  }
+
+  async createFeedback(data: InsertUserFeedback): Promise<UserFeedback> {
+    const [feedback] = await this.db.insert(userFeedback).values(data).returning();
+    return feedback;
   }
 
   async createBot(data: InsertBot): Promise<Bot> {

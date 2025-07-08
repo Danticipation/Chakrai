@@ -509,6 +509,36 @@ app.post('/api/voluntary-questions', async (req, res) => {
   }
 });
 
+// Feedback endpoints
+app.get('/api/feedback/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const feedback = await storage.getUserFeedback(userId);
+    res.json({ feedback });
+  } catch (error) {
+    console.error('Error loading user feedback:', error);
+    res.status(500).json({ error: 'Failed to load feedback' });
+  }
+});
+
+app.post('/api/feedback', async (req, res) => {
+  try {
+    const { userId, type, title, description, priority, rating } = req.body;
+    const feedback = await storage.createFeedback({
+      userId,
+      type,
+      title,
+      description,
+      priority,
+      rating
+    });
+    res.json({ success: true, feedback });
+  } catch (error) {
+    console.error('Error creating feedback:', error);
+    res.status(500).json({ error: 'Failed to create feedback' });
+  }
+});
+
 // Journal data migration endpoint - consolidate entries under current user
 app.post('/api/users/:userId/migrate-journal-data', async (req, res) => {
   try {

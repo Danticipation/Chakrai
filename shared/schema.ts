@@ -892,7 +892,29 @@ export const insertDailyActivitySchema = createInsertSchema(dailyActivities).omi
   createdAt: true,
 });
 
+export const userFeedback = pgTable("user_feedback", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  type: text("type").notNull(), // 'bug', 'feature', 'general'
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  priority: text("priority").notNull().default('medium'), // 'low', 'medium', 'high'
+  status: text("status").notNull().default('submitted'), // 'submitted', 'reviewed', 'in_progress', 'resolved'
+  rating: integer("rating"), // 1-5 for general feedback
+  adminResponse: text("admin_response"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const insertUserFeedbackSchema = createInsertSchema(userFeedback).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type UserStreak = typeof userStreaks.$inferSelect;
 export type DailyActivity = typeof dailyActivities.$inferSelect;
+export type UserFeedback = typeof userFeedback.$inferSelect;
 export type InsertUserStreak = z.infer<typeof insertUserStreakSchema>;
 export type InsertDailyActivity = z.infer<typeof insertDailyActivitySchema>;
+export type InsertUserFeedback = z.infer<typeof insertUserFeedbackSchema>;
