@@ -1133,12 +1133,14 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             {/* Affirmation Section - Luxury Enhanced */}
             <button 
               onClick={() => setActiveSection('affirmation')}
-              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury"
+              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury overflow-hidden"
             >
               <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Affirmation</h3>
-              <p className="text-sm sm:text-base theme-text text-left leading-relaxed flex-1 font-light">
-                {dailyAffirmation.substring(0, 150)}...
-              </p>
+              <div className="flex-1 overflow-hidden">
+                <p className="text-sm sm:text-base theme-text text-left leading-relaxed font-light line-clamp-4 overflow-hidden">
+                  {dailyAffirmation.length > 120 ? dailyAffirmation.substring(0, 120) + '...' : dailyAffirmation}
+                </p>
+              </div>
               <p className="text-xs sm:text-sm theme-text/70 mt-3 sm:mt-6 font-medium tracking-wide">Click to hear</p>
             </button>
           </div>
