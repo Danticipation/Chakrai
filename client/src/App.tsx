@@ -8,6 +8,7 @@ import VoiceSelector from './components/VoiceSelector';
 import ThemeSelector from './components/ThemeSelector';
 
 import PersonalityQuiz from './components/PersonalityQuiz';
+import VoluntaryQuestionDeck from './components/VoluntaryQuestionDeck';
 import TherapeuticJournal from './components/TherapeuticJournal';
 import PersonalityReflection from './components/PersonalityReflection';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -109,6 +110,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     'journal': 'Private therapeutic journaling with mood tracking, voice-to-text, and AI insights to help process thoughts and emotions.',
     'memory': 'View how TraI learns and remembers your personality, preferences, and conversation patterns to provide more personalized support.',
     'analytics': 'Comprehensive wellness analytics showing mood trends, journal insights, goal progress, and therapeutic outcomes over time.',
+    'questions': 'Voluntary question deck with 12 categories including personality, lifestyle, emotional, social, and therapeutic insights to enhance AI personalization.',
     'challenges': 'Gamified wellness challenges with daily, weekly, streak, and seasonal goals to motivate consistent self-care and mental health practices.',
     'rewards': 'Wellness point system where you earn rewards for therapeutic activities and can unlock achievements, themes, and premium content.',
     'community': 'Connect with peer support groups, wellness challenges, and therapeutic forums in a safe, moderated environment.',
@@ -746,6 +748,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
       case 'analytics':
         return <AnalyticsDashboard userId={getCurrentUserId()} />;
 
+      case 'questions':
+        return <VoluntaryQuestionDeck />;
+
       case 'challenges':
         return <ChallengeSystem onNavigate={setActiveSection} onMobileModalNavigate={handleMobileModalNavigation} />;
 
@@ -1160,7 +1165,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 { id: 'health', label: 'Health', icon: '💗' },
                 { id: 'agents', label: 'Specialists', icon: '🧩' },
                 { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
-                { id: 'therapy-plans', label: 'Plans', icon: '📋' }
+                { id: 'therapy-plans', label: 'Plans', icon: '📋' },
+                { id: 'questions', label: 'Questions', icon: '❓' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1172,7 +1178,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                       setShowSettings(true);
                     } else if (tab.id === 'floating-chat') {
                       setIsFloatingChatOpen(true);
-                    } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans'].includes(tab.id)) {
+                    } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans', 'questions'].includes(tab.id)) {
                       setContentLoading(true);
                       setMobileModalContent(tab.id);
                       setShowMobileModal(true);
@@ -1246,7 +1252,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               { id: 'therapy-plans', label: 'Therapy Plans' },
               { id: 'agents', label: 'AI Specialists' },
               { id: 'vr', label: 'VR Therapy' },
-              { id: 'health', label: 'Wearables' }
+              { id: 'health', label: 'Wearables' },
+              { id: 'questions', label: 'Question Deck' }
             ].map((tab) => (
               <button
                 key={tab.id}

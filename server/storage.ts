@@ -9,8 +9,10 @@ import {
   dailyActivities, communityChallenges, userChallengeProgress, userLevels, userStreaks,
   conversationSummaries, semanticMemories, memoryConnections, memoryInsights,
   therapists, clientTherapistRelationships, clientPrivacySettings, therapistSessionNotes, riskAlerts,
+  voluntaryQuestions,
   type User, type InsertUser,
   type UserProfile, type InsertUserProfile,
+  type VoluntaryQuestion, type InsertVoluntaryQuestion,
   type Bot, type InsertBot,
   type Message, type InsertMessage,
   type LearnedWord, type InsertLearnedWord,
@@ -63,6 +65,11 @@ export interface IStorage {
   createUserProfile(data: InsertUserProfile): Promise<UserProfile>;
   getUserProfile(userId: number): Promise<UserProfile | null>;
   updateUserProfile(userId: number, data: Partial<InsertUserProfile>): Promise<UserProfile>;
+  
+  // Voluntary Questions
+  createVoluntaryQuestionAnswer(data: InsertVoluntaryQuestion): Promise<VoluntaryQuestion>;
+  getVoluntaryQuestionAnswers(userId: number): Promise<VoluntaryQuestion[]>;
+  updateVoluntaryQuestionAnswer(userId: number, questionId: string, answer: string): Promise<VoluntaryQuestion>;
   
   // Data clearing methods for fresh starts
   clearUserMessages(userId: number): Promise<void>;
@@ -311,6 +318,57 @@ export class DbStorage implements IStorage {
       .where(eq(userProfiles.userId, userId))
       .returning();
     return profile;
+  }
+
+  // Voluntary Questions
+  async createVoluntaryQuestionAnswer(data: InsertVoluntaryQuestion): Promise<VoluntaryQuestion> {
+    // Check if answer already exists, update if so
+    const existing = await this.db.select()
+      .from(voluntaryQuestions)
+      .where(and(
+        eq(voluntaryQuestions.userId, data.userId),
+        eq(voluntaryQuestions.questionId, data.questionId)
+      ));
+
+    if (existing.length > 0) {
+      const [updated] = await this.db.update(voluntaryQuestions)
+        .set({ 
+          answer: data.answer,
+          answeredAt: new Date(),
+          updatedAt: new Date()
+        })
+        .where(and(
+          eq(voluntaryQuestions.userId, data.userId),
+          eq(voluntaryQuestions.questionId, data.questionId)
+        ))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await this.db.insert(voluntaryQuestions).values(data).returning();
+      return created;
+    }
+  }
+
+  async getVoluntaryQuestionAnswers(userId: number): Promise<VoluntaryQuestion[]> {
+    return await this.db.select()
+      .from(voluntaryQuestions)
+      .where(eq(voluntaryQuestions.userId, userId))
+      .orderBy(voluntaryQuestions.answeredAt);
+  }
+
+  async updateVoluntaryQuestionAnswer(userId: number, questionId: string, answer: string): Promise<VoluntaryQuestion> {
+    const [updated] = await this.db.update(voluntaryQuestions)
+      .set({ 
+        answer,
+        answeredAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(and(
+        eq(voluntaryQuestions.userId, userId),
+        eq(voluntaryQuestions.questionId, questionId)
+      ))
+      .returning();
+    return updated;
   }
 
   async createBot(data: InsertBot): Promise<Bot> {

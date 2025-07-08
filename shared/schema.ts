@@ -35,6 +35,18 @@ export const userProfiles = pgTable("user_profiles", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Voluntary question deck responses
+export const voluntaryQuestions = pgTable("voluntary_questions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  questionId: text("question_id").notNull(),
+  categoryId: text("category_id").notNull(),
+  answer: text("answer").notNull(),
+  answeredAt: timestamp("answered_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const bots = pgTable("bots", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
@@ -334,6 +346,12 @@ export const insertUserProfileSchema = createInsertSchema(userProfiles).omit({
   updatedAt: true,
 });
 
+export const insertVoluntaryQuestionSchema = createInsertSchema(voluntaryQuestions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertBotSchema = createInsertSchema(bots).omit({
   id: true,
   createdAt: true,
@@ -446,9 +464,11 @@ export type PredictiveInsight = typeof predictiveInsights.$inferSelect;
 export type EmotionalResponseAdaptation = typeof emotionalResponseAdaptations.$inferSelect;
 export type CrisisDetectionLog = typeof crisisDetectionLogs.$inferSelect;
 export type UserProfile = typeof userProfiles.$inferSelect;
+export type VoluntaryQuestion = typeof voluntaryQuestions.$inferSelect;
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
+export type InsertVoluntaryQuestion = z.infer<typeof insertVoluntaryQuestionSchema>;
 export type InsertBot = z.infer<typeof insertBotSchema>;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type InsertLearnedWord = z.infer<typeof insertLearnedWordSchema>;

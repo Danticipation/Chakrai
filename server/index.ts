@@ -480,6 +480,35 @@ app.post('/api/user-profile', async (req, res) => {
   }
 });
 
+// Voluntary Questions endpoints
+app.get('/api/voluntary-questions/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const answers = await storage.getVoluntaryQuestionAnswers(userId);
+    res.json({ answers });
+  } catch (error) {
+    console.error('Get voluntary questions error:', error);
+    res.status(500).json({ error: 'Failed to get voluntary questions' });
+  }
+});
+
+app.post('/api/voluntary-questions', async (req, res) => {
+  try {
+    const { userId, questionId, answer, categoryId } = req.body;
+    const voluntaryAnswer = await storage.createVoluntaryQuestionAnswer({
+      userId,
+      questionId,
+      categoryId,
+      answer,
+      answeredAt: new Date()
+    });
+    res.json(voluntaryAnswer);
+  } catch (error) {
+    console.error('Create voluntary question answer error:', error);
+    res.status(500).json({ error: 'Failed to save answer' });
+  }
+});
+
 // Journal data migration endpoint - consolidate entries under current user
 app.post('/api/users/:userId/migrate-journal-data', async (req, res) => {
   try {
