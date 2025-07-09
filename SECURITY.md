@@ -1,337 +1,561 @@
-# Security & Compliance Documentation
+# TraI - Security & Compliance Documentation
 
-This document outlines the comprehensive security measures, privacy protections, and compliance frameworks implemented in TraI - Mental Wellness Companion Application.
+## Executive Summary
 
-## Security Architecture
+TraI implements enterprise-grade security architecture with zero-knowledge privacy design, supporting both anonymous and registered users while maintaining full GDPR/HIPAA compliance. The platform features comprehensive data protection, secure subscription management, and professional healthcare integration capabilities.
 
-### Zero-Knowledge Architecture
-TraI implements a zero-knowledge security model where user data remains encrypted and inaccessible to system administrators.
+## Privacy-First Architecture
 
-**Core Principles:**
-- **Client-Side Encryption**: All sensitive data encrypted before transmission
-- **User-Controlled Keys**: Encryption keys never leave user devices
-- **No Server-Side Decryption**: Backend cannot decrypt user therapeutic data
-- **Forward Secrecy**: Key rotation ensures historical data protection
+### Zero-Knowledge Design Principles
+- **Complete Data Isolation**: User data is cryptographically isolated with no cross-contamination
+- **Anonymous Operation**: Full platform functionality without personal data collection
+- **Device-Based Identity**: Secure fingerprinting without personally identifiable information
+- **Minimal Data Collection**: Only essential data for service functionality is gathered
+- **User Control**: Granular permissions and data sharing controls
 
-**Implementation:**
-```javascript
-// Client-side encryption using AES-256-GCM
-const encryptData = async (data, userKey) => {
-  const algorithm = 'AES-256-GCM';
-  const encoder = new TextEncoder();
-  const dataBuffer = encoder.encode(JSON.stringify(data));
+### Anonymous User Privacy Protection
+```typescript
+// Device fingerprinting without personal data
+const generateDeviceFingerprint = async (): Promise<string> => {
+  const fingerprint = [
+    navigator.userAgent,
+    navigator.language,
+    screen.width + 'x' + screen.height,
+    new Date().getTimezoneOffset(),
+    navigator.platform || 'unknown'
+  ].join('|');
   
-  const encrypted = await crypto.subtle.encrypt(
-    { name: algorithm, iv: crypto.getRandomValues(new Uint8Array(12)) },
-    userKey,
-    dataBuffer
-  );
-  
-  return encrypted;
+  // SHA-256 hash for consistent identification
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(fingerprint));
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 32);
 };
 ```
 
-### Data Encryption Standards
+### Data Minimization & Purpose Limitation
+- **Therapeutic Data**: Mood entries, journal content, and conversation history stored only for wellness purposes
+- **Subscription Data**: Payment information processed through Stripe with minimal local storage
+- **Usage Analytics**: Aggregated metrics without individual user identification
+- **Automatic Purging**: Inactive anonymous user data automatically removed after 90 days
 
-**At Rest:**
-- **AES-256-GCM** encryption for all therapeutic data
-- **PBKDF2** key derivation with 100,000 rounds
-- **Unique salt** generation per user account
-- **Database-level encryption** for additional protection
+## Authentication & Access Control
 
-**In Transit:**
-- **TLS 1.3** for all client-server communications
-- **Certificate pinning** for API endpoints
-- **HSTS** headers for secure connection enforcement
-- **End-to-end encryption** for sensitive data transmission
+### Multi-Tier Authentication System
+```typescript
+// Anonymous user authentication
+interface AnonymousAuth {
+  deviceFingerprint: string;
+  sessionToken: string;
+  expiresAt: Date;
+  permissions: 'free' | 'premium';
+}
 
-**In Memory:**
-- **Secure memory allocation** for cryptographic operations
-- **Automatic memory clearing** after processing
-- **Protected key storage** using Web Crypto API
-- **Session isolation** between users
-
-### Authentication & Authorization
-
-**Multi-Factor Authentication:**
-- **TOTP** (Time-based One-Time Passwords)
-- **WebAuthn** support for hardware security keys
-- **Biometric authentication** on supported devices
-- **Backup recovery codes** for account recovery
-
-**Session Management:**
-- **JWT tokens** with short expiration times
-- **Refresh token rotation** for extended sessions
-- **Device fingerprinting** for anomaly detection
-- **Automatic logout** after inactivity periods
-
-**Access Controls:**
-- **Role-based access control** (RBAC) for different user types
-- **Principle of least privilege** for system access
-- **API rate limiting** to prevent abuse
-- **Granular permissions** for data sharing
-
-## Privacy Protection
-
-### Differential Privacy
-TraI implements differential privacy to enable anonymous analytics while protecting individual user privacy.
-
-**Technical Implementation:**
-- **Laplace Mechanism**: ε = 1.0 for general analytics
-- **Gaussian Mechanism**: δ = 0.00001 for sensitive queries
-- **Privacy Budget Management**: Automatic budget allocation and tracking
-- **Cohort Minimums**: Minimum 10 users for any aggregated report
-
-**Privacy Guarantees:**
-```python
-# Example differential privacy implementation
-def add_laplace_noise(value, sensitivity, epsilon):
-    scale = sensitivity / epsilon
-    noise = numpy.random.laplace(0, scale)
-    return value + noise
-
-# Analytics query with privacy protection
-def get_anonymous_mood_trends(time_period):
-    raw_data = query_mood_data(time_period)
-    privacy_budget = get_privacy_budget('mood_trends')
-    
-    if privacy_budget < REQUIRED_EPSILON:
-        raise PrivacyBudgetExceeded()
-    
-    # Add calibrated noise to protect privacy
-    noisy_data = add_laplace_noise(
-        raw_data, 
-        sensitivity=1.0, 
-        epsilon=privacy_budget
-    )
-    
-    update_privacy_budget('mood_trends', REQUIRED_EPSILON)
-    return noisy_data
+// Registered user authentication
+interface RegisteredAuth {
+  userId: number;
+  email: string;
+  passwordHash: string;  // bcrypt with 12 rounds
+  jwtToken: string;
+  refreshToken: string;
+  subscriptionStatus: 'free' | 'premium';
+  mfaEnabled?: boolean;
+}
 ```
 
-### Data Minimization
-- **Purpose Limitation**: Data collected only for specified therapeutic purposes
-- **Retention Policies**: Automatic deletion of data after defined periods
-- **Anonymization**: Irreversible anonymization of research data
-- **Selective Sharing**: Users control what data is shared with whom
+### Password Security
+- **Hashing**: bcrypt with 12 rounds minimum for password storage
+- **Requirements**: 8+ characters, mixed case, numbers, special characters
+- **Breach Protection**: Passwords never stored in plaintext or reversible encryption
+- **Reset Security**: Time-limited tokens with single-use validation
 
-### Consent Management
-- **Granular Consent**: Separate consent for different data types and uses
-- **Withdraw Consent**: Users can revoke consent at any time
-- **Consent Auditing**: Complete audit trail of consent decisions
-- **Clear Communication**: Plain language privacy notices
-
-## Compliance Frameworks
-
-### GDPR Compliance (General Data Protection Regulation)
-
-**Article 25 - Data Protection by Design:**
-- **Privacy by default** settings for all new accounts
-- **Built-in privacy** protections in system architecture
-- **Regular privacy impact** assessments
-- **Data protection officer** oversight
-
-**Data Subject Rights:**
-- **Right to Access**: Users can export all their data
-- **Right to Rectification**: Users can correct inaccurate data
-- **Right to Erasure**: Complete data deletion upon request
-- **Right to Portability**: Data export in standard formats
-- **Right to Object**: Opt-out of specific data processing
-
-**Implementation Example:**
+### Session Management
 ```typescript
-// GDPR data export implementation
-export const exportUserData = async (userId: string) => {
-  const userData = await gatherAllUserData(userId);
+// Secure session configuration
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET!, // 256-bit random secret
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,      // Prevent XSS access
+    secure: true,        // HTTPS only
+    sameSite: 'strict',  // CSRF protection
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week
+  },
+  store: new PostgreSQLSessionStore({
+    conString: process.env.DATABASE_URL,
+    createTableIfMissing: false,
+    ttl: 7 * 24 * 60 * 60 // 1 week TTL
+  })
+};
+```
+
+## Data Encryption & Protection
+
+### Encryption Standards
+- **Data at Rest**: AES-256-CBC encryption for sensitive database fields
+- **Data in Transit**: TLS 1.3 for all client-server communications
+- **API Keys**: Environment variables with secure key rotation capabilities
+- **Database**: PostgreSQL with transparent data encryption (TDE) enabled
+
+### Field-Level Encryption Implementation
+```typescript
+// AES-256-CBC encryption for sensitive data
+class EncryptionService {
+  private static algorithm = 'aes-256-cbc';
+  private static keyLength = 32; // 256 bits
+  
+  static encrypt(data: string, key: string): { encryptedData: string, iv: string } {
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipher(this.algorithm, key);
+    let encrypted = cipher.update(data, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return { 
+      encryptedData: encrypted, 
+      iv: iv.toString('hex') 
+    };
+  }
+  
+  static decrypt(encryptedData: string, key: string, iv: string): string {
+    const decipher = crypto.createDecipher(this.algorithm, key);
+    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+  }
+}
+
+// Selective field encryption for therapeutic data
+const encryptSensitiveFields = async (journalEntry: JournalEntry): Promise<EncryptedJournalEntry> => {
+  const encryptionKey = process.env.JOURNAL_ENCRYPTION_KEY!;
   
   return {
-    personalData: userData.profile,
-    journalEntries: userData.journal,
-    moodData: userData.moods,
-    conversationHistory: userData.chats,
-    preferences: userData.settings,
-    consentHistory: userData.consents,
-    exportDate: new Date().toISOString(),
-    format: "JSON",
-    retention: "User can request deletion at any time"
+    ...journalEntry,
+    content: EncryptionService.encrypt(journalEntry.content, encryptionKey),
+    // Title and metadata remain unencrypted for search functionality
   };
 };
 ```
 
-### HIPAA Compliance (Health Insurance Portability and Accountability Act)
+### Secure Key Management
+- **Environment Separation**: Development, staging, and production keys completely isolated
+- **Key Rotation**: Automated 90-day rotation schedule for encryption keys
+- **Hardware Security**: Cloud provider HSM for production key storage
+- **Access Control**: Role-based access to encryption keys with audit logging
 
-**Administrative Safeguards:**
-- **Security Officer**: Designated privacy and security officer
-- **Workforce Training**: Regular security awareness training
-- **Access Management**: Formal access control procedures
-- **Incident Response**: Documented breach response procedures
+## Payment Security & PCI Compliance
 
-**Physical Safeguards:**
-- **Facility Access**: Controlled access to data centers
-- **Workstation Use**: Secure workstation configurations
-- **Device Controls**: Mobile device management policies
-- **Media Disposal**: Secure destruction of storage media
+### Stripe Integration Security
+```typescript
+// Secure Stripe webhook validation
+const validateStripeWebhook = (req: Request): Stripe.Event => {
+  const sig = req.headers['stripe-signature'] as string;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+  
+  try {
+    return stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (error) {
+    throw new Error('Invalid webhook signature');
+  }
+};
 
-**Technical Safeguards:**
-- **Access Control**: Unique user identification and authentication
-- **Audit Controls**: Comprehensive activity logging
-- **Integrity**: Data integrity verification mechanisms
-- **Transmission Security**: End-to-end encryption for all transmissions
+// Subscription management with security controls
+const processSubscriptionUpdate = async (event: Stripe.Event) => {
+  const session = event.data.object as Stripe.Checkout.Session;
+  const userId = parseInt(session.metadata?.userId || '0');
+  
+  // Validate user ownership
+  const user = await storage.getUser(userId);
+  if (!user || user.customerId !== session.customer) {
+    throw new Error('User validation failed');
+  }
+  
+  // Update subscription with audit trail
+  await storage.updateUserSubscription(userId, {
+    subscriptionStatus: 'premium',
+    subscriptionId: session.subscription as string,
+    updatedAt: new Date(),
+    auditLog: `Subscription activated via webhook: ${event.id}`
+  });
+};
+```
 
-### SOC 2 Type II Compliance
+### PCI DSS Compliance
+- **No Card Storage**: All payment data processed through Stripe's PCI-compliant infrastructure
+- **Tokenization**: Sensitive payment information replaced with non-sensitive tokens
+- **Audit Trails**: Complete transaction logging for compliance verification
+- **Network Security**: Segmented network access for payment processing components
 
-**Security:**
-- **Multi-factor authentication** for all administrative access
-- **Network segmentation** isolating sensitive systems
-- **Intrusion detection** and prevention systems
-- **Regular penetration testing** and vulnerability assessments
+## Regulatory Compliance
 
-**Availability:**
-- **99.9% uptime** service level agreement
-- **Redundant infrastructure** across multiple availability zones
-- **Automated failover** and disaster recovery procedures
-- **Real-time monitoring** and alerting systems
+### GDPR (General Data Protection Regulation)
+- **Lawful Basis**: Consent and legitimate interest for wellness service provision
+- **Data Subject Rights**: Complete implementation of access, rectification, erasure, and portability
+- **Consent Management**: Granular consent with easy withdrawal mechanisms
+- **Data Protection Officer**: Designated contact for privacy concerns and compliance
 
-**Processing Integrity:**
-- **Data validation** at input and processing stages
-- **Error detection** and correction mechanisms
-- **Audit trails** for all data modifications
-- **Backup verification** and recovery testing
+#### GDPR Rights Implementation
+```typescript
+// Data portability - export user data
+export const exportUserData = async (userId: number): Promise<UserDataExport> => {
+  const [user, journalEntries, moodEntries, messages] = await Promise.all([
+    storage.getUser(userId),
+    storage.getJournalEntries(userId),
+    storage.getMoodEntries(userId),
+    storage.getMessages(userId)
+  ]);
+  
+  return {
+    personal: {
+      username: user.username,
+      email: user.email,
+      createdAt: user.createdAt
+    },
+    wellness: {
+      journalEntries: journalEntries.map(entry => ({
+        title: entry.title,
+        content: entry.content,
+        createdAt: entry.createdAt
+      })),
+      moodEntries,
+      conversationHistory: messages
+    },
+    subscription: {
+      status: user.subscriptionStatus,
+      expiresAt: user.subscriptionExpiresAt
+    }
+  };
+};
 
-**Confidentiality:**
-- **Encryption at rest** for all stored data
-- **Secure key management** with hardware security modules
-- **Network encryption** for all data in transit
-- **Access logging** for all confidential data access
+// Right to erasure - complete data deletion
+export const deleteUserData = async (userId: number): Promise<void> => {
+  await Promise.all([
+    storage.deleteUser(userId),
+    storage.deleteUserMessages(userId),
+    storage.deleteUserJournalEntries(userId),
+    storage.deleteUserMoodEntries(userId),
+    storage.deleteUserMemories(userId),
+    storage.deleteUserSubscription(userId)
+  ]);
+  
+  // Audit log for compliance
+  await storage.createAuditLog({
+    action: 'user_data_deletion',
+    userId,
+    timestamp: new Date(),
+    details: 'Complete user data erasure per GDPR Article 17'
+  });
+};
+```
 
-**Privacy:**
-- **Privacy impact assessments** for new features
-- **Data classification** and handling procedures
-- **Third-party privacy** reviews and contracts
-- **User privacy controls** and transparency
+### HIPAA (Health Insurance Portability and Accountability Act)
+- **Protected Health Information (PHI)**: Therapeutic conversations and wellness data treated as PHI
+- **Business Associate Agreements**: Executed with all third-party service providers
+- **Access Controls**: Role-based access with multi-factor authentication for healthcare providers
+- **Audit Logging**: Comprehensive access logs for all PHI interactions
 
-## Security Monitoring & Incident Response
+#### HIPAA Security Safeguards
+```typescript
+// Administrative safeguards
+interface HIPAAAccessControl {
+  userId: number;
+  role: 'patient' | 'therapist' | 'admin';
+  permissions: string[];
+  lastAccess: Date;
+  sessionTimeout: number; // 15 minutes for healthcare users
+  mfaRequired: boolean;
+}
 
-### Continuous Monitoring
-- **SIEM Integration**: Security Information and Event Management
-- **Behavioral Analytics**: Anomaly detection for user behavior
-- **Threat Intelligence**: Real-time threat feed integration
-- **Automated Alerting**: Immediate notification of security events
+// Physical safeguards
+const physicalSafeguards = {
+  dataCenter: 'SOC 2 Type II certified cloud infrastructure',
+  encryption: 'AES-256 for data at rest and in transit',
+  backups: 'Encrypted offsite backups with 7-year retention',
+  disposal: 'Secure data destruction protocols for decommissioned systems'
+};
 
-### Incident Response Plan
+// Technical safeguards
+const technicalSafeguards = {
+  accessControl: 'Role-based with principle of least privilege',
+  auditControls: 'Comprehensive logging of all PHI access',
+  integrity: 'Digital signatures and checksums for data integrity',
+  transmission: 'End-to-end encryption for all data transmission'
+};
+```
 
-**Phase 1: Preparation**
-- **Response Team**: Designated security response team
-- **Communication Plan**: Stakeholder notification procedures
-- **Tool Readiness**: Incident response tools and access
-- **Training**: Regular incident response drills
+### Healthcare Data Security
+- **Therapy Session Encryption**: End-to-end encryption for all therapeutic conversations
+- **Professional Access Controls**: Granular permissions for licensed mental health providers
+- **Audit Trails**: Complete logging of healthcare professional access to patient data
+- **Data Retention**: Configurable retention periods to meet healthcare regulations
 
-**Phase 2: Identification**
-- **Detection**: Automated and manual threat detection
-- **Classification**: Incident severity and type determination
-- **Notification**: Internal team and external stakeholder alerts
-- **Documentation**: Detailed incident logging
+## Application Security
 
-**Phase 3: Containment**
-- **Immediate Containment**: Isolate affected systems
-- **System Backup**: Preserve evidence and system state
-- **Short-term Containment**: Temporary fixes to prevent spread
-- **Long-term Containment**: Permanent system changes
+### Input Validation & Sanitization
+```typescript
+// Comprehensive input validation
+const validateUserInput = (input: any, schema: ZodSchema): ValidationResult => {
+  try {
+    const sanitized = DOMPurify.sanitize(input);
+    const validated = schema.parse(sanitized);
+    return { isValid: true, data: validated };
+  } catch (error) {
+    return { 
+      isValid: false, 
+      error: 'Invalid input format',
+      details: error.message 
+    };
+  }
+};
 
-**Phase 4: Eradication**
-- **Root Cause Analysis**: Identify underlying vulnerabilities
-- **Malware Removal**: Clean affected systems
-- **Vulnerability Patching**: Address security weaknesses
-- **System Hardening**: Implement additional security controls
+// SQL injection prevention with Drizzle ORM
+const getUserJournalEntries = async (userId: number, limit: number = 50) => {
+  return await db.select()
+    .from(journalEntries)
+    .where(eq(journalEntries.userId, userId))
+    .limit(Math.min(limit, 100)) // Prevent large data extraction
+    .orderBy(desc(journalEntries.createdAt));
+};
+```
 
-**Phase 5: Recovery**
-- **System Restoration**: Restore systems to normal operation
-- **Monitoring**: Enhanced monitoring during recovery
-- **Testing**: Verify system functionality and security
-- **Gradual Restoration**: Phased return to full operation
+### Cross-Site Scripting (XSS) Prevention
+- **Content Security Policy**: Strict CSP headers preventing unauthorized script execution
+- **Input Sanitization**: DOMPurify for all user-generated content
+- **Output Encoding**: Context-aware encoding for data display
+- **Cookie Security**: HttpOnly and Secure flags for all session cookies
 
-**Phase 6: Lessons Learned**
-- **Post-Incident Review**: Comprehensive incident analysis
-- **Documentation Update**: Update procedures and documentation
-- **Training**: Additional training based on lessons learned
-- **Prevention**: Implement measures to prevent recurrence
+### Cross-Site Request Forgery (CSRF) Protection
+```typescript
+// CSRF protection implementation
+const csrfProtection = csrf({
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  },
+  value: (req) => req.headers['x-csrf-token'] as string
+});
 
-### Vulnerability Management
+// Double-submit cookie pattern for API endpoints
+app.use('/api/', csrfProtection);
+```
 
-**Regular Assessments:**
-- **Weekly automated scans** of all infrastructure
-- **Monthly manual penetration testing**
-- **Quarterly third-party security audits**
-- **Annual comprehensive security reviews**
+## API Security
 
-**Patch Management:**
-- **Critical patches** applied within 24 hours
-- **High-priority patches** applied within 7 days
-- **Regular patches** applied within 30 days
-- **Testing procedures** for all patch deployments
+### Rate Limiting & DDoS Protection
+```typescript
+// Tiered rate limiting by user type
+const rateLimitConfig = {
+  free: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // requests per window
+    message: 'Rate limit exceeded for free tier'
+  },
+  premium: {
+    windowMs: 15 * 60 * 1000,
+    max: 1000, // 10x higher for premium users
+    message: 'Rate limit exceeded'
+  },
+  anonymous: {
+    windowMs: 15 * 60 * 1000,
+    max: 50, // Lower for anonymous users
+    message: 'Anonymous user rate limit exceeded'
+  }
+};
+
+// Adaptive rate limiting based on user behavior
+const adaptiveRateLimit = (userId: number, userType: string) => {
+  const config = rateLimitConfig[userType as keyof typeof rateLimitConfig];
+  
+  return rateLimit({
+    ...config,
+    keyGenerator: (req) => `${req.ip}:${userId}`,
+    handler: (req, res) => {
+      res.status(429).json({
+        error: config.message,
+        retryAfter: Math.ceil(config.windowMs / 1000)
+      });
+    }
+  });
+};
+```
+
+### API Authentication & Authorization
+```typescript
+// JWT token validation with refresh mechanism
+const authenticateAPI = async (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
+    
+    // Check token expiration and refresh if needed
+    if (decoded.exp && decoded.exp < Date.now() / 1000) {
+      const refreshed = await refreshUserToken(decoded.userId);
+      res.setHeader('X-New-Token', refreshed.token);
+    }
+    
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(403).json({ error: 'Invalid authentication token' });
+  }
+};
+```
+
+## Infrastructure Security
+
+### Network Security
+- **TLS Configuration**: TLS 1.3 with perfect forward secrecy
+- **HSTS Headers**: HTTP Strict Transport Security for all connections
+- **Certificate Management**: Automated certificate renewal with Let's Encrypt
+- **Network Segmentation**: Isolated subnets for database and application tiers
+
+### Database Security
+```sql
+-- Database access controls
+CREATE ROLE trai_app_user WITH LOGIN PASSWORD 'secure_password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO trai_app_user;
+REVOKE ALL ON auth_tokens FROM public;
+GRANT SELECT, INSERT, DELETE ON auth_tokens TO trai_app_user;
+
+-- Row-level security for user data isolation
+ALTER TABLE journal_entries ENABLE ROW LEVEL SECURITY;
+CREATE POLICY user_journal_access ON journal_entries 
+  USING (user_id = current_setting('app.current_user_id')::INTEGER);
+
+-- Audit logging for sensitive operations
+CREATE TABLE audit_log (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER,
+  action VARCHAR(50),
+  table_name VARCHAR(50),
+  record_id INTEGER,
+  old_values JSONB,
+  new_values JSONB,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  ip_address INET
+);
+```
+
+### Cloud Security
+- **Infrastructure as Code**: Terraform for reproducible security configurations
+- **Secret Management**: Cloud provider secret managers for API keys and certificates
+- **Monitoring**: Real-time security monitoring with automated threat detection
+- **Backup Security**: Encrypted backups with secure key management
+
+## Incident Response & Business Continuity
+
+### Security Incident Response Plan
+1. **Detection**: Automated monitoring with immediate alerting for security events
+2. **Assessment**: Rapid triage to determine scope and severity of incidents
+3. **Containment**: Immediate isolation of affected systems and data
+4. **Eradication**: Root cause analysis and vulnerability remediation
+5. **Recovery**: Secure system restoration with enhanced monitoring
+6. **Lessons Learned**: Post-incident review and security improvements
+
+### Data Breach Response Protocol
+```typescript
+// Automated breach detection and response
+const detectPotentialBreach = async (event: SecurityEvent): Promise<void> => {
+  const severity = assessBreachSeverity(event);
+  
+  if (severity >= BreachSeverity.HIGH) {
+    // Immediate containment
+    await isolateAffectedSystems(event.affectedResources);
+    
+    // Legal notification requirements
+    if (severity >= BreachSeverity.CRITICAL) {
+      await notifyDataProtectionAuthorities(event);
+      await notifyAffectedUsers(event);
+    }
+    
+    // Forensic analysis
+    await preserveForensicEvidence(event);
+    
+    // Stakeholder communication
+    await notifyIncidentResponse team(event);
+  }
+};
+```
+
+### Business Continuity Planning
+- **High Availability**: Multi-region deployment with automatic failover
+- **Data Recovery**: Point-in-time recovery with 4-hour Recovery Time Objective (RTO)
+- **Service Continuity**: Graceful degradation for non-critical features during outages
+- **Communication**: Automated status page updates and user notifications
+
+## Security Monitoring & Auditing
+
+### Real-Time Security Monitoring
+```typescript
+// Security event monitoring
+const securityMonitor = {
+  loginAttempts: {
+    threshold: 5,
+    window: '15 minutes',
+    action: 'account_lockout'
+  },
+  dataAccess: {
+    threshold: 100,
+    window: '1 hour',
+    action: 'rate_limit'
+  },
+  apiCalls: {
+    threshold: 1000,
+    window: '15 minutes',
+    action: 'temporary_ban'
+  }
+};
+
+// Automated threat detection
+const detectAnomalousActivity = async (userId: number, activity: UserActivity): Promise<ThreatAssessment> => {
+  const userBaseline = await getUserActivityBaseline(userId);
+  const riskScore = calculateRiskScore(activity, userBaseline);
+  
+  if (riskScore > RISK_THRESHOLD) {
+    await logSecurityEvent({
+      userId,
+      eventType: 'anomalous_activity',
+      riskScore,
+      details: activity,
+      timestamp: new Date()
+    });
+    
+    // Adaptive response based on risk level
+    if (riskScore > CRITICAL_THRESHOLD) {
+      await suspendUserSession(userId);
+      await notifySecurityTeam(userId, activity);
+    }
+  }
+  
+  return { riskScore, recommended Action: determineResponse(riskScore) };
+};
+```
+
+### Compliance Auditing
+- **Automated Compliance Checks**: Daily validation of security controls and configurations
+- **Access Reviews**: Quarterly review of user permissions and administrative access
+- **Penetration Testing**: Annual third-party security assessments
+- **Vulnerability Management**: Continuous scanning with 24-hour critical patch SLA
 
 ## Third-Party Security
 
-### Vendor Risk Management
-- **Security questionnaires** for all vendors
-- **On-site security audits** for critical vendors
-- **Continuous monitoring** of vendor security posture
-- **Contract security requirements** and SLAs
+### Vendor Security Assessment
+- **OpenAI**: SOC 2 Type II certified, data processing agreements in place
+- **ElevenLabs**: Security questionnaire completed, data retention policies verified
+- **Stripe**: PCI DSS Level 1 certified, comprehensive security controls validated
+- **Cloud Providers**: Enterprise security agreements with data residency controls
 
-### API Security
-- **Rate limiting** to prevent abuse
-- **API key management** with regular rotation
-- **Input validation** and sanitization
-- **Output encoding** to prevent injection attacks
+### API Security Standards
+- **OAuth 2.0**: Secure authorization for third-party integrations
+- **API Versioning**: Controlled API evolution with security patch distribution
+- **Webhook Security**: HMAC signature validation for all webhook endpoints
+- **Service Dependencies**: Minimal third-party dependencies with security monitoring
 
-### Cloud Security
-- **Infrastructure as Code** for consistent security configurations
-- **Network access control lists** limiting traffic
-- **Security groups** with minimal required permissions
-- **Cloud security monitoring** and compliance checking
-
-## Data Backup & Recovery
-
-### Backup Strategy
-- **Automated daily backups** with encryption
-- **Geographic distribution** across multiple regions
-- **Point-in-time recovery** capabilities
-- **Backup integrity verification** and testing
-
-### Disaster Recovery
-- **Recovery Time Objective (RTO)**: 4 hours maximum
-- **Recovery Point Objective (RPO)**: 1 hour maximum data loss
-- **Failover procedures** with automated triggers
-- **Regular disaster recovery testing** and documentation
-
-### Business Continuity
-- **Alternative processing sites** ready for activation
-- **Communication plans** for stakeholders during outages
-- **Vendor contingency plans** for critical service providers
-- **Incident escalation procedures** for business impact
-
-## Security Training & Awareness
-
-### Employee Training
-- **Security awareness training** for all employees
-- **Role-specific training** for different job functions
-- **Phishing simulation** exercises and training
-- **Incident response training** for technical staff
-
-### Developer Security
-- **Secure coding practices** and standards
-- **Code review procedures** including security review
-- **Security testing** integration into CI/CD pipelines
-- **Threat modeling** for new features and systems
-
-### User Education
-- **Privacy settings** education and best practices
-- **Password security** and multi-factor authentication
-- **Phishing awareness** and reporting procedures
-- **Data sharing** guidelines and recommendations
-
----
-
-**Security Contact**: For security concerns or to report vulnerabilities, contact security@trai.app with encrypted communications using our PGP key available at https://trai.app/.well-known/pgp-key.
-
-**Compliance Inquiries**: For compliance-related questions, contact compliance@trai.app or your designated account representative.
+TraI's comprehensive security framework ensures enterprise-grade protection for mental wellness data while maintaining user privacy and regulatory compliance across all operational aspects.

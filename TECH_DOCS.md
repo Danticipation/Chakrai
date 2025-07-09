@@ -1,484 +1,599 @@
-# Technical Documentation
-
-This document provides comprehensive technical information for developers working on TraI - Mental Wellness Companion Application.
+# TraI - Technical Documentation
 
 ## Architecture Overview
 
-### System Architecture
-TraI follows a modern full-stack architecture with clear separation of concerns:
+TraI is a comprehensive mental wellness platform built with modern web technologies, featuring subscription-based monetization, AI-powered therapeutic support, and privacy-first architecture supporting both anonymous and registered users.
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Client (React) │◄──►│ Server (Express)│◄──►│ Database (Postgres)
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  External APIs  │    │   AI Services   │    │  File Storage   │
-│ • OpenAI GPT-4o │    │ • ElevenLabs    │    │ • Local/Cloud   │
-│ • Whisper API   │    │ • Transcription │    │ • Encrypted     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+### Technology Stack
 
-### Tech Stack
+#### Frontend
+- **Framework**: React 18 with TypeScript and Vite
+- **Styling**: Tailwind CSS with luxury design system and glass morphism effects
+- **State Management**: TanStack Query for server state, React Context for local state
+- **Authentication**: JWT tokens with device fingerprinting for anonymous users
+- **Payments**: Stripe React components with subscription management
+- **Progressive Web App**: Service worker with offline capabilities and installable features
 
-**Frontend**
-- **React 18** with TypeScript for type safety
-- **Vite** for fast development and optimized builds
-- **Tailwind CSS** for styling with custom therapeutic color schemes
-- **TanStack Query** for server state management
-- **Wouter** for lightweight client-side routing
-- **shadcn/ui** components for consistent UI elements
+#### Backend
+- **Runtime**: Node.js with Express.js and TypeScript
+- **Database**: PostgreSQL with Drizzle ORM for type-safe queries
+- **Authentication**: JWT tokens with session management and device fingerprinting
+- **Payments**: Stripe webhooks and subscription lifecycle management
+- **AI Integration**: OpenAI GPT-4o, ElevenLabs TTS, OpenAI Whisper STT
+- **Security**: AES-256 encryption, CORS protection, rate limiting
 
-**Backend**
-- **Express.js** with TypeScript for API development
-- **Drizzle ORM** for type-safe database operations
-- **PostgreSQL** for primary data storage
-- **WebSocket** support for real-time features
-- **Multer** for file upload handling
-
-**AI & External Services**
-- **OpenAI GPT-4o** for conversational AI and wellness analysis
-- **OpenAI Whisper** for speech-to-text transcription
-- **ElevenLabs** for text-to-speech synthesis with voices: Hope, James, Charlotte, Bronson
-- **Neon Database** for managed PostgreSQL hosting
-
-## Project Structure
-
-```
-trai-mental-wellness/
-├── client/                 # Frontend application
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── hooks/          # Custom React hooks
-│   │   ├── lib/            # Utility libraries
-│   │   ├── pages/          # Page components
-│   │   └── styles/         # CSS and styling
-│   ├── index.html          # Main HTML template
-│   └── vite.config.ts      # Vite configuration
-├── server/                 # Backend application
-│   ├── index.ts            # Main server entry point
-│   ├── routes.ts           # API route definitions
-│   ├── storage.ts          # Database abstraction layer
-│   ├── vite.ts             # Vite middleware setup
-│   └── modules/            # Feature-specific modules
-├── shared/                 # Shared types and schemas
-│   └── schema.ts           # Database schema definitions
-├── drizzle.config.ts       # Database configuration
-├── package.json            # Dependencies and scripts
-└── tsconfig.json           # TypeScript configuration
-```
+#### Infrastructure
+- **Development**: Vite dev server with HMR and TypeScript compilation
+- **Database**: PostgreSQL with automated migrations and schema validation
+- **File Storage**: Local storage with future cloud storage support
+- **Monitoring**: Console logging with error tracking and performance metrics
 
 ## Database Schema
 
-### Core Tables
+### Core User Management
+```typescript
+// User accounts with anonymous and registered support
+users: {
+  id: number (primary key)
+  username: string
+  email: string | null
+  passwordHash: string | null
+  deviceFingerprint: string | null
+  isAnonymous: boolean
+  subscriptionStatus: 'free' | 'premium'
+  subscriptionId: string | null
+  subscriptionExpiresAt: date | null
+  customerId: string | null (Stripe customer ID)
+  monthlyUsage: number
+  lastUsageReset: date
+  createdAt: date
+  updatedAt: date
+}
 
-**Users & Authentication**
-```sql
-users: id, username, email, password_hash, display_name, onboarding_completed
-bots: id, user_id, name, level, words_learned, personality_mode, voice_id
-messages: id, user_id, content, is_bot, timestamp
+// Authentication tokens for session management
+authTokens: {
+  id: number (primary key)
+  userId: number (foreign key)
+  token: string
+  expiresAt: date
+  deviceInfo: string | null
+  createdAt: date
+}
 ```
 
-**Mental Health Data**
-```sql
-journal_entries: id, user_id, content, mood, mood_intensity, tags, is_private
-mood_entries: id, user_id, mood_type, intensity, triggers, notes
-therapeutic_goals: id, user_id, title, description, target_date, completed
+### Subscription & Payment Management
+```typescript
+// Stripe subscription tracking
+subscriptions: {
+  id: number (primary key)
+  userId: number (foreign key)
+  stripeSubscriptionId: string
+  stripePriceId: string
+  status: string
+  currentPeriodStart: date
+  currentPeriodEnd: date
+  cancelAtPeriodEnd: boolean
+  createdAt: date
+  updatedAt: date
+}
+
+// Usage tracking for freemium model
+usageMetrics: {
+  id: number (primary key)
+  userId: number (foreign key)
+  feature: string
+  count: number
+  month: number
+  year: number
+  createdAt: date
+}
 ```
 
-**Analytics & Insights**
-```sql
-emotional_patterns: id, user_id, pattern_data, confidence_score, detected_at
-mood_forecasts: id, user_id, predicted_mood, confidence_score, risk_level
-crisis_detection_logs: id, user_id, risk_level, confidence_score, intervention_type
+### Mental Wellness Data
+```typescript
+// Mood tracking with emotional analysis
+moodEntries: {
+  id: number (primary key)
+  userId: number (foreign key)
+  mood: string
+  intensity: number
+  emotion: string | null
+  tags: string[]
+  notes: text | null
+  timestamp: date
+  createdAt: date
+}
+
+// Therapeutic journaling with AI analysis
+journalEntries: {
+  id: number (primary key)
+  userId: number (foreign key)
+  title: string
+  content: text
+  mood: string | null
+  tags: string[]
+  isPrivate: boolean
+  moodIntensity: number | null
+  createdAt: date
+  updatedAt: date
+}
+
+// AI conversation history
+messages: {
+  id: number (primary key)
+  userId: number (foreign key)
+  content: text
+  role: 'user' | 'assistant'
+  timestamp: date
+  emotionalContext: jsonb | null
+  responseType: string | null
+}
 ```
 
-**Gamification**
-```sql
-user_achievements: id, user_id, achievement_id, unlocked_at, is_completed
-wellness_streaks: id, user_id, activity_type, current_streak, longest_streak
-user_wellness_points: id, user_id, total_points, available_points, current_level
+### AI & Analytics
+```typescript
+// Semantic memory for AI personality development
+semanticMemories: {
+  id: number (primary key)
+  userId: number (foreign key)
+  content: text
+  embedding: vector
+  memoryType: string
+  emotionalContext: jsonb
+  temporalContext: jsonb
+  accessCount: number
+  lastAccessed: date
+  createdAt: date
+}
+
+// Emotional intelligence analytics
+emotionalPatterns: {
+  id: number (primary key)
+  userId: number (foreign key)
+  patternType: string
+  confidence: number
+  triggerFactors: string[]
+  recommendations: string[]
+  detectedAt: date
+  validUntil: date | null
+}
+
+// Predictive mood forecasting
+moodForecasts: {
+  id: number (primary key)
+  userId: number (foreign key)
+  predictedMood: string
+  confidenceScore: number
+  riskLevel: string
+  triggerFactors: string[]
+  preventiveRecommendations: string[]
+  forecastDate: date
+  createdAt: date
+}
 ```
 
 ## API Reference
 
 ### Authentication Endpoints
 
-**POST** `/api/auth/login`
-- Login user with credentials
-- Returns: JWT token and user data
-
-**POST** `/api/auth/logout`
-- Logout current user
-- Clears session data
-
-**GET** `/api/auth/user`
-- Get current authenticated user
-- Returns: User profile data
-
-### Chat & AI Endpoints
-
-**POST** `/api/chat`
+#### Anonymous User Management
 ```typescript
-interface ChatRequest {
-  message: string;
-  voice?: string;
-  userId?: number;
-  personalityMode?: string;
+POST /api/users/anonymous
+// Creates or retrieves anonymous user by device fingerprint
+Body: { deviceFingerprint: string }
+Response: { user: User, isNew: boolean }
+
+POST /api/auth/register
+// Converts anonymous user to registered account
+Body: { email: string, password: string, deviceFingerprint?: string }
+Response: { user: User, token: string }
+
+POST /api/auth/login
+// Authenticates registered user
+Body: { email: string, password: string }
+Response: { user: User, token: string }
+```
+
+### Subscription Management
+
+#### Subscription Status & Usage
+```typescript
+GET /api/subscription/status
+// Returns current subscription status and usage
+Headers: Authorization: Bearer <token>
+Response: {
+  status: 'free' | 'premium',
+  expiresAt: date | null,
+  monthlyUsage: number,
+  lastUsageReset: date
 }
 
-interface ChatResponse {
-  message: string;
-  audioData?: string; // base64 encoded audio
-  crisisDetected?: boolean;
-  crisisData?: CrisisDetectionData;
+POST /api/subscription/usage
+// Increments usage counter for feature tracking
+Headers: Authorization: Bearer <token>
+Body: { increment?: number }
+Response: { monthlyUsage: number }
+```
+
+#### Payment Processing
+```typescript
+POST /api/subscription/create-checkout
+// Creates Stripe checkout session
+Headers: Authorization: Bearer <token>
+Body: { planType: 'monthly' | 'yearly', deviceFingerprint?: string }
+Response: { sessionId: string }
+
+POST /api/subscription/webhook
+// Stripe webhook handler for subscription events
+Headers: stripe-signature: <signature>
+Body: Stripe webhook payload (raw)
+Response: { received: boolean }
+```
+
+### AI & Wellness Features
+
+#### Conversation Management
+```typescript
+POST /api/chat
+// AI conversation with personality mirroring
+Headers: Authorization: Bearer <token>
+Body: { message: string, selectedVoice?: string }
+Response: { 
+  reply: string, 
+  audioData?: string,
+  emotionalState?: object,
+  usageCount: number 
+}
+
+POST /api/voice/tts
+// Text-to-speech conversion
+Headers: Authorization: Bearer <token>
+Body: { text: string, voice: string }
+Response: { audioData: string }
+```
+
+#### Wellness Tracking
+```typescript
+POST /api/mood-entries
+// Create mood entry with analysis
+Headers: Authorization: Bearer <token>
+Body: { mood: string, intensity: number, notes?: string, tags?: string[] }
+Response: { entry: MoodEntry, analysis?: object }
+
+GET /api/mood-entries
+// Retrieve mood history
+Headers: Authorization: Bearer <token>
+Query: { limit?: number, offset?: number }
+Response: { entries: MoodEntry[], total: number }
+
+POST /api/journal-entries
+// Create journal entry with AI analysis
+Headers: Authorization: Bearer <token>
+Body: { title: string, content: string, isPrivate?: boolean }
+Response: { entry: JournalEntry, insights?: object }
+```
+
+#### Analytics & Insights
+```typescript
+GET /api/analytics/dashboard
+// Comprehensive wellness analytics
+Headers: Authorization: Bearer <token>
+Response: {
+  overview: object,
+  charts: object,
+  insights: string,
+  trends: object[]
+}
+
+GET /api/personality-reflection
+// AI personality analysis
+Headers: Authorization: Bearer <token>
+Response: {
+  traits: string[],
+  strengths: string[],
+  growthAreas: string[],
+  communicationStyle: string
 }
 ```
 
-**POST** `/api/transcribe`
-- Convert audio to text using Whisper
-- Accepts: multipart/form-data with audio file
-- Returns: { text: string }
+## Development Setup
 
-**POST** `/api/text-to-speech`
-```typescript
-interface TTSRequest {
-  text: string;
-  voice: string;
-  emotionalContext?: string;
-}
+### Prerequisites
+- Node.js 18+ with npm
+- PostgreSQL 14+ database
+- OpenAI API key for AI features
+- Stripe account for payment processing
+- ElevenLabs API key for voice features (optional)
+
+### Environment Configuration
+```bash
+# Core Services
+OPENAI_API_KEY=sk-...
+DATABASE_URL=postgresql://user:password@localhost:5432/trai
+SESSION_SECRET=your-session-secret
+
+# Subscription System
+STRIPE_SECRET_KEY=sk_test_...
+VITE_STRIPE_PUBLIC_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_MONTHLY_PRICE_ID=price_...
+STRIPE_YEARLY_PRICE_ID=price_...
+
+# Optional Voice Features
+ELEVENLABS_API_KEY=your-elevenlabs-key
+
+# Development Settings
+NODE_ENV=development
 ```
 
-### Journal Endpoints
+### Installation Steps
 
-**GET** `/api/journal/entries/:userId`
-- Retrieve user's journal entries
-- Supports pagination and filtering
-
-**POST** `/api/journal/entry`
-```typescript
-interface JournalEntryRequest {
-  userId: number;
-  content: string;
-  mood?: string;
-  moodIntensity?: number;
-  tags?: string[];
-  isPrivate?: boolean;
-}
-```
-
-**GET** `/api/journal/analytics/:userId`
-- Get journal analytics and insights
-- Returns emotional patterns and trends
-
-### Mood & Wellness Endpoints
-
-**POST** `/api/mood`
-```typescript
-interface MoodEntryRequest {
-  userId: number;
-  moodType: string;
-  intensity: number;
-  triggers?: string[];
-  notes?: string;
-}
-```
-
-**GET** `/api/mood/forecast/:userId`
-- Get mood forecasting data
-- Returns predictions and risk assessments
-
-**GET** `/api/wellness/overview/:userId`
-- Comprehensive wellness dashboard data
-- Includes scores, trends, and recommendations
-
-## Development Workflow
-
-### Local Development Setup
-
-1. **Environment Configuration**
+1. **Clone and Install**
    ```bash
-   # Copy environment template
-   cp .env.example .env
-   
-   # Configure required variables
-   DATABASE_URL=postgresql://username:password@localhost:5432/trai
-   OPENAI_API_KEY=sk-...
-   ELEVENLABS_API_KEY=...
-   SESSION_SECRET=your-secret-key
+   git clone <repository>
+   cd trai-mental-wellness
+   npm install
    ```
 
 2. **Database Setup**
    ```bash
-   # Push schema to database
-   npm run db:push
+   # Create PostgreSQL database
+   createdb trai_development
    
-   # Optional: Open database studio
-   npm run db:studio
+   # Run migrations
+   npm run db:push
    ```
 
-3. **Development Server**
+3. **Stripe Configuration**
    ```bash
-   # Start development mode (both frontend and backend)
+   # Create products and prices in Stripe Dashboard
+   # Update environment variables with price IDs
+   # Configure webhook endpoint: /api/subscription/webhook
+   ```
+
+4. **Start Development**
+   ```bash
    npm run dev
-   
-   # Backend only
-   npm run server:dev
-   
-   # Frontend only
-   npm run client:dev
    ```
 
 ### Build & Deployment
 
-**Production Build**
+#### Production Build
 ```bash
-# Build frontend for production
 npm run build
-
-# Type checking
-npm run type-check
-
-# Linting
-npm run lint
+npm run start
 ```
 
-**Database Migrations**
+#### Database Migrations
 ```bash
+# Push schema changes
+npm run db:push
+
 # Generate migration files
 npm run db:generate
 
 # Apply migrations
 npm run db:migrate
-
-# Reset database (development only)
-npm run db:reset
 ```
 
-## Component Architecture
+## Voice System Integration
 
-### Frontend Components
-
-**Core Components**
-- `App.tsx` - Main application shell with routing
-- `AppLayout.tsx` - Layout wrapper with navigation
-- `Chat.tsx` - Main chat interface
-- `TherapeuticJournal.tsx` - Journaling interface
-
-**Feature Components**
-- `MoodTracking.tsx` - Mood selection and tracking
-- `AnalyticsDashboard.tsx` - Data visualization
-- `CommunitySupport.tsx` - Peer support features
-- `VRTherapy.tsx` - Virtual reality integration
-
-**Shared Components**
-- `VoiceSelector.tsx` - Voice selection interface
-- `PersonalityReflection.tsx` - AI personality insights
-- `CrisisSupport.tsx` - Crisis intervention UI
-
-### State Management
-
-**TanStack Query Configuration**
+### ElevenLabs Configuration
 ```typescript
-// lib/queryClient.ts
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: (failureCount, error) => {
-        if (error?.status === 401) return false;
-        return failureCount < 3;
-      },
-    },
-  },
-});
-```
+// Voice mapping for 8 professional voices
+const VOICE_MAPPING = {
+  'James': 'AkChSigMDjW8pW5ESqn1',      // Professional/calming
+  'Brian': 'nPczCjzI2devNBz1zQrb',      // Deep/resonant  
+  'Alexandra': 'lokGPaxlzBSMvBpCu8QA',  // Clear/articulate
+  'Carla': 'l32B8XDoylOsZKiSdfhE',      // Warm/empathetic
+  'Hope': 'JL01Zqk8IjjVUKBsW3rR',       // Warm/encouraging
+  'Charlotte': 'XB0fDUnXU5powFXDhCwa',  // Gentle/empathetic
+  'Bronson': 'pMsXgVXv3BLzUgSXRplE',   // Confident/reassuring
+  'Marcus': 'VxNyRZ6lYqXPB7VFZSwa'     // Smooth/supportive
+};
 
-**Custom Hooks**
-```typescript
-// hooks/useAuth.ts
-export function useAuth() {
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["/api/auth/user"],
-    retry: false,
+// Audio generation with loading states
+async function generateSpeech(text: string, voice: string): Promise<string> {
+  const response = await fetch('/api/voice/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: scrubTextForTTS(text), voice })
   });
-
-  return {
-    user,
-    isLoading,
-    isAuthenticated: !!user,
-  };
+  
+  const { audioData } = await response.json();
+  return audioData; // Base64 encoded audio
 }
+```
+
+### Speech-to-Text Integration
+```typescript
+// OpenAI Whisper for voice journaling
+async function transcribeAudio(audioBlob: Blob): Promise<string> {
+  const formData = new FormData();
+  formData.append('audio', audioBlob, 'recording.wav');
+  
+  const response = await fetch('/api/voice/transcribe', {
+    method: 'POST',
+    body: formData
+  });
+  
+  const { transcript } = await response.json();
+  return transcript;
+}
+```
+
+## Security Implementation
+
+### Authentication & Authorization
+```typescript
+// JWT token verification middleware
+export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+  
+  jwt.verify(token, process.env.JWT_SECRET!, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token' });
+    req.user = user;
+    next();
+  });
+};
+
+// Anonymous user session management
+export const getOrCreateAnonymousUser = async (deviceFingerprint: string): Promise<User> => {
+  let user = await storage.getUserByDeviceFingerprint(deviceFingerprint);
+  
+  if (!user) {
+    user = await storage.createUser({
+      username: `anon_${deviceFingerprint.slice(0, 8)}`,
+      deviceFingerprint,
+      isAnonymous: true,
+      subscriptionStatus: 'free'
+    });
+  }
+  
+  return user;
+};
+```
+
+### Data Encryption & Privacy
+```typescript
+// AES-256 encryption for sensitive data
+const encrypt = (text: string, key: string): { encryptedData: string, iv: string } => {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipher('aes-256-cbc', key);
+  let encrypted = cipher.update(text, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return { encryptedData: encrypted, iv: iv.toString('hex') };
+};
+
+const decrypt = (encryptedData: string, key: string, iv: string): string => {
+  const decipher = crypto.createDecipher('aes-256-cbc', key);
+  let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+};
 ```
 
 ## Performance Optimization
 
-### Frontend Optimization
-- **Code Splitting**: Lazy loading for feature components
-- **Image Optimization**: SVG icons and optimized assets
-- **Bundle Analysis**: Vite bundle analyzer for size monitoring
-- **Caching**: Service worker for offline functionality
+### Database Query Optimization
+- Use Drizzle ORM with type-safe queries and automatic query optimization
+- Implement connection pooling for PostgreSQL database connections
+- Add database indexes for frequently queried fields (userId, timestamp, deviceFingerprint)
+- Use pagination for large data sets and implement efficient offset/limit queries
 
-### Backend Optimization
-- **Database Indexing**: Strategic indexes on frequently queried columns
-- **Connection Pooling**: Optimized database connection management
-- **Caching**: Redis for session storage and frequent queries
-- **Compression**: Gzip compression for API responses
+### Frontend Performance
+- Implement React.memo for expensive components to prevent unnecessary re-renders
+- Use TanStack Query for efficient server state management with automatic caching
+- Lazy load components and routes to reduce initial bundle size
+- Optimize images and assets with appropriate compression and formats
 
-### AI Service Optimization
-- **Response Caching**: Cache similar AI responses
-- **Rate Limiting**: Prevent API abuse and manage costs
-- **Streaming**: Real-time response streaming for chat
-- **Fallback Handling**: Graceful degradation when services unavailable
+### AI Service Integration
+- Implement request batching for OpenAI API calls to reduce latency
+- Add response caching for repeated queries to minimize API usage costs
+- Use streaming responses for long-form AI content generation
+- Implement fallback strategies for service unavailability
+
+## Monitoring & Analytics
+
+### Application Monitoring
+```typescript
+// Error tracking and performance monitoring
+const logError = (error: Error, context: object) => {
+  console.error({
+    timestamp: new Date().toISOString(),
+    error: error.message,
+    stack: error.stack,
+    context
+  });
+  
+  // Send to monitoring service in production
+  if (process.env.NODE_ENV === 'production') {
+    // Implementation for error tracking service
+  }
+};
+
+// Performance metrics tracking
+const trackPerformance = (operation: string, duration: number, metadata?: object) => {
+  console.log({
+    timestamp: new Date().toISOString(),
+    operation,
+    duration,
+    metadata
+  });
+};
+```
+
+### User Analytics
+- Track feature usage patterns for subscription optimization
+- Monitor conversion rates from free to premium subscriptions
+- Analyze user engagement patterns and retention metrics
+- Implement privacy-compliant analytics with user consent management
 
 ## Testing Strategy
 
-### Frontend Testing
-```bash
-# Unit tests with Vitest
-npm run test
-
-# E2E tests with Playwright
-npm run test:e2e
-
-# Component testing
-npm run test:components
+### Unit Testing
+```typescript
+// Example test for subscription management
+describe('Subscription Management', () => {
+  it('should track usage correctly for free users', async () => {
+    const user = await createTestUser({ subscriptionStatus: 'free' });
+    
+    // Simulate AI conversation usage
+    const response = await request(app)
+      .post('/api/chat')
+      .set('Authorization', `Bearer ${user.token}`)
+      .send({ message: 'Hello' });
+    
+    expect(response.status).toBe(200);
+    expect(response.body.usageCount).toBe(1);
+  });
+  
+  it('should block free users after usage limit', async () => {
+    const user = await createTestUser({ 
+      subscriptionStatus: 'free',
+      monthlyUsage: 10 // At limit
+    });
+    
+    const response = await request(app)
+      .post('/api/chat')
+      .set('Authorization', `Bearer ${user.token}`)
+      .send({ message: 'Hello' });
+    
+    expect(response.status).toBe(403);
+    expect(response.body.error).toContain('usage limit');
+  });
+});
 ```
 
-### Backend Testing
-```bash
-# API integration tests
-npm run test:api
+### Integration Testing
+- Test complete user journeys from registration to subscription
+- Verify Stripe webhook handling and subscription lifecycle events
+- Test anonymous user to registered user migration flows
+- Validate AI service integrations with mock responses
 
-# Database tests
-npm run test:db
-```
+### End-to-End Testing
+- Test complete subscription purchase flows in staging environment
+- Verify mobile PWA functionality across different devices
+- Test voice features with actual ElevenLabs integration
+- Validate crisis detection and intervention workflows
 
-### Testing Patterns
-- **Unit Tests**: Individual function testing
-- **Integration Tests**: API endpoint testing
-- **E2E Tests**: Full user workflow testing
-- **Accessibility Tests**: WCAG compliance testing
+## Deployment & DevOps
 
-## Deployment
+### Environment Management
+- Use environment-specific configuration files for different deployment stages
+- Implement secure secret management for API keys and sensitive configuration
+- Set up automated database migrations and schema validation
+- Configure monitoring and alerting for production environments
 
-### Environment-Specific Configurations
+### Scaling Considerations
+- Implement horizontal scaling for Express.js backend with load balancing
+- Use connection pooling and read replicas for database scaling
+- Implement caching strategies for frequently accessed data
+- Design API rate limiting to handle traffic spikes and abuse prevention
 
-**Development**
-- Hot reloading enabled
-- Detailed error logging
-- Development database
-
-**Staging**
-- Production-like environment
-- Limited external API calls
-- Staging database with production data copy
-
-**Production**
-- Optimized builds
-- Error tracking and monitoring
-- Production database with backups
-
-### CI/CD Pipeline
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy
-on:
-  push:
-    branches: [main]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-      - name: Install dependencies
-        run: npm ci
-      - name: Run tests
-        run: npm test
-      - name: Build application
-        run: npm run build
-      - name: Deploy to production
-        run: npm run deploy
-```
-
-## Monitoring & Observability
-
-### Application Monitoring
-- **Error Tracking**: Sentry for error monitoring and alerting
-- **Performance**: Web Vitals tracking for user experience metrics
-- **Analytics**: Usage analytics for feature adoption tracking
-- **Health Checks**: API endpoint health monitoring
-
-### Database Monitoring
-- **Query Performance**: Slow query identification and optimization
-- **Connection Monitoring**: Database connection pool metrics
-- **Backup Verification**: Automated backup testing and restoration
-
-### AI Service Monitoring
-- **API Usage**: Token consumption and cost tracking
-- **Response Time**: AI service latency monitoring
-- **Quality Metrics**: Response quality and user satisfaction tracking
-
-## Contributing Guidelines
-
-### Code Standards
-- **TypeScript**: Strict mode enabled, full type coverage
-- **ESLint**: Configured for React and Node.js best practices
-- **Prettier**: Consistent code formatting
-- **Conventional Commits**: Standardized commit message format
-
-### Development Process
-1. **Feature Branching**: Create feature branches from main
-2. **Code Review**: All changes require review before merging
-3. **Testing**: Comprehensive test coverage for new features
-4. **Documentation**: Update documentation for API changes
-
-### Git Workflow
-```bash
-# Create feature branch
-git checkout -b feature/new-feature
-
-# Make changes and commit
-git commit -m "feat: add new therapeutic feature"
-
-# Push and create pull request
-git push origin feature/new-feature
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**Database Connection Errors**
-- Verify DATABASE_URL environment variable
-- Check PostgreSQL service status
-- Confirm database exists and permissions
-
-**AI Service Errors**
-- Validate API keys in environment variables
-- Check API rate limits and quotas
-- Monitor service status pages
-
-**Build Failures**
-- Clear node_modules and reinstall dependencies
-- Check TypeScript compilation errors
-- Verify environment variable configuration
-
-### Debug Mode
-```bash
-# Enable debug logging
-DEBUG=* npm run dev
-
-# Database query logging
-DEBUG=drizzle:* npm run dev
-
-# AI service debugging
-DEBUG=openai:* npm run dev
-```
-
----
-
-For additional technical support, consult the development team or open an issue with detailed reproduction steps.
+TraI's technical architecture provides a solid foundation for scalable, secure mental wellness platform with comprehensive subscription management and AI-powered therapeutic features.

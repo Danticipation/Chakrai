@@ -1,127 +1,105 @@
-# TraI - Mental Wellness Companion Application
+# TraI - Mental Wellness & Therapy Application
 
-TraI is a comprehensive AI-powered mental wellness companion that provides supportive interactions through intelligent, adaptive technology and professional-grade features for mental health and personal growth.
+TraI is a comprehensive AI-powered mental wellness companion featuring subscription-based monetization, advanced therapeutic support, and privacy-first architecture for both anonymous and registered users.
 
 ## Features Overview
 
-- **AI Wellness Conversations** - Dynamic personality mirroring with OpenAI GPT-4o
-- **Voice Integration** - ElevenLabs text-to-speech with multiple calming voices (Hope, James, Charlotte, Bronson)
-- **Comprehensive Journaling** - AI-assisted wellness journaling with analytics
-- **Mood & Emotion Tracking** - Real-time emotional analysis and pattern recognition
-- **Crisis Detection** - Advanced NLP-driven safety monitoring and intervention
-- **Professional Integration** - Clinical collaboration tools and session management
-- **Privacy & Compliance** - Zero-knowledge architecture with differential privacy
-- **EHR Integration** - FHIR-compliant healthcare data integration for licensed professionals
+### Core Functionality
+- **AI Conversations**: OpenAI GPT-4o powered therapeutic conversations with personality mirroring
+- **8-Voice System**: Professional ElevenLabs voices (James, Brian, Alexandra, Carla, Hope, Charlotte, Bronson, Marcus)
+- **Subscription System**: Freemium model with device-based subscriptions for anonymous users
+- **Mood Tracking**: Comprehensive mood entries with intensity, tags, and AI analysis
+- **Therapeutic Journaling**: Private journaling with voice-to-text and AI insights
+- **Crisis Detection**: Real-time detection and intervention with professional support resources
+
+### Premium Features (Subscription Required)
+- **Unlimited AI Conversations**: Remove 10/month limit for free users
+- **Advanced Analytics**: Detailed emotional patterns and longitudinal trends
+- **Voice Features**: Full voice synthesis and speech-to-text capabilities
+- **Export Capabilities**: PDF/CSV reports for healthcare providers
+- **Personality Insights**: Deep AI analysis of communication patterns and growth areas
+
+### Advanced Capabilities
+- **Progressive Web App**: Installable mobile app with offline functionality
+- **Anonymous Privacy**: Device fingerprint-based identification, no personal data required
+- **Professional Integration**: EHR systems, insurance compatibility, therapist portal
+- **Multi-Device Sync**: Seamless experience across all devices
+- **6 Luxury Themes**: Sophisticated color schemes with glass morphism effects
+- **Memory System**: AI maintains contextual personality insights across sessions
+
+## Technology Stack
+
+- **Frontend**: React 18 + TypeScript + Vite with Tailwind CSS luxury design system
+- **Backend**: Express.js + TypeScript with comprehensive API endpoints
+- **Database**: PostgreSQL with Drizzle ORM and complete schema management
+- **Payments**: Stripe integration with subscription management and webhooks
+- **AI Services**: OpenAI GPT-4o, ElevenLabs TTS (8 voices), Whisper STT
+- **Authentication**: JWT tokens with anonymous user support and device fingerprinting
+- **State Management**: TanStack Query + Context providers for subscription state
 
 ## Quick Start
 
-### Prerequisites
-
-- Node.js 18+ 
-- PostgreSQL database
-- OpenAI API key
-- ElevenLabs API key (optional, for voice features)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd trai-mental-wellness
-   ```
-
-2. **Install dependencies**
+1. **Install Dependencies**
    ```bash
    npm install
    ```
 
-3. **Environment Setup**
+2. **Set Up Environment Variables**
+   ```bash
+   # Required Core Services
+   OPENAI_API_KEY=your_openai_key
+   DATABASE_URL=your_postgresql_url
    
-   Create a `.env` file with:
-   ```env
-   DATABASE_URL=your_postgresql_connection_string
-   OPENAI_API_KEY=your_openai_api_key
-   ELEVENLABS_API_KEY=your_elevenlabs_api_key
-   SESSION_SECRET=your_session_secret
+   # Subscription System (Required for Premium Features)
+   STRIPE_SECRET_KEY=sk_test_...
+   VITE_STRIPE_PUBLIC_KEY=pk_test_...
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   
+   # Optional Voice Features
+   ELEVENLABS_API_KEY=your_elevenlabs_key
    ```
 
-4. **Database Setup**
+3. **Initialize Database**
    ```bash
    npm run db:push
    ```
 
-5. **Start Development Server**
+4. **Start Development Server**
    ```bash
    npm run dev
    ```
 
-   The application will be available at `http://localhost:5000`
+Visit `http://localhost:5000` to access TraI Mental Wellness Companion.
 
-## Project Structure
+## Monetization Model
 
-```
-trai-mental-wellness/
-├── client/           # React frontend application
-├── server/           # Express backend API
-├── shared/           # Shared types and database schema
-├── docs/             # Additional documentation
-├── README.md         # This file
-├── PRODUCT_FEATURES.md  # Product features overview
-├── TECH_DOCS.md      # Technical documentation
-└── SECURITY.md       # Security and compliance
-```
+### Free Tier
+- 10 AI conversations per month
+- Basic mood tracking and journaling
+- Community support access
+- Standard analytics
 
-## Architecture
+### Premium Tier ($9.99/month)
+- Unlimited AI conversations
+- Advanced emotional intelligence features
+- Voice synthesis and speech-to-text
+- Professional exports and EHR integration
+- Deep personality insights and analytics
 
-- **Frontend**: React with TypeScript, Tailwind CSS, Vite
-- **Backend**: Express.js with TypeScript
-- **Database**: PostgreSQL with Drizzle ORM
-- **AI Integration**: OpenAI GPT-4o for conversations and analysis
-- **Voice**: ElevenLabs for text-to-speech synthesis
-- **Real-time**: WebSocket support for live interactions
+## Documentation Suite
 
-## Development Commands
+- **[PRODUCT_FEATURES.md](PRODUCT_FEATURES.md)**: Complete feature specifications and capabilities
+- **[TECH_DOCS.md](TECH_DOCS.md)**: Development guides, API reference, and architecture
+- **[SECURITY.md](SECURITY.md)**: Privacy compliance, security measures, and data protection
 
-```bash
-# Start development server
-npm run dev
+## Privacy & Compliance
 
-# Build for production
-npm run build
+TraI implements zero-knowledge architecture with complete user data isolation. Anonymous users can access all features through device fingerprinting, with seamless migration to registered accounts. Full GDPR/HIPAA compliance with enterprise-grade security measures.
 
-# Database operations
-npm run db:push        # Push schema changes
-npm run db:studio      # Open database studio
+## Support & Professional Integration
 
-# Type checking
-npm run type-check
-
-# Linting
-npm run lint
-```
-
-## Documentation
-
-- **[Product Features](PRODUCT_FEATURES.md)** - Comprehensive feature overview
-- **[Technical Documentation](TECH_DOCS.md)** - Development and API documentation
-- **[Security & Compliance](SECURITY.md)** - Privacy, security, and compliance details
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Compatible with healthcare systems through FHIR standards, insurance reporting, and professional therapist portal. Comprehensive crisis detection with immediate intervention resources and professional escalation pathways.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support, please contact the development team or open an issue in the repository.
-
----
-
-**Important**: This application is designed as a wellness companion and personal growth tool. It is not a replacement for professional mental health care or therapy. Always consult with qualified mental health professionals for serious mental health concerns or clinical treatment.
+Proprietary mental wellness platform with enterprise licensing available.
