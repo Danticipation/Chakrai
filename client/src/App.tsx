@@ -1049,7 +1049,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
       {/* Mobile-Optimized Header */}
       <div className="theme-background">
         {/* Mobile: Polished Header */}
-        <div className="block md:hidden mobile-polish-header">
+        <div className="block lg:hidden mobile-polish-header">
           {/* Top Row: Logo and Status */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-3">
@@ -1344,7 +1344,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     <div className="absolute -top-1 -right-1 w-4 h-4 theme-accent rounded-full animate-ping"></div>
                   </div>
                   <h1 className="text-5xl font-bold theme-text mb-4 bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-secondary)] bg-clip-text text-transparent font-serif">
-                    Welcome to Your Wellness Journey
+                    Welcome to TRaI Mental Wellness
                   </h1>
                   <p className="theme-text-secondary text-xl mb-8 font-light tracking-wide">Your AI companion is here to support your mental health and personal growth</p>
                   

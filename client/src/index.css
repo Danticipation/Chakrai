@@ -888,6 +888,22 @@ input:focus, button:focus {
     margin: 0 auto !important;
   }
   
+  /* Mobile header cards - ensure visibility */
+  .mobile-polish-header .grid.grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    margin-top: 0.75rem !important;
+  }
+  
+  .mobile-polish-header .grid.grid-cols-2 button {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0.75rem !important;
+    min-height: 80px !important;
+    text-align: left !important;
+  }
+  
   /* Header grid responsive sizing */
   .grid.grid-cols-3 {
     gap: 0.5rem !important;
