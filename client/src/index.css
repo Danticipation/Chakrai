@@ -889,6 +889,19 @@ input:focus, button:focus {
     justify-self: center !important;
   }
   
+  /* Force larger logo size */
+  .trai-logo-large {
+    height: 8rem !important;
+    max-height: none !important;
+  }
+  
+  @media (min-width: 640px) {
+    .trai-logo-large {
+      height: 16rem !important;
+      max-height: none !important;
+    }
+  }
+  
   /* Header grid responsive sizing */
   .grid.grid-cols-3 {
     gap: 0.5rem !important;
