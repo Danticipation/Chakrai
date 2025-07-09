@@ -46,7 +46,7 @@ const DynamicAmbientSound: React.FC = () => {
       name: 'Forest Rain',
       category: 'nature',
       moodTags: ['calm', 'stressed', 'anxious', 'overwhelmed'],
-      description: 'Gentle rain on forest leaves with distant thunder',
+      description: 'Layered rain sounds with gentle forest ambiance',
       icon: <TreePine className="w-5 h-5" />,
       audioUrl: '/api/ambient-audio/rain-forest',
       recommendedFor: ['anxiety', 'stress relief', 'sleep'],
@@ -57,7 +57,7 @@ const DynamicAmbientSound: React.FC = () => {
       name: 'Ocean Waves',
       category: 'nature',
       moodTags: ['peaceful', 'sad', 'contemplative', 'tired'],
-      description: 'Rhythmic ocean waves with seagulls',
+      description: 'Realistic ocean waves with foam and deep water sounds',
       icon: <Waves className="w-5 h-5" />,
       audioUrl: '/api/ambient-audio/ocean-waves',
       recommendedFor: ['meditation', 'deep breathing', 'relaxation'],
@@ -68,7 +68,7 @@ const DynamicAmbientSound: React.FC = () => {
       name: 'Wind Chimes',
       category: 'meditation',
       moodTags: ['restless', 'agitated', 'focused', 'creative'],
-      description: 'Gentle wind chimes with soft breeze',
+      description: 'Peaceful wind chimes with gentle breeze sounds',
       icon: <Wind className="w-5 h-5" />,
       audioUrl: '/api/ambient-audio/wind-chimes',
       recommendedFor: ['focus', 'creativity', 'mindfulness'],
@@ -430,22 +430,22 @@ const DynamicAmbientSound: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    console.log('Testing direct audio endpoint...');
-                    const testAudio = new Audio('/api/ambient-audio/white-noise');
-                    testAudio.volume = 0.3;
+                    console.log('Testing rain forest audio...');
+                    const testAudio = new Audio('/api/ambient-audio/rain-forest');
+                    testAudio.volume = 0.4;
                     testAudio.play().then(() => {
-                      console.log('Direct audio test successful!');
+                      console.log('Rain forest test successful!');
                       setTimeout(() => {
                         testAudio.pause();
                         console.log('Test audio stopped');
-                      }, 3000);
+                      }, 4000);
                     }).catch(e => {
-                      console.error('Direct audio test failed:', e);
+                      console.error('Rain forest test failed:', e);
                     });
                   }}
                   className="px-4 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors border border-silver text-sm"
                 >
-                  Test Audio
+                  Test Rain
                 </button>
                 <button
                   onClick={stopSound}

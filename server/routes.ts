@@ -1905,29 +1905,64 @@ router.get('/ambient-audio/:soundId', async (req, res) => {
           sample = (Math.random() - 0.5) * 0.1;
           break;
         case 'rain-forest':
-          // Pink noise for rain effect
-          sample = (Math.random() - 0.5) * 0.08 * Math.sin(t * 10);
+          // Layered rain effect with varying droplet intensities
+          const rainBase = (Math.random() - 0.5) * 0.06;
+          const droplets = Math.random() < 0.3 ? (Math.random() - 0.5) * 0.15 : 0;
+          const windRustle = Math.sin(t * 0.7) * 0.02 * (Math.random() * 0.5 + 0.5);
+          sample = rainBase + droplets + windRustle;
           break;
         case 'ocean-waves':
-          // Wave-like pattern
-          sample = Math.sin(t * 0.5) * 0.1 * (Math.random() * 0.5 + 0.5);
+          // Realistic ocean waves with foam and depth
+          const wave1 = Math.sin(t * 0.3) * 0.08;
+          const wave2 = Math.sin(t * 0.7) * 0.04;
+          const foam = (Math.random() - 0.5) * 0.03 * Math.abs(Math.sin(t * 0.5));
+          const deepRumble = Math.sin(t * 0.1) * 0.02;
+          sample = wave1 + wave2 + foam + deepRumble;
           break;
         case 'wind-chimes':
-          // Random bell-like tones
-          if (Math.random() < 0.001) {
-            sample = Math.sin(t * 1000 * (1 + Math.random())) * 0.1 * Math.exp(-t % 1 * 5);
+          // Gentle wind chimes with soft breeze
+          const windBase = Math.sin(t * 2) * 0.01 * (Math.random() * 0.3 + 0.7);
+          let chimeSound = 0;
+          if (Math.random() < 0.003) {
+            const chimeFreq = 800 + Math.random() * 600;
+            chimeSound = Math.sin(t * chimeFreq * 2 * Math.PI) * 0.08 * Math.exp(-((t * 10) % 10));
           }
+          sample = windBase + chimeSound;
           break;
         case 'binaural-alpha':
           // 10Hz binaural beat
           sample = Math.sin(t * 2 * Math.PI * 440) * 0.05;
           break;
         case 'heart-coherence':
-          // Rhythmic pulses at 60 BPM
-          sample = Math.sin(t * 2 * Math.PI * 1) * 0.1 * Math.exp(-(t % 1) * 10);
+          // Rhythmic pulses at 60 BPM with gentle harmonics
+          const heartbeat = Math.sin(t * 2 * Math.PI * 1) * 0.08 * Math.exp(-(t % 1) * 8);
+          const harmonic = Math.sin(t * 2 * Math.PI * 2) * 0.03 * Math.exp(-(t % 1) * 12);
+          sample = heartbeat + harmonic;
+          break;
+        case 'morning-birds':
+          // Cheerful bird sounds with variety
+          let birdSong = 0;
+          if (Math.random() < 0.008) {
+            const freq = 1000 + Math.random() * 2000;
+            const duration = 0.5 + Math.random() * 0.8;
+            birdSong = Math.sin(t * freq * 2 * Math.PI) * 0.06 * Math.exp(-((t * 3) % 3));
+          }
+          const ambientForest = Math.sin(t * 0.5) * 0.01 * (Math.random() * 0.2 + 0.8);
+          sample = birdSong + ambientForest;
+          break;
+        case 'water-drops':
+          // Gentle water droplets in cave-like environment
+          let dropSound = 0;
+          if (Math.random() < 0.004) {
+            const dropFreq = 400 + Math.random() * 300;
+            dropSound = Math.sin(t * dropFreq * 2 * Math.PI) * 0.1 * Math.exp(-((t * 5) % 5));
+          }
+          const caveReverb = Math.sin(t * 0.2) * 0.005;
+          sample = dropSound + caveReverb;
           break;
         default:
-          sample = Math.sin(t * 2 * Math.PI * 220) * 0.05;
+          // Default to gentle tone
+          sample = Math.sin(t * 2 * Math.PI * 220) * 0.03;
       }
       
       // Convert to 16-bit integer and write to buffer
