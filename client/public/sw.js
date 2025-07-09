@@ -1,11 +1,11 @@
-const CACHE_NAME = 'trai-pwa-v3';
+const CACHE_NAME = 'trai-pwa-v4-20250709';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
   '/static/css/main.css',
   '/manifest.webmanifest',
-  '/pwa-192x192.png',
-  '/pwa-512x512.png'
+  '/pwa-icon-small.png',
+  '/pwa-icon-large.png'
 ];
 
 // Install service worker
