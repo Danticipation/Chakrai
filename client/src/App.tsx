@@ -1071,7 +1071,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         </div>
 
         {/* Desktop: Original Layout */}
-        <div className="flex justify-center px-2 sm:px-4">
+        <div className="hidden md:flex justify-center px-2 sm:px-4">
           <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-[1152px] h-[120px] sm:h-[200px]">
             {/* Horoscope Section - Luxury Enhanced */}
             <button 
@@ -1085,14 +1085,18 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               <p className="text-xs sm:text-sm theme-text/70 mt-3 sm:mt-6 font-medium tracking-wide">Click to expand</p>
             </button>
             
-            {/* Logo Section - Luxury Center */}
+            {/* Logo Section - Luxury Center - Enhanced Centering */}
             <button 
               onClick={() => setActiveSection('logo')}
-              className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury"
+              className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury relative"
             >
-              <img src={traiLogo} alt="TrAI" className="trai-logo-large h-36 sm:h-48 w-auto mb-2 sm:mb-6 -mt-1 sm:-mt-2.5 drop-shadow-lg" />
-              <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide">TraI Mental Wellness</p>
-              <p className="text-xs sm:text-sm theme-text-secondary mt-1 sm:mt-3 font-light">Click for more info</p>
+              <div className="flex flex-col items-center justify-center h-full w-full">
+                <img src={traiLogo} alt="TrAI" className="h-20 sm:h-32 w-auto mb-2 sm:mb-4 drop-shadow-lg flex-shrink-0" />
+                <div className="text-center">
+                  <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide leading-tight">TraI Mental Wellness</p>
+                  <p className="text-xs sm:text-sm theme-text-secondary mt-1 sm:mt-2 font-light">Click for more info</p>
+                </div>
+              </div>
             </button>
             
             {/* Affirmation Section - Luxury Enhanced */}

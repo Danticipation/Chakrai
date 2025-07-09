@@ -883,23 +883,21 @@ input:focus, button:focus {
     overflow-y: auto !important;
   }
   
-  /* Fix logo and header alignment */
-  .tra-logo {
+  /* Header layout fixes */
+  .grid.grid-cols-3 > *:nth-child(2) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     text-align: center !important;
-    justify-self: center !important;
   }
   
-  /* Force larger logo size */
-  .trai-logo-large {
-    height: 8rem !important;
-    max-height: none !important;
-  }
-  
-  @media (min-width: 640px) {
-    .trai-logo-large {
-      height: 16rem !important;
-      max-height: none !important;
-    }
+  /* Ensure all header sections have equal height and alignment */
+  .grid.grid-cols-3 > * {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100% !important;
   }
   
   /* Header grid responsive sizing */
