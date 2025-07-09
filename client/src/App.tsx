@@ -1093,9 +1093,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
           {/* Top Row: Logo and Status */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-3">
-              <img src={traiLogo} alt="TraI" className="h-10 w-auto" />
+              <img src={chakraiLogo} alt="Chakrai" className="h-10 w-auto" />
               <div>
-                <p className="text-white font-bold text-lg">TraI</p>
+                <p className="text-white font-bold text-lg">Chakrai</p>
                 <p className="text-white/70 text-xs">Mental Wellness</p>
               </div>
             </div>
