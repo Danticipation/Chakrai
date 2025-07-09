@@ -268,10 +268,9 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
   // Floating chat box when open
   return (
     <div 
-      className="fixed bottom-6 right-6 w-96 h-[500px] backdrop-blur-xl border rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden"
+      className="fixed bottom-6 right-6 w-96 h-[500px] backdrop-blur-xl border-2 border-silver rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden"
       style={{
-        background: `linear-gradient(135deg, var(--theme-background), var(--theme-surface))`,
-        borderColor: `var(--theme-accent)`
+        background: `linear-gradient(135deg, var(--theme-background), var(--theme-surface))`
       }}
     >
       {/* Header */}
@@ -404,14 +403,13 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
           {/* Microphone button */}
           <button
             onClick={isRecording ? stopRecording : startRecording}
-            className={`p-2 rounded-xl transition-colors theme-text ${
+            className={`p-2 rounded-xl transition-colors theme-text border-2 border-silver ${
               isRecording ? 'animate-pulse' : ''
             }`}
             style={{
               backgroundColor: isRecording 
                 ? '#ef4444'
-                : `var(--theme-primary)`,
-              border: `1px solid var(--theme-accent)`
+                : `var(--theme-primary)`
             }}
             disabled={isLoading}
           >
@@ -421,10 +419,9 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
           {/* Send button */}
           <button
             onClick={() => sendMessage(inputMessage)}
-            className="p-2 rounded-xl transition-colors disabled:opacity-50 theme-text"
+            className="p-2 rounded-xl transition-colors disabled:opacity-50 theme-text border-2 border-silver"
             style={{
-              backgroundColor: `var(--theme-primary)`,
-              border: `1px solid var(--theme-accent)`
+              backgroundColor: `var(--theme-primary)`
             }}
             disabled={isLoading || !inputMessage.trim()}
           >

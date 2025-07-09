@@ -1102,7 +1102,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 setActiveSection('horoscope');
                 updateUserActivity('horoscope_access');
               }}
-              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 flex flex-col cursor-pointer text-luxury"
+              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 flex flex-col cursor-pointer text-luxury border-2 border-silver"
             >
               <h3 className="text-sm font-bold theme-text mb-2 underline font-serif">Horoscope</h3>
               <p className="text-xs theme-text text-left leading-relaxed flex-1 font-light line-clamp-2">
@@ -1117,7 +1117,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 setActiveSection('affirmation');
                 updateUserActivity('affirmation_access');
               }}
-              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 flex flex-col cursor-pointer text-luxury overflow-hidden"
+              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 flex flex-col cursor-pointer text-luxury overflow-hidden border-2 border-silver"
             >
               <h3 className="text-sm font-bold theme-text mb-2 underline font-serif">Affirmation</h3>
               <div className="flex-1 overflow-hidden">
@@ -1144,7 +1144,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                       setActiveSection('horoscope');
                       updateUserActivity('horoscope_access');
                     }}
-                    className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury"
+                    className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury border-2 border-silver"
                   >
                     <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Horoscope</h3>
                     <p className="text-sm sm:text-base theme-text text-left leading-relaxed flex-1 font-light">
@@ -1156,7 +1156,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                   {/* Logo Section - Luxury Center - Enhanced Centering */}
                   <button 
                     onClick={() => setActiveSection('logo')}
-                    className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury relative"
+                    className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-silver hover:border-silver-light transition-all cursor-pointer text-luxury relative"
                   >
                     <div className="flex flex-col items-center justify-center h-full w-full">
                       <img src={traiLogo} alt="TraI" className="h-20 sm:h-32 w-auto mb-2 sm:mb-4 drop-shadow-lg flex-shrink-0" />
@@ -1173,7 +1173,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                       setActiveSection('affirmation');
                       updateUserActivity('affirmation_access');
                     }}
-                    className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury overflow-hidden"
+                    className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury overflow-hidden border-2 border-silver"
                   >
                     <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Affirmation</h3>
                     <div className="flex-1 overflow-hidden">
@@ -1379,7 +1379,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               <div className="max-w-6xl mx-auto space-y-8 relative z-10">
                 
                 {/* Hero Welcome Section - Luxury Enhanced */}
-                <div className="theme-card border-luxury glass-luxury gradient-luxury shadow-deep p-10 text-center hover-lift text-luxury">
+                <div className="theme-card border-luxury glass-luxury gradient-luxury shadow-deep p-10 text-center hover-lift text-luxury border-2 border-silver">
                   <div className="relative mb-8">
                     <img 
                       src={traiLogo} 
@@ -1396,7 +1396,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                   {/* Enhanced Chat Button with Pulse Animation */}
                   <button
                     onClick={() => setIsFloatingChatOpen(true)}
-                    className="relative mt-4 px-10 py-4 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 text-white rounded-2xl font-bold text-lg hover:from-purple-700 hover:via-blue-700 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 animate-pulse"
+                    className="relative mt-4 px-10 py-4 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 text-white rounded-2xl font-bold text-lg hover:from-purple-700 hover:via-blue-700 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 animate-pulse border-2 border-silver"
                   >
                     <span className="relative z-10">💬 Start Conversation with TraI</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-400 rounded-2xl blur opacity-30 animate-pulse"></div>
@@ -1423,7 +1423,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div 
                     onClick={() => setActiveSection('daily')}
-                    className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group"
+                    className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group border-2 border-silver"
                   >
                     <div className="text-5xl mb-4 group-hover:animate-bounce">🧠</div>
                     <h3 className="text-2xl font-semibold theme-text mb-3 font-serif">Mind & Mood</h3>
@@ -1441,7 +1441,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                       setActiveSection('journal');
                       updateUserActivity('journal_access');
                     }}
-                    className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group"
+                    className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group border-2 border-silver"
                   >
                     <div className="text-5xl mb-4 group-hover:animate-pulse">📝</div>
                     <h3 className="text-2xl font-semibold theme-text mb-3 font-serif">Journal</h3>
@@ -1456,7 +1456,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
                   <div 
                     onClick={() => setActiveSection('analytics')}
-                    className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group"
+                    className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group border-2 border-silver"
                   >
                     <div className="text-5xl mb-4 group-hover:animate-spin">📊</div>
                     <h3 className="text-2xl font-semibold theme-text mb-3 font-serif">Analytics</h3>
@@ -1472,7 +1472,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
                 {/* Real Streak Statistics Section */}
                 {streakStats && (
-                  <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg">
+                  <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border-2 border-silver shadow-lg">
                     <h2 className="text-2xl font-bold theme-text mb-6 text-center">🔥 Your Wellness Streaks</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="text-center">
@@ -1498,7 +1498,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div 
                     onClick={() => setActiveSection('affirmation')}
-                    className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg cursor-pointer transform hover:scale-105 transition-all duration-300 group"
+                    className="theme-card backdrop-blur-sm rounded-xl p-6 border-2 border-silver shadow-lg cursor-pointer transform hover:scale-105 transition-all duration-300 group"
                   >
                     <h3 className="text-xl font-semibold theme-text mb-3 flex items-center">
                       <Star className="mr-2 group-hover:animate-spin" size={20} />
@@ -1514,7 +1514,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
                   <div 
                     onClick={() => setActiveSection('horoscope')}
-                    className="theme-card backdrop-blur-sm rounded-xl p-6 border border-[var(--theme-accent)]/30 shadow-lg cursor-pointer transform hover:scale-105 transition-all duration-300 group"
+                    className="theme-card backdrop-blur-sm rounded-xl p-6 border-2 border-silver shadow-lg cursor-pointer transform hover:scale-105 transition-all duration-300 group"
                   >
                     <h3 className="text-xl font-semibold theme-text mb-3 flex items-center">
                       <Sun className="mr-2 group-hover:animate-pulse" size={20} />
@@ -1605,7 +1605,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
           {/* Enhanced Progress Tracking with Rounded Cards and Gradients */}
           <div className="space-y-6">
             {/* Daily Journaling Progress */}
-            <div className="bg-gradient-to-br from-green-500/20 to-emerald-600/30 backdrop-blur-sm border border-green-400/30 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="bg-gradient-to-br from-green-500/20 to-emerald-600/30 backdrop-blur-sm border-2 border-silver rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <div className="theme-text text-lg font-bold mb-4 flex items-center gap-2">
                 📝 Daily Journaling
               </div>
@@ -1620,7 +1620,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
 
             {/* Weekly Chat Sessions */}
-            <div className="bg-gradient-to-br from-blue-500/20 to-cyan-600/30 backdrop-blur-sm border border-blue-400/30 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="bg-gradient-to-br from-blue-500/20 to-cyan-600/30 backdrop-blur-sm border-2 border-silver rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <div className="theme-text text-lg font-bold mb-4 flex items-center gap-2">
                 💬 Chat Activity
               </div>
@@ -1635,7 +1635,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
 
             {/* Total Active Days */}
-            <div className="bg-gradient-to-br from-purple-500/20 to-violet-600/30 backdrop-blur-sm border border-purple-400/30 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="bg-gradient-to-br from-purple-500/20 to-violet-600/30 backdrop-blur-sm border-2 border-silver rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <div className="theme-text text-lg font-bold mb-4 flex items-center gap-2">
                 📊 Total Active Days
               </div>
@@ -1650,7 +1650,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
 
             {/* Wellness Journey */}
-            <div className="bg-gradient-to-br from-amber-500/20 to-orange-600/30 backdrop-blur-sm border border-amber-400/30 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center">
+            <div className="bg-gradient-to-br from-amber-500/20 to-orange-600/30 backdrop-blur-sm border-2 border-silver rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center">
               <div className="theme-text text-lg font-bold mb-4 flex items-center justify-center gap-2">
                 🌟 Wellness Journey
               </div>
@@ -1663,7 +1663,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
 
             {/* Reset Data Button */}
-            <div className="bg-gradient-to-br from-red-500/20 to-red-600/30 backdrop-blur-sm border border-red-400/30 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 text-center">
+            <div className="bg-gradient-to-br from-red-500/20 to-red-600/30 backdrop-blur-sm border-2 border-silver rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 text-center">
               <button 
                 onClick={clearAllUserData}
                 className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 px-4 rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"

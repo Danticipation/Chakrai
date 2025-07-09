@@ -76,7 +76,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4">
-      <div className="theme-surface rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] md:max-h-[90vh] overflow-hidden">
+      <div className="theme-surface rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] md:max-h-[90vh] overflow-hidden border-2 border-silver">
         {/* Header */}
         <div className="theme-primary p-4 md:p-6 border-b border-[var(--theme-accent)]/30">
           <div className="flex items-center justify-between">
@@ -148,7 +148,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                       </p>
                       <button
                         onClick={onReset}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 md:px-6 py-2 rounded-lg transition-colors flex items-center space-x-2 text-sm md:text-base"
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 md:px-6 py-2 rounded-lg transition-colors flex items-center space-x-2 text-sm md:text-base border-2 border-silver"
                       >
                         <RefreshCw className="w-4 h-4" />
                         <span>Reset All Data</span>
@@ -247,8 +247,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                             onClick={() => onVoiceChange(voice.id)}
                             className={`p-3 md:p-4 rounded-lg border-2 transition-all ${
                               selectedVoice === voice.id
-                                ? 'border-[var(--theme-accent)] bg-[var(--theme-accent)]/10'
-                                : 'border-[var(--theme-accent)]/30 hover:border-[var(--theme-accent)]/50'
+                                ? 'border-silver-light bg-[var(--theme-accent)]/10'
+                                : 'border-silver hover:border-silver-light'
                             }`}
                           >
                             <div className="text-left">
@@ -278,8 +278,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                             onClick={() => onThemeChange(theme.id)}
                             className={`p-3 md:p-4 rounded-lg border-2 transition-all ${
                               currentTheme === theme.id
-                                ? 'border-[var(--theme-accent)] bg-[var(--theme-accent)]/10 ring-2 ring-[var(--theme-accent)]/30'
-                                : 'border-[var(--theme-accent)]/30 hover:border-[var(--theme-accent)]/50 hover:bg-[var(--theme-surface)]/20'
+                                ? 'border-silver-light bg-[var(--theme-accent)]/10 ring-2 ring-silver/30'
+                                : 'border-silver hover:border-silver-light hover:bg-[var(--theme-surface)]/20'
                             }`}
                           >
                             <div className="text-left">

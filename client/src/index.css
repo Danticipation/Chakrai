@@ -41,9 +41,10 @@ h1, h2, h3, h4, h5, h6 {
   --progress-middle: #eab308;
   --progress-end: #22c55e;
   
-  /* Silver shimmering border */
+  /* Silver shimmering border - "Everything has a silver lining" */
   --silver: #c0c0c0;
   --silver-light: #e5e5e5;
+  --silver-dark: #a8a8a8;
   
   /* Luxury enhancements */
   --glass-blur: blur(20px);
@@ -83,6 +84,11 @@ h1, h2, h3, h4, h5, h6 {
 /* Luxury borders */
 .border-luxury { border-radius: var(--border-radius-luxury); }
 .border-soft { border-radius: var(--border-radius-soft); }
+
+/* Silver border classes - "Everything has a silver lining" */
+.border-silver { border-color: var(--silver) !important; }
+.border-silver-light { border-color: var(--silver-light) !important; }
+.border-silver-dark { border-color: var(--silver-dark) !important; }
 
 /* Enhanced animations */
 .hover-lift {
