@@ -1299,7 +1299,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     <img 
                       src={traiLogo} 
                       alt="TrAI" 
-                      className="h-28 w-auto mx-auto transform hover:scale-110 transition-transform duration-300 drop-shadow-xl" 
+                      className="h-48 sm:h-56 w-auto mx-auto transform hover:scale-110 transition-transform duration-300 drop-shadow-xl" 
                     />
                     <div className="absolute -top-1 -right-1 w-4 h-4 theme-accent rounded-full animate-ping"></div>
                   </div>
