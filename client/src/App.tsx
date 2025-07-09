@@ -1249,6 +1249,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
         {/* Desktop Left Sidebar Navigation */}
         <div className="hidden lg:flex w-72 flex-col justify-center py-8">
+          {/* Sidebar Logo */}
+          <div className="flex items-center justify-center mb-8 px-6">
+            <img src={traiLogo} alt="TraI" className="h-16 w-auto" />
+          </div>
           {/* User Features Section */}
           <div className="mb-4">
             <div className="theme-text-secondary text-sm font-medium px-6 pb-2">Wellness Features</div>
