@@ -306,6 +306,30 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     }
   };
 
+  // Activity tracking function to update goal progress
+  const updateUserActivity = async (activityType: string) => {
+    try {
+      const userId = getCurrentUserId();
+      if (userId) {
+        await fetch('/api/users/activity', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: userId,
+            activityType: activityType,
+            timestamp: new Date().toISOString()
+          })
+        });
+        // Refresh streak stats after activity
+        fetchStreakStats();
+      }
+    } catch (error) {
+      console.error('Failed to update user activity:', error);
+    }
+  };
+
   const recordAppVisit = async () => {
     try {
       if (currentUserId) {
@@ -417,6 +441,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         };
 
         setMessages(prev => [...prev, botMessage]);
+
+        // Update chat activity tracking
+        updateUserActivity('chat_session');
 
         // Track emotional tone analytics
         try {
@@ -1071,7 +1098,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
           <div className="grid grid-cols-2 gap-2 mt-3">
             {/* Horoscope Section */}
             <button 
-              onClick={() => setActiveSection('horoscope')}
+              onClick={() => {
+                setActiveSection('horoscope');
+                updateUserActivity('horoscope_access');
+              }}
               className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 flex flex-col cursor-pointer text-luxury"
             >
               <h3 className="text-sm font-bold theme-text mb-2 underline font-serif">Horoscope</h3>
@@ -1083,7 +1113,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             
             {/* Affirmation Section */}
             <button 
-              onClick={() => setActiveSection('affirmation')}
+              onClick={() => {
+                setActiveSection('affirmation');
+                updateUserActivity('affirmation_access');
+              }}
               className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 flex flex-col cursor-pointer text-luxury overflow-hidden"
             >
               <h3 className="text-sm font-bold theme-text mb-2 underline font-serif">Affirmation</h3>
@@ -1107,7 +1140,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 <div className="grid grid-cols-3 gap-4 h-[120px] sm:h-[200px]">
                   {/* Horoscope Section - Luxury Enhanced */}
                   <button 
-                    onClick={() => setActiveSection('horoscope')}
+                    onClick={() => {
+                      setActiveSection('horoscope');
+                      updateUserActivity('horoscope_access');
+                    }}
                     className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury"
                   >
                     <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Horoscope</h3>
@@ -1133,7 +1169,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                   
                   {/* Affirmation Section - Luxury Enhanced */}
                   <button 
-                    onClick={() => setActiveSection('affirmation')}
+                    onClick={() => {
+                      setActiveSection('affirmation');
+                      updateUserActivity('affirmation_access');
+                    }}
                     className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury overflow-hidden"
                   >
                     <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Affirmation</h3>
@@ -1194,6 +1233,12 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     } else if (tab.id === 'settings') {
                       setShowSettings(true);
                     } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans', 'questions', 'feedback'].includes(tab.id)) {
+                      // Track activity for specific sections
+                      if (tab.id === 'journal') {
+                        updateUserActivity('journal_access');
+                      } else if (tab.id === 'daily') {
+                        updateUserActivity('reflection_access');
+                      }
                       setContentLoading(true);
                       setMobileModalContent(tab.id);
                       setShowMobileModal(true);
@@ -1392,7 +1437,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                   </div>
 
                   <div 
-                    onClick={() => setActiveSection('journal')}
+                    onClick={() => {
+                      setActiveSection('journal');
+                      updateUserActivity('journal_access');
+                    }}
                     className="theme-card border-luxury glass-luxury gradient-soft shadow-luxury p-8 text-center cursor-pointer hover-lift text-luxury group"
                   >
                     <div className="text-5xl mb-4 group-hover:animate-pulse">📝</div>
@@ -1550,43 +1598,63 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
           )}
         </div>
 
-        {/* Right Stats Sidebar - Mobile Responsive */}
+        {/* Right Stats Sidebar - Enhanced with Rounded Cards and Gradients */}
         <div className="hidden lg:block w-96 py-8 px-8">
           <div className="text-white text-2xl font-bold mb-8 text-center underline">Goal Tracking</div>
           
-          {/* Real Progress Tracking */}
+          {/* Enhanced Progress Tracking with Rounded Cards and Gradients */}
           <div className="space-y-6">
             {/* Daily Journaling Progress */}
-            <div className="theme-card rounded-lg p-3">
-              <div className="theme-text text-lg font-bold mb-3">Daily Journaling</div>
-              <div className="theme-background rounded-full h-4 mb-3">
-                <div className="progress-high h-4 rounded-full" style={{width: streakStats ? `${Math.min(100, (streakStats.consecutiveDaysJournaling / 30) * 100)}%` : '0%'}}></div>
+            <div className="bg-gradient-to-br from-green-500/20 to-emerald-600/30 backdrop-blur-sm border border-green-400/30 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="theme-text text-lg font-bold mb-4 flex items-center gap-2">
+                📝 Daily Journaling
               </div>
-              <div className="theme-text text-base">{streakStats ? `${streakStats.consecutiveDaysJournaling} day streak` : 'No data yet'}</div>
+              <div className="bg-black/20 rounded-full h-6 mb-4 overflow-hidden">
+                <div 
+                  className="h-6 rounded-full bg-gradient-to-r from-green-400 via-green-500 to-emerald-600 shadow-lg transition-all duration-500 ease-out"
+                  style={{width: streakStats ? `${Math.min(100, (streakStats.consecutiveDaysJournaling / 30) * 100)}%` : '0%'}}
+                ></div>
+              </div>
+              <div className="theme-text text-base font-medium">{streakStats ? `${streakStats.consecutiveDaysJournaling} day streak` : '0 day streak'}</div>
+              <div className="theme-text-secondary text-sm mt-1">Target: 30 days</div>
             </div>
 
             {/* Weekly Chat Sessions */}
-            <div className="theme-card rounded-lg p-3">
-              <div className="theme-text text-lg font-bold mb-3">Chat Activity</div>
-              <div className="theme-background rounded-full h-4 mb-3">
-                <div className="progress-medium h-4 rounded-full" style={{width: streakStats ? `${Math.min(100, (streakStats.consecutiveDaysActive / 7) * 100)}%` : '0%'}}></div>
+            <div className="bg-gradient-to-br from-blue-500/20 to-cyan-600/30 backdrop-blur-sm border border-blue-400/30 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="theme-text text-lg font-bold mb-4 flex items-center gap-2">
+                💬 Chat Activity
               </div>
-              <div className="theme-text text-base">{streakStats ? `${streakStats.consecutiveDaysActive} active days` : 'No activity yet'}</div>
+              <div className="bg-black/20 rounded-full h-6 mb-4 overflow-hidden">
+                <div 
+                  className="h-6 rounded-full bg-gradient-to-r from-blue-400 via-blue-500 to-cyan-600 shadow-lg transition-all duration-500 ease-out"
+                  style={{width: streakStats ? `${Math.min(100, (streakStats.consecutiveDaysActive / 7) * 100)}%` : '0%'}}
+                ></div>
+              </div>
+              <div className="theme-text text-base font-medium">{streakStats ? `${streakStats.consecutiveDaysActive} active days` : '0 active days'}</div>
+              <div className="theme-text-secondary text-sm mt-1">Target: 7 days</div>
             </div>
 
             {/* Total Active Days */}
-            <div className="theme-card rounded-lg p-3">
-              <div className="theme-text text-lg font-bold mb-3">Total Active Days</div>
-              <div className="theme-background rounded-full h-4 mb-3">
-                <div className="progress-high h-4 rounded-full" style={{width: streakStats ? `${Math.min(100, (streakStats.totalActiveDays / 30) * 100)}%` : '0%'}}></div>
+            <div className="bg-gradient-to-br from-purple-500/20 to-violet-600/30 backdrop-blur-sm border border-purple-400/30 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="theme-text text-lg font-bold mb-4 flex items-center gap-2">
+                📊 Total Active Days
               </div>
-              <div className="theme-text text-base">{streakStats ? `${streakStats.totalActiveDays} days total` : 'No activity yet'}</div>
+              <div className="bg-black/20 rounded-full h-6 mb-4 overflow-hidden">
+                <div 
+                  className="h-6 rounded-full bg-gradient-to-r from-purple-400 via-purple-500 to-violet-600 shadow-lg transition-all duration-500 ease-out"
+                  style={{width: streakStats ? `${Math.min(100, (streakStats.totalActiveDays / 30) * 100)}%` : '0%'}}
+                ></div>
+              </div>
+              <div className="theme-text text-base font-medium">{streakStats ? `${streakStats.totalActiveDays} days total` : '0 days total'}</div>
+              <div className="theme-text-secondary text-sm mt-1">Target: 30 days</div>
             </div>
 
             {/* Wellness Journey */}
-            <div className="theme-card rounded-lg p-3 text-center">
-              <div className="theme-text text-lg font-bold mb-3">Wellness Journey</div>
-              <div className="theme-text text-2xl font-bold mb-2">
+            <div className="bg-gradient-to-br from-amber-500/20 to-orange-600/30 backdrop-blur-sm border border-amber-400/30 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-center">
+              <div className="theme-text text-lg font-bold mb-4 flex items-center justify-center gap-2">
+                🌟 Wellness Journey
+              </div>
+              <div className="theme-text text-3xl font-bold mb-3 bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">
                 {streakStats && streakStats.totalActiveDays > 0 ? `Day ${streakStats.totalActiveDays}` : 'Day 1'}
               </div>
               <div className="theme-text-secondary text-sm">
@@ -1595,10 +1663,10 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
 
             {/* Reset Data Button */}
-            <div className="theme-card rounded-lg p-2 text-center">
+            <div className="bg-gradient-to-br from-red-500/20 to-red-600/30 backdrop-blur-sm border border-red-400/30 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 text-center">
               <button 
                 onClick={clearAllUserData}
-                className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg transition-colors font-medium"
+                className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 px-4 rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
                 title="Clear all data for fresh start"
               >
                 🔄 Reset All Data

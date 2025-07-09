@@ -154,8 +154,20 @@ export default function JournalEditor({ entry, onSave, onCancel, userId }: Journ
         return response.data;
       }
     },
-    onSuccess: (savedEntry) => {
+    onSuccess: async (savedEntry) => {
       console.log("Journal entry saved successfully");
+      
+      // Track journal activity for goal tracking
+      try {
+        await axios.post('/api/users/activity', {
+          userId: userId,
+          activityType: 'journal_entry',
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error('Failed to track journal activity:', error);
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['/api/journal'] });
       onSave?.(savedEntry);
     },
