@@ -224,7 +224,7 @@ export default function PWAManager({ onNotificationPermissionChange }: PWAManage
     // Show update available notification
     if (swRegistration?.waiting) {
       const updateConfirm = confirm(
-        'A new version of TraI is available. Update now for the latest features and improvements?'
+        'A new version of Chakrai is available. Update now for the latest features and improvements?'
       );
       
       if (updateConfirm) {

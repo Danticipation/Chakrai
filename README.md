@@ -1,6 +1,6 @@
-# TraI - Mental Wellness & Therapy Application
+# Chakrai - Mental Wellness & Therapy Application
 
-TraI is a comprehensive AI-powered mental wellness companion featuring subscription-based monetization, advanced therapeutic support, and privacy-first architecture for both anonymous and registered users.
+Chakrai is a comprehensive AI-powered mental wellness companion featuring subscription-based monetization, advanced therapeutic support, and privacy-first architecture for both anonymous and registered users.
 
 ## Features Overview
 
@@ -94,7 +94,7 @@ Visit `http://localhost:5000` to access TraI Mental Wellness Companion.
 
 ## Privacy & Compliance
 
-TraI implements zero-knowledge architecture with complete user data isolation. Anonymous users can access all features through device fingerprinting, with seamless migration to registered accounts. Full GDPR/HIPAA compliance with enterprise-grade security measures.
+Chakrai implements zero-knowledge architecture with complete user data isolation. Anonymous users can access all features through device fingerprinting, with seamless migration to registered accounts. Full GDPR/HIPAA compliance with enterprise-grade security measures.
 
 ## Support & Professional Integration
 

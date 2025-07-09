@@ -1,7 +1,7 @@
 {
-  "id": "trai-pixel-app-2025",
-  "name": "TrAI Pure Black",
-  "short_name": "TrAI",
+  "id": "chakrai-pixel-app-2025",
+  "name": "Chakrai Pure Black",
+  "short_name": "Chakrai",
   "description": "Mental wellness companion",
   "start_url": "/?source=pwa",
   "display": "standalone",

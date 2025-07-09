@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TraI - Offline</title>
+    <title>Chakrai - Offline</title>
     <style>
         * {
             margin: 0;
@@ -135,7 +135,7 @@
 </head>
 <body>
     <div class="offline-container">
-        <div class="logo">TraI</div>
+        <div class="logo">Chakrai</div>
         <div class="offline-icon">📱</div>
         
         <h1>You're Offline</h1>
@@ -169,7 +169,7 @@
         </button>
         
         <div class="footer">
-            TraI - Your Mental Wellness Companion<br>
+            Chakrai - Your Mental Wellness Companion<br>
             Available offline for your convenience
         </div>
     </div>
@@ -211,7 +211,7 @@
                 if (response.ok) {
                     statusElement.className = 'connection-status status-online';
                     statusElement.innerHTML = '<span>🟢</span> Connection restored!';
-                    retryButton.textContent = 'Return to TraI';
+                    retryButton.textContent = 'Return to Chakrai';
                     retryButton.onclick = () => window.location.href = '/';
                     retryButton.disabled = false;
                 } else {

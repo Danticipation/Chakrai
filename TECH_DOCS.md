@@ -1,8 +1,8 @@
-# TraI - Technical Documentation
+# Chakrai - Technical Documentation
 
 ## Architecture Overview
 
-TraI is a comprehensive mental wellness platform built with modern web technologies, featuring subscription-based monetization, AI-powered therapeutic support, and privacy-first architecture supporting both anonymous and registered users.
+Chakrai is a comprehensive mental wellness platform built with modern web technologies, featuring subscription-based monetization, AI-powered therapeutic support, and privacy-first architecture supporting both anonymous and registered users.
 
 ### Technology Stack
 

@@ -48,7 +48,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const traiLogo = './TrAI-Logo.png';
+const chakraiLogo = './TrAI-Logo.png';
 
 interface BotStats {
   level: number;
@@ -985,8 +985,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             <div className="max-w-2x1 mx-auto">
               <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg text-center">
                 <div className="mb-8">
-                  <img src={traiLogo} alt="TraI" className="h-36 w-auto mx-auto mb-6" />
-                  <h1 className="text-4xl font-bold text-white mb-4">TraI Mental Wellness</h1>
+                  <img src={chakraiLogo} alt="Chakrai" className="h-36 w-auto mx-auto mb-6" />
+                  <h1 className="text-4xl font-bold text-white mb-4">Chakrai Mental Wellness</h1>
                   <p className="text-xl text-white/90 mb-6">AI Wellness Companion</p>
                 </div>
 
@@ -1164,9 +1164,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-silver hover:border-silver-light transition-all cursor-pointer text-luxury relative"
                   >
                     <div className="flex flex-col items-center justify-center h-full w-full">
-                      <img src={traiLogo} alt="TraI" className="h-20 sm:h-32 w-auto mb-2 sm:mb-4 drop-shadow-lg flex-shrink-0" />
+                      <img src={chakraiLogo} alt="Chakrai" className="h-20 sm:h-32 w-auto mb-2 sm:mb-4 drop-shadow-lg flex-shrink-0" />
                       <div className="text-center">
-                        <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide leading-tight">TraI Mental Wellness</p>
+                        <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide leading-tight">Chakrai Mental Wellness</p>
                         <p className="text-xs sm:text-sm theme-text-secondary mt-1 sm:mt-2 font-light">Click for more info</p>
                       </div>
                     </div>
@@ -1403,7 +1403,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     onClick={() => setIsFloatingChatOpen(true)}
                     className="relative mt-4 px-10 py-4 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 text-white rounded-2xl font-bold text-lg hover:from-purple-700 hover:via-blue-700 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 animate-pulse border-2 border-silver"
                   >
-                    <span className="relative z-10">💬 Start Conversation with TraI</span>
+                    <span className="relative z-10">💬 Start Conversation with Chakrai</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-400 rounded-2xl blur opacity-30 animate-pulse"></div>
                   </button>
                   
