@@ -1901,17 +1901,19 @@ router.get('/ambient-audio/:soundId', async (req, res) => {
       const t = i / sampleRate;
       
       switch (soundId) {
-        case 'white-noise':
+        case 'white-noise': {
           sample = (Math.random() - 0.5) * 0.1;
           break;
-        case 'rain-forest':
+        }
+        case 'rain-forest': {
           // Layered rain effect with varying droplet intensities
           const rainBase = (Math.random() - 0.5) * 0.06;
           const droplets = Math.random() < 0.3 ? (Math.random() - 0.5) * 0.15 : 0;
           const windRustle = Math.sin(t * 0.7) * 0.02 * (Math.random() * 0.5 + 0.5);
           sample = rainBase + droplets + windRustle;
           break;
-        case 'ocean-waves':
+        }
+        case 'ocean-waves': {
           // Realistic ocean waves with foam and depth
           const wave1 = Math.sin(t * 0.3) * 0.08;
           const wave2 = Math.sin(t * 0.7) * 0.04;
@@ -1919,7 +1921,8 @@ router.get('/ambient-audio/:soundId', async (req, res) => {
           const deepRumble = Math.sin(t * 0.1) * 0.02;
           sample = wave1 + wave2 + foam + deepRumble;
           break;
-        case 'wind-chimes':
+        }
+        case 'wind-chimes': {
           // Gentle wind chimes with soft breeze
           const windBase = Math.sin(t * 2) * 0.01 * (Math.random() * 0.3 + 0.7);
           let chimeSound = 0;
@@ -1929,28 +1932,31 @@ router.get('/ambient-audio/:soundId', async (req, res) => {
           }
           sample = windBase + chimeSound;
           break;
-        case 'binaural-alpha':
+        }
+        case 'binaural-alpha': {
           // 10Hz binaural beat
           sample = Math.sin(t * 2 * Math.PI * 440) * 0.05;
           break;
-        case 'heart-coherence':
+        }
+        case 'heart-coherence': {
           // Rhythmic pulses at 60 BPM with gentle harmonics
           const heartbeat = Math.sin(t * 2 * Math.PI * 1) * 0.08 * Math.exp(-(t % 1) * 8);
           const harmonic = Math.sin(t * 2 * Math.PI * 2) * 0.03 * Math.exp(-(t % 1) * 12);
           sample = heartbeat + harmonic;
           break;
-        case 'morning-birds':
+        }
+        case 'morning-birds': {
           // Cheerful bird sounds with variety
           let birdSong = 0;
           if (Math.random() < 0.008) {
             const freq = 1000 + Math.random() * 2000;
-            const duration = 0.5 + Math.random() * 0.8;
             birdSong = Math.sin(t * freq * 2 * Math.PI) * 0.06 * Math.exp(-((t * 3) % 3));
           }
           const ambientForest = Math.sin(t * 0.5) * 0.01 * (Math.random() * 0.2 + 0.8);
           sample = birdSong + ambientForest;
           break;
-        case 'water-drops':
+        }
+        case 'water-drops': {
           // Gentle water droplets in cave-like environment
           let dropSound = 0;
           if (Math.random() < 0.004) {
@@ -1960,9 +1966,12 @@ router.get('/ambient-audio/:soundId', async (req, res) => {
           const caveReverb = Math.sin(t * 0.2) * 0.005;
           sample = dropSound + caveReverb;
           break;
-        default:
+        }
+        default: {
           // Default to gentle tone
           sample = Math.sin(t * 2 * Math.PI * 220) * 0.03;
+          break;
+        }
       }
       
       // Convert to 16-bit integer and write to buffer
