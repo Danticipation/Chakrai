@@ -1072,7 +1072,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
         {/* Desktop: Original Layout */}
         <div className="hidden md:flex justify-center items-center w-full">
-          <div className="grid grid-cols-3 gap-4 w-[80%] max-w-5xl h-[120px] sm:h-[200px]">
+          <div className="grid grid-cols-3 gap-4 max-w-6xl mx-auto h-[120px] sm:h-[200px]" style={{ width: 'calc(100% - 576px)' }}>
             {/* Horoscope Section - Luxury Enhanced */}
             <button 
               onClick={() => setActiveSection('horoscope')}

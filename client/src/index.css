@@ -883,11 +883,9 @@ input:focus, button:focus {
     overflow-y: auto !important;
   }
   
-  /* Header centering fixes */
+  /* Header alignment with main content */
   .grid.grid-cols-3 {
     margin: 0 auto !important;
-    display: grid !important;
-    place-items: center !important;
   }
   
   /* Header grid responsive sizing */
