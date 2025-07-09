@@ -1071,47 +1071,55 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         </div>
 
         {/* Desktop: Original Layout */}
-        <div className="hidden md:flex justify-center items-center w-full">
-          <div className="grid grid-cols-3 gap-4 max-w-6xl mx-auto h-[120px] sm:h-[200px]" style={{ width: 'calc(100% - 576px)' }}>
-            {/* Horoscope Section - Luxury Enhanced */}
-            <button 
-              onClick={() => setActiveSection('horoscope')}
-              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury"
-            >
-              <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Horoscope</h3>
-              <p className="text-sm sm:text-base theme-text text-left leading-relaxed flex-1 font-light">
-                {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
-              </p>
-              <p className="text-xs sm:text-sm theme-text/70 mt-3 sm:mt-6 font-medium tracking-wide">Click to expand</p>
-            </button>
-            
-            {/* Logo Section - Luxury Center - Enhanced Centering */}
-            <button 
-              onClick={() => setActiveSection('logo')}
-              className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury relative"
-            >
-              <div className="flex flex-col items-center justify-center h-full w-full">
-                <img src={traiLogo} alt="TrAI" className="h-20 sm:h-32 w-auto mb-2 sm:mb-4 drop-shadow-lg flex-shrink-0" />
-                <div className="text-center">
-                  <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide leading-tight">TraI Mental Wellness</p>
-                  <p className="text-xs sm:text-sm theme-text-secondary mt-1 sm:mt-2 font-light">Click for more info</p>
+        <div className="hidden lg:block">
+          <div className="flex">
+            <div className="w-72"></div>
+            <div className="flex-1">
+              <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-3 gap-4 h-[120px] sm:h-[200px]">
+                  {/* Horoscope Section - Luxury Enhanced */}
+                  <button 
+                    onClick={() => setActiveSection('horoscope')}
+                    className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury"
+                  >
+                    <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Horoscope</h3>
+                    <p className="text-sm sm:text-base theme-text text-left leading-relaxed flex-1 font-light">
+                      {horoscopeText ? horoscopeText.substring(0, 200) + '...' : "Today brings opportunities for reflection and personal development. The cosmic energies align to support your mental wellness journey..."}
+                    </p>
+                    <p className="text-xs sm:text-sm theme-text/70 mt-3 sm:mt-6 font-medium tracking-wide">Click to expand</p>
+                  </button>
+                  
+                  {/* Logo Section - Luxury Center - Enhanced Centering */}
+                  <button 
+                    onClick={() => setActiveSection('logo')}
+                    className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury relative"
+                  >
+                    <div className="flex flex-col items-center justify-center h-full w-full">
+                      <img src={traiLogo} alt="TrAI" className="h-20 sm:h-32 w-auto mb-2 sm:mb-4 drop-shadow-lg flex-shrink-0" />
+                      <div className="text-center">
+                        <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide leading-tight">TraI Mental Wellness</p>
+                        <p className="text-xs sm:text-sm theme-text-secondary mt-1 sm:mt-2 font-light">Click for more info</p>
+                      </div>
+                    </div>
+                  </button>
+                  
+                  {/* Affirmation Section - Luxury Enhanced */}
+                  <button 
+                    onClick={() => setActiveSection('affirmation')}
+                    className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury overflow-hidden"
+                  >
+                    <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Affirmation</h3>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="text-sm sm:text-base theme-text text-left leading-relaxed font-light line-clamp-4 overflow-hidden">
+                        {dailyAffirmation.length > 120 ? dailyAffirmation.substring(0, 120) + '...' : dailyAffirmation}
+                      </p>
+                    </div>
+                    <p className="text-xs sm:text-sm theme-text/70 mt-3 sm:mt-6 font-medium tracking-wide">Click to hear</p>
+                  </button>
                 </div>
               </div>
-            </button>
-            
-            {/* Affirmation Section - Luxury Enhanced */}
-            <button 
-              onClick={() => setActiveSection('affirmation')}
-              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 sm:p-8 flex flex-col cursor-pointer text-luxury overflow-hidden"
-            >
-              <h3 className="text-lg sm:text-2xl font-bold theme-text mb-3 sm:mb-6 underline font-serif">Affirmation</h3>
-              <div className="flex-1 overflow-hidden">
-                <p className="text-sm sm:text-base theme-text text-left leading-relaxed font-light line-clamp-4 overflow-hidden">
-                  {dailyAffirmation.length > 120 ? dailyAffirmation.substring(0, 120) + '...' : dailyAffirmation}
-                </p>
-              </div>
-              <p className="text-xs sm:text-sm theme-text/70 mt-3 sm:mt-6 font-medium tracking-wide">Click to hear</p>
-            </button>
+            </div>
+            <div className="w-96"></div>
           </div>
         </div>
       </div>
