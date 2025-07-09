@@ -9,7 +9,7 @@ import {
   dailyActivities, communityChallenges, userChallengeProgress, userLevels, userStreaks,
   conversationSummaries, semanticMemories, memoryConnections, memoryInsights,
   therapists, clientTherapistRelationships, clientPrivacySettings, therapistSessionNotes, riskAlerts,
-  voluntaryQuestions, userFeedback,
+  voluntaryQuestions, userFeedback, authTokens,
   type User, type InsertUser,
   type UserProfile, type InsertUserProfile,
   type VoluntaryQuestion, type InsertVoluntaryQuestion,
@@ -58,9 +58,17 @@ export interface IStorage {
   getUserById(id: number): Promise<User | null>;
   getUserByUsername(username: string): Promise<User | null>;
   getUserByDeviceFingerprint(fingerprint: string): Promise<User | null>;
+  getUserByEmail(email: string): Promise<User | null>;
+  createRegisteredUser(data: Partial<InsertUser>): Promise<User>;
+  migrateAnonymousToRegistered(userId: number, data: Partial<InsertUser>): Promise<User>;
   updateUser(id: number, data: Partial<InsertUser>): Promise<User>;
   updateUserLastActive(id: number): Promise<void>;
   deleteInactiveAnonymousUsers(beforeDate: Date): Promise<void>;
+  
+  // Authentication tokens
+  createAuthToken(data: { userId: number; token: string; expiresAt: Date; deviceInfo?: string }): Promise<void>;
+  deleteAuthToken(token: string): Promise<void>;
+  cleanupExpiredTokens(): Promise<void>;
   
   // User Profiles
   createUserProfile(data: InsertUserProfile): Promise<UserProfile>;
@@ -394,6 +402,51 @@ export class DbStorage implements IStorage {
   async createFeedback(data: InsertUserFeedback): Promise<UserFeedback> {
     const [feedback] = await this.db.insert(userFeedback).values(data).returning();
     return feedback;
+  }
+
+  // Authentication methods
+  async getUserByEmail(email: string): Promise<User | null> {
+    const result = await this.db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0] || null;
+  }
+
+  async createRegisteredUser(data: Partial<InsertUser>): Promise<User> {
+    const userData = {
+      ...data,
+      isAnonymous: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastActiveAt: new Date()
+    };
+    
+    const [user] = await this.db.insert(users).values(userData).returning();
+    return user;
+  }
+
+  async migrateAnonymousToRegistered(userId: number, data: Partial<InsertUser>): Promise<User> {
+    const updateData = {
+      ...data,
+      isAnonymous: false,
+      updatedAt: new Date()
+    };
+    
+    const [user] = await this.db.update(users)
+      .set(updateData)
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async createAuthToken(data: { userId: number; token: string; expiresAt: Date; deviceInfo?: string }): Promise<void> {
+    await this.db.insert(authTokens).values(data);
+  }
+
+  async deleteAuthToken(token: string): Promise<void> {
+    await this.db.delete(authTokens).where(eq(authTokens.token, token));
+  }
+
+  async cleanupExpiredTokens(): Promise<void> {
+    await this.db.delete(authTokens).where(lt(authTokens.expiresAt, new Date()));
   }
 
   async createBot(data: InsertBot): Promise<Bot> {

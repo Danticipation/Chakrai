@@ -3,9 +3,11 @@ import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from '@tan
 import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, RotateCcw, Sun, Star, Heart, BarChart3, Gift, Headphones, Shield, X, Palette } from 'lucide-react';
 import axios from 'axios';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import ThemeSelector from './components/ThemeSelector';
+import AuthModal from './components/AuthModal';
 
 import PersonalityQuiz from './components/PersonalityQuiz';
 import VoluntaryQuestionDeck from './components/VoluntaryQuestionDeck';
@@ -72,7 +74,9 @@ interface AppLayoutProps {
 
 const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   const { currentTheme, changeTheme } = useTheme();
+  const { user, isAuthenticated } = useAuth();
   const [activeSection, setActiveSection] = useState('chat');
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const queryClient = useQueryClient();
   
   // Debug logging for activeSection changes
@@ -208,7 +212,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  const { data: user } = useQuery({
+  const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
       const response = await axios.get('/api/user/current');
@@ -273,7 +277,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
       window.removeEventListener('openVoiceJournal', handleVoiceJournal);
       window.removeEventListener('showDailyAffirmation', handleDailyAffirmation);
     };
-  }, [user]);
+  }, [currentUser]);
 
   const fetchBotStats = async () => {
     try {
@@ -1856,7 +1860,9 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <AppWithOnboarding />
+        <AuthProvider>
+          <AppWithOnboarding />
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

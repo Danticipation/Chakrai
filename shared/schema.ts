@@ -2,7 +2,7 @@ import { pgTable, serial, text, integer, boolean, timestamp, jsonb, decimal } fr
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Basic user system with anonymous user support
+// Enhanced user system with anonymous and registered user support
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -16,6 +16,16 @@ export const users = pgTable("users", {
   lastActiveAt: timestamp("last_active_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User authentication tokens for persistent login
+export const authTokens = pgTable("auth_tokens", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  deviceInfo: text("device_info"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // User personality profiles from onboarding quiz
@@ -487,6 +497,13 @@ export type InsertEmotionalContext = z.infer<typeof insertEmotionalContextSchema
 export type InsertPredictiveInsight = z.infer<typeof insertPredictiveInsightSchema>;
 export type InsertEmotionalResponseAdaptation = z.infer<typeof insertEmotionalResponseAdaptationSchema>;
 export type InsertCrisisDetectionLog = z.infer<typeof insertCrisisDetectionLogSchema>;
+
+export const insertAuthTokenSchema = createInsertSchema(authTokens).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertAuthToken = z.infer<typeof insertAuthTokenSchema>;
 
 // Analytics & Reporting Tables
 export const monthlyWellnessReports = pgTable("monthly_wellness_reports", {

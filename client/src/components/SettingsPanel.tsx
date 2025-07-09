@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { X, Settings, RefreshCw, Volume2, Palette, Database, Download, Upload, Info, Shield } from 'lucide-react';
+import { X, Settings, RefreshCw, Volume2, Palette, Database, Download, Upload, Info, Shield, User, LogIn, LogOut } from 'lucide-react';
 import { getCurrentUserId } from '../utils/userSession';
+import { useAuth } from '../contexts/AuthContext';
+import AuthModal from './AuthModal';
 
 interface SettingsPanelProps {
   onClose: () => void;
@@ -20,6 +22,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onThemeChange
 }) => {
   const [activeTab, setActiveTab] = useState('general');
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const { user, isAuthenticated, logout } = useAuth();
 
   const voices = [
     { id: 'james', name: 'James', description: 'Professional & Calming' },
@@ -62,6 +67,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
   const tabs = [
     { id: 'general', name: 'General', icon: Settings },
+    { id: 'account', name: 'Account', icon: User },
     { id: 'audio', name: 'Audio', icon: Volume2 },
     { id: 'theme', name: 'Theme', icon: Palette },
     { id: 'data', name: 'Data', icon: Database },
@@ -147,6 +153,80 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                         <RefreshCw className="w-4 h-4" />
                         <span>Reset All Data</span>
                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'account' && (
+              <div className="space-y-4 md:space-y-6">
+                <div>
+                  <h3 className="text-lg md:text-xl font-semibold theme-text mb-3 md:mb-4">Account Settings</h3>
+                  <div className="space-y-3 md:space-y-4">
+                    <div className="theme-card p-3 md:p-4 rounded-lg border border-[var(--theme-accent)]/30">
+                      <h4 className="font-semibold theme-text mb-2">Account Status</h4>
+                      {isAuthenticated ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                              <p className="theme-text font-medium">{user?.email}</p>
+                              <p className="text-sm theme-text-secondary">Account verified</p>
+                            </div>
+                          </div>
+                          <div className="pt-4 border-t border-white/20">
+                            <button
+                              onClick={() => logout()}
+                              className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                            >
+                              <LogOut className="w-4 h-4" />
+                              <span>Sign Out</span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                              <p className="theme-text font-medium">Anonymous User</p>
+                              <p className="text-sm theme-text-secondary">Using device-based storage</p>
+                            </div>
+                          </div>
+                          <div className="pt-4 border-t border-white/20">
+                            <p className="text-sm theme-text-secondary mb-4">
+                              Sign in to sync your data across devices and access advanced features.
+                            </p>
+                            <div className="flex space-x-3">
+                              <button
+                                onClick={() => {
+                                  setAuthMode('login');
+                                  setShowAuthModal(true);
+                                }}
+                                className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                              >
+                                <LogIn className="w-4 h-4" />
+                                <span>Sign In</span>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setAuthMode('register');
+                                  setShowAuthModal(true);
+                                }}
+                                className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                              >
+                                <User className="w-4 h-4" />
+                                <span>Sign Up</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -268,6 +348,15 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           </div>
         </div>
       </div>
+      
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          mode={authMode}
+        />
+      )}
     </div>
   );
 };

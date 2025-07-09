@@ -19,6 +19,223 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Import storage for database operations
 import { storage } from './storage.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+
+// JWT secret for authentication
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+
+// Middleware for authentication
+const authenticateToken = (req: any, res: any, next: any) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// Authentication endpoints
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, password, name } = req.body;
+
+    // Check if user already exists
+    const existingUser = await storage.getUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists with this email' });
+    }
+
+    // Hash password
+    const saltRounds = 12;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+
+    // Create user
+    const user = await storage.createRegisteredUser({
+      email,
+      passwordHash,
+      displayName: name,
+      username: email.split('@')[0] + '_' + Date.now(), // Generate unique username
+      isAnonymous: false
+    });
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    // Store auth token
+    await storage.createAuthToken({
+      userId: user.id,
+      token: token,
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+      deviceInfo: req.headers['user-agent'] || 'Unknown device'
+    });
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
+        isAnonymous: false
+      },
+      token
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await storage.getUserByEmail(email);
+    if (!user || user.isAnonymous) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    // Store auth token
+    await storage.createAuthToken({
+      userId: user.id,
+      token: token,
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+      deviceInfo: req.headers['user-agent'] || 'Unknown device'
+    });
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
+        isAnonymous: false
+      },
+      token
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+app.post('/api/auth/logout', authenticateToken, async (req: any, res) => {
+  try {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (token) {
+      await storage.deleteAuthToken(token);
+    }
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'Logout failed' });
+  }
+});
+
+app.get('/api/auth/verify', authenticateToken, async (req: any, res) => {
+  try {
+    const user = await storage.getUser(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
+        isAnonymous: user.isAnonymous
+      }
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(500).json({ error: 'Token verification failed' });
+  }
+});
+
+// Migration endpoint to convert anonymous user to registered user
+app.post('/api/auth/migrate', async (req, res) => {
+  try {
+    const { anonymousUserId, email, password, name } = req.body;
+
+    // Check if registered user already exists
+    const existingUser = await storage.getUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists with this email' });
+    }
+
+    // Get anonymous user
+    const anonymousUser = await storage.getUser(anonymousUserId);
+    if (!anonymousUser || !anonymousUser.isAnonymous) {
+      return res.status(400).json({ error: 'Invalid anonymous user' });
+    }
+
+    // Hash password
+    const saltRounds = 12;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+
+    // Convert anonymous user to registered user
+    const updatedUser = await storage.migrateAnonymousToRegistered(anonymousUserId, {
+      email,
+      passwordHash,
+      displayName: name,
+      username: email.split('@')[0] + '_' + Date.now()
+    });
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: updatedUser.id, email: updatedUser.email },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    // Store auth token
+    await storage.createAuthToken({
+      userId: updatedUser.id,
+      token: token,
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+      deviceInfo: req.headers['user-agent'] || 'Unknown device'
+    });
+
+    res.json({
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        displayName: updatedUser.displayName,
+        isAnonymous: false
+      },
+      token
+    });
+  } catch (error) {
+    console.error('Migration error:', error);
+    res.status(500).json({ error: 'Migration failed' });
+  }
+});
 
 // Direct streak stats endpoint to fix JSON parsing error - MUST BE FIRST
 app.get('/api/streak-stats', (req, res) => {
