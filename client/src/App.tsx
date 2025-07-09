@@ -1090,7 +1090,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               onClick={() => setActiveSection('logo')}
               className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury"
             >
-              <img src={traiLogo} alt="TrAI" className="h-20 sm:h-48 w-auto mb-2 sm:mb-6 -mt-1 sm:-mt-2.5 drop-shadow-lg" />
+              <img src={traiLogo} alt="TrAI" className="h-32 sm:h-64 w-auto mb-2 sm:mb-6 -mt-1 sm:-mt-2.5 drop-shadow-lg" />
               <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide">TraI Mental Wellness</p>
               <p className="text-xs sm:text-sm theme-text-secondary mt-1 sm:mt-3 font-light">Click for more info</p>
             </button>
