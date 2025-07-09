@@ -196,21 +196,24 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                           <button
                             key={theme.id}
                             onClick={() => {
-                              console.log('Theme button clicked:', theme.id);
+                              console.log('Theme button clicked:', theme.id, 'Current:', currentTheme);
                               onThemeChange(theme.id);
                             }}
                             className={`p-3 md:p-4 rounded-lg border-2 transition-all ${
                               currentTheme === theme.id
-                                ? 'border-[var(--theme-accent)] bg-[var(--theme-accent)]/10'
-                                : 'border-[var(--theme-accent)]/30 hover:border-[var(--theme-accent)]/50'
+                                ? 'border-[var(--theme-accent)] bg-[var(--theme-accent)]/10 ring-2 ring-[var(--theme-accent)]/30'
+                                : 'border-[var(--theme-accent)]/30 hover:border-[var(--theme-accent)]/50 hover:bg-[var(--theme-surface)]/20'
                             }`}
                           >
                             <div className="text-left">
                               <h5 className="font-semibold theme-text text-sm md:text-base">{theme.name}</h5>
                               <p className="text-xs md:text-sm theme-text-secondary">{theme.description}</p>
-                              <p className="text-xs theme-text-secondary">
-                                Current: {currentTheme} | This: {theme.id} | Match: {currentTheme === theme.id ? 'YES' : 'NO'}
-                              </p>
+                              {currentTheme === theme.id && (
+                                <div className="flex items-center mt-2">
+                                  <div className="w-2 h-2 bg-[var(--theme-accent)] rounded-full mr-2"></div>
+                                  <span className="text-xs text-[var(--theme-accent)] font-medium">Currently Active</span>
+                                </div>
+                              )}
                             </div>
                           </button>
                         ))}
