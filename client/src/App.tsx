@@ -46,7 +46,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const traiLogo = '/TrAI-Logo.png';
+const traiLogo = '/TraI-Logo.png';
 
 interface BotStats {
   level: number;
@@ -954,7 +954,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg text-center">
                 <div className="mb-8">
                   <img src={traiLogo} alt="TraI" className="h-36 w-auto mx-auto mb-6" />
-                  <h1 className="text-4xl font-bold text-white mb-4">TrAI Mental Wellness</h1>
+                  <h1 className="text-4xl font-bold text-white mb-4">TraI Mental Wellness</h1>
                   <p className="text-xl text-white/90 mb-6">AI Wellness Companion</p>
                 </div>
 
@@ -1053,7 +1053,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
           {/* Top Row: Logo and Status */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-3">
-              <img src={traiLogo} alt="TrAI" className="h-10 w-auto" />
+              <img src={traiLogo} alt="TraI" className="h-10 w-auto" />
               <div>
                 <p className="text-white font-bold text-lg">TraI</p>
                 <p className="text-white/70 text-xs">Mental Wellness</p>
@@ -1095,7 +1095,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury relative"
                   >
                     <div className="flex flex-col items-center justify-center h-full w-full">
-                      <img src={traiLogo} alt="TrAI" className="h-20 sm:h-32 w-auto mb-2 sm:mb-4 drop-shadow-lg flex-shrink-0" />
+                      <img src={traiLogo} alt="TraI" className="h-20 sm:h-32 w-auto mb-2 sm:mb-4 drop-shadow-lg flex-shrink-0" />
                       <div className="text-center">
                         <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide leading-tight">TraI Mental Wellness</p>
                         <p className="text-xs sm:text-sm theme-text-secondary mt-1 sm:mt-2 font-light">Click for more info</p>
@@ -1310,7 +1310,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                   <div className="relative mb-8">
                     <img 
                       src={traiLogo} 
-                      alt="TrAI" 
+                      alt="TraI" 
                       className="h-48 sm:h-56 w-auto mx-auto transform hover:scale-110 transition-transform duration-300 drop-shadow-xl" 
                     />
                     <div className="absolute -top-1 -right-1 w-4 h-4 theme-accent rounded-full animate-ping"></div>
