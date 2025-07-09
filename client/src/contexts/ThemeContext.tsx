@@ -155,7 +155,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]); // Ocean Blue default
 
   useEffect(() => {
-    // Load saved theme from localStorage
+    // Load saved theme from localStorage on initial load
     const savedTheme = localStorage.getItem('trai-theme');
     if (savedTheme) {
       const theme = themes.find(t => t.id === savedTheme);
@@ -165,8 +165,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  // Force initial theme application immediately
   useEffect(() => {
+    // Apply theme colors to CSS custom properties whenever theme changes
     const root = document.documentElement;
     root.style.setProperty('--theme-primary', currentTheme.colors.primary);
     root.style.setProperty('--theme-primary-light', currentTheme.colors.primaryLight);
@@ -187,38 +187,20 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--progress-start', '#ef4444'); // red-500
     root.style.setProperty('--progress-middle', '#eab308'); // yellow-500  
     root.style.setProperty('--progress-end', '#22c55e'); // green-500
+    
     console.log('Theme applied:', currentTheme.name, currentTheme.colors);
-  }, []);
-
-  useEffect(() => {
-    // Apply theme colors to CSS custom properties
-    const root = document.documentElement;
-    root.style.setProperty('--theme-primary', currentTheme.colors.primary);
-    root.style.setProperty('--theme-primary-light', currentTheme.colors.primaryLight);
-    root.style.setProperty('--theme-primary-dark', currentTheme.colors.primaryDark);
-    root.style.setProperty('--theme-primary-mid', currentTheme.colors.primaryMid);
-    root.style.setProperty('--theme-secondary', currentTheme.colors.secondary);
-    root.style.setProperty('--theme-secondary-light', currentTheme.colors.secondaryLight);
-    root.style.setProperty('--theme-secondary-dark', currentTheme.colors.secondaryDark);
-    root.style.setProperty('--theme-accent', currentTheme.colors.accent);
-    root.style.setProperty('--theme-accent-light', currentTheme.colors.accentLight);
-    root.style.setProperty('--theme-background', currentTheme.colors.background);
-    root.style.setProperty('--theme-surface', currentTheme.colors.surface);
-    root.style.setProperty('--theme-surface-light', currentTheme.colors.surfaceLight);
-    root.style.setProperty('--theme-text', currentTheme.colors.text);
-    root.style.setProperty('--theme-text-secondary', currentTheme.colors.textSecondary);
-    
-    // Progress bars always use red->yellow->green regardless of theme
-    root.style.setProperty('--progress-start', '#ef4444'); // red-500
-    root.style.setProperty('--progress-middle', '#eab308'); // yellow-500  
-    root.style.setProperty('--progress-end', '#22c55e'); // green-500
   }, [currentTheme]);
 
   const changeTheme = (themeId: string) => {
+    console.log('changeTheme called with:', themeId);
     const theme = themes.find(t => t.id === themeId);
     if (theme) {
+      console.log('Found theme:', theme.name);
       setCurrentTheme(theme);
       localStorage.setItem('trai-theme', themeId);
+      console.log('Theme changed successfully to:', theme.name);
+    } else {
+      console.error('Theme not found:', themeId);
     }
   };
 
