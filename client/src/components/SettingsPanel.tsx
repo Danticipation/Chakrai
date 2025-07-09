@@ -195,7 +195,10 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                         {themes.map((theme) => (
                           <button
                             key={theme.id}
-                            onClick={() => onThemeChange(theme.id)}
+                            onClick={() => {
+                              console.log('Theme button clicked:', theme.id);
+                              onThemeChange(theme.id);
+                            }}
                             className={`p-3 md:p-4 rounded-lg border-2 transition-all ${
                               currentTheme === theme.id
                                 ? 'border-[var(--theme-accent)] bg-[var(--theme-accent)]/10'
@@ -205,6 +208,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                             <div className="text-left">
                               <h5 className="font-semibold theme-text text-sm md:text-base">{theme.name}</h5>
                               <p className="text-xs md:text-sm theme-text-secondary">{theme.description}</p>
+                              <p className="text-xs theme-text-secondary">
+                                Current: {currentTheme} | This: {theme.id} | Match: {currentTheme === theme.id ? 'YES' : 'NO'}
+                              </p>
                             </div>
                           </button>
                         ))}
