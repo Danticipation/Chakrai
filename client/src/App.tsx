@@ -38,6 +38,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import FloatingChat from './components/FloatingChat';
 import ChallengeSystem from './components/ChallengeSystem';
 import SettingsPanel from './components/SettingsPanel';
+import DynamicAmbientSound from './components/DynamicAmbientSound';
 import { getCurrentUserId } from './utils/userSession';
 
 const queryClient = new QueryClient({
@@ -129,6 +130,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     'community': 'Connect with peer support groups, wellness challenges, and therapeutic forums in a safe, moderated environment.',
     'vr': 'Virtual reality guided meditation, exposure therapy, and immersive therapeutic environments for enhanced mental wellness.',
     'health': 'Integrate wearable devices to correlate physical health metrics with emotional wellness for comprehensive health insights.',
+    'ambient-sound': 'AI-curated ambient soundscapes that adapt to your current mood and wellness needs for enhanced relaxation and focus.',
     'agents': 'Specialized AI therapists for specific needs: CBT Coach, Mindfulness Guide, Anxiety Specialist, and Self-Compassion Coach.',
     'adaptive': 'AI learning system that adapts therapeutic approaches based on your responses, progress, and preferred communication style.',
     'therapy-plans': 'Personalized therapeutic care plans with goals, exercises, progress tracking, and professional guidance recommendations.',
@@ -818,6 +820,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
       case 'health':
         return <HealthIntegration />;
 
+      case 'ambient-sound':
+        return <DynamicAmbientSound />;
+
       case 'privacy':
         return <PrivacyCompliance />;
 
@@ -891,6 +896,9 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
       case 'health':
         return <HealthIntegration />;
+
+      case 'ambient-sound':
+        return <DynamicAmbientSound />;
 
       case 'privacy':
         return <PrivacyCompliance />;
@@ -1219,6 +1227,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 { id: 'community', label: 'Community', icon: '👥' },
                 { id: 'vr', label: 'VR Therapy', icon: '🥽' },
                 { id: 'health', label: 'Health', icon: '💗' },
+                { id: 'ambient-sound', label: 'Ambient', icon: '🎵' },
                 { id: 'agents', label: 'Specialists', icon: '🧩' },
                 { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
                 { id: 'therapy-plans', label: 'Plans', icon: '📋' },
@@ -1237,7 +1246,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                       setIsFloatingChatOpen(true);
                     } else if (tab.id === 'settings') {
                       setShowSettings(true);
-                    } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans', 'questions', 'feedback'].includes(tab.id)) {
+                    } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'ambient-sound', 'agents', 'adaptive', 'therapy-plans', 'questions', 'feedback'].includes(tab.id)) {
                       // Track activity for specific sections
                       if (tab.id === 'journal') {
                         updateUserActivity('journal_access');
@@ -1318,6 +1327,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               { id: 'agents', label: 'AI Specialists' },
               { id: 'vr', label: 'VR Therapy' },
               { id: 'health', label: 'Wearables' },
+              { id: 'ambient-sound', label: 'Ambient Sound' },
               { id: 'questions', label: 'Question Deck' },
               { id: 'feedback', label: 'Feedback & Suggestions' },
               { id: 'settings', label: 'Settings' }

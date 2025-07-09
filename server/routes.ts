@@ -1808,6 +1808,239 @@ router.get('/api/analytics/simple/:userId', async (req, res) => {
 });
 
 // ================================
+// DYNAMIC AMBIENT SOUND ENDPOINTS
+// ================================
+
+// Get user's current mood data for ambient sound recommendations
+router.get('/user-mood-current', async (req, res) => {
+  try {
+    const userId = userSessionManager.getAnonymousUserId(req);
+    const recentMoodEntries = await storage.getMoodEntries(userId);
+    
+    if (!recentMoodEntries || recentMoodEntries.length === 0) {
+      return res.json({
+        currentMood: 'neutral',
+        energy: 5,
+        stress: 3,
+        focus: 5,
+        anxiety: 2
+      });
+    }
+
+    // Get most recent mood entry for current state
+    const latestMood = recentMoodEntries[recentMoodEntries.length - 1];
+    const moodValue = latestMood.mood || 'neutral';
+    const intensity = latestMood.intensity || 5;
+
+    // Map mood values to numeric scales
+    const moodMappings: Record<string, any> = {
+      'happy': { energy: 8, stress: 2, focus: 7, anxiety: 1 },
+      'sad': { energy: 3, stress: 6, focus: 4, anxiety: 5 },
+      'anxious': { energy: 6, stress: 8, focus: 3, anxiety: 8 },
+      'calm': { energy: 5, stress: 2, focus: 8, anxiety: 1 },
+      'excited': { energy: 9, stress: 3, focus: 6, anxiety: 2 },
+      'tired': { energy: 2, stress: 4, focus: 3, anxiety: 3 },
+      'stressed': { energy: 7, stress: 9, focus: 2, anxiety: 7 },
+      'neutral': { energy: 5, stress: 5, focus: 5, anxiety: 3 }
+    };
+
+    const moodData = moodMappings[moodValue] || moodMappings['neutral'];
+    
+    res.json({
+      currentMood: moodValue,
+      energy: moodData.energy,
+      stress: moodData.stress,
+      focus: moodData.focus,
+      anxiety: moodData.anxiety,
+      lastUpdated: latestMood.createdAt
+    });
+  } catch (error) {
+    console.error('Error fetching current mood data:', error);
+    res.json({
+      currentMood: 'neutral',
+      energy: 5,
+      stress: 3,
+      focus: 5,
+      anxiety: 2
+    });
+  }
+});
+
+// Ambient audio generation endpoints
+router.get('/ambient-audio/:soundId', async (req, res) => {
+  try {
+    const { soundId } = req.params;
+    
+    // Generate procedural ambient audio using different algorithms
+    // This would normally serve pre-recorded high-quality ambient sounds
+    // For now, return a JSON response indicating the sound type
+    const soundDatabase: Record<string, any> = {
+      'rain-forest': {
+        type: 'nature',
+        description: 'Forest rain with distant thunder',
+        duration: 3600, // 1 hour
+        frequency: 'binaural',
+        baseFreq: 40, // Hz for rain
+        overlayFreqs: [80, 120, 200], // Thunder frequencies
+      },
+      'ocean-waves': {
+        type: 'nature', 
+        description: 'Rhythmic ocean waves',
+        duration: 3600,
+        frequency: 'white-noise',
+        baseFreq: 60,
+        overlayFreqs: [20, 40, 100],
+      },
+      'wind-chimes': {
+        type: 'meditation',
+        description: 'Gentle wind chimes',
+        duration: 3600,
+        frequency: 'pure-tones',
+        baseFreq: 432,
+        overlayFreqs: [528, 639, 741],
+      },
+      'binaural-alpha': {
+        type: 'binaural',
+        description: 'Alpha wave binaural beats',
+        duration: 3600,
+        frequency: 'binaural',
+        baseFreq: 440,
+        beatFreq: 10, // Alpha waves
+      },
+      'heart-rhythm': {
+        type: 'binaural',
+        description: 'Heart coherence rhythm',
+        duration: 3600,
+        frequency: 'rhythmic',
+        baseFreq: 60, // BPM
+        coherencePattern: '4-4-4-4', // Breathing pattern
+      },
+      'white-noise': {
+        type: 'white-noise',
+        description: 'Pure white noise',
+        duration: 3600,
+        frequency: 'white-noise',
+        spectrum: 'full',
+      },
+      'morning-birds': {
+        type: 'nature',
+        description: 'Morning bird songs',
+        duration: 3600,
+        frequency: 'natural',
+        birdTypes: ['robin', 'sparrow', 'cardinal'],
+      },
+      'water-drops': {
+        type: 'meditation',
+        description: 'Water droplets in cave',
+        duration: 3600,
+        frequency: 'rhythmic',
+        dropRate: 60, // per minute
+        reverbDelay: 200, // ms
+      }
+    };
+
+    const soundConfig = soundDatabase[soundId];
+    if (!soundConfig) {
+      return res.status(404).json({ error: 'Sound not found' });
+    }
+
+    // In a real implementation, this would:
+    // 1. Generate or serve the actual audio file
+    // 2. Use Web Audio API for real-time generation
+    // 3. Stream high-quality audio content
+    
+    res.json({
+      success: true,
+      soundId,
+      config: soundConfig,
+      // In real implementation, this would be a streaming audio URL
+      audioUrl: `/generated-audio/${soundId}`,
+      message: 'Audio configuration ready for Web Audio API generation'
+    });
+
+  } catch (error) {
+    console.error('Ambient audio generation error:', error);
+    res.status(500).json({ error: 'Failed to generate ambient audio' });
+  }
+});
+
+// Save user's ambient sound preferences
+router.post('/ambient-sound/preferences', async (req, res) => {
+  try {
+    const userId = userSessionManager.getAnonymousUserId(req);
+    const { 
+      favoriteCategories, 
+      preferredVolume, 
+      adaptiveMode, 
+      customSoundSettings 
+    } = req.body;
+
+    const preferences = await storage.createAmbientSoundPreferences({
+      userId,
+      favoriteCategories: favoriteCategories || [],
+      preferredVolume: preferredVolume || 0.5,
+      adaptiveMode: adaptiveMode !== false, // Default to true
+      customSoundSettings: customSoundSettings || {},
+      lastUpdated: new Date()
+    });
+
+    res.json({ success: true, preferences });
+  } catch (error) {
+    console.error('Error saving ambient sound preferences:', error);
+    res.status(500).json({ error: 'Failed to save preferences' });
+  }
+});
+
+// Get user's ambient sound preferences
+router.get('/ambient-sound/preferences/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId) || userSessionManager.getAnonymousUserId(req);
+    const preferences = await storage.getAmbientSoundPreferences(userId);
+    
+    if (!preferences) {
+      return res.json({
+        favoriteCategories: ['nature'],
+        preferredVolume: 0.5,
+        adaptiveMode: true,
+        customSoundSettings: {}
+      });
+    }
+
+    res.json(preferences);
+  } catch (error) {
+    console.error('Error fetching ambient sound preferences:', error);
+    res.json({
+      favoriteCategories: ['nature'],
+      preferredVolume: 0.5,
+      adaptiveMode: true,
+      customSoundSettings: {}
+    });
+  }
+});
+
+// Log ambient sound usage for analytics
+router.post('/ambient-sound/usage', async (req, res) => {
+  try {
+    const userId = userSessionManager.getAnonymousUserId(req);
+    const { soundId, duration, mood, category } = req.body;
+
+    const usage = await storage.logAmbientSoundUsage({
+      userId,
+      soundId,
+      duration: duration || 0,
+      mood: mood || 'neutral',
+      category: category || 'general',
+      timestamp: new Date()
+    });
+
+    res.json({ success: true, usage });
+  } catch (error) {
+    console.error('Error logging ambient sound usage:', error);
+    res.status(500).json({ error: 'Failed to log usage' });
+  }
+});
+
+// ================================
 // EHR INTEGRATION & INSURANCE SYSTEM ENDPOINTS
 // ================================
 

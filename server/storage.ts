@@ -84,6 +84,11 @@ export interface IStorage {
   getUserFeedback(userId: number): Promise<UserFeedback[]>;
   createFeedback(data: InsertUserFeedback): Promise<UserFeedback>;
   
+  // Ambient Sound System
+  createAmbientSoundPreferences(data: any): Promise<any>;
+  getAmbientSoundPreferences(userId: number): Promise<any>;
+  logAmbientSoundUsage(data: any): Promise<any>;
+  
   // Data clearing methods for fresh starts
   clearUserMessages(userId: number): Promise<void>;
   clearUserJournalEntries(userId: number): Promise<void>;
@@ -1721,6 +1726,49 @@ export class DbStorage implements IStorage {
       
       await this.updateUserStreak(userId, streakType, updates);
     }
+  }
+
+  // Ambient Sound System Implementation
+  async createAmbientSoundPreferences(data: any): Promise<any> {
+    // Store preferences in memory for now (would normally be stored in database)
+    const preferences = {
+      id: Date.now(),
+      userId: data.userId,
+      favoriteCategories: data.favoriteCategories || [],
+      preferredVolume: data.preferredVolume || 0.5,
+      adaptiveMode: data.adaptiveMode !== false,
+      customSoundSettings: data.customSoundSettings || {},
+      lastUpdated: data.lastUpdated || new Date()
+    };
+    
+    // In a full implementation, this would use a proper database table
+    return preferences;
+  }
+
+  async getAmbientSoundPreferences(userId: number): Promise<any> {
+    // Return default preferences for now
+    return {
+      favoriteCategories: ['nature'],
+      preferredVolume: 0.5,
+      adaptiveMode: true,
+      customSoundSettings: {}
+    };
+  }
+
+  async logAmbientSoundUsage(data: any): Promise<any> {
+    // Log usage data (would normally be stored in database)
+    const usage = {
+      id: Date.now(),
+      userId: data.userId,
+      soundId: data.soundId,
+      duration: data.duration || 0,
+      mood: data.mood || 'neutral',
+      category: data.category || 'general',
+      timestamp: data.timestamp || new Date()
+    };
+    
+    // In a full implementation, this would use a proper database table
+    return usage;
   }
 }
 
