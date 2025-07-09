@@ -410,6 +410,11 @@ export class DbStorage implements IStorage {
     return result[0] || null;
   }
 
+  async getUserByCustomerId(customerId: string): Promise<User | null> {
+    const result = await this.db.select().from(users).where(eq(users.customerId, customerId)).limit(1);
+    return result[0] || null;
+  }
+
   async createRegisteredUser(data: Partial<InsertUser>): Promise<User> {
     const userData = {
       ...data,

@@ -4,6 +4,7 @@ import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, Rotate
 import axios from 'axios';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import ThemeSelector from './components/ThemeSelector';
@@ -1861,7 +1862,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <AppWithOnboarding />
+          <SubscriptionProvider>
+            <AppWithOnboarding />
+          </SubscriptionProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

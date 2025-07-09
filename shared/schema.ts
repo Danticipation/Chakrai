@@ -16,6 +16,13 @@ export const users = pgTable("users", {
   lastActiveAt: timestamp("last_active_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // Subscription fields
+  subscriptionStatus: text("subscription_status").default("free"), // free, premium, premium_device
+  subscriptionId: text("subscription_id"),
+  customerId: text("customer_id"),
+  subscriptionExpiresAt: timestamp("subscription_expires_at"),
+  monthlyUsage: integer("monthly_usage").default(0),
+  lastUsageReset: timestamp("last_usage_reset").defaultNow(),
 });
 
 // User authentication tokens for persistent login

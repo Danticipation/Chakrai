@@ -2889,4 +2889,226 @@ router.get('/api/users/:userId/streak-stats', async (req, res) => {
   }
 });
 
+// ====================
+// SUBSCRIPTION MANAGEMENT ENDPOINTS
+// ====================
+
+// Initialize Stripe (will be conditionally used if keys are available)
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-06-20',
+  });
+}
+
+// Get subscription status
+router.get('/api/subscription/status', async (req, res) => {
+  try {
+    const userId = await userSessionManager.getUserId(req);
+    const user = await storage.getUser(userId);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const now = new Date();
+    const subscriptionExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
+    
+    // Reset monthly usage if it's a new month
+    const lastReset = user.lastUsageReset ? new Date(user.lastUsageReset) : now;
+    if (now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear()) {
+      await storage.updateUser(userId, {
+        monthlyUsage: 0,
+        lastUsageReset: now
+      });
+    }
+
+    res.json({
+      status: subscriptionExpired ? 'free' : (user.subscriptionStatus || 'free'),
+      expiresAt: user.subscriptionExpiresAt,
+      monthlyUsage: user.monthlyUsage || 0,
+      lastUsageReset: user.lastUsageReset || now
+    });
+  } catch (error) {
+    console.error('Error fetching subscription status:', error);
+    res.status(500).json({ error: 'Failed to fetch subscription status' });
+  }
+});
+
+// Update usage count
+router.post('/api/subscription/usage', async (req, res) => {
+  try {
+    const userId = await userSessionManager.getUserId(req);
+    const { increment = 1 } = req.body;
+    
+    const user = await storage.getUser(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const newUsage = (user.monthlyUsage || 0) + increment;
+    await storage.updateUser(userId, { monthlyUsage: newUsage });
+    
+    res.json({ monthlyUsage: newUsage });
+  } catch (error) {
+    console.error('Error updating usage:', error);
+    res.status(500).json({ error: 'Failed to update usage' });
+  }
+});
+
+// Create Stripe checkout session
+router.post('/api/subscription/create-checkout', async (req, res) => {
+  if (!stripe) {
+    return res.status(400).json({ error: 'Payment system not configured' });
+  }
+
+  try {
+    const { planType, deviceFingerprint } = req.body;
+    let userId;
+    
+    try {
+      userId = await userSessionManager.getUserId(req);
+    } catch {
+      // Anonymous user - create or find by device fingerprint
+      if (!deviceFingerprint) {
+        return res.status(400).json({ error: 'Device fingerprint required for anonymous users' });
+      }
+      
+      let user = await storage.getUserByDeviceFingerprint(deviceFingerprint);
+      if (!user) {
+        user = await storage.createUser({
+          username: `anon_${deviceFingerprint.slice(0, 8)}`,
+          deviceFingerprint,
+          isAnonymous: true
+        });
+      }
+      userId = user.id;
+    }
+
+    const user = await storage.getUser(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Create or retrieve Stripe customer
+    let customerId = user.customerId;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email || undefined,
+        metadata: {
+          userId: userId.toString(),
+          deviceFingerprint: user.deviceFingerprint || ''
+        }
+      });
+      customerId = customer.id;
+      await storage.updateUser(userId, { customerId });
+    }
+
+    // Define price IDs (you'll need to create these in Stripe Dashboard)
+    const priceIds = {
+      monthly: process.env.STRIPE_MONTHLY_PRICE_ID || 'price_monthly_placeholder',
+      yearly: process.env.STRIPE_YEARLY_PRICE_ID || 'price_yearly_placeholder'
+    };
+
+    // Create checkout session
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceIds[planType as keyof typeof priceIds],
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: `${req.headers.origin}/?session_id={CHECKOUT_SESSION_ID}&success=true`,
+      cancel_url: `${req.headers.origin}/?canceled=true`,
+      metadata: {
+        userId: userId.toString(),
+        planType
+      }
+    });
+
+    res.json({ sessionId: session.id });
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    res.status(500).json({ error: 'Failed to create checkout session' });
+  }
+});
+
+// Stripe webhook handler
+router.post('/api/subscription/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  if (!stripe) {
+    return res.status(400).json({ error: 'Payment system not configured' });
+  }
+
+  const sig = req.headers['stripe-signature'];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!sig || !webhookSecret) {
+    return res.status(400).json({ error: 'Missing webhook signature or secret' });
+  }
+
+  try {
+    const event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const session = event.data.object as Stripe.Checkout.Session;
+        const userId = parseInt(session.metadata?.userId || '0');
+        const planType = session.metadata?.planType;
+
+        if (userId && session.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+          const expiresAt = new Date(subscription.current_period_end * 1000);
+
+          await storage.updateUser(userId, {
+            subscriptionStatus: 'premium',
+            subscriptionId: subscription.id,
+            subscriptionExpiresAt: expiresAt,
+            monthlyUsage: 0 // Reset usage on subscription
+          });
+        }
+        break;
+
+      case 'customer.subscription.deleted':
+        const deletedSub = event.data.object as Stripe.Subscription;
+        const customer = await stripe.customers.retrieve(deletedSub.customer as string);
+        
+        if (customer && !customer.deleted && customer.metadata?.userId) {
+          const userId = parseInt(customer.metadata.userId);
+          await storage.updateUser(userId, {
+            subscriptionStatus: 'free',
+            subscriptionId: null,
+            subscriptionExpiresAt: null
+          });
+        }
+        break;
+
+      case 'invoice.payment_succeeded':
+        const invoice = event.data.object as Stripe.Invoice;
+        if (invoice.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+          const customer = await stripe.customers.retrieve(subscription.customer as string);
+          
+          if (customer && !customer.deleted && customer.metadata?.userId) {
+            const userId = parseInt(customer.metadata.userId);
+            const expiresAt = new Date(subscription.current_period_end * 1000);
+            
+            await storage.updateUser(userId, {
+              subscriptionStatus: 'premium',
+              subscriptionExpiresAt: expiresAt
+            });
+          }
+        }
+        break;
+    }
+
+    res.json({ received: true });
+  } catch (error) {
+    console.error('Webhook error:', error);
+    res.status(400).json({ error: 'Webhook error' });
+  }
+});
+
 export default router;
