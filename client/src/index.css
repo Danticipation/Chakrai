@@ -1,5 +1,5 @@
 /* Import luxury fonts with clear character distinction */
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,15 +7,15 @@
 
 /* Apply luxury typography globally with clear character distinction */
 body {
-  font-family: 'Source Code Pro', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-family: 'Merriweather', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
-  font-weight: 600;
+  font-family: 'Merriweather', serif;
+  font-weight: 400;
   letter-spacing: -0.02em;
 }
 
@@ -240,7 +240,7 @@ html, body, #root {
 /* Theme card styling */
 .theme-card {
   background-color: var(--theme-surface);
-  border: 1px solid var(--theme-accent);
+  border: 2px solid var(--theme-accent);
 }
 
 /* Basic form styling */
@@ -530,15 +530,15 @@ input:focus, button:focus {
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(90deg, 
-    transparent 20%, 
+  background: linear-gradient(130deg, 
+    transparent 15%, 
     rgba(192, 192, 192, 0.6) 40%, 
     rgba(255, 255, 255, 0.8) 50%, 
     rgba(192, 192, 192, 0.6) 60%, 
     transparent 80%
   );
   background-size: 200% 100%;
-  animation: shimmer 2s infinite;
+  animation: shimmer 6s infinite;
   border-radius: 14px;
   z-index: -1;
 }

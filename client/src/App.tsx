@@ -1067,6 +1067,34 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
           </div>
           
+          {/* Mobile Header Cards: Horoscope and Affirmation */}
+          <div className="grid grid-cols-2 gap-2 mt-3">
+            {/* Horoscope Section */}
+            <button 
+              onClick={() => setActiveSection('horoscope')}
+              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 flex flex-col cursor-pointer text-luxury"
+            >
+              <h3 className="text-sm font-bold theme-text mb-2 underline font-serif">Horoscope</h3>
+              <p className="text-xs theme-text text-left leading-relaxed flex-1 font-light line-clamp-2">
+                {horoscopeText ? horoscopeText.substring(0, 80) + '...' : "Today brings opportunities for reflection..."}
+              </p>
+              <p className="text-xs theme-text/70 mt-2 font-medium">Tap to read</p>
+            </button>
+            
+            {/* Affirmation Section */}
+            <button 
+              onClick={() => setActiveSection('affirmation')}
+              className="theme-primary border-soft glass-luxury gradient-soft hover-lift p-3 flex flex-col cursor-pointer text-luxury overflow-hidden"
+            >
+              <h3 className="text-sm font-bold theme-text mb-2 underline font-serif">Affirmation</h3>
+              <div className="flex-1 overflow-hidden">
+                <p className="text-xs theme-text text-left leading-relaxed font-light line-clamp-2 overflow-hidden">
+                  {dailyAffirmation.length > 80 ? dailyAffirmation.substring(0, 80) + '...' : dailyAffirmation}
+                </p>
+              </div>
+              <p className="text-xs theme-text/70 mt-2 font-medium">Tap to hear</p>
+            </button>
+          </div>
 
         </div>
 
