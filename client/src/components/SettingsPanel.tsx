@@ -195,10 +195,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                         {themes.map((theme) => (
                           <button
                             key={theme.id}
-                            onClick={() => {
-                              console.log('Theme button clicked:', theme.id, 'Current:', currentTheme);
-                              onThemeChange(theme.id);
-                            }}
+                            onClick={() => onThemeChange(theme.id)}
                             className={`p-3 md:p-4 rounded-lg border-2 transition-all ${
                               currentTheme === theme.id
                                 ? 'border-[var(--theme-accent)] bg-[var(--theme-accent)]/10 ring-2 ring-[var(--theme-accent)]/30'

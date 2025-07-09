@@ -188,19 +188,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--progress-middle', '#eab308'); // yellow-500  
     root.style.setProperty('--progress-end', '#22c55e'); // green-500
     
-    console.log('Theme applied:', currentTheme.name, currentTheme.colors);
+
   }, [currentTheme]);
 
   const changeTheme = (themeId: string) => {
-    console.log('changeTheme called with:', themeId);
     const theme = themes.find(t => t.id === themeId);
     if (theme) {
-      console.log('Found theme:', theme.name);
       setCurrentTheme(theme);
       localStorage.setItem('trai-theme', themeId);
-      console.log('Theme changed successfully to:', theme.name);
-    } else {
-      console.error('Theme not found:', themeId);
     }
   };
 
