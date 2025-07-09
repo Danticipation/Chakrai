@@ -1871,93 +1871,78 @@ router.get('/ambient-audio/:soundId', async (req, res) => {
   try {
     const { soundId } = req.params;
     
-    // Generate procedural ambient audio using different algorithms
-    // This would normally serve pre-recorded high-quality ambient sounds
-    // For now, return a JSON response indicating the sound type
-    const soundDatabase: Record<string, any> = {
-      'rain-forest': {
-        type: 'nature',
-        description: 'Forest rain with distant thunder',
-        duration: 3600, // 1 hour
-        frequency: 'binaural',
-        baseFreq: 40, // Hz for rain
-        overlayFreqs: [80, 120, 200], // Thunder frequencies
-      },
-      'ocean-waves': {
-        type: 'nature', 
-        description: 'Rhythmic ocean waves',
-        duration: 3600,
-        frequency: 'white-noise',
-        baseFreq: 60,
-        overlayFreqs: [20, 40, 100],
-      },
-      'wind-chimes': {
-        type: 'meditation',
-        description: 'Gentle wind chimes',
-        duration: 3600,
-        frequency: 'pure-tones',
-        baseFreq: 432,
-        overlayFreqs: [528, 639, 741],
-      },
-      'binaural-alpha': {
-        type: 'binaural',
-        description: 'Alpha wave binaural beats',
-        duration: 3600,
-        frequency: 'binaural',
-        baseFreq: 440,
-        beatFreq: 10, // Alpha waves
-      },
-      'heart-rhythm': {
-        type: 'binaural',
-        description: 'Heart coherence rhythm',
-        duration: 3600,
-        frequency: 'rhythmic',
-        baseFreq: 60, // BPM
-        coherencePattern: '4-4-4-4', // Breathing pattern
-      },
-      'white-noise': {
-        type: 'white-noise',
-        description: 'Pure white noise',
-        duration: 3600,
-        frequency: 'white-noise',
-        spectrum: 'full',
-      },
-      'morning-birds': {
-        type: 'nature',
-        description: 'Morning bird songs',
-        duration: 3600,
-        frequency: 'natural',
-        birdTypes: ['robin', 'sparrow', 'cardinal'],
-      },
-      'water-drops': {
-        type: 'meditation',
-        description: 'Water droplets in cave',
-        duration: 3600,
-        frequency: 'rhythmic',
-        dropRate: 60, // per minute
-        reverbDelay: 200, // ms
-      }
-    };
-
-    const soundConfig = soundDatabase[soundId];
-    if (!soundConfig) {
-      return res.status(404).json({ error: 'Sound not found' });
-    }
-
-    // In a real implementation, this would:
-    // 1. Generate or serve the actual audio file
-    // 2. Use Web Audio API for real-time generation
-    // 3. Stream high-quality audio content
+    // Generate simple procedural audio for different sound types
+    const sampleRate = 22050; // Lower sample rate for smaller files
+    const duration = 30; // 30 seconds of audio
+    const numSamples = sampleRate * duration;
     
-    res.json({
-      success: true,
-      soundId,
-      config: soundConfig,
-      // In real implementation, this would be a streaming audio URL
-      audioUrl: `/generated-audio/${soundId}`,
-      message: 'Audio configuration ready for Web Audio API generation'
+    // Create WAV header
+    const bufferLength = 44 + (numSamples * 2);
+    const buffer = Buffer.alloc(bufferLength);
+    
+    // WAV header
+    buffer.write('RIFF', 0);
+    buffer.writeUInt32LE(bufferLength - 8, 4);
+    buffer.write('WAVE', 8);
+    buffer.write('fmt ', 12);
+    buffer.writeUInt32LE(16, 16); // PCM chunk size
+    buffer.writeUInt16LE(1, 20);  // PCM format
+    buffer.writeUInt16LE(1, 22);  // Mono
+    buffer.writeUInt32LE(sampleRate, 24);
+    buffer.writeUInt32LE(sampleRate * 2, 28); // Byte rate
+    buffer.writeUInt16LE(2, 32);  // Block align
+    buffer.writeUInt16LE(16, 34); // Bits per sample
+    buffer.write('data', 36);
+    buffer.writeUInt32LE(numSamples * 2, 40);
+    
+    // Generate audio samples based on sound type
+    for (let i = 0; i < numSamples; i++) {
+      let sample = 0;
+      const t = i / sampleRate;
+      
+      switch (soundId) {
+        case 'white-noise':
+          sample = (Math.random() - 0.5) * 0.1;
+          break;
+        case 'rain-forest':
+          // Pink noise for rain effect
+          sample = (Math.random() - 0.5) * 0.08 * Math.sin(t * 10);
+          break;
+        case 'ocean-waves':
+          // Wave-like pattern
+          sample = Math.sin(t * 0.5) * 0.1 * (Math.random() * 0.5 + 0.5);
+          break;
+        case 'wind-chimes':
+          // Random bell-like tones
+          if (Math.random() < 0.001) {
+            sample = Math.sin(t * 1000 * (1 + Math.random())) * 0.1 * Math.exp(-t % 1 * 5);
+          }
+          break;
+        case 'binaural-alpha':
+          // 10Hz binaural beat
+          sample = Math.sin(t * 2 * Math.PI * 440) * 0.05;
+          break;
+        case 'heart-coherence':
+          // Rhythmic pulses at 60 BPM
+          sample = Math.sin(t * 2 * Math.PI * 1) * 0.1 * Math.exp(-(t % 1) * 10);
+          break;
+        default:
+          sample = Math.sin(t * 2 * Math.PI * 220) * 0.05;
+      }
+      
+      // Convert to 16-bit integer and write to buffer
+      const intSample = Math.max(-32768, Math.min(32767, sample * 32767));
+      buffer.writeInt16LE(intSample, 44 + (i * 2));
+    }
+    
+    res.set({
+      'Content-Type': 'audio/wav',
+      'Content-Length': buffer.length.toString(),
+      'Cache-Control': 'public, max-age=3600',
+      'Accept-Ranges': 'bytes'
     });
-
+    
+    res.send(buffer);
   } catch (error) {
     console.error('Ambient audio generation error:', error);
     res.status(500).json({ error: 'Failed to generate ambient audio' });

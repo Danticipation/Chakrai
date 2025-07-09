@@ -238,18 +238,30 @@ const DynamicAmbientSound: React.FC = () => {
         audio.src = sound.audioUrl;
       }
 
-      await audio.load();
-      await audio.play();
-      
-      // Fade in the new sound
-      const targetVolume = sound.volume * masterVolume;
-      fadeIntervals.current[sound.id] = fadeInAudio(audio, targetVolume);
-      
-      setCurrentSoundId(sound.id);
-      setIsPlaying(true);
+      // Add error handling for audio loading
+      audio.onerror = (error) => {
+        console.error('Audio loading error:', error);
+        generateAmbientSound(sound);
+      };
+
+      try {
+        await audio.load();
+        await audio.play();
+        
+        // Fade in the new sound
+        const targetVolume = sound.volume * masterVolume;
+        fadeIntervals.current[sound.id] = fadeInAudio(audio, targetVolume);
+        
+        setCurrentSoundId(sound.id);
+        setIsPlaying(true);
+      } catch (playError) {
+        console.error('Audio play error, falling back to generated sound:', playError);
+        generateAmbientSound(sound);
+        setCurrentSoundId(sound.id);
+        setIsPlaying(true);
+      }
     } catch (error) {
       console.error('Error playing ambient sound:', error);
-      // Fallback to generated ambient sound
       generateAmbientSound(sound);
     } finally {
       setIsLoading(false);

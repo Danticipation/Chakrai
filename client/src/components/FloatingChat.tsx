@@ -149,15 +149,26 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
       }
 
       audioRef.current = new Audio(audioUrl);
+      audioRef.current.volume = 0.8; // Set reasonable volume
       audioRef.current.onended = () => {
         setIsPlayingVoice(false);
         URL.revokeObjectURL(audioUrl);
       };
-      audioRef.current.onerror = () => {
+      audioRef.current.onerror = (error) => {
+        console.error('Audio playback error:', error);
         setIsPlayingVoice(false);
         URL.revokeObjectURL(audioUrl);
       };
-      await audioRef.current.play();
+      
+      // Try to play with better error handling
+      try {
+        await audioRef.current.play();
+      } catch (playError) {
+        console.error('Autoplay prevented:', playError);
+        // If autoplay fails, we could show a play button or try again later
+        setIsPlayingVoice(false);
+        URL.revokeObjectURL(audioUrl);
+      }
     } catch (error) {
       console.error('Error playing voice:', error);
       setIsPlayingVoice(false);
@@ -288,7 +299,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
             <MessageCircle size={20} className="theme-text" />
           </div>
           <div>
-            <h3 className="theme-text font-semibold">TraI Companion</h3>
+            <h3 className="theme-text font-semibold">Chakrai Companion</h3>
             <p className="theme-text-secondary text-xs">Always here to help</p>
           </div>
         </div>
