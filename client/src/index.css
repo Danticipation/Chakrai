@@ -906,7 +906,7 @@ input:focus, button:focus {
   }
   
   .grid.grid-cols-3 img {
-    height: 3rem !important;
+    height: 8rem !important;
     margin-bottom: 0.5rem !important;
   }
 }
@@ -955,7 +955,7 @@ input:focus, button:focus {
   }
   
   .grid.grid-cols-3 img {
-    height: 2.5rem !important;
+    height: 6rem !important;
     margin-bottom: 0.25rem !important;
   }
 }
@@ -1098,7 +1098,7 @@ input:focus, button:focus {
   }
   
   .grid.grid-cols-3 img {
-    height: 1.5rem !important;
+    height: 4rem !important;
   }
 }
 
