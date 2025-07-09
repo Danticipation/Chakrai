@@ -1397,14 +1397,14 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 <div className="theme-card border-luxury glass-luxury gradient-luxury shadow-deep p-10 text-center hover-lift text-luxury border-2 border-silver">
                   <div className="relative mb-8">
                     <img 
-                      src={traiLogo} 
-                      alt="TraI" 
+                      src={chakraiLogo} 
+                      alt="Chakrai" 
                       className="h-48 sm:h-56 w-auto mx-auto transform hover:scale-110 transition-transform duration-300 drop-shadow-xl" 
                     />
                     <div className="absolute -top-1 -right-1 w-4 h-4 theme-accent rounded-full animate-ping"></div>
                   </div>
                   <h1 className="text-5xl font-bold theme-text mb-4 bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-secondary)] bg-clip-text text-transparent font-serif">
-                    Welcome to TRaI Mental Wellness
+                    Welcome to Chakrai Mental Wellness
                   </h1>
                   <p className="theme-text-secondary text-xl mb-8 font-light tracking-wide">Your AI companion is here to support your mental health and personal growth</p>
                   
