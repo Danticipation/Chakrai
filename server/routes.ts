@@ -1,5 +1,6 @@
 import express from "express";
 import multer from 'multer';
+import Stripe from 'stripe';
 import { storage } from './storage.js';
 import { analyzeEmotionalState } from './emotionalAnalysis.js';
 import { openai } from './openaiRetry.js';

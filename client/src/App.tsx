@@ -4,7 +4,9 @@ import { MessageCircle, Brain, BookOpen, Mic, User, Square, Send, Target, Rotate
 import axios from 'axios';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { SubscriptionProvider } from './contexts/SubscriptionContext';
+import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
+import { SubscriptionModal } from './components/SubscriptionModal';
+import { UsageLimitModal } from './components/UsageLimitModal';
 import MemoryDashboard from './components/MemoryDashboard';
 import VoiceSelector from './components/VoiceSelector';
 import ThemeSelector from './components/ThemeSelector';
@@ -76,8 +78,11 @@ interface AppLayoutProps {
 const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   const { currentTheme, changeTheme } = useTheme();
   const { user, isAuthenticated } = useAuth();
+  const { subscription, canUseFeature, updateUsage } = useSubscription();
   const [activeSection, setActiveSection] = useState('chat');
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showUsageLimitModal, setShowUsageLimitModal] = useState(false);
   const queryClient = useQueryClient();
   
   // Debug logging for activeSection changes
@@ -1829,6 +1834,22 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
           onThemeChange={changeTheme}
         />
       )}
+
+      {/* Subscription Modal */}
+      <SubscriptionModal
+        isOpen={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+      />
+
+      {/* Usage Limit Modal */}
+      <UsageLimitModal
+        isOpen={showUsageLimitModal}
+        onClose={() => setShowUsageLimitModal(false)}
+        onUpgrade={() => {
+          setShowUsageLimitModal(false);
+          setShowSubscriptionModal(true);
+        }}
+      />
 
       {/* Floating Chat Component */}
       <FloatingChat
