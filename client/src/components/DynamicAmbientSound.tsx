@@ -173,7 +173,17 @@ const DynamicAmbientSound: React.FC = () => {
     if (!audioRefs.current[sound.id]) {
       const audio = new Audio();
       audio.loop = true;
-      audio.preload = 'metadata';
+      audio.preload = 'none'; // Changed from 'metadata' to avoid early loading
+      audio.crossOrigin = 'anonymous';
+      // Add more detailed error logging
+      audio.onerror = (error) => {
+        console.error(`Audio error for ${sound.name}:`, error);
+        console.error('Audio source:', audio.src);
+        console.error('Audio ready state:', audio.readyState);
+        console.error('Audio network state:', audio.networkState);
+      };
+      audio.onloadstart = () => console.log(`Loading started for ${sound.name}`);
+      audio.oncanplay = () => console.log(`Can play ${sound.name}`);
       audioRefs.current[sound.id] = audio;
     }
     return audioRefs.current[sound.id];
@@ -245,8 +255,13 @@ const DynamicAmbientSound: React.FC = () => {
       };
 
       try {
-        await audio.load();
-        await audio.play();
+        // Wait for user interaction first
+        if (typeof audio.play === 'function') {
+          const playPromise = audio.play();
+          if (playPromise) {
+            await playPromise;
+          }
+        }
         
         // Fade in the new sound
         const targetVolume = sound.volume * masterVolume;
@@ -254,11 +269,18 @@ const DynamicAmbientSound: React.FC = () => {
         
         setCurrentSoundId(sound.id);
         setIsPlaying(true);
+        console.log('Successfully playing ambient sound:', sound.name);
       } catch (playError) {
         console.error('Audio play error, falling back to generated sound:', playError);
-        generateAmbientSound(sound);
-        setCurrentSoundId(sound.id);
-        setIsPlaying(true);
+        // Try the fallback procedural generation
+        try {
+          generateAmbientSound(sound);
+          setCurrentSoundId(sound.id);
+          setIsPlaying(true);
+          console.log('Fallback audio generation successful for:', sound.name);
+        } catch (fallbackError) {
+          console.error('Fallback audio generation failed:', fallbackError);
+        }
       }
     } catch (error) {
       console.error('Error playing ambient sound:', error);
@@ -405,6 +427,25 @@ const DynamicAmbientSound: React.FC = () => {
                     <Play className="w-5 h-5" />
                   )}
                   <span>{isLoading ? 'Loading...' : isPlaying ? 'Pause' : 'Play'}</span>
+                </button>
+                <button
+                  onClick={() => {
+                    console.log('Testing direct audio endpoint...');
+                    const testAudio = new Audio('/api/ambient-audio/white-noise');
+                    testAudio.volume = 0.3;
+                    testAudio.play().then(() => {
+                      console.log('Direct audio test successful!');
+                      setTimeout(() => {
+                        testAudio.pause();
+                        console.log('Test audio stopped');
+                      }, 3000);
+                    }).catch(e => {
+                      console.error('Direct audio test failed:', e);
+                    });
+                  }}
+                  className="px-4 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors border border-silver text-sm"
+                >
+                  Test Audio
                 </button>
                 <button
                   onClick={stopSound}
