@@ -37,19 +37,19 @@ interface AchievementDashboardProps {
 export default function AchievementDashboard({ userId }: AchievementDashboardProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const { data: achievements = [], isLoading: achievementsLoading } = useQuery({
+  const { data: achievements = [], isLoading: achievementsLoading } = useQuery<Achievement[]>({
     queryKey: ['/api/achievements', userId],
   });
 
-  const { data: streaks = [], isLoading: streaksLoading } = useQuery({
+  const { data: streaks = [], isLoading: streaksLoading } = useQuery<WellnessStreak[]>({
     queryKey: ['/api/wellness-streaks', userId],
   });
 
-  const { data: badges = [], isLoading: badgesLoading } = useQuery({
+  const { data: badges = [], isLoading: badgesLoading } = useQuery<Badge[]>({
     queryKey: ['/api/badges'],
   });
 
-  const { data: userStats = {}, isLoading: statsLoading } = useQuery({
+  const { data: userStats = {}, isLoading: statsLoading } = useQuery<Record<string, any>>({
     queryKey: ['/api/user-stats', userId],
   });
 
@@ -70,9 +70,9 @@ export default function AchievementDashboard({ userId }: AchievementDashboardPro
     );
   }
 
-  const earnedBadges = achievements.map((a: Achievement) => a.badgeId);
-  const totalPoints = achievements.reduce((sum: number, achievement: Achievement) => {
-    const badge = badges.find((b: Badge) => b.id === achievement.badgeId);
+  const earnedBadges = achievements.map((a) => a.badgeId);
+  const totalPoints = achievements.reduce((sum, achievement) => {
+    const badge = badges.find((b) => b.id === achievement.badgeId);
     return sum + (badge?.points || 0);
   }, 0);
 
@@ -113,7 +113,7 @@ export default function AchievementDashboard({ userId }: AchievementDashboardPro
 
   const filteredBadges = selectedCategory === 'all' 
     ? badges 
-    : badges.filter((badge: Badge) => badge.category === selectedCategory);
+    : badges.filter((badge) => badge.category === selectedCategory);
 
   return (
     <div className="space-y-6">
@@ -129,7 +129,7 @@ export default function AchievementDashboard({ userId }: AchievementDashboardPro
 
       {/* Level & Points Overview */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-2xl p-4 text-center shadow-sm" style={{ backgroundColor: 'var(--pale-green)' }}>
+        <div className="rounded-2xl p-4 text-center shadow-sm border-2 border-silver" style={{ backgroundColor: 'var(--pale-green)' }}>
           <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
           <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
             Level {currentLevel}
@@ -144,7 +144,7 @@ export default function AchievementDashboard({ userId }: AchievementDashboardPro
           )}
         </div>
 
-        <div className="rounded-2xl p-4 text-center shadow-sm" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+        <div className="rounded-2xl p-4 text-center shadow-sm border-2 border-silver" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
           <Award className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
           <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
             {achievements.length}
@@ -159,17 +159,17 @@ export default function AchievementDashboard({ userId }: AchievementDashboardPro
       </div>
 
       {/* Wellness Streaks */}
-      <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
+      <div className="rounded-2xl p-4 shadow-sm border-2 border-silver" style={{ backgroundColor: 'var(--surface-secondary)' }}>
         <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
           <Flame className="w-5 h-5 mr-2" style={{ color: 'var(--soft-blue-dark)' }} />
           Wellness Streaks
         </h3>
         <div className="space-y-3">
-          {streaks.map((streak: WellnessStreak) => (
-            <div key={streak.id} className="flex items-center justify-between p-3 rounded-xl" 
+          {streaks.map((streak) => (
+            <div key={streak.id} className="flex items-center justify-between p-3 rounded-xl border-2 border-silver" 
                  style={{ backgroundColor: 'var(--pale-green)' }}>
               <div className="flex items-center">
-                <div className="p-2 rounded-lg mr-3" style={{ backgroundColor: 'var(--soft-blue-dark)', color: 'white' }}>
+                <div className="p-2 rounded-lg mr-3 border-2 border-silver" style={{ backgroundColor: 'var(--soft-blue-dark)', color: 'white' }}>
                   {getStreakIcon(streak.streakType)}
                 </div>
                 <div>
@@ -205,7 +205,7 @@ export default function AchievementDashboard({ userId }: AchievementDashboardPro
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors border-2 border-silver ${
               selectedCategory === category 
                 ? 'text-white' 
                 : 'opacity-70'
@@ -226,12 +226,12 @@ export default function AchievementDashboard({ userId }: AchievementDashboardPro
 
       {/* Badge Grid */}
       <div className="grid grid-cols-1 gap-3">
-        {filteredBadges.map((badge: Badge) => {
+        {filteredBadges.map((badge) => {
           const isEarned = earnedBadges.includes(badge.id);
           return (
             <div 
               key={badge.id}
-              className={`rounded-2xl p-4 shadow-sm transition-all ${
+              className={`rounded-2xl p-4 shadow-sm transition-all border-2 border-silver ${
                 isEarned ? 'ring-2 ring-yellow-400' : 'opacity-50'
               }`}
               style={{ backgroundColor: 'var(--surface-secondary)' }}
@@ -270,7 +270,7 @@ export default function AchievementDashboard({ userId }: AchievementDashboardPro
       </div>
 
       {/* Motivational Message */}
-      <div className="text-center p-4 rounded-2xl" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
+      <div className="text-center p-4 rounded-2xl border-2 border-silver" style={{ backgroundColor: 'var(--gentle-lavender)' }}>
         <Star className="w-6 h-6 mx-auto mb-2" style={{ color: 'var(--soft-blue-dark)' }} />
         <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
           Every small step in your wellness journey counts. Keep going!
