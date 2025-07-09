@@ -949,11 +949,11 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
       case 'logo':
         return (
-          <div className="h-full theme-background p-6 overflow-y-auto">
-            <div className="max-w-2xl mx-auto">
+          <div className="h-full theme-background p-32 overflow-y-auto">
+            <div className="max-w-2x1 mx-auto">
               <div className="theme-card backdrop-blur-sm rounded-2xl p-8 border border-[var(--theme-accent)]/30 shadow-lg text-center">
                 <div className="mb-8">
-                  <img src={traiLogo} alt="TrAI" className="h-32 w-auto mx-auto mb-6" />
+                  <img src={traiLogo} alt="TraI" className="h-36 w-auto mx-auto mb-6" />
                   <h1 className="text-4xl font-bold text-white mb-4">TrAI Mental Wellness</h1>
                   <p className="text-xl text-white/90 mb-6">AI Wellness Companion</p>
                 </div>
@@ -1090,7 +1090,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               onClick={() => setActiveSection('logo')}
               className="theme-card border-luxury glass-luxury gradient-luxury shadow-luxury hover-lift p-3 sm:p-8 flex flex-col items-center justify-center border-2 border-[var(--theme-accent)]/30 hover:border-[var(--theme-secondary)]/50 transition-all cursor-pointer text-luxury"
             >
-              <img src={traiLogo} alt="TrAI" className="trai-logo-large h-32 sm:h-64 w-auto mb-2 sm:mb-6 -mt-1 sm:-mt-2.5 drop-shadow-lg" />
+              <img src={traiLogo} alt="TrAI" className="trai-logo-large h-36 sm:h-48 w-auto mb-2 sm:mb-6 -mt-1 sm:-mt-2.5 drop-shadow-lg" />
               <p className="text-sm sm:text-xl theme-text font-semibold tracking-wide">TraI Mental Wellness</p>
               <p className="text-xs sm:text-sm theme-text-secondary mt-1 sm:mt-3 font-light">Click for more info</p>
             </button>
