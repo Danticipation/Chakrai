@@ -33,12 +33,12 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   ];
 
   const themes = [
-    { id: 'midnight', name: 'Midnight Luxury', description: 'Deep blues and purples' },
+    { id: 'blue', name: 'Midnight Luxury', description: 'Deep blues and purples' },
     { id: 'lavender', name: 'Soft Lavender', description: 'Gentle purple tones' },
-    { id: 'ocean', name: 'Ocean Depths', description: 'Calming sea blues' },
-    { id: 'forest', name: 'Forest Luxury', description: 'Natural green tones' },
-    { id: 'sunset', name: 'Sunset Rose', description: 'Warm pink hues' },
-    { id: 'gold', name: 'Warm Gold', description: 'Rich golden tones' }
+    { id: 'teal', name: 'Ocean Depths', description: 'Calming sea blues' },
+    { id: 'sage', name: 'Forest Luxury', description: 'Natural green tones' },
+    { id: 'rose', name: 'Sunset Rose', description: 'Warm pink hues' },
+    { id: 'amber', name: 'Warm Gold', description: 'Rich golden tones' }
   ];
 
   const handleDataExport = async () => {
