@@ -760,7 +760,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <VoluntaryQuestionDeck />;
 
       case 'feedback':
-        return <FeedbackSystem userId={currentUserId || 1} />;
+        return <FeedbackSystem userId={getCurrentUserId()} />;
 
       case 'challenges':
         return <ChallengeSystem onNavigate={setActiveSection} onMobileModalNavigate={handleMobileModalNavigation} />;
@@ -1552,12 +1552,12 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
 
         {/* Right Stats Sidebar - Mobile Responsive */}
         <div className="hidden lg:block w-96 py-8 px-8">
-          <div className="text-white text-2xl font-bold mb-8 text-center underline">Stats or goal tracking</div>
+          <div className="text-white text-2xl font-bold mb-8 text-center underline">Goal Tracking</div>
           
           {/* Real Progress Tracking */}
           <div className="space-y-6">
             {/* Daily Journaling Progress */}
-            <div className="theme-card rounded-lg p-6">
+            <div className="theme-card rounded-lg p-3">
               <div className="theme-text text-lg font-bold mb-3">Daily Journaling</div>
               <div className="theme-background rounded-full h-4 mb-3">
                 <div className="progress-high h-4 rounded-full" style={{width: streakStats ? `${Math.min(100, (streakStats.consecutiveDaysJournaling / 30) * 100)}%` : '0%'}}></div>
@@ -1566,7 +1566,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
 
             {/* Weekly Chat Sessions */}
-            <div className="theme-card rounded-lg p-6">
+            <div className="theme-card rounded-lg p-3">
               <div className="theme-text text-lg font-bold mb-3">Chat Activity</div>
               <div className="theme-background rounded-full h-4 mb-3">
                 <div className="progress-medium h-4 rounded-full" style={{width: streakStats ? `${Math.min(100, (streakStats.consecutiveDaysActive / 7) * 100)}%` : '0%'}}></div>
@@ -1575,7 +1575,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
 
             {/* Total Active Days */}
-            <div className="theme-card rounded-lg p-6">
+            <div className="theme-card rounded-lg p-3">
               <div className="theme-text text-lg font-bold mb-3">Total Active Days</div>
               <div className="theme-background rounded-full h-4 mb-3">
                 <div className="progress-high h-4 rounded-full" style={{width: streakStats ? `${Math.min(100, (streakStats.totalActiveDays / 30) * 100)}%` : '0%'}}></div>
@@ -1584,7 +1584,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
 
             {/* Wellness Journey */}
-            <div className="theme-card rounded-lg p-6 text-center">
+            <div className="theme-card rounded-lg p-3 text-center">
               <div className="theme-text text-lg font-bold mb-3">Wellness Journey</div>
               <div className="theme-text text-2xl font-bold mb-2">
                 {streakStats && streakStats.totalActiveDays > 0 ? `Day ${streakStats.totalActiveDays}` : 'Day 1'}
@@ -1595,7 +1595,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             </div>
 
             {/* Reset Data Button */}
-            <div className="theme-card rounded-lg p-6 text-center">
+            <div className="theme-card rounded-lg p-2 text-center">
               <button 
                 onClick={clearAllUserData}
                 className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg transition-colors font-medium"
