@@ -6,7 +6,7 @@
   "display": "standalone",
   "background_color": "#0a0e1a",
   "theme_color": "#0d82da",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "orientation": "portrait-primary",
   "categories": ["health", "wellness", "medical"],
   "lang": "en",

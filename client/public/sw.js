@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trai-pwa-v4-20250709';
+const CACHE_NAME = 'trai-pwa-v5-fixed-logo';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
