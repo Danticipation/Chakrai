@@ -381,10 +381,14 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
-              className="w-full rounded-xl px-4 py-2 theme-text theme-text-secondary focus:outline-none focus:ring-1 floating-chat-input"
+              className="w-full rounded-xl px-4 py-2 theme-text theme-text-secondary focus:outline-none focus:ring-1"
               style={{
                 backgroundColor: `var(--theme-surface)`,
-                border: `1px solid var(--theme-accent)`
+                border: `1px solid var(--theme-accent)`,
+                '&:focus': {
+                  borderColor: `var(--theme-primary)`,
+                  boxShadow: `0 0 0 1px var(--theme-primary)`
+                }
               }}
               disabled={isLoading || isRecording}
             />
