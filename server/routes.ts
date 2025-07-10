@@ -1871,8 +1871,8 @@ router.get('/ambient-audio/:soundId', async (req, res) => {
   try {
     const { soundId } = req.params;
     
-    // Generate simple procedural audio for different sound types
-    const sampleRate = 22050; // Lower sample rate for smaller files
+    // Generate high-quality procedural audio for different sound types
+    const sampleRate = 44100; // CD quality sample rate
     const duration = 30; // 30 seconds of audio
     const numSamples = sampleRate * duration;
     
@@ -1906,31 +1906,101 @@ router.get('/ambient-audio/:soundId', async (req, res) => {
           break;
         }
         case 'rain-forest': {
-          // Layered rain effect with varying droplet intensities
-          const rainBase = (Math.random() - 0.5) * 0.06;
-          const droplets = Math.random() < 0.3 ? (Math.random() - 0.5) * 0.15 : 0;
-          const windRustle = Math.sin(t * 0.7) * 0.02 * (Math.random() * 0.5 + 0.5);
-          sample = rainBase + droplets + windRustle;
+          // Sophisticated rain forest with multiple layers and natural variations
+          const rainIntensity = 0.8 + 0.2 * Math.sin(t * 0.05); // Varying intensity
+          
+          // Base rain layer - filtered noise
+          const rainBase = (Math.random() - 0.5) * 0.04 * rainIntensity;
+          
+          // Individual droplets hitting leaves
+          let dropletSounds = 0;
+          if (Math.random() < 0.2 * rainIntensity) {
+            const dropFreq = 300 + Math.random() * 700;
+            const dropDecay = Math.exp(-((t * 12) % 1) * 8);
+            dropletSounds = Math.sin(t * dropFreq * 2 * Math.PI) * 0.08 * dropDecay;
+          }
+          
+          // Wind through leaves with natural variation
+          const windFreq = 0.5 + Math.sin(t * 0.1) * 0.2;
+          const windBase = Math.sin(t * windFreq) * 0.015;
+          const leafRustle = (Math.random() - 0.5) * 0.01 * Math.abs(Math.sin(t * 0.8));
+          
+          // Water trickling down branches
+          let trickleSound = 0;
+          if (Math.random() < 0.05) {
+            const trickleFreq = 200 + Math.random() * 400;
+            trickleSound = Math.sin(t * trickleFreq * 2 * Math.PI) * 0.03 * Math.exp(-((t * 6) % 2));
+          }
+          
+          // Distant thunder (rare)
+          let thunder = 0;
+          if (Math.random() < 0.0002) {
+            const thunderFreq = 30 + Math.random() * 70;
+            thunder = Math.sin(t * thunderFreq * 2 * Math.PI) * 0.15 * Math.exp(-((t * 1) % 8));
+          }
+          
+          sample = rainBase + dropletSounds + windBase + leafRustle + trickleSound + thunder;
           break;
         }
         case 'ocean-waves': {
-          // Realistic ocean waves with foam and depth
-          const wave1 = Math.sin(t * 0.3) * 0.08;
-          const wave2 = Math.sin(t * 0.7) * 0.04;
-          const foam = (Math.random() - 0.5) * 0.03 * Math.abs(Math.sin(t * 0.5));
-          const deepRumble = Math.sin(t * 0.1) * 0.02;
-          sample = wave1 + wave2 + foam + deepRumble;
+          // Sophisticated ocean soundscape with multiple wave patterns
+          const waveIntensity = 0.9 + 0.1 * Math.sin(t * 0.03); // Tide variation
+          
+          // Large wave swells
+          const mainWave = Math.sin(t * 0.15) * 0.12 * waveIntensity;
+          const secondaryWave = Math.sin(t * 0.25 + Math.PI/3) * 0.08 * waveIntensity;
+          
+          // Medium waves with foam
+          const midWave = Math.sin(t * 0.4) * 0.06 * (0.8 + 0.2 * Math.sin(t * 0.1));
+          
+          // Foam and bubbles with realistic texture
+          const foamIntensity = Math.abs(Math.sin(t * 0.3)) * waveIntensity;
+          const foam = (Math.random() - 0.5) * 0.04 * foamIntensity;
+          
+          // Deep ocean rumble
+          const deepRumble = Math.sin(t * 0.08) * 0.025;
+          
+          // Occasional seagulls
+          let seagulls = 0;
+          if (Math.random() < 0.001) {
+            const birdFreq = 1200 + Math.random() * 1000;
+            seagulls = Math.sin(t * birdFreq * 2 * Math.PI) * 0.06 * Math.exp(-((t * 3) % 4));
+          }
+          
+          // Water lapping on shore
+          const lapFreq = 0.6 + Math.sin(t * 0.05) * 0.2;
+          const waterLap = Math.sin(t * lapFreq) * 0.03;
+          
+          sample = mainWave + secondaryWave + midWave + foam + deepRumble + seagulls + waterLap;
           break;
         }
         case 'wind-chimes': {
-          // Gentle wind chimes with soft breeze
-          const windBase = Math.sin(t * 2) * 0.01 * (Math.random() * 0.3 + 0.7);
+          // Realistic wind chimes with harmonic resonance and natural wind patterns
+          const windStrength = 0.6 + 0.4 * Math.sin(t * 0.08);
+          const windBase = Math.sin(t * 1.2 + Math.sin(t * 0.3) * 0.8) * 0.012 * windStrength;
+          
           let chimeSound = 0;
-          if (Math.random() < 0.003) {
-            const chimeFreq = 800 + Math.random() * 600;
-            chimeSound = Math.sin(t * chimeFreq * 2 * Math.PI) * 0.08 * Math.exp(-((t * 10) % 10));
+          if (Math.random() < 0.006 * windStrength) {
+            const fundamentalFreq = 350 + Math.random() * 500;
+            const harmonic2 = fundamentalFreq * 1.618; // Golden ratio harmonic
+            const harmonic3 = fundamentalFreq * 2.414; // Natural overtone
+            
+            const chimeDecay = Math.exp(-((t * 2.5) % 2.5) * 3);
+            const resonance = 1 + 0.3 * Math.sin(t * fundamentalFreq * 0.1);
+            
+            chimeSound = (
+              Math.sin(t * fundamentalFreq * 2 * Math.PI) * 0.1 +
+              Math.sin(t * harmonic2 * 2 * Math.PI) * 0.05 +
+              Math.sin(t * harmonic3 * 2 * Math.PI) * 0.025
+            ) * chimeDecay * resonance;
           }
-          sample = windBase + chimeSound;
+          
+          // Gentle breeze with leaves
+          const breezeFreq = 0.7 + Math.sin(t * 0.05) * 0.3;
+          const breeze = Math.sin(t * breezeFreq) * 0.008;
+          const leafRustle = (Math.random() - 0.5) * 0.005 * windStrength;
+          
+          sample = windBase + chimeSound + breeze + leafRustle;
           break;
         }
         case 'binaural-alpha': {
@@ -1939,32 +2009,108 @@ router.get('/ambient-audio/:soundId', async (req, res) => {
           break;
         }
         case 'heart-coherence': {
-          // Rhythmic pulses at 60 BPM with gentle harmonics
-          const heartbeat = Math.sin(t * 2 * Math.PI * 1) * 0.08 * Math.exp(-(t % 1) * 8);
-          const harmonic = Math.sin(t * 2 * Math.PI * 2) * 0.03 * Math.exp(-(t % 1) * 12);
-          sample = heartbeat + harmonic;
+          // Realistic heart rhythm with coherent breathing pattern
+          const bpm = 60;
+          const heartCycle = (t * bpm / 60) % 1;
+          
+          let heartbeat = 0;
+          if (heartCycle < 0.08) {
+            // Lub (S1 sound) - ventricular contraction
+            const lubPhase = heartCycle / 0.08;
+            heartbeat = Math.sin(lubPhase * Math.PI) * 0.15 * Math.exp(-lubPhase * 12);
+          } else if (heartCycle > 0.12 && heartCycle < 0.2) {
+            // Dub (S2 sound) - valve closure
+            const dubPhase = (heartCycle - 0.12) / 0.08;
+            heartbeat = Math.sin(dubPhase * Math.PI) * 0.08 * Math.exp(-dubPhase * 10);
+          }
+          
+          // Coherent breathing at 5 breaths per minute (0.083 Hz)
+          const breathingRate = 0.083;
+          const breathingPhase = (t * breathingRate) % 1;
+          let breathing = 0;
+          if (breathingPhase < 0.4) {
+            // Inhale
+            breathing = Math.sin(breathingPhase * 2.5 * Math.PI) * 0.02;
+          } else if (breathingPhase > 0.6) {
+            // Exhale
+            const exhalePhase = (breathingPhase - 0.6) / 0.4;
+            breathing = Math.sin(exhalePhase * Math.PI) * 0.015;
+          }
+          
+          // Subtle ambient harmony
+          const harmony = Math.sin(t * 2 * Math.PI * 0.5) * 0.01;
+          
+          sample = heartbeat + breathing + harmony;
           break;
         }
         case 'morning-birds': {
-          // Cheerful bird sounds with variety
+          // Realistic morning bird chorus with multiple species
           let birdSong = 0;
-          if (Math.random() < 0.008) {
-            const freq = 1000 + Math.random() * 2000;
-            birdSong = Math.sin(t * freq * 2 * Math.PI) * 0.06 * Math.exp(-((t * 3) % 3));
+          
+          // Robin-like warbling
+          if (Math.random() < 0.012) {
+            const baseFreq = 800 + Math.random() * 1000;
+            const warble = Math.sin(t * baseFreq * 2 * Math.PI + Math.sin(t * 15) * 0.8);
+            const trill = Math.sin(t * baseFreq * 2.5 * 2 * Math.PI) * 0.3;
+            birdSong += (warble + trill) * 0.08 * Math.exp(-((t * 1.5) % 1.5) * 2);
           }
-          const ambientForest = Math.sin(t * 0.5) * 0.01 * (Math.random() * 0.2 + 0.8);
-          sample = birdSong + ambientForest;
+          
+          // Cardinal-like whistle
+          if (Math.random() < 0.006) {
+            const whistleFreq = 1500 + Math.random() * 800;
+            const whistle = Math.sin(t * whistleFreq * 2 * Math.PI);
+            birdSong += whistle * 0.07 * Math.exp(-((t * 2) % 2) * 3);
+          }
+          
+          // Sparrow-like chirps
+          if (Math.random() < 0.01) {
+            const chirpFreq = 2000 + Math.random() * 1500;
+            const chirp = Math.sin(t * chirpFreq * 2 * Math.PI);
+            birdSong += chirp * 0.05 * Math.exp(-((t * 6) % 1) * 8);
+          }
+          
+          // Distant woodpecker
+          if (Math.random() < 0.002) {
+            const peckFreq = 600 + Math.random() * 400;
+            const peck = Math.sin(t * peckFreq * 2 * Math.PI);
+            birdSong += peck * 0.04 * Math.exp(-((t * 10) % 0.1) * 20);
+          }
+          
+          // Forest ambience with wind
+          const forestBase = Math.sin(t * 0.4) * 0.008;
+          const windThroughTrees = Math.sin(t * 0.6 + Math.sin(t * 0.1) * 0.5) * 0.006;
+          const leafRustle = (Math.random() - 0.5) * 0.003;
+          
+          sample = birdSong + forestBase + windThroughTrees + leafRustle;
           break;
         }
         case 'water-drops': {
-          // Gentle water droplets in cave-like environment
+          // Realistic water droplets in cave with natural reverb
           let dropSound = 0;
-          if (Math.random() < 0.004) {
-            const dropFreq = 400 + Math.random() * 300;
-            dropSound = Math.sin(t * dropFreq * 2 * Math.PI) * 0.1 * Math.exp(-((t * 5) % 5));
+          if (Math.random() < 0.008) {
+            const dropFreq = 250 + Math.random() * 450;
+            const harmonicFreq = dropFreq * 1.5;
+            
+            // Initial impact
+            const impact = Math.sin(t * dropFreq * 2 * Math.PI) * 0.12 * Math.exp(-((t * 10) % 1) * 15);
+            
+            // Harmonic ring
+            const ring = Math.sin(t * harmonicFreq * 2 * Math.PI) * 0.06 * Math.exp(-((t * 6) % 1) * 8);
+            
+            // Cave reverb - multiple echoes
+            const echo1 = Math.sin(t * dropFreq * 2 * Math.PI) * 0.04 * Math.exp(-((t * 3) % 1) * 4);
+            const echo2 = Math.sin(t * dropFreq * 2 * Math.PI) * 0.02 * Math.exp(-((t * 1.5) % 1) * 2);
+            const echo3 = Math.sin(t * dropFreq * 2 * Math.PI) * 0.01 * Math.exp(-((t * 0.8) % 1) * 1);
+            
+            dropSound = impact + ring + echo1 + echo2 + echo3;
           }
-          const caveReverb = Math.sin(t * 0.2) * 0.005;
-          sample = dropSound + caveReverb;
+          
+          // Cave atmosphere
+          const caveResonance = Math.sin(t * 0.1) * 0.003;
+          const airMovement = Math.sin(t * 0.05) * 0.002;
+          const deepRumble = Math.sin(t * 0.03) * 0.001;
+          
+          sample = dropSound + caveResonance + airMovement + deepRumble;
           break;
         }
         default: {

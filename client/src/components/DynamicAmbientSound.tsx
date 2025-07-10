@@ -431,7 +431,7 @@ const DynamicAmbientSound: React.FC = () => {
                 <button
                   onClick={() => {
                     console.log('Testing ocean waves audio...');
-                    const testAudio = new Audio('/api/ambient-audio/ocean-waves');
+                    const testAudio = new Audio('/api/ambient-audio/rain-forest');
                     testAudio.volume = 0.4;
                     testAudio.play().then(() => {
                       console.log('Ocean waves test successful!');
@@ -445,7 +445,7 @@ const DynamicAmbientSound: React.FC = () => {
                   }}
                   className="px-4 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors border border-silver text-sm"
                 >
-                  Test Ocean
+                  Test Forest Rain
                 </button>
                 <button
                   onClick={stopSound}
