@@ -403,7 +403,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
               }}
               disabled={!isPlayingVoice}
             >
-              {isPlayingVoice ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              {isPlayingVoice ? <VolumeX size={18} /> : <Volume2 size={24} />}
             </button>
           )}
 
@@ -420,7 +420,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
             }}
             disabled={isLoading}
           >
-            {isRecording ? <Square size={18} /> : <Mic size={18} />}
+            {isRecording ? <Square size={18} /> : <Mic size={24} />}
           </button>
 
           {/* Send button */}
@@ -432,7 +432,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
             }}
             disabled={isLoading || !inputMessage.trim()}
           >
-            <Send size={18} />
+            <Send size={24} />
           </button>
         </div>
         
