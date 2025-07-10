@@ -1137,3 +1137,9 @@ input:focus, button:focus {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Floating chat input focus styles */
+.floating-chat-input:focus {
+  border-color: var(--theme-primary) !important;
+  box-shadow: 0 0 0 1px var(--theme-primary) !important;
+}

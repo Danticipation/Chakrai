@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trai-wellness-v1-fresh';
+const CACHE_NAME = 'Chakrai-wellness-v1-fresh';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',

@@ -63,7 +63,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
         // Only show greeting if no chat history exists
         setMessages([{
           sender: 'bot',
-          text: 'Hello! I\'m TraI, How are you feeling today?',
+          text: 'Hello! I\'m Chakrai, How are you feeling today?',
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }]);
       }
@@ -72,7 +72,7 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
       // Fallback to greeting message
       setMessages([{
         sender: 'bot',
-        text: 'Hello! I\'m TraI, How are you feeling today?',
+        text: 'Hello! I\'m Chakrai, How are you feeling today?',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     }
@@ -381,14 +381,10 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
-              className="w-full rounded-xl px-4 py-2 theme-text theme-text-secondary focus:outline-none focus:ring-1"
+              className="w-full rounded-xl px-4 py-2 theme-text theme-text-secondary focus:outline-none focus:ring-1 floating-chat-input"
               style={{
                 backgroundColor: `var(--theme-surface)`,
-                border: `1px solid var(--theme-accent)`,
-                '&:focus': {
-                  borderColor: `var(--theme-primary)`,
-                  boxShadow: `0 0 0 1px var(--theme-primary)`
-                }
+                border: `1px solid var(--theme-accent)`
               }}
               disabled={isLoading || isRecording}
             />
