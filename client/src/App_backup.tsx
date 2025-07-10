@@ -15,7 +15,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const traiLogo = '/TrAI-Logo.png';
+const ChakraiLogo = '/TrAI-Logo.png';
 
 interface BotStats {
   level: number;
@@ -434,8 +434,8 @@ const AppLayout = () => {
       <div className="bg-white/60 backdrop-blur-sm p-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <img src={traiLogo} alt="TrAI" className="w-8 h-8" />
-            <h1 className="text-xl font-bold text-gray-800">TrAI</h1>
+            <img src={ChakraiLogo} alt="Chakrai" className="w-8 h-8" />
+            <h1 className="text-xl font-bold text-gray-800">chakrai</h1>
           </div>
           <div className="flex items-center space-x-2">
             {botStats && (

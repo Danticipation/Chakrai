@@ -38,7 +38,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import FloatingChat from './components/FloatingChat';
 import ChallengeSystem from './components/ChallengeSystem';
 import SettingsPanel from './components/SettingsPanel';
-import DynamicAmbientSound from './components/DynamicAmbientSound';
+// import DynamicAmbientSound from './components/DynamicAmbientSound'; // DISABLED due to audio issues
 import { getCurrentUserId } from './utils/userSession';
 
 const queryClient = new QueryClient({
@@ -122,7 +122,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
   const featureDescriptions: Record<string, string> = {
     'daily': 'AI-powered personality reflection that analyzes your conversations to provide insights about your communication style, emotional patterns, and personal growth opportunities.',
     'journal': 'Private therapeutic journaling with mood tracking, voice-to-text, and AI insights to help process thoughts and emotions.',
-    'memory': 'View how TraI learns and remembers your personality, preferences, and conversation patterns to provide more personalized support.',
+    'memory': 'View how Chakrai learns and remembers your personality, preferences, and conversation patterns to provide more personalized support.',
     'analytics': 'Comprehensive wellness analytics showing mood trends, journal insights, goal progress, and therapeutic outcomes over time.',
     'questions': 'Voluntary question deck with 12 categories including personality, lifestyle, emotional, social, and therapeutic insights to enhance AI personalization.',
     'challenges': 'Gamified wellness challenges with daily, weekly, streak, and seasonal goals to motivate consistent self-care and mental health practices.',
@@ -130,7 +130,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     'community': 'Connect with peer support groups, wellness challenges, and therapeutic forums in a safe, moderated environment.',
     'vr': 'Virtual reality guided meditation, exposure therapy, and immersive therapeutic environments for enhanced mental wellness.',
     'health': 'Integrate wearable devices to correlate physical health metrics with emotional wellness for comprehensive health insights.',
-    'ambient-sound': 'AI-curated ambient soundscapes that adapt to your current mood and wellness needs for enhanced relaxation and focus.',
+    // 'ambient-sound': 'AI-curated ambient soundscapes that adapt to your current mood and wellness needs for enhanced relaxation and focus.', // DISABLED due to audio quality issues
     'agents': 'Specialized AI therapists for specific needs: CBT Coach, Mindfulness Guide, Anxiety Specialist, and Self-Compassion Coach.',
     'adaptive': 'AI learning system that adapts therapeutic approaches based on your responses, progress, and preferred communication style.',
     'therapy-plans': 'Personalized therapeutic care plans with goals, exercises, progress tracking, and professional guidance recommendations.',
@@ -138,7 +138,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
     'privacy': 'Advanced privacy controls with zero-knowledge encryption, differential privacy analytics, and GDPR compliance features.',
     'outcomes': 'Therapeutic outcome tracking with evidence-based metrics, progress indicators, and clinical assessment tools.',
     'ehr': 'Electronic health record integration with FHIR standards, insurance-eligible session summaries, and clinical data export.',
-    'privacy-policy': 'Complete privacy policy and legal compliance information for TraI mental wellness companion services.'
+    'privacy-policy': 'Complete privacy policy and legal compliance information for Chakrai mental wellness companion services.'
   };
   const [newUserName, setNewUserName] = useState('');
   const [userQuery, setUserQuery] = useState('');
@@ -821,7 +821,11 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <HealthIntegration />;
 
       case 'ambient-sound':
-        return <DynamicAmbientSound />;
+        return (
+          <div className="flex items-center justify-center h-64 text-white/60">
+            <p>Ambient sound feature disabled due to audio quality issues</p>
+          </div>
+        );
 
       case 'privacy':
         return <PrivacyCompliance />;
@@ -898,7 +902,11 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
         return <HealthIntegration />;
 
       case 'ambient-sound':
-        return <DynamicAmbientSound />;
+        return (
+          <div className="flex items-center justify-center h-64 text-white/60">
+            <p>Ambient sound feature disabled due to audio quality issues</p>
+          </div>
+        );
 
       case 'privacy':
         return <PrivacyCompliance />;
@@ -1027,7 +1035,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                   <div className="grid grid-cols-2 gap-6 text-center">
                     <div>
                       <div className="text-2xl font-bold theme-text">{botStats?.stage || 'Wellness Companion'}</div>
-                      <div className="text-sm theme-text opacity-60">Level {botStats?.level || 3}</div>
+                      <div className="text-sm theme-text opacity-60">Level {botStats?.level || 1}</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold theme-text">95%</div>
@@ -1102,8 +1110,8 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
             
             {/* Quick Stats */}
             <div className="text-right">
-              <p className="text-white/90 text-sm font-medium">Level {botStats?.level || 3}</p>
-              <p className="text-white/60 text-xs">{botStats?.stage || 'Wellness Companion'}</p>
+              <p className="text-white/90 text-sm font-medium">Level {botStats?.level || 1}</p>
+              <p className="text-white/60 text-xs">{botStats?.stage || 'Sidekick'}</p>
             </div>
           </div>
           
@@ -1227,7 +1235,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                 { id: 'community', label: 'Community', icon: '👥' },
                 { id: 'vr', label: 'VR Therapy', icon: '🥽' },
                 { id: 'health', label: 'Health', icon: '💗' },
-                { id: 'ambient-sound', label: 'Ambient', icon: '🎵' },
+                // { id: 'ambient-sound', label: 'Ambient', icon: '🎵' }, // DISABLED due to audio quality issues
                 { id: 'agents', label: 'Specialists', icon: '🧩' },
                 { id: 'adaptive', label: 'AI Learn', icon: '🤖' },
                 { id: 'therapy-plans', label: 'Plans', icon: '📋' },
@@ -1246,7 +1254,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                       setIsFloatingChatOpen(true);
                     } else if (tab.id === 'settings') {
                       setShowSettings(true);
-                    } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'ambient-sound', 'agents', 'adaptive', 'therapy-plans', 'questions', 'feedback'].includes(tab.id)) {
+                    } else if (['journal', 'analytics', 'memory', 'daily', 'challenges', 'rewards', 'community', 'vr', 'health', 'agents', 'adaptive', 'therapy-plans', 'questions', 'feedback'].includes(tab.id)) {
                       // Track activity for specific sections
                       if (tab.id === 'journal') {
                         updateUserActivity('journal_access');
@@ -1327,7 +1335,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
               { id: 'agents', label: 'AI Specialists' },
               { id: 'vr', label: 'VR Therapy' },
               { id: 'health', label: 'Wearables' },
-              { id: 'ambient-sound', label: 'Ambient Sound' },
+              // { id: 'ambient-sound', label: 'Ambient Sound' }, // DISABLED due to audio quality issues
               { id: 'questions', label: 'Question Deck' },
               { id: 'feedback', label: 'Feedback & Suggestions' },
               { id: 'settings', label: 'Settings' }
@@ -1596,7 +1604,7 @@ const AppLayout = ({ currentUserId, onDataReset }: AppLayoutProps) => {
                     {activeSection === 'privacy' && 'Privacy & Compliance'}
                     {activeSection === 'horoscope' && 'Horoscope'}
                     {activeSection === 'affirmation' && 'Daily Affirmation'}
-                    {activeSection === 'logo' && 'TraI Information'}
+                    {activeSection === 'logo' && 'Chakrai Information'}
                     {activeSection === 'goals' && 'Wellness Goals'}
                     {activeSection === 'outcomes' && 'Therapeutic Outcomes'}
                     {activeSection === 'ehr' && 'EHR Integration'}

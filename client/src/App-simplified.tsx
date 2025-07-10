@@ -91,7 +91,7 @@ const voiceOptions = [
   { id: 'carla', name: 'Carla', description: 'Energetic and encouraging' }
 ];
 
-function TraiApp() {
+function ChakraiApp() {
   const [currentView, setCurrentView] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userId] = useState(1); // Simplified user ID
@@ -104,7 +104,7 @@ function TraiApp() {
   const { data: botStats } = useQuery({
     queryKey: ['/api/bot-stats', userId],
     queryFn: () => axios.get(`/api/bot-stats/${userId}`).then(res => res.data),
-    initialData: { level: 3, stage: 'Therapist', wordsLearned: 1000 }
+    initialData: { level: 1, stage: 'Companion', wordsLearned: 1000 }
   });
 
   const sendMessage = async () => {
@@ -156,7 +156,7 @@ function TraiApp() {
               {messages.length === 0 && (
                 <div className="text-center py-12">
                   <Brain className="w-16 h-16 mx-auto mb-4 text-white/70" />
-                  <h3 className="text-xl font-semibold text-white mb-2">Welcome to TraI</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">Welcome to Chakrai</h3>
                   <p className="text-white/80">Your personal AI therapist is here to help. Start a conversation below.</p>
                 </div>
               )}
@@ -270,7 +270,7 @@ function TraiApp() {
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-4 bg-white/10 backdrop-blur-sm border-b border-white/20">
-        <h1 className="text-xl font-bold text-white">TraI</h1>
+        <h1 className="text-xl font-bold text-white">Chakrai</h1>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 text-white/80 hover:text-white"
@@ -283,7 +283,7 @@ function TraiApp() {
       <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-80 bg-white/10 backdrop-blur-sm border-r border-white/20 md:min-h-screen`}>
         <div className="p-6">
           <div className="hidden md:block mb-8">
-            <h1 className="text-2xl font-bold text-white">TraI</h1>
+            <h1 className="text-2xl font-bold text-white">Chakrai</h1>
             <p className="text-white/70 text-sm">Mental Wellness Companion</p>
           </div>
 
@@ -299,7 +299,7 @@ function TraiApp() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-white/70">Level</span>
-                <span className="text-white font-medium">{botStats?.level || 3}</span>
+                <span className="text-white font-medium">{botStats?.level || 1}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-white/70">Experience</span>
@@ -354,7 +354,7 @@ function TraiApp() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TraiApp />
+      <ChakraiApp />
     </QueryClientProvider>
   );
 }

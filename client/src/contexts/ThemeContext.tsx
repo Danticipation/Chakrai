@@ -156,7 +156,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     // Load saved theme from localStorage on initial load
-    const savedTheme = localStorage.getItem('trai-theme');
+    const savedTheme = localStorage.getItem('chakrai-theme');
     if (savedTheme) {
       const theme = themes.find(t => t.id === savedTheme);
       if (theme) {
@@ -195,7 +195,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const theme = themes.find(t => t.id === themeId);
     if (theme) {
       setCurrentTheme(theme);
-      localStorage.setItem('trai-theme', themeId);
+      localStorage.setItem('Chakrai-theme', themeId);
     }
   };
 
