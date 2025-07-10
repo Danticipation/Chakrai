@@ -1866,10 +1866,18 @@ router.get('/user-mood-current', async (req, res) => {
   }
 });
 
-// Ambient audio generation endpoints
+// Ambient audio generation endpoints - serve high-quality pre-recorded or Web Audio API generated sounds
 router.get('/ambient-audio/:soundId', async (req, res) => {
   try {
     const { soundId } = req.params;
+    
+    // For now, return a simple instruction to use Web Audio API on frontend
+    // This will be much higher quality than server-side generation
+    res.status(400).json({ 
+      error: 'Use Web Audio API frontend generation instead',
+      instruction: 'CLIENT_GENERATE' 
+    });
+    return;
     
     // Generate high-quality procedural audio for different sound types
     const sampleRate = 44100; // CD quality sample rate

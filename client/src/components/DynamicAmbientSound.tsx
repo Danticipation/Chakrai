@@ -33,6 +33,10 @@ const DynamicAmbientSound: React.FC = () => {
   
   const audioRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
   const fadeIntervals = useRef<{ [key: string]: NodeJS.Timeout }>({});
+  
+  // Web Audio API references for high-quality sound generation
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const soundGeneratorRef = useRef<any>(null);
 
   // Fetch user's current mood data for adaptive recommendations
   const { data: moodData } = useQuery<UserMoodData>({
@@ -248,38 +252,45 @@ const DynamicAmbientSound: React.FC = () => {
         audio.src = sound.audioUrl;
       }
 
-      // Add error handling for audio loading
-      audio.onerror = (error) => {
-        console.error('Audio loading error:', error);
-        generateAmbientSound(sound);
-      };
-
+      // Try Web Audio API first for high-quality sound
       try {
-        // Wait for user interaction first
-        if (typeof audio.play === 'function') {
+        const audioContext = initAudioContext();
+        
+        // Resume audio context if suspended (required for some browsers)
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume();
+        }
+        
+        const generator = generateWebAudioSound(sound, audioContext);
+        soundGeneratorRef.current = generator;
+        
+        setCurrentSoundId(sound.id);
+        setIsPlaying(true);
+        console.log('Successfully playing high-quality ambient sound:', sound.name);
+      } catch (webAudioError) {
+        console.error('Web Audio API error, falling back to server audio:', webAudioError);
+        
+        // Fallback to server-generated audio
+        try {
+          // Set up audio source if not already set
+          if (!audio.src) {
+            audio.src = sound.audioUrl;
+          }
+          
           const playPromise = audio.play();
           if (playPromise) {
             await playPromise;
           }
-        }
-        
-        // Fade in the new sound
-        const targetVolume = sound.volume * masterVolume;
-        fadeIntervals.current[sound.id] = fadeInAudio(audio, targetVolume);
-        
-        setCurrentSoundId(sound.id);
-        setIsPlaying(true);
-        console.log('Successfully playing ambient sound:', sound.name);
-      } catch (playError) {
-        console.error('Audio play error, falling back to generated sound:', playError);
-        // Try the fallback procedural generation
-        try {
-          generateAmbientSound(sound);
+          
+          // Fade in the new sound
+          const targetVolume = sound.volume * masterVolume;
+          fadeIntervals.current[sound.id] = fadeInAudio(audio, targetVolume);
+          
           setCurrentSoundId(sound.id);
           setIsPlaying(true);
-          console.log('Fallback audio generation successful for:', sound.name);
+          console.log('Successfully playing fallback ambient sound:', sound.name);
         } catch (fallbackError) {
-          console.error('Fallback audio generation failed:', fallbackError);
+          console.error('All audio methods failed:', fallbackError);
         }
       }
     } catch (error) {
@@ -290,32 +301,277 @@ const DynamicAmbientSound: React.FC = () => {
     }
   };
 
-  const generateAmbientSound = (sound: AmbientSound) => {
-    // Generate procedural ambient sound using Web Audio API
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const gainNode = audioContext.createGain();
-    gainNode.connect(audioContext.destination);
-    gainNode.gain.value = sound.volume * masterVolume;
+  const initAudioContext = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    return audioContextRef.current;
+  };
 
-    // Different sound generation based on type
-    switch (sound.category) {
-      case 'white-noise':
-        const bufferSize = audioContext.sampleRate * 2;
-        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
-        }
-        const source = audioContext.createBufferSource();
-        source.buffer = buffer;
-        source.loop = true;
-        source.connect(gainNode);
-        source.start();
-        break;
+  const generateWebAudioSound = (sound: AmbientSound, audioContext: AudioContext) => {
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = sound.volume * masterVolume;
+    gainNode.connect(audioContext.destination);
+
+    let oscillators: OscillatorNode[] = [];
+    let noiseNode: AudioBufferSourceNode | null = null;
+    let intervals: NodeJS.Timeout[] = [];
+
+    const cleanup = () => {
+      oscillators.forEach(osc => {
+        try { osc.stop(); } catch {}
+      });
+      if (noiseNode) {
+        try { noiseNode.stop(); } catch {}
+      }
+      intervals.forEach(interval => clearInterval(interval));
+      oscillators = [];
+      noiseNode = null;
+      intervals = [];
+    };
+
+    const createNoiseBuffer = (context: AudioContext, duration: number = 2) => {
+      const sampleRate = context.sampleRate;
+      const buffer = context.createBuffer(1, sampleRate * duration, sampleRate);
+      const data = buffer.getChannelData(0);
+      
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() - 0.5) * 2;
+      }
+      
+      return buffer;
+    };
+
+    switch (sound.id) {
+      case 'rain-forest':
+        // High-quality rain using filtered noise
+        const rainBuffer = createNoiseBuffer(audioContext);
+        noiseNode = audioContext.createBufferSource();
+        noiseNode.buffer = rainBuffer;
+        noiseNode.loop = true;
         
-      case 'binaural':
+        const rainFilter = audioContext.createBiquadFilter();
+        rainFilter.type = 'lowpass';
+        rainFilter.frequency.value = 1000;
+        rainFilter.Q.value = 0.5;
+        
+        noiseNode.connect(rainFilter);
+        rainFilter.connect(gainNode);
+        noiseNode.start();
+        
+        // Add occasional droplet sounds
+        const dropletOsc = audioContext.createOscillator();
+        dropletOsc.frequency.value = 400;
+        dropletOsc.type = 'sine';
+        
+        const dropletGain = audioContext.createGain();
+        dropletGain.gain.setValueAtTime(0, audioContext.currentTime);
+        
+        dropletOsc.connect(dropletGain);
+        dropletGain.connect(gainNode);
+        dropletOsc.start();
+        
+        oscillators.push(dropletOsc);
+        
+        // Random droplet triggers
+        const dropletInterval = setInterval(() => {
+          if (Math.random() < 0.3) {
+            const now = audioContext.currentTime;
+            dropletGain.gain.setValueAtTime(0, now);
+            dropletGain.gain.linearRampToValueAtTime(0.15, now + 0.01);
+            dropletGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+          }
+        }, 200);
+        
+        intervals.push(dropletInterval);
+        break;
+
+      case 'ocean-waves':
+        // Ocean waves with multiple frequencies
+        const wave1 = audioContext.createOscillator();
+        wave1.frequency.value = 0.1;
+        wave1.type = 'sine';
+        
+        const wave2 = audioContext.createOscillator();
+        wave2.frequency.value = 0.15;
+        wave2.type = 'sine';
+        
+        const waveGain1 = audioContext.createGain();
+        waveGain1.gain.value = 0.4;
+        
+        const waveGain2 = audioContext.createGain();
+        waveGain2.gain.value = 0.3;
+        
+        wave1.connect(waveGain1);
+        wave2.connect(waveGain2);
+        waveGain1.connect(gainNode);
+        waveGain2.connect(gainNode);
+        
+        wave1.start();
+        wave2.start();
+        
+        oscillators.push(wave1, wave2);
+        
+        // Add white noise for foam
+        const foamBuffer = createNoiseBuffer(audioContext);
+        noiseNode = audioContext.createBufferSource();
+        noiseNode.buffer = foamBuffer;
+        noiseNode.loop = true;
+        
+        const foamFilter = audioContext.createBiquadFilter();
+        foamFilter.type = 'highpass';
+        foamFilter.frequency.value = 2000;
+        
+        const foamGain = audioContext.createGain();
+        foamGain.gain.value = 0.1;
+        
+        noiseNode.connect(foamFilter);
+        foamFilter.connect(foamGain);
+        foamGain.connect(gainNode);
+        noiseNode.start();
+        break;
+
+      case 'white-noise':
+        // Pure white noise
+        const whiteNoiseBuffer = createNoiseBuffer(audioContext);
+        noiseNode = audioContext.createBufferSource();
+        noiseNode.buffer = whiteNoiseBuffer;
+        noiseNode.loop = true;
+        noiseNode.connect(gainNode);
+        noiseNode.start();
+        break;
+
+      case 'wind-chimes':
+        // Wind chimes with harmonic frequencies
+        const chimeFreqs = [261.63, 293.66, 329.63, 349.23, 392.00]; // C major pentatonic
+        
+        chimeFreqs.forEach(freq => {
+          const osc = audioContext.createOscillator();
+          osc.frequency.value = freq;
+          osc.type = 'sine';
+          
+          const oscGain = audioContext.createGain();
+          oscGain.gain.value = 0;
+          
+          osc.connect(oscGain);
+          oscGain.connect(gainNode);
+          osc.start();
+          
+          oscillators.push(osc);
+          
+          // Random chime triggers
+          const chimeInterval = setInterval(() => {
+            if (Math.random() < 0.1) {
+              const now = audioContext.currentTime;
+              oscGain.gain.setValueAtTime(0, now);
+              oscGain.gain.linearRampToValueAtTime(0.1, now + 0.1);
+              oscGain.gain.exponentialRampToValueAtTime(0.001, now + 3);
+            }
+          }, 1000);
+          
+          intervals.push(chimeInterval);
+        });
+        break;
+
+      case 'morning-birds':
+        // Bird songs with varying frequencies
+        const birdFreqs = [800, 1200, 1600, 2000, 2400];
+        
+        birdFreqs.forEach((freq, index) => {
+          const osc = audioContext.createOscillator();
+          osc.frequency.value = freq;
+          osc.type = 'sine';
+          
+          const oscGain = audioContext.createGain();
+          oscGain.gain.value = 0;
+          
+          osc.connect(oscGain);
+          oscGain.connect(gainNode);
+          osc.start();
+          
+          oscillators.push(osc);
+          
+          // Random bird song triggers
+          const birdInterval = setInterval(() => {
+            if (Math.random() < 0.2) {
+              const now = audioContext.currentTime;
+              oscGain.gain.setValueAtTime(0, now);
+              oscGain.gain.linearRampToValueAtTime(0.08, now + 0.05);
+              oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+            }
+          }, 2000 + index * 500);
+          
+          intervals.push(birdInterval);
+        });
+        break;
+
+      case 'water-drops':
+        // Water drops with reverb
+        const dropOsc = audioContext.createOscillator();
+        dropOsc.frequency.value = 300;
+        dropOsc.type = 'sine';
+        
+        const dropGain = audioContext.createGain();
+        dropGain.gain.value = 0;
+        
+        dropOsc.connect(dropGain);
+        dropGain.connect(gainNode);
+        dropOsc.start();
+        
+        oscillators.push(dropOsc);
+        
+        // Random drop triggers
+        const dropInterval = setInterval(() => {
+          if (Math.random() < 0.3) {
+            const now = audioContext.currentTime;
+            dropGain.gain.setValueAtTime(0, now);
+            dropGain.gain.linearRampToValueAtTime(0.15, now + 0.01);
+            dropGain.gain.exponentialRampToValueAtTime(0.001, now + 2);
+          }
+        }, 1500);
+        
+        intervals.push(dropInterval);
+        break;
+
+      case 'heart-rhythm':
+        // Heart beat rhythm
+        const heartOsc = audioContext.createOscillator();
+        heartOsc.frequency.value = 60; // Low frequency for heart sound
+        heartOsc.type = 'sine';
+        
+        const heartGain = audioContext.createGain();
+        heartGain.gain.value = 0;
+        
+        heartOsc.connect(heartGain);
+        heartGain.connect(gainNode);
+        heartOsc.start();
+        
+        oscillators.push(heartOsc);
+        
+        // 60 BPM heart beat
+        const heartInterval = setInterval(() => {
+          const now = audioContext.currentTime;
+          // Lub sound
+          heartGain.gain.setValueAtTime(0, now);
+          heartGain.gain.linearRampToValueAtTime(0.2, now + 0.05);
+          heartGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+          
+          // Dub sound
+          setTimeout(() => {
+            const now2 = audioContext.currentTime;
+            heartGain.gain.setValueAtTime(0, now2);
+            heartGain.gain.linearRampToValueAtTime(0.1, now2 + 0.03);
+            heartGain.gain.exponentialRampToValueAtTime(0.001, now2 + 0.2);
+          }, 200);
+        }, 1000); // 60 BPM
+        
+        intervals.push(heartInterval);
+        break;
+
+      case 'binaural-alpha':
+        // Binaural beats
         const freq1 = 440;
-        const freq2 = 444; // 4Hz difference for alpha waves
+        const freq2 = 450; // 10Hz difference for alpha waves
         const osc1 = audioContext.createOscillator();
         const osc2 = audioContext.createOscillator();
         const merger = audioContext.createChannelMerger(2);
@@ -325,17 +581,35 @@ const DynamicAmbientSound: React.FC = () => {
         osc1.type = 'sine';
         osc2.type = 'sine';
         
-        osc1.connect(merger, 0, 0);
-        osc2.connect(merger, 0, 1);
+        const gain1 = audioContext.createGain();
+        const gain2 = audioContext.createGain();
+        gain1.gain.value = 0.3;
+        gain2.gain.value = 0.3;
+        
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        gain1.connect(merger, 0, 0);
+        gain2.connect(merger, 0, 1);
         merger.connect(gainNode);
         
         osc1.start();
         osc2.start();
+        
+        oscillators.push(osc1, osc2);
         break;
     }
+
+    return { cleanup };
   };
 
   const stopSound = () => {
+    // Stop Web Audio API sound if active
+    if (soundGeneratorRef.current) {
+      soundGeneratorRef.current.cleanup();
+      soundGeneratorRef.current = null;
+    }
+    
+    // Stop traditional audio if active
     if (currentSoundId && audioRefs.current[currentSoundId]) {
       const audio = audioRefs.current[currentSoundId];
       if (fadeIntervals.current[currentSoundId]) {
@@ -343,6 +617,7 @@ const DynamicAmbientSound: React.FC = () => {
       }
       fadeIntervals.current[currentSoundId] = fadeOutAudio(audio);
     }
+    
     setIsPlaying(false);
     setCurrentSoundId(null);
   };
@@ -430,7 +705,7 @@ const DynamicAmbientSound: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    console.log('Testing ocean waves audio...');
+                    console.log('Testing Web Audio API rain forest...');
                     const testAudio = new Audio('/api/ambient-audio/rain-forest');
                     testAudio.volume = 0.4;
                     testAudio.play().then(() => {
