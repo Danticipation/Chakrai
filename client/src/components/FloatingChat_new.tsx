@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Mic, Square, Volume2, VolumeX } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { MessageCircle, X, Send, Mic, Square, Volume2, VolumeX, Move, Maximize2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -23,8 +23,18 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
   const [isPlayingVoice, setIsPlayingVoice] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  
+  // Dragging and resizing state
+  const [position, setPosition] = useState({ x: 24, y: 24 });
+  const [size, setSize] = useState({ width: 384, height: 500 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
   const scrollToBottom = () => {
@@ -34,6 +44,65 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Mouse event handlers for dragging
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('drag-handle')) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y
+      });
+      e.preventDefault();
+    }
+  }, [position]);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (isDragging) {
+      const newX = Math.max(0, Math.min(window.innerWidth - size.width, e.clientX - dragStart.x));
+      const newY = Math.max(0, Math.min(window.innerHeight - size.height, e.clientY - dragStart.y));
+      setPosition({ x: newX, y: newY });
+    }
+    if (isResizing) {
+      const newWidth = Math.max(300, Math.min(800, resizeStart.width + (e.clientX - resizeStart.x)));
+      const newHeight = Math.max(400, Math.min(700, resizeStart.height + (e.clientY - resizeStart.y)));
+      setSize({ width: newWidth, height: newHeight });
+    }
+  }, [isDragging, isResizing, dragStart, resizeStart, size]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+    setIsResizing(false);
+  }, []);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    setIsResizing(true);
+    setResizeStart({
+      x: e.clientX,
+      y: e.clientY,
+      width: size.width,
+      height: size.height
+    });
+    e.preventDefault();
+    e.stopPropagation();
+  }, [size]);
+
+  // Add global mouse event listeners
+  useEffect(() => {
+    if (isDragging || isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = isDragging ? 'grabbing' : 'nw-resize';
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+      };
+    }
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
   // Load chat history when component opens
   useEffect(() => {
@@ -97,7 +166,10 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
       
       const response = await axios.post('/api/chat', {
         message: text.trim(),
-        context: 'floating_chat'
+        context: 'floating_chat',
+        voice: selectedVoice,
+        userId: 1,
+        isAnonymous: true
       }, {
         headers: {
           'X-Device-Fingerprint': deviceFingerprint,
@@ -113,9 +185,40 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
 
       setMessages(prev => [...prev, botMessage]);
 
-      // Auto-play voice response if voice is enabled
-      if (selectedVoice && response.data.response) {
-        playVoiceResponse(response.data.response);
+      // Play voice if audio is available and voice is selected
+      if (response.data.audio && selectedVoice) {
+        try {
+          const audioBlob = new Blob([Uint8Array.from(atob(response.data.audio), c => c.charCodeAt(0))], { type: 'audio/mpeg' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+          }
+          
+          const audio = new Audio(audioUrl);
+          audioRef.current = audio;
+          
+          setIsPlayingVoice(true);
+          
+          audio.onended = () => {
+            setIsPlayingVoice(false);
+            URL.revokeObjectURL(audioUrl);
+            audioRef.current = null;
+          };
+          
+          audio.onerror = () => {
+            setIsPlayingVoice(false);
+            URL.revokeObjectURL(audioUrl);
+            audioRef.current = null;
+            console.error('Audio playback failed');
+          };
+          
+          await audio.play();
+        } catch (audioError) {
+          console.error('Audio playback error:', audioError);
+          setIsPlayingVoice(false);
+        }
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -130,107 +233,49 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
     }
   };
 
-  const playVoiceResponse = async (text: string) => {
-    if (!selectedVoice || isPlayingVoice) return;
-
-    setIsPlayingVoice(true);
-    try {
-      const response = await axios.post('/api/text-to-speech', {
-        text,
-        voice: selectedVoice
-      }, { responseType: 'blob' });
-
-      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      if (audioRef.current) {
-        audioRef.current.pause();
-        URL.revokeObjectURL(audioRef.current.src);
-      }
-
-      audioRef.current = new Audio(audioUrl);
-      audioRef.current.volume = 0.8; // Set reasonable volume
-      audioRef.current.onended = () => {
-        setIsPlayingVoice(false);
-        URL.revokeObjectURL(audioUrl);
-      };
-      audioRef.current.onerror = (error) => {
-        console.error('Audio playback error:', error);
-        setIsPlayingVoice(false);
-        URL.revokeObjectURL(audioUrl);
-      };
-      
-      // Try to play with better error handling
-      try {
-        await audioRef.current.play();
-      } catch (playError) {
-        console.error('Autoplay prevented:', playError);
-        // If autoplay fails, we could show a play button or try again later
-        setIsPlayingVoice(false);
-        URL.revokeObjectURL(audioUrl);
-      }
-    } catch (error) {
-      console.error('Error playing voice:', error);
-      setIsPlayingVoice(false);
-    }
-  };
-
   const stopVoice = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      audioRef.current = null;
       setIsPlayingVoice(false);
     }
   };
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-          sampleRate: 44100,
-          channelCount: 1
-        } 
-      });
-
-      const options = { mimeType: 'audio/webm' };
-      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-        options.mimeType = 'audio/mp4';
-      }
-      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-        options.mimeType = 'audio/wav';
-      }
-
-      const recorder = new MediaRecorder(stream, options);
-      const chunks: Blob[] = [];
-
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      
+      setMediaRecorder(recorder);
+      setAudioChunks([]);
+      setIsRecording(true);
+      
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          chunks.push(event.data);
+          setAudioChunks(prev => [...prev, event.data]);
         }
       };
-
+      
       recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: options.mimeType });
-        await sendAudioToWhisper(audioBlob);
         stream.getTracks().forEach(track => track.stop());
+        setIsRecording(false);
+        
+        if (audioChunks.length > 0) {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          await sendAudioToWhisper(audioBlob);
+        }
       };
-
+      
       recorder.start(1000);
-      setMediaRecorder(recorder);
-      setAudioChunks(chunks);
-      setIsRecording(true);
     } catch (error) {
       console.error('Error starting recording:', error);
+      setIsRecording(false);
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
+    if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
-      setIsRecording(false);
     }
   };
 
@@ -238,13 +283,21 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
     try {
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
-
+      formData.append('userId', '1');
+      
+      // Generate device fingerprint for anonymous user identification
+      const deviceFingerprint = `browser_${navigator.userAgent.slice(0, 50)}_${screen.width}x${screen.height}_${new Date().getTimezoneOffset()}`;
+      
       const response = await axios.post('/api/transcribe', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'X-Device-Fingerprint': deviceFingerprint,
+          'X-Session-Id': `session_${Date.now()}`
+        }
       });
-
-      if (response.data.text) {
-        await sendMessage(response.data.text);
+      
+      if (response.data.transcription) {
+        await sendMessage(response.data.transcription);
       }
     } catch (error) {
       console.error('Error transcribing audio:', error);
@@ -258,71 +311,81 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
     }
   };
 
-  // Chat bubble when closed
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
-          onClick={onToggle}
-          className="theme-primary hover:theme-primary-dark theme-text p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 animate-pulse"
-          style={{ 
-            backdropFilter: 'blur(10px)',
-            background: `linear-gradient(135deg, var(--theme-primary), var(--theme-accent))`
-          }}
-        >
-          <MessageCircle size={24} />
-        </button>
-      </div>
+      <button
+        onClick={onToggle}
+        className="fixed p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 border-2 border-silver"
+        style={{
+          backgroundColor: `var(--theme-primary)`,
+          color: 'white',
+          zIndex: 1000,
+          right: `${position.x}px`,
+          bottom: `${window.innerHeight - position.y - 60}px`
+        }}
+      >
+        <MessageCircle size={24} />
+      </button>
     );
   }
 
-  // Floating chat box when open
   return (
-    <div 
-      className="fixed bottom-6 right-6 w-96 h-[500px] backdrop-blur-xl border-2 border-silver rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden"
+    <div
+      ref={chatRef}
+      className="fixed rounded-2xl shadow-2xl flex flex-col border-2 border-silver select-none"
       style={{
-        background: `linear-gradient(135deg, var(--theme-background), var(--theme-surface))`
+        backgroundColor: `var(--theme-background)`,
+        zIndex: 1000,
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        width: `${size.width}px`,
+        height: `${size.height}px`,
+        cursor: isDragging ? 'grabbing' : 'default'
       }}
+      onMouseDown={handleMouseDown}
     >
       {/* Header */}
       <div 
-        className="p-4 flex items-center justify-between"
-        style={{
-          background: `linear-gradient(135deg, var(--theme-primary), var(--theme-accent))`
+        className="p-4 rounded-t-2xl flex items-center justify-between border-b drag-handle cursor-grab"
+        style={{ 
+          backgroundColor: `var(--theme-surface)`,
+          borderColor: `var(--theme-accent)`
         }}
       >
-        <div className="flex items-center space-x-3">
-          <div 
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
-          >
-            <MessageCircle size={20} className="theme-text" />
-          </div>
-          <div>
-            <h3 className="theme-text font-semibold">Chakrai Companion</h3>
-            <p className="theme-text-secondary text-xs">Always here to help</p>
-          </div>
+        <div className="flex items-center space-x-2 drag-handle">
+          <Move size={16} className="theme-text drag-handle opacity-50" />
+          <MessageCircle size={20} className="theme-text drag-handle" />
+          <h3 className="font-semibold theme-text drag-handle">Chakrai Assistant</h3>
         </div>
-        <button
-          onClick={onToggle}
-          className="theme-text-secondary hover:theme-text transition-colors p-1 hover:bg-white/10 rounded-full"
-        >
-          <X size={20} />
-        </button>
+        <div className="flex items-center space-x-2">
+          <span className="text-xs theme-text-secondary">
+            {size.width}x{size.height}
+          </span>
+          <button
+            onClick={onToggle}
+            className="p-1 hover:bg-white/10 rounded theme-text"
+          >
+            <X size={18} />
+          </button>
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.map((message, index) => (
           <div
             key={index}
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className="max-w-[80%] p-3 rounded-2xl theme-text"
+              className={`max-w-[85%] p-3 rounded-2xl ${
+                message.sender === 'user' 
+                  ? 'rounded-br-md' 
+                  : 'rounded-bl-md'
+              }`}
               style={{
-                background: message.sender === 'user'
-                  ? `linear-gradient(135deg, var(--theme-primary), var(--theme-accent))`
+                backgroundColor: message.sender === 'user' 
+                  ? `var(--theme-primary)` 
                   : `var(--theme-surface)`,
                 border: message.sender === 'user' ? 'none' : `1px solid var(--theme-accent)`
               }}
@@ -381,14 +444,10 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
-              className="w-full rounded-xl px-4 py-2 theme-text theme-text-secondary focus:outline-none focus:ring-1"
+              className="w-full rounded-xl px-4 py-2 theme-text theme-text-secondary focus:outline-none focus:ring-1 floating-chat-input"
               style={{
                 backgroundColor: `var(--theme-surface)`,
-                border: `1px solid var(--theme-accent)`,
-                '&:focus': {
-                  borderColor: `var(--theme-primary)`,
-                  boxShadow: `0 0 0 1px var(--theme-primary)`
-                }
+                border: `1px solid var(--theme-accent)`
               }}
               disabled={isLoading || isRecording}
             />
@@ -446,6 +505,15 @@ const FloatingChat: React.FC<FloatingChatProps> = ({ isOpen, onToggle, selectedV
           </p>
         )}
       </div>
+
+      {/* Resize handle */}
+      <div
+        className="absolute bottom-0 right-0 w-4 h-4 cursor-nw-resize opacity-50 hover:opacity-100 transition-opacity"
+        style={{
+          background: `linear-gradient(-45deg, transparent 0%, transparent 30%, var(--theme-accent) 30%, var(--theme-accent) 35%, transparent 35%, transparent 65%, var(--theme-accent) 65%, var(--theme-accent) 70%, transparent 70%)`
+        }}
+        onMouseDown={handleResizeStart}
+      />
     </div>
   );
 };

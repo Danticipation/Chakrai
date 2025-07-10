@@ -1143,3 +1143,20 @@ input:focus, button:focus {
   border-color: var(--theme-primary) !important;
   box-shadow: 0 0 0 1px var(--theme-primary) !important;
 }
+
+/* Drag and resize styles */
+.drag-handle {
+  cursor: grab !important;
+}
+
+.drag-handle:active {
+  cursor: grabbing !important;
+}
+
+/* Prevent text selection during drag */
+.select-none {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
