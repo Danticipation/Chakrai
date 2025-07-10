@@ -202,18 +202,18 @@ router.post('/chat', async (req, res) => {
       `User's personality traits: ${userFacts.map(f => f.fact).join(', ')}\n` +
       `User's memories: ${userMemories.map(m => m.memory).join(', ')}\n` : '';
 
-    const systemPrompt = `You are TraI, an AI wellness companion providing mental wellness support. You are not a licensed therapist, but a supportive companion for personal growth. Your responses should be:
-- Warm, empathetic, and focused on wellness
+    const systemPrompt = `You are Chakrai, an AI wellness companion providing mental wellness support and personal growth guidance. Your responses should be:
+- Warm, empathetic, and genuinely supportive
 - Personalized based on the user's communication style and personality
-- Focused on emotional support and personal growth
-- Crisis-aware when risk indicators are detected (refer to professional help when needed)
+- Focused on emotional support, self-reflection, and personal growth
+- Crisis-aware when risk indicators are detected (suggest professional help when needed)
 
 ${personalityContext}
 
 Current emotional context: ${JSON.stringify(emotionalState)}
 Crisis level: ${crisisData.riskLevel}
 
-Adapt your response to mirror the user's communication patterns while maintaining wellness support value. Always clarify you are not a professional therapist if therapy questions arise.`;
+Adapt your response to mirror the user's communication patterns while providing meaningful wellness support. Be naturally helpful and understanding.`;
 
     // Generate OpenAI response
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -785,7 +785,7 @@ Be supportive, encouraging, and therapeutic in tone. Focus on growth and self-aw
           messages: [
             {
               role: 'system',
-              content: 'You are TraI, an AI wellness companion providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness. You are not a licensed therapist, but a companion for mental wellness support.'
+              content: 'You are Chakrai, an AI wellness companion providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness. Provide meaningful wellness support and guidance.'
             },
             {
               role: 'user',

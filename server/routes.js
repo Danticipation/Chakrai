@@ -169,7 +169,7 @@ ${contextualReferences.references.map(ref =>
     const crisisDetected = crisisData.riskLevel === 'high' || crisisData.riskLevel === 'critical';
 
     // Enhanced system prompt with semantic memory recall
-    const systemPrompt = `You are TraI, a therapeutic AI companion with intelligent memory recall. Your core purpose is personality mirroring while making contextual references to past conversations for deeper therapeutic value.
+    const systemPrompt = `You are Chakrai, an AI wellness companion with intelligent memory recall. Your core purpose is personality mirroring while making contextual references to past conversations for deeper wellness support.
 
 ${personalityContext}${semanticMemoryContext}${contextualReferenceText}
 
@@ -608,7 +608,7 @@ Be supportive, encouraging, and therapeutic in tone. Focus on growth and self-aw
           messages: [
             {
               role: 'system',
-              content: 'You are TraI, an AI wellness companion providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness. You are not a licensed therapist, but a companion for mental wellness support.'
+              content: 'You are Chakrai, an AI wellness companion providing personality reflection and analysis. Be supportive, insightful, and focused on personal growth and self-awareness. Provide meaningful wellness support and guidance.'
             },
             {
               role: 'user',
